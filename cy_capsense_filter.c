@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.c
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file contains the source code of all filters implementation.

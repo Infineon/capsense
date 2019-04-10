@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -831,10 +831,6 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * cannot change the power mode without completing the current scan as
 * a transition to Deep Sleep during the scan can disrupt the middleware
 * operation.
-* 
-* For details of SysPm types and macros refer to
-* <a href="../../pdl_api_reference_manual/html/group__group__syspm.html" 
-* title="SysPm API Reference" >SysPm API Reference</a>.
 * 
 * \param callbackParams
 * Refer to the description of the cy_stc_syspm_callback_params_t type in the

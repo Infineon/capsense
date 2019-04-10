@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file provides the source code for the Tuner module functions.

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file provides the top-level declarations of the CapSense data

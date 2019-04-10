@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_gesture_lib.h
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * Provides the gesture interface.

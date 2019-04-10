@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file provides the common CapSense definitions.
@@ -36,9 +36,9 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MDW_VERSION_MAJOR                   1
+#define CY_CAPSENSE_MDW_VERSION_MAJOR                   (1)
 /** Middleware minor version */
-#define CY_CAPSENSE_MDW_VERSION_MINOR                   1
+#define CY_CAPSENSE_MDW_VERSION_MINOR                   (20)
 /** Middleware ID */
 #define CY_CAPSENSE_MDW_ID                              (CY_PDL_DRV_ID(0x07uL))
 

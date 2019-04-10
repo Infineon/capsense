@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file includes all the header files of the CapSense middleware.
@@ -201,40 +201,59 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td>1.1</td>
+*     <td rowspan="2">1.20</td>
+*     <td>Added ARMC6 compiler support</td>
+*     <td>Feature enhancement</td>
+*   </tr>
+*   <tr>
+*     <td>Changed the hierarchy of the binary files folders</td>
+*     <td>MBED OS compatibility</td>
+*   </tr>
+*   <tr>
+*     <td rowspan="6">1.1</td>
 *     <td>
-*         * Marked several functions as obsolete:
-*           * Cy_CapSense_CSDSetupWidget()
-*           * Cy_CapSense_CSDSetupWidgetExt()
-*           * Cy_CapSense_CSDScan()
-*           * Cy_CapSense_CSDScanExt()
-*           * Cy_CapSense_CSDCalibrateWidget()
-*           * Cy_CapSense_CSXSetupWidget()
-*           * Cy_CapSense_CSXSetupWidgetExt()
-*           * Cy_CapSense_CSXScan()
-*           * Cy_CapSense_CSXScanExt()
-*           * Cy_CapSense_CSXCalibrateWidget()
-*         * Added two new functions:
-*           * Cy_CapSense_SetupWidgetExt()
-*           * Cy_CapSense_ScanExt()
-*         * Fixed the shield operation when Csh is disabled.
-*         * Fixed implementation of position filtering for Radial Slider widget.
-*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to  
-*           its default state.
-*         * Added the possibility to enable the shield with no dedicated electrodes.
-*         * Added support of protocol-agnostic tuning (UART, SPI, etc.).
+*         The following functions made obsolete:
+*         * Cy_CapSense_CSDSetupWidget()
+*         * Cy_CapSense_CSDSetupWidgetExt()
+*         * Cy_CapSense_CSDScan()
+*         * Cy_CapSense_CSDScanExt()
+*         * Cy_CapSense_CSDCalibrateWidget()
+*         * Cy_CapSense_CSXSetupWidget()
+*         * Cy_CapSense_CSXSetupWidgetExt()
+*         * Cy_CapSense_CSXScan()
+*         * Cy_CapSense_CSXScanExt()
+*         * Cy_CapSense_CSXCalibrateWidget()
+*
+*         Two simple functions introduced to replace the listed above functions:
+*         * Cy_CapSense_SetupWidgetExt()
+*         * Cy_CapSense_ScanExt()
 *     </td>
-*     <td>
-*         * Improved user's experience with an API.
-*         * Improved documentation.
-*         * Defect fixing.
-*         * Enhanced functionality.
-*     </td>
+*     <td>User experience improvement</td>
+*   </tr>
+*   <tr>
+*     <td>Fixed the shield operation when Csh is disabled</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Fixed the implementation of the position filtering for the Radial Slider widget</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Added restoring hardware to its default state in the Cy_CapSense_DeInit() implementation</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Added the capability to enable the shield electrode without dedicated electrodes</td>
+*     <td>Feature enhancement</td>
+*   </tr>
+*   <tr>
+*     <td>Added support of a protocol-agnostic tuner interface (UART, SPI, etc.)</td>
+*     <td>Feature enhancement</td>
 *   </tr>
 *   <tr>
 *     <td>1.0</td>
 *     <td>
-*         * The initial version.
+*         The initial version
 *     </td>
 *     <td></td>
 *   </tr>

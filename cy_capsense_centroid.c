@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 1.1
+* \version 1.20
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
