@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -17,6 +17,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #include "cy_syslib.h"
 #include <stddef.h>
 #include <string.h>
@@ -26,6 +27,8 @@
 #include "cy_capsense_lib.h"
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_centroid.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -206,8 +209,9 @@ void Cy_CapSense_InitializeWidgetStatus(
         /* Init Adaptive IIR filter */
         if (0u != (ptrWdCfg->posFilterConfig & CY_CAPSENSE_POSITION_AIIR_MASK))
         {
-            Cy_CapSense_AdaptiveFilterInitialize_Lib(&ptrWdCfg->aiirConfig,
-                        ptrWdCfg->ptrPosFilterHistory->ptrPosition);
+            Cy_CapSense_AdaptiveFilterInitialize_Lib_Call(&ptrWdCfg->aiirConfig,
+                                                          ptrWdCfg->ptrPosFilterHistory->ptrPosition,
+                                                          context);
         }
     }
 }
@@ -304,10 +308,10 @@ void Cy_CapSense_InitializeWidgetGestures(
 * \funcusage
 * 
 * An example of gesture decoding:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Gesture
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Gesture
 * 
 * An example of gesture status parsing:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Gesture_Macro
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Gesture_Macro
 * 
 *******************************************************************************/
 uint32_t Cy_CapSense_DecodeWidgetGestures(
@@ -391,7 +395,6 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
     cy_stc_capsense_sensor_context_t * ptrSnsCxtCh;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtSns;
 
-
     snsHistorySize = (uint32_t)ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
     freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
 
@@ -409,11 +412,13 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
         ptrHistoryLowSns = ptrHistoryLowCh;
         for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)    
         {
-            Cy_CapSense_FtRunEnabledFiltersInternal(ptrWdConfig, ptrSnsCxtSns, ptrHistorySns, ptrHistoryLowSns);
-
+            Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
+                                                         ptrSnsCxtSns,
+                                                         ptrHistorySns,
+                                                         ptrHistoryLowSns,
+                                                         context);
             result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, context);
             Cy_CapSense_DpUpdateDifferences(ptrWdConfig->ptrWdContext, ptrSnsCxtSns);
-
             ptrSnsCxtSns++;
             ptrHistorySns += snsHistorySize;
             if(NULL != ptrHistoryLowSns)
@@ -470,11 +475,11 @@ void Cy_CapSense_DpProcessCsxWidgetStatus(
     {
         case (uint8_t)CY_CAPSENSE_WD_BUTTON_E:
         case (uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E:
-            Cy_CapSense_DpProcessButton(ptrWdConfig, context);
+            Cy_CapSense_DpProcessButton_Call(ptrWdConfig, context);
             break;
 
         case (uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E:
-            Cy_CapSense_DpProcessCsxTouchpad(ptrWdConfig, context);
+            Cy_CapSense_DpProcessCsxTouchpad_Call(ptrWdConfig, context);
             break;
 
     default:
@@ -538,10 +543,12 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
     {
-        Cy_CapSense_FtRunEnabledFiltersInternal(ptrWdConfig,
-                                                ptrSnsContext,
-                                                ptrSnsRawHistory,
-                                                ptrSnsRawHistoryLow);
+        Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
+                                                     ptrSnsContext,
+                                                     ptrSnsRawHistory,
+                                                     ptrSnsRawHistoryLow,
+                                                     context);
+
     }
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
@@ -616,13 +623,19 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
         ptrHistoryLowSns = ptrHistoryLowCh;
         for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)
         {
-            Cy_CapSense_FtRunEnabledFiltersInternal(ptrWdConfig, ptrSnsCxtSns, ptrHistorySns, ptrHistoryLowSns);
-                    
+            Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
+                                                         ptrSnsCxtSns,
+                                                         ptrHistorySns,
+                                                         ptrHistoryLowSns,
+                                                         context);
             /* Run auto-tuning activities */
             if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
             {
-                Cy_CapSense_RunNoiseEnvelope_Lib(ptrSnsCxtSns->raw, ptrWdConfig->ptrWdContext->sigPFC, ptrNEHistory);
-                Cy_CapSense_DpUpdateThresholds(ptrWdConfig->ptrWdContext, ptrNEHistory, snsIndex);
+                Cy_CapSense_RunNoiseEnvelope_Lib_Call(ptrSnsCxtSns->raw,
+                                                      ptrWdConfig->ptrWdContext->sigPFC,
+                                                      ptrNEHistory,
+                                                      context);
+                Cy_CapSense_DpUpdateThresholds_Call(ptrWdConfig->ptrWdContext, ptrNEHistory, snsIndex, context);
                 if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == ptrWdConfig->wdType)
                 {
                     ptrWdConfig->ptrWdContext->proxTh = (uint16_t)(((uint32_t)ptrWdConfig->ptrWdContext->fingerTh * 
@@ -723,10 +736,11 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
     {
-        Cy_CapSense_FtRunEnabledFiltersInternal(ptrWdConfig,
-                                                ptrSnsContext,
-                                                ptrSnsRawHistory,
-                                                ptrSnsRawHistoryLow);
+        Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
+                                                     ptrSnsContext,
+                                                     ptrSnsRawHistory,
+                                                     ptrSnsRawHistoryLow,
+                                                     context);
     }
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
@@ -767,24 +781,24 @@ void Cy_CapSense_DpProcessCsdWidgetStatus(
     switch (ptrWdConfig->wdType)
     {
         case (uint8_t)CY_CAPSENSE_WD_BUTTON_E:
-            Cy_CapSense_DpProcessButton(ptrWdConfig, context);
+            Cy_CapSense_DpProcessButton_Call(ptrWdConfig, context);
             break;
 
         case (uint8_t)CY_CAPSENSE_WD_LINEAR_SLIDER_E:
         case (uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E:
-            Cy_CapSense_DpProcessSlider(ptrWdConfig, context);
+            Cy_CapSense_DpProcessSlider_Call(ptrWdConfig, context);
             break;
 
         case (uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E:
-            Cy_CapSense_DpProcessCsdMatrix(ptrWdConfig, context);
+            Cy_CapSense_DpProcessCsdMatrix_Call(ptrWdConfig, context);
             break;
 
         case (uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E:
-            Cy_CapSense_DpProcessCsdTouchpad(ptrWdConfig, context);
+            Cy_CapSense_DpProcessCsdTouchpad_Call(ptrWdConfig, context);
             break;
 
         case (uint8_t)CY_CAPSENSE_WD_PROXIMITY_E:
-            Cy_CapSense_DpProcessProximity(ptrWdConfig);
+            Cy_CapSense_DpProcessProximity_Call(ptrWdConfig, context);
             break;
 
         default:
@@ -1055,7 +1069,7 @@ void Cy_CapSense_DpProcessProximity(const cy_stc_capsense_widget_config_t * ptrW
 *******************************************************************************/
 void Cy_CapSense_DpProcessSlider(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
     uint32_t touchTh;
@@ -1143,9 +1157,8 @@ void Cy_CapSense_DpProcessSlider(
     /* Position filtering */
     if (0u != (ptrWdConfig->posFilterConfig & CY_CAPSENSE_POSITION_FILTERS_MASK))
     {
-        Cy_CapSense_ProcessPositionFilters(&newTouch, ptrWdConfig, context);
+        Cy_CapSense_ProcessPositionFilters_Call(&newTouch, ptrWdConfig, context);
     }
-
     /* Copy positions into public structure */
     ptrWdConfig->ptrWdContext->wdTouch.numPosition = newTouch.numPosition;
     for (snsIndex = 0u; snsIndex < newTouch.numPosition; snsIndex++)
@@ -1297,7 +1310,7 @@ void Cy_CapSense_DpProcessCsdMatrix(
 *******************************************************************************/
 void Cy_CapSense_DpProcessCsdTouchpad(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
     uint32_t touchTh;
@@ -1377,14 +1390,14 @@ void Cy_CapSense_DpProcessCsdTouchpad(
         if (0u != (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_5X5_MASK))
         {
             /* Centroid processing */
-            Cy_CapSense_DpAdvancedCentroidTouchpad(&newTouch, ptrWdConfig);
+            Cy_CapSense_DpAdvancedCentroidTouchpad_Call(&newTouch, ptrWdConfig, context);
         }
     }
 
     /* Position filtering */
     if (0u != (ptrWdConfig->posFilterConfig & CY_CAPSENSE_POSITION_FILTERS_MASK))
     {
-        Cy_CapSense_ProcessPositionFilters(&newTouch, ptrWdConfig, context);
+        Cy_CapSense_ProcessPositionFilters_Call(&newTouch, ptrWdConfig, context);
     }
 
     /* Copy positions into public structure */
@@ -1400,12 +1413,12 @@ void Cy_CapSense_DpProcessCsdTouchpad(
     /* Ballistic Multiplier Filtering */
     if (0u != (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_BALLISTIC_MASK))
     {
-        Cy_CapSense_BallisticMultiplier_Lib(
-                    &ptrWdConfig->ballisticConfig,
-                    &ptrWdCxt->wdTouch,
-                    &delta,
-                    context->ptrCommonContext->timestamp,
-                    ptrWdConfig->ptrBallisticContext);
+        Cy_CapSense_BallisticMultiplier_Lib_Call(&ptrWdConfig->ballisticConfig,
+                                                 &ptrWdCxt->wdTouch,
+                                                 &delta,
+                                                 context->ptrCommonContext->timestamp,
+                                                 ptrWdConfig->ptrBallisticContext,
+                                                 context);
         ptrWdCxt->xDelta = delta.deltaX;
         ptrWdCxt->yDelta = delta.deltaY;
     }
@@ -1440,7 +1453,7 @@ void Cy_CapSense_DpProcessCsxTouchpad(
     /* Identify all touches and assign them correct ID based on historical data */
     Cy_CapSense_DpTouchTracking(ptrWdConfig);
     /* Filter the position data and write it into data structure */
-    Cy_CapSense_DpFilterTouchRecord(ptrWdConfig);
+    Cy_CapSense_DpFilterTouchRecord(ptrWdConfig, context);
 }
 
 
@@ -1465,6 +1478,8 @@ void Cy_CapSense_RunMfsFiltering(
                   (uint32_t)ptrSnsContext[CY_CAPSENSE_MFS_CH1_INDEX * context->ptrCommonConfig->numSns].diff,
                   (uint32_t)ptrSnsContext[CY_CAPSENSE_MFS_CH2_INDEX * context->ptrCommonConfig->numSns].diff);
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

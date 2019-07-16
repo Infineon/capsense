@@ -16,6 +16,7 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fcsx_5ftouch_5fbuffer_5ft',['cy_stc_capsense_csx_touch_buffer_t',['../structcy__stc__capsense__csx__touch__buffer__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcsx_5ftouch_5fhistory_5ft',['cy_stc_capsense_csx_touch_history_t',['../structcy__stc__capsense__csx__touch__history__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5felectrode_5fconfig_5ft',['cy_stc_capsense_electrode_config_t',['../structcy__stc__capsense__electrode__config__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5ffptr_5fconfig_5ft',['cy_stc_capsense_fptr_config_t',['../structcy__stc__capsense__fptr__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fgesture_5fconfig_5ft',['cy_stc_capsense_gesture_config_t',['../structcy__stc__capsense__gesture__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fgesture_5fcontext_5ft',['cy_stc_capsense_gesture_context_t',['../structcy__stc__capsense__gesture__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fgesture_5fposition_5ft',['cy_stc_capsense_gesture_position_t',['../structcy__stc__capsense__gesture__position__t.html',1,'']]],

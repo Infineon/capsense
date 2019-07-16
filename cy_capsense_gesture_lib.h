@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_gesture_lib.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * Provides the gesture interface.
@@ -13,14 +13,18 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #ifndef CY_CAPSENSE_GESTURE_LIB_H
 #define CY_CAPSENSE_GESTURE_LIB_H
 
 #include <stdint.h>
 
+#if defined(CY_IP_MXCSDV2)
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
 
 /******************************************************************************/
 /** \addtogroup group_capsense_gesture_structures *//** \{ */
@@ -193,14 +197,58 @@ typedef struct
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+
+/******************************************************************************/
+/** \cond SECTION_CAPSENSE_INTERNAL */
+/** \addtogroup group_capsense_internal *//** \{ */
+/******************************************************************************/
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_Gesture_ResetState
+****************************************************************************//**
+*
+* Initializes internal variables and states.
+*
+* \param context
+* The pointer to the gesture context structure 
+* \ref cy_stc_capsense_gesture_context_t.
+*
+*******************************************************************************/
 void Cy_CapSense_Gesture_ResetState(
                 cy_stc_capsense_gesture_context_t * context);
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_Gesture_Decode
+****************************************************************************//**
+*
+* Decodes all enabled gestures. This function is called each scanning cycle.
+*
+* \param timestamp
+* Current timestamp.
+*
+* \param touchNumber
+* The number of touches. Also this parameter defines the size of position array.
+*
+* \param position
+* The pointer to the array of positions \ref cy_stc_capsense_gesture_position_t.
+*
+* \param config
+* The pointer to the gesture configuration structure 
+* \ref cy_stc_capsense_gesture_config_t.
+*
+* \param context
+* The pointer to the gesture context structure 
+* \ref cy_stc_capsense_gesture_context_t.
+*
+*******************************************************************************/
 void Cy_CapSense_Gesture_Decode(
                 uint32_t timestamp,
                 uint32_t touchNumber,
                 const cy_stc_capsense_gesture_position_t * position,
                 const cy_stc_capsense_gesture_config_t * config,
                 cy_stc_capsense_gesture_context_t * context);
+/** \} \endcond */
 
 /*******************************************************************************
 * Macros
@@ -306,6 +354,8 @@ void Cy_CapSense_Gesture_Decode(
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_GESTURE_LIB_H */
 

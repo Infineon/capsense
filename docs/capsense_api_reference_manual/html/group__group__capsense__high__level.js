@@ -25,5 +25,5 @@ var group__group__capsense__high__level =
     [ "Cy_CapSense_IsProximitySensorActive", "group__group__capsense__high__level.html#ga96509342c580a9c5f6e17bdf8c74e53a", null ],
     [ "Cy_CapSense_GetTouchInfo", "group__group__capsense__high__level.html#ga6192ba34167662ac9573c0a4cd71682f", null ],
     [ "Cy_CapSense_RunTuner", "group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4", null ],
-    [ "Cy_CapSense_CheckCommandIntegrity", "group__group__capsense__high__level.html#ga1a7753ae8be8781b0886e9535e612eab", null ]
+    [ "Cy_CapSense_CheckTunerCmdIntegrity", "group__group__capsense__high__level.html#ga1f0fdedcec1ad936f5e9e4ae28f17274", null ]
 ];

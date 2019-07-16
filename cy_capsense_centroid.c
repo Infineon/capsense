@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -14,6 +14,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #include <string.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -23,6 +24,8 @@
 #include "cy_capsense_lib.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_filter.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -42,6 +45,11 @@
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+
+/******************************************************************************/
+/** \cond SECTION_CAPSENSE_INTERNAL */
+/** \addtogroup group_capsense_internal *//** \{ */
+/******************************************************************************/
 static void Cy_CapSense_TransferTouch(
                 uint32_t newIndex, 
                 uint32_t oldIndex, 
@@ -63,6 +71,7 @@ __STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
 __STATIC_INLINE void Cy_CapSense_SortByAge(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig);
 __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask);
+/** \} \endcond */
 
 
 /*******************************************************************************
@@ -1565,9 +1574,13 @@ static void Cy_CapSense_CopyTouchRecord(
 * The pointer to the widget configuration structure
 * \ref cy_stc_capsense_widget_config_t.
 *
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
 *******************************************************************************/
 void Cy_CapSense_DpFilterTouchRecord(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig)
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t i;
     uint32_t j;
@@ -1620,7 +1633,7 @@ void Cy_CapSense_DpFilterTouchRecord(
                 if (ptrHistory->id == ptrNewPeak->id)
                 {
                     /* Filter X and Y position of touch that exists from previous scan */
-                    Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrNewPeak, ptrHistory);
+                    Cy_CapSense_RunPositionFilters_Call(ptrWdConfig, ptrNewPeak, ptrHistory, context);
                     /* Mark history touch as assigned */
                     historyFlag[j] = 1u;
                     newTouchFlag = 1u;
@@ -1638,7 +1651,10 @@ void Cy_CapSense_DpFilterTouchRecord(
                 {
                     if (0u == historyFlag[j])
                     {
-                        Cy_CapSense_InitPositionFilters(ptrWdConfig->posFilterConfig, ptrNewPeak, ptrHistory);
+                        Cy_CapSense_InitPositionFilters_Call(ptrWdConfig->posFilterConfig,
+                                                             ptrNewPeak,
+                                                             ptrHistory,
+                                                             context);
                         historyFlag[j] = 1u;
                         /* Assignment is done; go to the next new touch */
                         break;
@@ -1753,8 +1769,9 @@ void Cy_CapSense_InitPositionFilters(
 * Applies enabled filters to position specified by ptrInput argument and stores 
 * history into ptrHistory.
 *
-* \param filterConfig
-* The configuration of filters of the widget.
+* \param ptrWdConfig 
+* The pointer to the widget configuration structure
+* \ref cy_stc_capsense_widget_config_t.
 *
 * \param ptrInput
 * The pointer to the position structure that holds currently detected
@@ -1764,11 +1781,15 @@ void Cy_CapSense_InitPositionFilters(
 * The pointer to the position structure that holds previous historical 
 * position values.
 *
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
 *******************************************************************************/
 void Cy_CapSense_RunPositionFilters(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory)
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t temp;
     uint32_t xPos = ptrInput->x;
@@ -1800,7 +1821,7 @@ void Cy_CapSense_RunPositionFilters(
     }
     if (0u != (filterCfg & CY_CAPSENSE_POSITION_AIIR_MASK))
     {
-        Cy_CapSense_AdaptiveFilterRun_Lib(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos);
+        Cy_CapSense_AdaptiveFilterRun_Lib_Call(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos, context);
         ptrHistoryIndex++;
     }
     if (0u != (filterCfg & CY_CAPSENSE_POSITION_AVG_MASK))
@@ -1833,8 +1854,9 @@ void Cy_CapSense_RunPositionFilters(
 * history into ptrHistory. Filtering considers specific widget type where 
 * the next value after maximum position is zero and vise versa. 
 *
-* \param filterConfig
-* The configuration of filters of the widget.
+* \param ptrWdConfig 
+* The pointer to the widget configuration structure
+* \ref cy_stc_capsense_widget_config_t.
 *
 * \param ptrInput
 * The pointer to the position structure that holds currently detected
@@ -1844,11 +1866,15 @@ void Cy_CapSense_RunPositionFilters(
 * The pointer to the position structure that holds previous historical 
 * position values.
 *
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
 *******************************************************************************/
 void Cy_CapSense_RunPositionFiltersRadial(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory)
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context)
 {
     /*
     * If new position crosses the zero point in one or another direction, 
@@ -1943,7 +1969,7 @@ void Cy_CapSense_RunPositionFiltersRadial(
         if(temp >= halfResolution)
         {
             /* Perform Initialization */
-            Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
+            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrInput, ptrHistory, context);
         }
         else
         {
@@ -1987,16 +2013,12 @@ void Cy_CapSense_RunPositionFiltersRadial(
         if(temp >= halfResolution)
         {
             /* Perform Initialization */
-            Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
+            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrInput, ptrHistory, context);
         }
         else
         {
             /* Perform filtering */
-            Cy_CapSense_AdaptiveFilterRun_Lib(
-                        &ptrWdConfig->aiirConfig, 
-                        ptrHistoryIndex, 
-                        &xPos, 
-                        &yPos);
+            Cy_CapSense_AdaptiveFilterRun_Lib_Call(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos, context);
             /* Perform zero-cross correction of filtered position */
             if (xPos >= centroidResolution)
             {
@@ -2061,9 +2083,9 @@ void Cy_CapSense_RunPositionFiltersRadial(
 * \param newTouch
 * The pointer to the touch structure.
 *
-* \param ptrHistory
-* The pointer to the position structure that holds previous historical 
-* position values.
+* \param ptrWdConfig 
+* The pointer to the widget configuration structure
+* \ref cy_stc_capsense_widget_config_t.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -2072,7 +2094,7 @@ void Cy_CapSense_RunPositionFiltersRadial(
 void Cy_CapSense_ProcessPositionFilters(
                 cy_stc_capsense_touch_t * newTouch,
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t posIndex;
     uint32_t filterCfg;
@@ -2081,7 +2103,7 @@ void Cy_CapSense_ProcessPositionFilters(
     cy_stc_capsense_position_t * ptrHistory;
     cy_stc_capsense_position_t * ptrPos;
     uint32_t numPos = newTouch->numPosition;
-    
+
     /* Position filtering */
     if ((CY_CAPSENSE_POSITION_NONE != numPos) && (CY_CAPSENSE_POSITION_MULTIPLE != numPos))
     {
@@ -2109,7 +2131,7 @@ void Cy_CapSense_ProcessPositionFilters(
         {
             for (posIndex = 0u; posIndex < numPosMin; posIndex++)
             {
-                Cy_CapSense_RunPositionFiltersRadial(ptrWdConfig, ptrPos, ptrHistory);
+                Cy_CapSense_RunPositionFiltersRadial(ptrWdConfig, ptrPos, ptrHistory, context);
                 ptrPos++;
                 ptrHistory += filterSize;
             }
@@ -2118,7 +2140,7 @@ void Cy_CapSense_ProcessPositionFilters(
         {
             for (posIndex = 0u; posIndex < numPosMin; posIndex++)
             {
-                Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrPos, ptrHistory);
+                Cy_CapSense_RunPositionFilters_Call(ptrWdConfig, ptrPos, ptrHistory, context);
                 ptrPos++;
                 ptrHistory += filterSize;
             }
@@ -2127,7 +2149,7 @@ void Cy_CapSense_ProcessPositionFilters(
         /* Initialize all rest newly detected touches */
         for (; posIndex < numPos; posIndex++)
         {
-            Cy_CapSense_InitPositionFilters(filterCfg, ptrPos, ptrHistory);
+            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrPos, ptrHistory, context);
             ptrPos++;
             ptrHistory += filterSize;
         }
@@ -2135,6 +2157,8 @@ void Cy_CapSense_ProcessPositionFilters(
     /* Finally, copy number of positions */
     ptrWdConfig->ptrPosFilterHistory->numPosition = (uint8_t)numPos;
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

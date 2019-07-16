@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the function prototypes specific to the sensing module.
@@ -13,6 +13,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_SENSING_H)
 #define CY_CAPSENSE_SENSING_H
 
@@ -22,9 +23,12 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 
+#if defined(CY_IP_MXCSDV2)
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
 
 /*******************************************************************************
 * Function Prototypes
@@ -576,6 +580,8 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_SENSING_H */
 

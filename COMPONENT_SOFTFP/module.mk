@@ -1,11 +1,11 @@
 ################################################################################
 # \file module.mk
-# \version 1.20
+# \version 2.0
 #
 # \brief
-# CapSense software component with hard FP pre-built library constructed to work
-# on top of the CSD driver. Note that this software component is not compatible 
-# with CM0+ applications as it requires a floating point unit.
+# CapSense software component with soft FP pre-built library constructed to work
+# on top of the CSD driver. This software component is compatible with all 
+# CPU cores.
 #
 ################################################################################
 # \copyright
@@ -33,7 +33,7 @@ endif
 #
 # The internal tag name of the software component
 #
-MIDDLEWARE_CAPSENSE_HARDFP_NAME=MIDDLEWARE_CAPSENSE_HARDFP
+MIDDLEWARE_CAPSENSE_SOFTFP_NAME=MIDDLEWARE_CAPSENSE_SOFTFP
 
 #
 # If defined, the list of legal PLATFORM values for this component.
@@ -60,20 +60,19 @@ CY_COMP_CATEGORY=Middleware
 #
 # The displayed human readable name of the component
 #
-CY_COMP_NAME_DISPLAY=CapSense, Hard FP prebuilt library
+CY_COMP_NAME_DISPLAY=CapSense, Soft FP prebuilt library
 
 #
 # The name in the form of an identifier ([a-z_][a-z0-9_]*).
 # Used to generate directories in the IDE.
 # 
-CY_COMP_NAME_ID=middlewareCapsenseHardFp
+CY_COMP_NAME_ID=middlewareCapsenseSoftFp
 
 #
 # The human readable description of the component
 #
-CY_COMP_DESCR=CapSense software component with hard FP pre-built library constructed to work\
-	on top of the CSD driver. Note that this software component is not compatible with CM0+ applications\
-	as it requires a floating point unit.
+CY_COMP_DESCR=CapSense software component with soft FP pre-built library constructed to work\
+	on top of the CSD driver. This software component is compatible with all CPU cores.
 
 #
 # The type of component ...
@@ -97,37 +96,32 @@ CY_COMP_DEPS=
 # Used by the build recipe for an ELF file to add this component
 # to the list of components that must be included
 #
-$(CYARTIFACT)_OBJ_COMP_TAG_LIST += $(MIDDLEWARE_CAPSENSE_HARDFP_NAME)
+$(CYARTIFACT)_OBJ_COMP_TAG_LIST += $(MIDDLEWARE_CAPSENSE_SOFTFP_NAME)
 
 #
 # Defines the series of needed make variables that include this component in the
 # build process.  Also defines the describe target if we are describing a component
 #
-$(MIDDLEWARE_CAPSENSE_HARDFP_NAME)_INCLUDES=\
+$(MIDDLEWARE_CAPSENSE_SOFTFP_NAME)_INCLUDES=\
 	-I$(CY_PSOC_LIB_COMP_MIDDLEWARE)/capsense
 
 ifeq ($(TOOLCHAIN),GCC)
 CY_CAPSENSE_LIB = \
-	lib/TOOLCHAIN_GCC_ARM/libcy_capsense.a
+	TOOLCHAIN_GCC_ARM/libcy_capsense.a
 else
 ifeq ($(TOOLCHAIN),IAR)
 CY_CAPSENSE_LIB = \
-	lib/TOOLCHAIN_IAR/libcy_capsense.a
+	TOOLCHAIN_IAR/libcy_capsense.a
 else
-ifeq ($(TOOLCHAIN),MDK)
+ifeq ($(TOOLCHAIN),ARMCC)
 CY_CAPSENSE_LIB = \
-	lib/TOOLCHAIN_ARM/libcy_capsense.ar
-else
-ifeq ($(TOOLCHAIN),ARMC6)
-CY_CAPSENSE_LIB = \
-	lib/TOOLCHAIN_ARMC6/libcy_capsense.ar
-endif
+	TOOLCHAIN_ARM/libcy_capsense.ar
 endif
 endif
 endif
 
 $(eval $(call \
-	CY_DECLARE_SWCOMP_OBJECT,$(MIDDLEWARE_CAPSENSE_HARDFP_NAME),\
+	CY_DECLARE_SWCOMP_OBJECT,$(MIDDLEWARE_CAPSENSE_SOFTFP_NAME),\
 	$(lastword $(MAKEFILE_LIST)),\
 	$(CY_CAPSENSE_LIB)\
 	../cy_capsense.h\

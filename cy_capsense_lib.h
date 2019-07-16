@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * The file contains application programming interface to the CapSense library.
@@ -13,10 +13,13 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_LIB_H)
 #define CY_CAPSENSE_LIB_H
 
 #include "cy_syslib.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -240,58 +243,314 @@ typedef struct
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+
+/******************************************************************************/
+/** \cond SECTION_CAPSENSE_INTERNAL */
+/** \addtogroup group_capsense_internal *//** \{ */
+/******************************************************************************/
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AdaptiveFilterInitialize_Lib
+****************************************************************************//**
+*
+* Initializes the Adaptive Filter context structure by writing default
+* adaptive coefficient for the AIIR filter.
+*
+* \param config
+* The pointer to the configuration structure of the Adaptive Filter.
+*
+* \param context
+* The pointer to the context structure of the Adaptive Filter.
+*
+*******************************************************************************/
 void Cy_CapSense_AdaptiveFilterInitialize_Lib(
                 const cy_stc_capsense_adaptive_filter_config_t * config, 
                 cy_stc_capsense_position_t * context);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AdaptiveFilterRun_Lib
+****************************************************************************//**
+*
+* This function runs the Adaptive Filter algorithm for the centroid position.
+*
+* Equation: result = ((k * curPos) + ((divisor-k) * prevPos)) / divisor
+* where k is adaptive coefficient.
+*
+* The function supposes that the filter history is updated at first touch
+* outside of the library. I.e. at the first touchdown the filter history has
+* be initialized by touch positions before calling this function.
+*
+* \param config
+* The pointer to the configuration structure of the Adaptive Filter.
+*
+* \param context
+* The pointer to the context structure of the Adaptive Filter.
+*
+* \param currentX
+* The pointer to X position.
+*
+* \param currentY
+* The pointer to Y position.
+*
+*******************************************************************************/
 void Cy_CapSense_AdaptiveFilterRun_Lib(
                 const cy_stc_capsense_adaptive_filter_config_t * config,
                 cy_stc_capsense_position_t * context, 
                 uint32_t * currentX, 
                 uint32_t * currentY);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AdvancedCentroidGetTouchCoordinates_Lib
+****************************************************************************//**
+*
+* This API calculates the centroids for up to two fingers.
+*
+* \param config
+* The pointer to the configuration structure of the Advanced Centroid.
+*
+* \param ptrSns
+* The pointer to the array with sensor raw counts.
+*
+* \param touch
+* The pointer to touch structure.
+*
+*******************************************************************************/
 void Cy_CapSense_AdvancedCentroidGetTouchCoordinates_Lib(
                 const cy_stc_capsense_advanced_centroid_config_t * config,
                 const uint16_t * ptrSns,
                 cy_stc_capsense_touch_t * touch);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_BallisticMultiplier_Lib
+****************************************************************************//**
+*
+* This function runs the ballistic multiplier.
+*
+* \param config
+* The pointer to the configuration structure of the Advanced Centroid.
+*
+* \param touch
+* The pointer to touch structure.
+*
+* \param displacement
+* The pointer to position displacement
+*
+* \param timestamp
+* The current timestamp
+*
+* \param context
+* The pointer to the context structure of the Ballistic Multiplier.
+*
+*******************************************************************************/
 void Cy_CapSense_BallisticMultiplier_Lib(
                 const cy_stc_capsense_ballistic_config_t * config, 
-                cy_stc_capsense_touch_t * touch,
-                cy_stc_capsense_ballistic_delta_t * delta,
+                const cy_stc_capsense_touch_t * touch,
+                cy_stc_capsense_ballistic_delta_t * displacement,
                 uint32_t timestamp,
                 cy_stc_capsense_ballistic_context_t * context);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AlpRun_Lib
+****************************************************************************//**
+*
+* Applies advanced low pass filter algorithm on raw counts.
+*
+* \param ptrFilterObj
+* The pointer to sensor filter data structure
+*
+* \param ptrFilterConfig
+* The pointer to sensor filter configuration structure
+*
+* \param rawCount
+* The pointer to sensor raw count
+*
+* \param baseline
+* The pointer to sensor baseline
+*
+*******************************************************************************/
 void Cy_CapSense_AlpRun_Lib(
                 cy_stc_capsense_alp_fltr_channel_t * ptrFilterObj, 
                 const cy_stc_capsense_alp_fltr_config_t * ptrFilterConfig,
                 uint16_t * rawCount, 
                 const uint16_t * baseline);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AlpInitialize_Lib
+****************************************************************************//**
+*
+* Initializes filter data structure.
+*
+* \param ptrFilterObj
+* Pointer to filter data structure
+*
+* \param rawCount
+* Pointer to sensor raw count
+*
+*******************************************************************************/
 void Cy_CapSense_AlpInitialize_Lib(
                 cy_stc_capsense_alp_fltr_channel_t * ptrFilterObj, 
                 const uint16_t * rawCount);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AlpResetState_Lib
+****************************************************************************//**
+*
+* Resets state machine of the filter.
+*
+* \param ptrFilterObj
+* Pointer to the filter data structure
+*
+*******************************************************************************/
 void Cy_CapSense_AlpResetState_Lib(
                 cy_stc_capsense_alp_fltr_channel_t * ptrFilterObj);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_AlpGetAverage_Lib
+****************************************************************************//**
+*
+* Returns the output of internal average filter
+*
+* \param ptrFilterObj
+* Pointer to the filter data structure
+*
+* \return
+* Returns the output of internal average filter
+*
+*******************************************************************************/
 uint32_t Cy_CapSense_AlpGetAverage_Lib(
                 const cy_stc_capsense_alp_fltr_channel_t * ptrFilterObj);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_TunePrescalers_Lib
+****************************************************************************//**
+*
+* This internal function tunes the Sense Clock divider.
+*
+* Found IDAC code in Single IDAC mode is used to calculate the optimal SnsClk.
+* The SnsClk divider is set to meet the requirement that the widget 
+* clock period should be greater than or equal to:
+* Period > 2*5*R*Cp,
+* where:
+* * Cp is the maximum sensor parasitic capacitance within the widget.
+* * R is the user input value in the expression view of the customizer for a 
+*   series resistor.
+*
+* \param config
+* The configuration structure.
+*
+* \return 
+* Cp in fF (10^-15)
+*
+*******************************************************************************/
 uint32_t Cy_CapSense_TunePrescalers_Lib(
                 cy_stc_capsense_auto_tune_config_t * config);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_TuneSensitivity_Lib
+****************************************************************************//**
+*
+* Configure scanning resolution to achieve the sufficient sensitivity.
+*
+* The function searches the lowest possible resolution that produces signal 
+* greater than 50 counts (Difference Counts) for user defined finger capacitance.
+* In addition, function calculates 75%-value of the achieved signal, that becomes 
+* candidate to finger threshold.
+*  
+* Used equation to calculate signal at resolution 16-bit:
+* sigPFCmax = (2^16-1) * vRef * snsClk * fingerCap / idacCurrent
+*
+* sigPFCmax contains absolute number of difference counts that user receives as 
+* result of sensor scanning at corresponding resolution.
+*
+* This function requires non-zero Modulator IDAC code (if IDAC is equal to zero it 
+* is considered as non-valid use case).
+*
+* \param config
+* The configuration structure.
+*
+* \return 
+* Scan resolution
+*
+*******************************************************************************/
 uint8_t Cy_CapSense_TuneSensitivity_Lib(
                 cy_stc_capsense_auto_tune_config_t * config);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_UpdateThresholds_Lib
+****************************************************************************//**
+*
+* Updates noise and finger thresholds for a specified widget.
+*
+* This function comprises an algorithm of thresholds auto-tune. The thresholds
+* object contains updated thresholds after this API is called.
+*
+* \param ptrNoiseEnvelope 
+* The pointer to the noise-envelope object in RAM.
+*
+* \param ptrThresholds    
+* The pointer to the thresholds object.
+*
+* \param sigPFC           
+* Signal per finger capacitance.
+*
+* \param startFlag           
+* The flag indicates a first sensor in a widget.
+*
+*******************************************************************************/
 void Cy_CapSense_UpdateThresholds_Lib(
                 const cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
                 cy_stc_capsense_smartsense_update_thresholds_t * ptrThresholds,
                 uint16_t sigPFC,
                 uint32_t startFlag);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_InitializeNoiseEnvelope_Lib
+****************************************************************************//**
+*
+* Initializes the noise-envelope filter.
+*
+* \param rawCount         
+* The RawCount value for a given sensor.
+*
+* \param sigPFC           
+* Signal per finger capacitance.
+*
+* \param ptrNoiseEnvelope 
+* The pointer to the noise-envelope RAM object of the sensor.
+*
+*******************************************************************************/
 void Cy_CapSense_InitializeNoiseEnvelope_Lib(
                 uint16_t rawCount,
                 uint16_t sigPFC,
                 cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_RunNoiseEnvelope_Lib
+****************************************************************************//**
+*
+* Runs the noise-envelope filter.
+*
+* \param rawCount         
+* The RawCount value for a given sensor.
+*
+* \param sigPFC           
+* Signal per finger capacitance.
+*
+* \param ptrNoiseEnvelope 
+* The pointer to the noise-envelope RAM object of the sensor.
+*
+*******************************************************************************/
 void Cy_CapSense_RunNoiseEnvelope_Lib(
                 uint16_t rawCount,
                 uint16_t sigPFC,
                 cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope);
-
+/** \} \endcond */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_LIB_H */
 

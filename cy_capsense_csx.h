@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the function prototypes specific to the CSX sensing
@@ -14,6 +14,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_CSX_H)
 #define CY_CAPSENSE_CSX_H
 
@@ -21,6 +22,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -197,13 +199,13 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext);
  * | 9:8    | POLARITY      | 0x02(IDAC polarity follows CSD_SENSE signal)                                           |
  * | 11:10  | BAL_MODE      | 0x03(IDAC is enabled in both phases and disabled by CSDCOMP at the end of balancing)   |
  * | 17:16  | LEG1_MODE     | 0x03(Configure LEG1 to CSD dynamic mode)                                               |
- * | 19:18  | LEG2_MODE     | 0x00(LEG2 is disabled)                                                                 |
+ * | 19:18  | LEG2_MODE     | 0x00(Configure LEG2 same as LEG 1)                                                     |
  * | 21     | DSI_CTRL_EN   | 0x00(IDAC DSI control is disabled)                                                     |
  * | 23:22  | RANGE         | Set range according to Csx0IdacGainV2 parameter value                                  |
  * | 24     | LEG1_EN       | 0x01(Output for LEG1 is enabled)                                                       |
  * | 25     | LEG2_EN       | 0x00(Output for LEG2 is disabled)                                                      |
  * +--------+---------------+----------------------------------------------------------------------------------------+*/
-#define CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG                (0x01030E80uL) 
+#define CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG                (0x010F0E80uL)
 
 /* +--------+---------------+----------------------------------------------------------------------------------------+
  * |  BITS  |   FIELD       |              MODE                                                                      |
@@ -604,6 +606,8 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext);
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif  /* End of CY_CAPSENSE_CSX_H */
 

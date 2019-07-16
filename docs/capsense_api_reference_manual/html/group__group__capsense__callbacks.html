@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Cypress CapSense Middleware Library: Callbacks</title>
+<title>Cypress CapSense Middleware Library 2.0: Callbacks</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="cypress_logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Cypress CapSense Middleware Library</div>
+   <div id="projectname">Cypress CapSense Middleware Library 2.0</div>
   </td>
  </tr>
  </tbody>
@@ -94,9 +94,9 @@ $(document).ready(function(){initNavTree('group__group__capsense__callbacks.html
 <tr>
 <td>2 </td><td>End Of Scan </td><td>ptrEOSCallback </td><td><a class="el" href="group__group__capsense__structures.html#ga908447ccc2720f31c861d9eb79ff75d2">cy_capsense_callback_t</a> </td><td>This is called after sensor scan completion and there is no other sensor in the queue to be scanned.  </td></tr>
 <tr>
-<td>3 </td><td>Tuner Send Callback </td><td>ptrTunerSendCallback </td><td><a class="el" href="group__group__capsense__structures.html#gabf58e6ce283cb73f9b8a398abf6bad17">cy_capsense_tuner_send_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
+<td>3 </td><td>Tuner Send Callback </td><td>ptrTunerSendCallback </td><td><a class="el" href="group__group__capsense__structures.html#gabf58e6ce283cb73f9b8a398abf6bad17">cy_capsense_tuner_send_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
 <tr>
-<td>4 </td><td>Tuner Receive Callback </td><td>ptrTunerReceiveCallback </td><td><a class="el" href="group__group__capsense__structures.html#gade1f00c852892b0fc498c9a3b9d28594">cy_capsense_tuner_receive_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
+<td>4 </td><td>Tuner Receive Callback </td><td>ptrTunerReceiveCallback </td><td><a class="el" href="group__group__capsense__structures.html#gade1f00c852892b0fc498c9a3b9d28594">cy_capsense_tuner_receive_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd><ol type="1">
 <li>Callbacks 1 and 2 are called by the <a class="el" href="group__group__capsense__high__level.html#ga484f29b24760bd087f19ea598de15078" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> function and lengthen this function execution. Usually, <a class="el" href="group__group__capsense__high__level.html#ga484f29b24760bd087f19ea598de15078" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> is called inside the CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.</li>
@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('group__group__capsense__callbacks.html
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>Cypress CapSense Middleware Library</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>Cypress CapSense Middleware Library 2.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

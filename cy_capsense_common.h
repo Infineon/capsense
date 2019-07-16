@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the common CapSense definitions.
@@ -19,14 +19,13 @@
 
 #include "cy_device_headers.h"
 #include "cy_sysint.h"
-    
-#ifndef CY_IP_MXCSDV2
-    #error "The CapSense middleware is not supported on this device"
-#endif
+
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
 
 /*******************************************************************************
 * Macros
@@ -36,16 +35,16 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MDW_VERSION_MAJOR                   (1)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                   (2)
 /** Middleware minor version */
-#define CY_CAPSENSE_MDW_VERSION_MINOR                   (20)
+#define CY_CAPSENSE_MW_VERSION_MINOR                   (0)
 /** Middleware ID */
-#define CY_CAPSENSE_MDW_ID                              (CY_PDL_DRV_ID(0x07uL))
+#define CY_CAPSENSE_ID                                 (CY_PDL_DRV_ID(0x07uL))
 
 
 /* Scanning status */
 /** The CapSense middleware is busy */
-#define CY_CAPSENSE_SW_STS_BUSY                         (0x80u)
+#define CY_CAPSENSE_BUSY                                (0x80u)
 /** The CapSense middleware is not busy */
 #define CY_CAPSENSE_NOT_BUSY                            (0x00u)
 
@@ -98,7 +97,7 @@ extern "C" {
 /* Inactive sensor connection options */
 /** Inactive sensor connection to ground */
 #define CY_CAPSENSE_SNS_CONNECTION_GROUND               (1u)
-/** Inactive sensor connection to high-z */
+/** Inactive sensor connection to High-Z */
 #define CY_CAPSENSE_SNS_CONNECTION_HIGHZ                (2u)
 /** Inactive sensor connection to shield */
 #define CY_CAPSENSE_SNS_CONNECTION_SHIELD               (3u)
@@ -335,7 +334,7 @@ extern "C" {
 /******************************************************************************/
 /** Connection of pin to ground */
 #define CY_CAPSENSE_GROUND                              (0u)
-/** Connection of pin to high-z */
+/** Connection of pin to High-Z */
 #define CY_CAPSENSE_HIGHZ                               (1u)
 /** Configuring of pin as a shield */
 #define CY_CAPSENSE_SHIELD                              (2u)
@@ -378,9 +377,23 @@ extern "C" {
 
 /** \} */
 
+#define CY_CAPSENSE_CONVERSION_MEGA                     (1000000u)
+
+/* 
+* These defines are obsolete and kept for backward compatibility only.
+* They will be removed in the future versions.
+*/
+#define CY_CAPSENSE_MDW_VERSION_MAJOR                   (CY_CAPSENSE_MW_VERSION_MAJOR)
+#define CY_CAPSENSE_MDW_VERSION_MINOR                   (CY_CAPSENSE_MW_VERSION_MINOR)
+#define CY_CAPSENSE_MDW_ID                              (CY_CAPSENSE_ID)
+#define CY_CAPSENSE_SW_STS_BUSY                         (CY_CAPSENSE_BUSY)
+
+
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_COMMON_H */
 

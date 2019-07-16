@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file contains the definitions for all the filters implementation.
@@ -13,6 +13,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_FILTER_H)
 #define CY_CAPSENSE_FILTER_H
 
@@ -22,9 +23,12 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
+#if defined(CY_IP_MXCSDV2)
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
 
 /***************************************
 * Function Prototypes
@@ -136,6 +140,8 @@ void Cy_CapSense_RunAverageInternal(
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_FILTER_H */
 

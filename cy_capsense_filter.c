@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file contains the source code of all filters implementation.
@@ -13,10 +13,13 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
-#include "stddef.h"
+
+#include <stddef.h>
 #include "cy_capsense_filter.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_lib.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -490,7 +493,10 @@ void Cy_CapSense_InitializeWidgetFilter(
             ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
             for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
             {
-                Cy_CapSense_InitializeNoiseEnvelope_Lib(ptrSnsCtx->raw, ptrWdCfg->ptrWdContext->sigPFC, ptrNEHistory);
+                Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(ptrSnsCtx->raw,
+                                                             ptrWdCfg->ptrWdContext->sigPFC,
+                                                             ptrNEHistory,
+                                                             context);
                 ptrSnsCtx++;
                 ptrNEHistory++;
             }
@@ -1089,6 +1095,8 @@ uint32_t Cy_CapSense_FtJitter(uint32_t input, uint32_t prevOutput)
     }
     return input;
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

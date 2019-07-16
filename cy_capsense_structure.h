@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the top-level declarations of the CapSense data
@@ -14,6 +14,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_STRUCTURE_H)
 #define CY_CAPSENSE_STRUCTURE_H
 
@@ -24,6 +25,7 @@
 #include "cy_capsense_gesture_lib.h"
 #include "cy_capsense_common.h"
 
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -334,7 +336,7 @@ typedef struct
 
     uint8_t periDividerType;                                    /**< Peripheral clock type (8- or 16-bit type) */
     uint8_t periDividerIndex;                                   /**< Peripheral divider index */
-    uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of the CSD HW block after power up or deep sleep. */
+    uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of the CSD HW block after power up or System Deep Sleep. */
 
     uint8_t ssIrefSource;                                       /**< Iref source */
     uint8_t ssVrefSource;                                       /**< Vref source */
@@ -384,10 +386,9 @@ typedef struct
     uint8_t csdRawTarget;                                       /**< Raw count target in percentage for CSD calibration */
     uint8_t csdAutotuneEn;                                      /**< SmartSense enabled */
     uint8_t csdIdacAutocalEn;                                   /**< CSD IDAC calibration enabled */
-    uint8_t csdIdacGainInit;                                    /**< IDAC gain index per \ref idacGainTable */
-    uint8_t csdIdacAutoGainEn;                                  /**< IDAC gain autocalibration enabled */
+    uint8_t csdIdacGainInitIndex;                               /**< IDAC gain index per \ref idacGainTable */
+    uint8_t csdIdacAutoGainEn;                                  /**< IDAC gain auto-calibration enabled */
     uint8_t csdCalibrationError;                                /**< Acceptable calibration error */
-    uint8_t csdIdacGainIndexDefault;                            /**< The highest IDAC gain index in CSD calibration per \ref idacGainTable */
     uint8_t csdIdacMin;                                         /**< Min acceptable IDAC value in CSD calibration */
     uint8_t csdIdacCompEn;                                      /**< Compensation IDAC enabled */
     uint8_t csdFineInitTime;                                    /**< Number of dummy SnsClk periods at fine initialization */
@@ -398,7 +399,7 @@ typedef struct
     uint8_t  csdMfsDividerOffsetF2;                             /**< Frequency divider offset for channel 2. This value is added to 
                                                                    * base (channel 0) SnsClk divider to form channel 2 frequency */
     uint8_t csxRawTarget;                                       /**< Raw count target in percentage for CSX calibration */
-    uint8_t csxIdacGainInit;                                        /**< IDAC gain for CSX method */
+    uint8_t csxIdacGainInitIndex;                               /**< IDAC gain for CSX method */
     uint8_t csxRefGain;                                         /**< Refgen gain for CSX method */
     uint8_t csxIdacAutocalEn;                                   /**< CSX IDAC calibration enabled */
     uint8_t csxCalibrationError;                                /**< Acceptable calibration error */
@@ -533,7 +534,6 @@ typedef struct
 } cy_stc_capsense_common_context_t;
 
 
-
 /** Declares top-level CapSense context data structure */
 typedef struct
 {
@@ -545,7 +545,219 @@ typedef struct
     const cy_stc_capsense_pin_config_t * ptrPinConfig;          /**< Pointer to the pin configuration structure */
     const cy_stc_capsense_pin_config_t * ptrShieldPinConfig;    /**< Pointer to the shield pin configuration structure */
     cy_stc_active_scan_sns_t * ptrActiveScanSns;                /**< Pointer to the current active sensor structure */
+    const void * ptrFptrConfig;                                 /**< Pointer to the function pointers structure */
 } cy_stc_capsense_context_t;
+
+/** The type of a pointer to the Cy_CapSense_CSDSetupWidget() function */
+typedef void (*cy_func_capsense_csd_setup_widget_ptr_t)
+                        (uint32_t widgetId,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSDScan() function */
+typedef void (*cy_func_capsense_csd_scan_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsdWidgetRawCounts() function */
+typedef uint32_t (*cy_func_capsense_dp_process_csd_widget_raw_counts_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsdWidgetStatus() function */
+typedef void (*cy_func_capsense_dp_process_csd_widget_status_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSDDisableMode() function */
+typedef void (*cy_func_capsense_csd_disable_mode_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSDInitialize() function */
+typedef void (*cy_func_capsense_csd_initialize_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSDScanISR() function */
+typedef void (*cy_func_capsense_csd_scan_isr_ptr_t)
+                        (void * capsenseContext);
+/** The type of a pointer to the Cy_CapSense_CSXSetupWidget() function */
+typedef void (*cy_func_capsense_csx_setup_widget_ptr_t)
+                        (uint32_t widgetId, cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSXScan() function */
+typedef void (*cy_func_capsense_csx_scan_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsxWidgetRawCounts() function */
+typedef uint32_t (*cy_capsense_dp_process_csx_widget_raw_counts_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsxWidgetStatus() function */
+typedef void (*cy_func_capsense_dp_process_csx_widget_status_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSXInitialize() function */
+typedef void (*cy_func_capsense_csx_initialize_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSXDisableMode() function */
+typedef void (*cy_func_capsense_csx_disablemode_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSXScanISR() function */
+typedef void (*cy_func_capsense_csx_scan_isr_ptr_t)
+                        (void * capsenseContext);
+/** The type of a pointer to the Cy_CapSense_AdaptiveFilterInitialize_Lib() function */
+typedef void (*cy_func_capsense_adaptive_filter_initialize_lib_ptr_t)
+                        (const cy_stc_capsense_adaptive_filter_config_t * config,
+                         cy_stc_capsense_position_t * context);
+/** The type of a pointer to the Cy_CapSense_AdaptiveFilterRun_Lib() function */
+typedef void (*cy_func_capsense_adaptive_filter_run_lib_ptr_t)
+                        (const cy_stc_capsense_adaptive_filter_config_t * config,
+                         cy_stc_capsense_position_t * context,
+                         uint32_t * currentX,
+                         uint32_t * currentY);
+/** The type of a pointer to the Cy_CapSense_BallisticMultiplier_Lib() function */
+typedef void (*cy_func_capsense_ballistic_multiplier_lib_ptr_t)
+                        (const cy_stc_capsense_ballistic_config_t * config,
+                         const cy_stc_capsense_touch_t * touch,
+                         cy_stc_capsense_ballistic_delta_t * delta,
+                         uint32_t timestamp,
+                         cy_stc_capsense_ballistic_context_t * context);
+/** The type of a pointer to the Cy_CapSense_InitializeAllFilters() function */
+typedef void (*cy_func_capsense_initialize_all_filters_ptr_t)
+                        (const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_FtRunEnabledFiltersInternal() function */
+typedef void (*cy_func_capsense_ft_run_enabled_filters_internal_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                         uint16_t * ptrSnsRawHistory,
+                         uint8_t * ptrSnsRawHistoryLow);
+/** The type of a pointer to the Cy_CapSense_ProcessPositionFilters() function */
+typedef void (*cy_func_capsense_process_position_filters_ptr_t)
+                        (cy_stc_capsense_touch_t * newTouch,
+                         const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_RunPositionFilters() function */
+typedef void (*cy_func_capsense_run_position_filters_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_position_t * ptrInput,
+                         cy_stc_capsense_position_t * ptrHistory,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_InitPositionFilters() function */
+typedef void (*cy_func_capsense_init_position_filters_ptr_t)
+                        (uint32_t filterConfig,
+                         const cy_stc_capsense_position_t * ptrInput,
+                         cy_stc_capsense_position_t * ptrHistory);
+/** The type of a pointer to the Cy_CapSense_DpProcessButton() function */
+typedef void (*cy_func_capsense_dp_process_button_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessSlider() function */
+typedef void (*cy_func_capsense_dp_process_slider_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsdMatrix() function */
+typedef void (*cy_func_capsense_dp_process_csd_matrix_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsdTouchpad() function */
+typedef void (*cy_func_capsense_dp_process_csd_touchpad_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_DpAdvancedCentroidTouchpad() function */
+typedef void (*cy_func_capsense_dp_advanced_centroid_touchpad_ptr_t)
+                        (cy_stc_capsense_touch_t * newTouch,
+                         const cy_stc_capsense_widget_config_t * ptrWdConfig);
+/** The type of a pointer to the Cy_CapSense_DpProcessProximity() function */
+typedef void (*cy_func_capsense_dp_process_proximity_ptr_t)
+                        (cy_stc_capsense_widget_config_t const * ptrWdConfig);
+/** The type of a pointer to the Cy_CapSense_DpProcessCsxTouchpad() function */
+typedef void (*cy_func_capsense_dp_process_csx_touchpad_ptr_t)
+                        (const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                         const cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CalibrateAllCsdWidgets() function */
+typedef cy_status (*cy_func_capsense_calibrate_all_csd_widgets_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CSDCalibrateWidget() function */
+typedef cy_status (*cy_func_capsense_csd_calibrate_widget_ptr_t)
+                        (uint32_t widgetId,
+                         uint32_t target,
+                         cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_CalibrateAllCsxWidgets() function */
+typedef cy_status (*cy_func_capsense_calibrate_all_csx_widgets_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_SsAutoTune() function */
+typedef cy_status (*cy_func_capsense_ss_auto_tune_ptr_t)
+                        (cy_stc_capsense_context_t * context);
+/** The type of a pointer to the Cy_CapSense_RunNoiseEnvelope_Lib() function */
+typedef void (*cy_func_capsense_run_noise_envelope_lib_ptr_t)
+                        (uint16_t rawCount,
+                         uint16_t sigPFC,
+                         cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope);
+/** The type of a pointer to the Cy_CapSense_DpUpdateThresholds() function */
+typedef void (*cy_func_capsense_dp_update_thresholds_ptr_t)
+                        (cy_stc_capsense_widget_context_t * ptrWdContext,
+                         const cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
+                         uint32_t startFlag);
+/** The type of a pointer to the Cy_CapSense_InitializeNoiseEnvelope_Lib() function */
+typedef void (*cy_func_capsense_initialize_noise_envelope_lib_ptr_t)
+                        (uint16_t rawCount,
+                         uint16_t sigPFC,
+                         cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope);
+
+/** Function pointers configuration structure */
+typedef struct
+{
+    cy_func_capsense_csd_setup_widget_ptr_t fptrCSDSetupWidget; /**< The Cy_CapSense_CSDSetupWidget() function pointer*/
+    cy_func_capsense_csd_scan_ptr_t fptrCSDScan;                /**< The Cy_CapSense_CSDScan() function pointer */
+    cy_func_capsense_dp_process_csd_widget_raw_counts_ptr_t fptrDpProcessCsdWidgetRawCounts;
+                                                                /**< The Cy_CapSense_DpProcessCsdWidgetRawCounts() function pointer*/
+    cy_func_capsense_dp_process_csd_widget_status_ptr_t fptrDpProcessCsdWidgetStatus;
+                                                                /**< The Cy_CapSense_DpProcessCsdWidgetStatus() function pointer*/
+    cy_func_capsense_csd_disable_mode_ptr_t fptrCSDDisableMode; /**< The Cy_CapSense_CSDDisableMode() function pointer*/
+    cy_func_capsense_csd_initialize_ptr_t fptrCSDInitialize;    /**< The Cy_CapSense_CSDInitialize() function pointer*/
+    cy_func_capsense_csd_scan_isr_ptr_t fptrCSDScanISR;         /**< The Cy_CapSense_CSDScanISR() function pointer*/
+    cy_func_capsense_csx_setup_widget_ptr_t fptrCSXSetupWidget; /**< The Cy_CapSense_CSXSetupWidget() function pointer*/
+    cy_func_capsense_csx_scan_ptr_t fptrCSXScan;                /**< The Cy_CapSense_CSXScan() function pointer*/
+    cy_capsense_dp_process_csx_widget_raw_counts_ptr_t fptrDpProcessCsxWidgetRawCounts;
+                                                                /**< The Cy_CapSense_DpProcessCsxWidgetRawCounts() function pointer*/
+    cy_func_capsense_dp_process_csx_widget_status_ptr_t fptrDpProcessCsxWidgetStatus;
+                                                                /**< The Cy_CapSense_DpProcessCsxWidgetStatus() function pointer*/
+    cy_func_capsense_csx_initialize_ptr_t fptrCSXInitialize;    /**< The Cy_CapSense_CSXInitialize() function pointer*/
+    cy_func_capsense_csx_disablemode_ptr_t fptrCSXDisableMode;  /**< The Cy_CapSense_CSXDisableMode() function pointer*/
+    cy_func_capsense_csx_scan_isr_ptr_t fptrCSXScanISR;         /**< The Cy_CapSense_CSXScanISR() function pointer*/
+    cy_func_capsense_adaptive_filter_initialize_lib_ptr_t fptrAdaptiveFilterInitializeLib;
+                                                                /**< The Cy_CapSense_AdaptiveFilterInitialize_Lib() function pointer*/
+    cy_func_capsense_adaptive_filter_run_lib_ptr_t fptrAdaptiveFilterRunLib;     /**< The Cy_CapSense_AdaptiveFilterRun_Lib() function pointer*/
+    cy_func_capsense_ballistic_multiplier_lib_ptr_t fptrBallisticMultiplierLib;
+                                                                /**< The Cy_CapSense_BallisticMultiplier_Lib() function pointer*/
+    cy_func_capsense_initialize_all_filters_ptr_t fptrInitializeAllFilters;
+                                                                /**< The Cy_CapSense_InitializeAllFilters() function pointer*/
+    cy_func_capsense_ft_run_enabled_filters_internal_ptr_t fptrFtRunEnabledFiltersInternal;
+                                                                /**< The Cy_CapSense_FtRunEnabledFiltersInternal() function pointer*/
+    cy_func_capsense_process_position_filters_ptr_t fptrProcessPositionFilters;
+                                                                /**< The Cy_CapSense_ProcessPositionFilters() function pointer*/
+    cy_func_capsense_run_position_filters_ptr_t fptrRunPositionFilters;
+                                                                /**< The Cy_CapSense_RunPositionFilters() function pointer*/
+    cy_func_capsense_init_position_filters_ptr_t fptrInitPositionFilters;
+                                                                /**< The Cy_CapSense_InitPositionFilters() function pointer*/
+    cy_func_capsense_dp_process_button_ptr_t fptrDpProcessButton;
+                                                                /**< The Cy_CapSense_DpProcessButton() function pointer*/
+    cy_func_capsense_dp_process_slider_ptr_t fptrDpProcessSlider;
+                                                                /**< The Cy_CapSense_DpProcessSlider() function pointer*/
+    cy_func_capsense_dp_process_csd_matrix_ptr_t fptrDpProcessCsdMatrix;
+                                                                /**< The Cy_CapSense_DpProcessCsdMatrix() function pointer*/
+    cy_func_capsense_dp_process_csd_touchpad_ptr_t fptrDpProcessCsdTouchpad;
+                                                                /**< The Cy_CapSense_DpProcessCsdTouchpad() function pointer*/
+    cy_func_capsense_dp_advanced_centroid_touchpad_ptr_t fptrDpAdvancedCentroidTouchpad;
+                                                                /**< The Cy_CapSense_DpAdvancedCentroidTouchpad() function pointer*/
+    cy_func_capsense_dp_process_proximity_ptr_t fptrDpProcessProximity;
+                                                                /**< The Cy_CapSense_DpProcessProximity() function pointer*/
+    cy_func_capsense_dp_process_csx_touchpad_ptr_t fptrDpProcessCsxTouchpad;
+                                                                /**< The Cy_CapSense_DpProcessCsxTouchpad() function pointer*/
+    cy_func_capsense_calibrate_all_csd_widgets_ptr_t fptrCalibrateAllCsdWidgets;
+                                                                /**< The Cy_CapSense_CalibrateAllCsdWidgets() function pointer*/
+    cy_func_capsense_csd_calibrate_widget_ptr_t fptrCSDCalibrateWidget;
+                                                                /**< The Cy_CapSense_CSDCalibrateWidget() function pointer*/
+    cy_func_capsense_calibrate_all_csx_widgets_ptr_t fptrCalibrateAllCsxWidgets;
+                                                                /**< The Cy_CapSense_CalibrateAllCsxWidgets() function pointer*/
+    cy_func_capsense_ss_auto_tune_ptr_t fptrSsAutoTune;         /**< The Cy_CapSense_SsAutoTune() function pointer*/
+    cy_func_capsense_run_noise_envelope_lib_ptr_t fptrRunNoiseEnvelopeLib;
+                                                                /**< The Cy_CapSense_RunNoiseEnvelope_Lib() function pointer*/
+    cy_func_capsense_dp_update_thresholds_ptr_t fptrDpUpdateThresholds;
+                                                                /**< The Cy_CapSense_DpUpdateThresholds() function pointer*/
+    cy_func_capsense_initialize_noise_envelope_lib_ptr_t fptrInitializeNoiseEnvelopeLib;
+                                                                /**< The Cy_CapSense_InitializeNoiseEnvelope_Lib() function pointer*/
+} cy_stc_capsense_fptr_config_t;
 
 /** \} */
 
@@ -583,7 +795,127 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CheckConfigIntegrity(
+                const cy_stc_capsense_context_t * context);
+
+/**< Internal wrapper functions for the flash optimization definitions */
+cy_status Cy_CapSense_CSDCalibrateWidget_Call(
+                uint32_t widgetId,
+                uint32_t target,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSDSetupWidget_Call(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSDScan_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSXSetupWidget_Call(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSXScan_Call(
+                cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CalibrateAllCsdWidgets_Call(
+                cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CalibrateAllCsxWidgets_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSDDisableMode_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSDInitialize_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessButton_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessCsxTouchpad_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessProximity_Call(
+                cy_stc_capsense_widget_config_t const * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessCsdTouchpad_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessSlider_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessCsdMatrix_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessCsdWidgetStatus_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpProcessCsxWidgetStatus_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpAdvancedCentroidTouchpad_Call(
+                cy_stc_capsense_touch_t * newTouch,
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitPositionFilters_Call(
+                uint32_t filterConfig,
+                const cy_stc_capsense_position_t * ptrInput,
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_RunPositionFilters_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_position_t * ptrInput,
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_ProcessPositionFilters_Call(
+                cy_stc_capsense_touch_t * newTouch,
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitializeAllFilters_Call(
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_FtRunEnabledFiltersInternal_Call(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                uint16_t * ptrSnsRawHistory,
+                uint8_t * ptrSnsRawHistoryLow,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSXDisableMode_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_CSXInitialize_Call(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_AdaptiveFilterInitialize_Lib_Call(
+                const cy_stc_capsense_adaptive_filter_config_t * config,
+                cy_stc_capsense_position_t * positionContext,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_AdaptiveFilterRun_Lib_Call(
+                const cy_stc_capsense_adaptive_filter_config_t * config,
+                cy_stc_capsense_position_t * positionContext,
+                uint32_t * currentX,
+                uint32_t * currentY,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_BallisticMultiplier_Lib_Call(
+                const cy_stc_capsense_ballistic_config_t * config,
+                const cy_stc_capsense_touch_t * touch,
+                cy_stc_capsense_ballistic_delta_t * delta,
+                uint32_t timestamp,
+                cy_stc_capsense_ballistic_context_t * ballisticContext,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_DpUpdateThresholds_Call(
+                cy_stc_capsense_widget_context_t * ptrWdContext,
+                const cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
+                uint32_t startFlag,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(
+                uint16_t rawCount,
+                uint16_t sigPFC,
+                cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_RunNoiseEnvelope_Lib_Call(
+                uint16_t rawCount,
+                uint16_t sigPFC,
+                cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
+                const cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_SsAutoTune_Call(
+                cy_stc_capsense_context_t * context);
+
 
 /** \} \endcond */
 
@@ -591,6 +923,8 @@ cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * con
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_STRUCTURE_H */
 

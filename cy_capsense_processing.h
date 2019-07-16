@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -17,6 +17,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_PROCESSING_H)
 #define CY_CAPSENSE_PROCESSING_H
 
@@ -24,9 +25,13 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_lib.h"
 
+#if defined(CY_IP_MXCSDV2)
+
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
 
 /*******************************************************************************
 * Function Prototypes
@@ -69,11 +74,11 @@ void Cy_CapSense_DpProcessProximity(
 
 void Cy_CapSense_DpProcessCsdTouchpad(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpProcessSlider(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_DpProcessCsdMatrix(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_context_t * context);
@@ -93,10 +98,6 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
                 uint8_t * ptrSnsRawHistoryLow,
                 uint32_t mode,
                 const cy_stc_capsense_context_t * context);
-
-void Cy_CapSense_DpProcessCsdWidgetStatus(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpProcessCsxWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
@@ -132,6 +133,8 @@ void Cy_CapSense_RunMfsFiltering(
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_PROCESSING_H */
 

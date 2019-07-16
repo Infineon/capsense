@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
@@ -13,11 +13,15 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
+#include <stddef.h>
 #include "cy_syslib.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_tuner.h"
 #include "cy_capsense_control.h"
 #include "cy_capsense_common.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -39,71 +43,93 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_RunTuner
 ****************************************************************************//**
 *
-* Establishes synchronized operation between the CapSense middleware and 
+* Establishes synchronized operation between the CapSense Middleware and 
 * the CapSense Tuner tool.
 *
-* This function should be called periodically in the application program to 
-* serve the CapSense Tuner tool requests and commands to synchronize the 
-* operation, however there is no specific timing requirement for this function. 
-* In most cases, the best place to call this function is after processing 
-* and before next scanning.
+* This function is called periodically in the application program. It serves
+* the CapSense Tuner tool requests and commands to synchronize the operation. 
+* Mostly, the best place to call this function is between processing and next 
+* scanning.
+* If the user changes some parameters in the Tuner tool, the middleware is 
+* re-started - the Tuner issues a restart command to be executed by this
+* function.
 * 
-* If a user changes some parameters in the Tuner tool, a re-initialization 
-* of the middleware is required. In such cases, the tuner issues a re-initialize 
-* command and which is executed by this function.
+* The Tuner interface supports two communication protocol: EZI2C and UART.
 * 
-* If this function is not called by the application program, the middleware 
-* operation is asynchronous to the Tuner tool and the following disadvantages 
-* are applicable:
-*
+* To use an EZI2C-based tuner interface, only initialization of the EZI2C 
+* driver and interface is required in the application program. Refer to 
+* the I2C driver documentation for details of the protocol implementation 
+* and data package format by the EZI2C interface.
+* 
+* To use a UART-based tuner interface, the user must:
+* * Initialize the UART driver and interface
+* * Use a callback function to facilitate data transmission and reception 
+*   using the UART driver.
+* 
+* The application program must: 
+* * Form a transmission data packet
+* * Validate the data package on receiver implementation prior to passing 
+*   to the CapSense Middleware.
+* 
+* The transmission packet includes a CapSense context structure sandwiched 
+* between a header (0x0D0A) and a tail (0x00FFFF), hence the package size 
+* is dependent on CapSense context information. The receiver packet is 
+* 16-byte (fixed length) data explained under the 
+* Cy_CapSense_CheckTunerCmdIntegrity() function. 
+* The Cy_CapSense_CheckTunerCmdIntegrity() function is used to validate 
+* the received data package prior to passing it to the CapSense middleware.
+* 
+* Periodical calling the Cy_CapSense_RunTuner() function is:
+* * mandatory for operation of a UART-based tuner interface. The middleware 
+*   operation is always synchronous to the Tuner tool. 
+* * optional to periodically call Cy_CapSense_RunTuner() for EZI2C based 
+*   interface.
+* 
+* If the Cy_CapSense_RunTuner() function is not periodically called by 
+* the application program, the middleware operation is asynchronous to 
+* the Tuner tool and the following disadvantages are applicable:
 * * The raw counts displayed in the CapSense Tuner tool may be filtered 
-*   and/or non-filtered. As a result, noise and SNR measurements will 
-*   not be accurate.
-* * The CapSense Tuner tool may read the sensor data such as raw counts 
-*   from a scan multiple times. As a result, noise and SNR measurement 
-*   will not be accurate.
-* * The CapSense Tuner tool and Host controller should not change 
-*   the parameters via the tuner interface. Changing the parameters via 
-*   the Tuner interface in the async mode will result in abnormal behavior.
+*   and/or non-filtered. Result – noise and SNR measurements are not accurate.
+* * The CapSense Tuner tool can read sensor data (such as raw counts) from 
+*   a scan multiply. Result – noise and SNR measurement are not accurate.
+* * The CapSense Tuner tool and Host controller should not change the 
+*   parameters via the Tuner interface – in async mode this leads to 
+*   abnormal behavior.
 * * Displaying detected gestures may be missed.
-*
-* \note 
-* Calling this function is not mandatory and required only  
-* synchronizing the communication with the CapSense Tuner tool when the Tuner 
-* is used.
 *
 * \warning 
 * This function executes received commands. Two commands 
-* CY_CAPSENSE_TU_CMD_ONE_SCAN_E and CY_CAPSENSE_TU_CMD_SUSPEND_E change the 
-* FW tuner module state to suspend. In this state, the function waits until 
-* CY_CAPSENSE_TU_CMD_RESUME_E is received. A callback mechanism of command 
-* receiving should be used to avoid FW hang.
-* 
+* CY_CAPSENSE_TU_CMD_ONE_SCAN_E and CY_CAPSENSE_TU_CMD_SUSPEND_E change 
+* the FW tuner module state to suspend. In this state, the function waits 
+* until CY_CAPSENSE_TU_CMD_RESUME_E is received. Use a callback mechanism 
+* of command receiving to avoid FW hanging. Refer to 
+* the Function Usage section for examples.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns a status of whether a re-initialization of the middleware was 
-* executed by this function or not:
+* The return parameter indicates whether a middleware re-start was executed 
+* by this function or not:
 * - CY_CAPSENSE_STATUS_RESTART_DONE - Based on a received command, the
 * CapSense was re-initialized.
-* - CY_CAPSENSE_STATUS_RESTART_NONE - No re-initialization was executed by this
+* - CY_CAPSENSE_STATUS_RESTART_NONE - Re-start was not executed by this
 * function.
 *
 * \funcusage
 * 
 * An example of synchronization with the Tuner tool using EzI2C:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_EzI2C
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_EzI2C
 * 
 * An example of synchronization with the Tuner tool using UART.<br>
 * Tuner Send callback implementation: Transmitting data through UART interface:
-* \snippet capsense\1.1\snippet\main.c snippet_TunerSend
+* \snippet capsense/snippet/main.c snippet_TunerSend
 * 
 * Tuner Receive callback implementation: Receiving data from UART interface:
-* \snippet capsense\1.1\snippet\main.c snippet_TunerReceive
+* \snippet capsense/snippet/main.c snippet_TunerReceive
 * 
 * A part of the main.c FW flow with registering callbacks:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_UART
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_UART
 * 
 * Refer to the \ref group_capsense_callbacks section for details.
 * 
@@ -161,7 +187,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             /* If command exists and is correct then read command */
             if ((NULL != commandPacket) || (NULL != tunerStructure))
             {
-                if (CY_CAPSENSE_COMMAND_OK == Cy_CapSense_CheckCommandIntegrity(commandPacket))
+                if (CY_CAPSENSE_COMMAND_OK == Cy_CapSense_CheckTunerCmdIntegrity(commandPacket))
                 {
                     tunerCommand = commandPacket[CY_CAPSENSE_COMMAND_CODE_0_IDX];
                     ptrCommonCxt->tunerCmd = tunerCommand;
@@ -253,7 +279,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 
 
 /*******************************************************************************
-* Function Name: Cy_CapSense_CheckCommandIntegrity
+* Function Name: Cy_CapSense_CheckTunerCmdIntegrity
 ****************************************************************************//**
 *
 * Checks command format, header, tail, CRC, etc.
@@ -270,17 +296,17 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 * Command format is the following:
 * * Byte  0: Header 0 = 0x0D
 * * Byte  1: Header 1 = 0x0A
-* * Byte  2: Command code MSB = cy_en_capsense_tuner_cmd_t
-* * Byte  3: Command code LSB = cy_en_capsense_tuner_cmd_t
-* * Byte  4: Command counter
-* * Byte  5: Size = either 1, 2 or 4
-* * Byte  6: Offset MSB
-* * Byte  7: Offset LSB
-* * Byte  8: Data MSB
+* * Byte  2: Command code = cy_en_capsense_tuner_cmd_t
+* * Byte  3: Command counter
+* * Byte  4: Size = either 1, 2 or 4
+* * Byte  5: Offset MSB
+* * Byte  6: Offset LSB
+* * Byte  7: Data MSB
+* * Byte  8: Data
 * * Byte  9: Data
-* * Byte 10: Data
-* * Byte 11: Data LSB
-* * Byte 12: 8-bit CRC
+* * Byte 10: Data LSB
+* * Byte 11: 16-bit CRC MSB
+* * Byte 12: 16-bit CRC LSB
 * * Byte 13: Tail 0 = 0x00
 * * Byte 14: Tail 1 = 0xFF
 * * Byte 15: Tail 2 = 0xFF
@@ -297,7 +323,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 * - CY_CAPSENSE_WRONG_CODE - Wrong Command code.
 *
 *******************************************************************************/
-uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
+uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket)
 {
     uint32_t cmdCheckStatus = CY_CAPSENSE_COMMAND_OK;
     uint16_t crcValue;
@@ -389,6 +415,8 @@ uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len)
 
     return (uint16_t)actualCrc;
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

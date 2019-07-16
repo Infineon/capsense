@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -16,6 +16,8 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
+#include <stddef.h>
 #include "cy_syslib.h"
 #include "cy_sysclk.h"
 #include "cy_gpio.h"
@@ -26,6 +28,8 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_csx.h"
 #include "cy_capsense_sensing.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -84,6 +88,7 @@ void Cy_CapSense_CSXInitialize(cy_stc_capsense_context_t * context)
 {
     uint32_t interruptState;
     uint32_t tmpRegVal;
+    cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     Cy_CapSense_DischargeExtCapacitors(context);
 
@@ -147,7 +152,10 @@ void Cy_CapSense_CSXInitialize(cy_stc_capsense_context_t * context)
     Cy_CapSense_SetIOsInDefaultState(context);
 
     /* Enable the CSD HW block interrupt and set interrupt vector to CSX sensing method */
-    context->ptrActiveScanSns->ptrISRCallback = &Cy_CapSense_CSXScanISR;
+    if(NULL != ptrFptrCfg->fptrCSXScanISR)
+    {
+        context->ptrActiveScanSns->ptrISRCallback = ptrFptrCfg->fptrCSXScanISR;
+    }
 
     context->ptrActiveScanSns->mfsChannelIndex = 0u;
 }
@@ -317,7 +325,7 @@ void Cy_CapSense_CSXSetupWidgetExt(
                 cy_stc_capsense_context_t * context)
 {
     /* Initialize widget */
-    Cy_CapSense_CSXSetupWidget(widgetId, context);
+    Cy_CapSense_CSXSetupWidget_Call(widgetId, context);
 
     /* Initialize sensor data structure pointer to appropriate address */
     Cy_CapSense_InitActivePtrSns(sensorId, context);
@@ -510,7 +518,7 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
         calibrateStatus = CY_RET_BAD_PARAM;
     }
 
-    if(CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+    if(CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         /* Previous widget is being scanned, return error */
         calibrateStatus = CYRET_INVALID_STATE;
@@ -519,6 +527,8 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
     if(CY_RET_SUCCESS == calibrateStatus)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
+        ptrWdCfg->ptrWdContext->idacGainIndex = context->ptrCommonConfig->csxIdacGainInitIndex;
+
         ptrActSnsContext = ptrWdCfg->ptrSnsContext;
         totalSns = ptrWdCfg->numSns;
     
@@ -542,11 +552,11 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
             (void)Cy_CapSense_SetupWidget(widgetId, context);
             (void)Cy_CapSense_Scan(context);
 
-            cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+            cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
             watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
             
             /* Wait for EOS */
-            while (CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+            while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
             {
                 if(0uL == watchdogCounter)
                 {
@@ -590,11 +600,11 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
         (void)Cy_CapSense_SetupWidget(widgetId, context);
         (void)Cy_CapSense_Scan(context);
 
-        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
                     
         /* Wait for EOS */
-        while (CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+        while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
             if(0uL == watchdogCounter)
             {
@@ -626,10 +636,11 @@ void Cy_CapSense_CSXSetUpIdacs(cy_stc_capsense_context_t * context)
 {
     uint32_t tmpRegVal;
 
-    tmpRegVal = (uint32_t)context->ptrActiveScanSns->ptrSnsContext->idacComp & CY_CAPSENSE_CSD_IDACA_VAL_MSK;
-    tmpRegVal = tmpRegVal | (((uint32_t)context->ptrCommonConfig->csxIdacGainInit << CSD_IDACA_RANGE_Pos) 
-                                                                  & CY_CAPSENSE_CSD_IDACA_RANGE_MSK);
-    tmpRegVal = tmpRegVal | CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG;
+    /* Set IDAC gain */
+    tmpRegVal = context->ptrCommonConfig->idacGainTable[context->ptrActiveScanSns->ptrWdContext->idacGainIndex].gainReg;
+    /* Set IDAC code */
+    tmpRegVal |= (uint32_t)context->ptrActiveScanSns->ptrSnsContext->idacComp & CY_CAPSENSE_CSD_IDACA_VAL_MSK;
+    tmpRegVal |= CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG;
 
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IDACA, tmpRegVal);
 }
@@ -700,7 +711,7 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSXConnectRx(
@@ -746,7 +757,7 @@ void Cy_CapSense_CSXConnectRx(
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSXConnectTx(
@@ -785,7 +796,7 @@ void Cy_CapSense_CSXConnectTx(
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectRx(
@@ -829,7 +840,7 @@ void Cy_CapSense_CSXDisconnectRx(
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectTx(
@@ -1060,7 +1071,7 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
         Cy_CapSense_CSXInitNextScan(cxt);
     }
     
-    if(CY_CAPSENSE_NOT_BUSY == (cxt->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+    if(CY_CAPSENSE_NOT_BUSY == (cxt->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CONFIG, cxt->ptrInternalContext->csxRegConfigInit);
         Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CSDCMP, CY_CAPSENSE_DEFAULT_CSD_CSDCMP_CFG);
@@ -1196,7 +1207,7 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_PRECHARGE_CSD_SEQ_START_CFG);
 
     /* Init Watchdog Counter to prevent a hang */
-    cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+    cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
     watchdogCounter = Cy_CapSense_WatchdogCyclesNum(initWatchdogTimeUs, cpuFreqMHz, intrInitLoopDuration);
     
     /* Approximate duration of Wait For Init loop */
@@ -1318,6 +1329,8 @@ static void Cy_CapSense_CSXChangeClkFreq(uint32_t channelIndex, cy_stc_capsense_
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SENSE_PERIOD, tmpRegVal);
 
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides CapSense MW Tuner module function prototypes.
@@ -13,11 +13,14 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_TUNER_H)
 #define CY_CAPSENSE_TUNER_H
 
 #include "cy_syslib.h"
 #include "cy_capsense_structure.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -70,7 +73,7 @@ extern "C" {
 /******************************************************************************/
 
 uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket);
+uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket);
 
 /** \} */
 
@@ -82,11 +85,34 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket);
 void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context);
 uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len);
 
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_CheckCommandIntegrity
+****************************************************************************//**
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_CheckTunerCmdIntegrity() function should be used instead.
+*
+* \param commandPacket
+* The pointer to the data packet that should be verified.
+*
+* \return
+* Returns the result of the command verification.
+*
+*******************************************************************************/
+__STATIC_INLINE uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
+{
+    return(Cy_CapSense_CheckTunerCmdIntegrity(commandPacket));
+}
+
 /** \} \endcond */
+
 
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_TUNER_H */
 

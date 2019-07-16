@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csd.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -16,6 +16,8 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
+#include <stddef.h>
 #include "cy_device_headers.h"
 #include "cy_sysclk.h"
 #include "cy_syslib.h"
@@ -26,6 +28,8 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_csd.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -193,6 +197,7 @@ void Cy_CapSense_CSDDisableShieldElectrodes(const cy_stc_capsense_context_t * co
 void Cy_CapSense_CSDInitialize(cy_stc_capsense_context_t * context)
 {
     uint32_t interruptState;
+    cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
     
     /* Set all the sensors to inactive state */
     Cy_CapSense_CSDClearSensors(context);
@@ -266,7 +271,10 @@ void Cy_CapSense_CSDInitialize(cy_stc_capsense_context_t * context)
     Cy_CapSense_SetClkDivider((uint32_t)context->ptrCommonContext->modCsdClk - 1u, context);
     
     /* Setup ISR handler to single-sensor scan function */
-    context->ptrActiveScanSns->ptrISRCallback = &Cy_CapSense_CSDScanISR;
+    if(NULL != ptrFptrCfg->fptrCSDScanISR)
+    {
+        context->ptrActiveScanSns->ptrISRCallback = ptrFptrCfg->fptrCSDScanISR;
+    }
 
     context->ptrActiveScanSns->mfsChannelIndex = 0u;
 }
@@ -819,7 +827,7 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSDConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSDConnectSns(
@@ -857,7 +865,7 @@ void Cy_CapSense_CSDConnectSns(
 * \funcusage
 * 
 * An example of using the function to perform port pin re-connection: 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSDConnect
 * 
 *******************************************************************************/
 void Cy_CapSense_CSDDisconnectSns(
@@ -1392,11 +1400,11 @@ static void Cy_CapSense_CSDCalibrate(
             /* Scan the sensor */
             Cy_CapSense_CSDScanExt(context);
 
-            cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+            cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
             watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
             
             /* Wait for EOS */
-            while (CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+            while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
             {
                 if(0uL == watchdogCounter)
                 {
@@ -1443,11 +1451,11 @@ static void Cy_CapSense_CSDCalibrate(
         Cy_CapSense_CSDSetupWidgetExt(widgetId, snsIndex, context);
         Cy_CapSense_CSDScanExt(context);
 
-        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
 
         /* Wait for EOS */
-        while (CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+        while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
             if(0uL == watchdogCounter)
             {
@@ -1565,7 +1573,7 @@ cy_status Cy_CapSense_CSDCalibrateWidget(
         calibrateStatus = CY_RET_BAD_PARAM;
     }
 
-    if(CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+    if(CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         /* Previous widget is being scanned, return error */
         calibrateStatus = CYRET_INVALID_STATE;
@@ -1574,7 +1582,8 @@ cy_status Cy_CapSense_CSDCalibrateWidget(
     if(CY_RET_SUCCESS == calibrateStatus)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
-        ptrWdCfg->ptrWdContext->idacGainIndex = context->ptrCommonConfig->csdIdacGainIndexDefault;
+        ptrWdCfg->ptrWdContext->idacGainIndex = context->ptrCommonConfig->csdIdacGainInitIndex;
+
         /* Perform calibration */
         if (CY_CAPSENSE_ENABLE != context->ptrCommonConfig->csdIdacAutoGainEn)
         {
@@ -1596,13 +1605,13 @@ cy_status Cy_CapSense_CSDCalibrateWidget(
         }
         
         /* Perform specified widget scan to check calibration result */
-        Cy_CapSense_CSDSetupWidget(widgetId, context);
-        Cy_CapSense_CSDScan(context);
+        Cy_CapSense_CSDSetupWidget_Call(widgetId, context);
+        Cy_CapSense_CSDScan_Call(context);
 
-        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
         
-        while (CY_CAPSENSE_SW_STS_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_SW_STS_BUSY))
+        while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
             if(0uL == watchdogCounter)
             {
@@ -1683,7 +1692,7 @@ static void Cy_CapSense_CSDCmodPrecharge(cy_stc_capsense_context_t * context)
                                                                      CY_CAPSENSE_CSD_SEQ_START_START_MSK);
 
     /* Init Watchdog Counter to prevent a hang */
-    cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+    cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
     watchdogCounter = Cy_CapSense_WatchdogCyclesNum(initWatchdogTimeUs, cpuFreqMHz, intrInitLoopDuration);
 
     /* Approximate duration of Wait For Init loop */
@@ -1991,6 +2000,8 @@ __STATIC_INLINE void Cy_CapSense_CSDChangeClkFreq(uint32_t channelIndex, cy_stc_
     /* Update reg value with divider and configuration */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SENSE_PERIOD, regConfig);
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

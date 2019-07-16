@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -13,6 +13,7 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #include <stddef.h>
 #include "cy_syslib.h"
 #include "cy_syspm.h"
@@ -24,6 +25,8 @@
 #include "cy_capsense_filter.h"
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_tuner.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 
 /*******************************************************************************
@@ -69,7 +72,7 @@
 *
 * \funcusage
 * 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Initialization
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Initialization
 * The 'cy_capsense_context' variable that is used as the parameter of the
 * Cy_CapSense_Init() and Cy_CapSense_Enable() functions is declared in the
 * cycfg_capsense.h file.
@@ -77,14 +80,14 @@
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
 * For CM0+ core:
-* \snippet capsense\1.1\snippet\main.c snippet_m0p_capsense_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m0p_capsense_interrupt_source_declaration
 *
 * For CM4 core:
-* \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
 * 
 * The CapSense interrupt handler should be declared by the application program
 * according to the example below:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_IntHandler
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_IntHandler
 * 
 * The CapSense_HW is the pointer to the base register address of 
 * the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
@@ -149,7 +152,7 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 *
 * \funcusage
 * 
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Initialization
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Initialization
 * The 'cy_capsense_context' variable that is used as the parameter of the
 * Cy_CapSense_Init() and Cy_CapSense_Enable() functions is declared in the
 * cycfg_capsense.h file.
@@ -157,14 +160,14 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
 * For CM0+ core:
-* \snippet capsense\1.1\snippet\main.c snippet_m0p_capsense_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m0p_capsense_interrupt_source_declaration
 *
 * For CM4 core:
-* \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
 * 
 * The CapSense interrupt handler should be declared by the application program
 * according to the example below:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_IntHandler
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_IntHandler
 * 
 * The CapSense_HW is the pointer to the base register address of 
 * the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
@@ -191,26 +194,26 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
     {
         if (CY_CAPSENSE_CSD_SS_DIS != context->ptrCommonConfig->csdAutotuneEn)
         {
-            result |= Cy_CapSense_SsAutoTune(context);
+            result |= Cy_CapSense_SsAutoTune_Call(context);
         }
 
         if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdEn) &&
            (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn) &&
            (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdIdacAutocalEn))
         {
-            result |= Cy_CapSense_CalibrateAllCsdWidgets(context);
+            result |= Cy_CapSense_CalibrateAllCsdWidgets_Call(context);
         }
 
         if((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxEn) &&
            (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxIdacAutocalEn))
         {
-            result |= Cy_CapSense_CalibrateAllCsxWidgets(context);
+            result |= Cy_CapSense_CalibrateAllCsxWidgets_Call(context);
         }
 
 
         result |= Cy_CapSense_ScanAllWidgets(context);
         /* Init Watchdog Counter to prevent a hang */
-        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
+        cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
 
         while(CY_CAPSENSE_NOT_BUSY != Cy_CapSense_IsBusy(context))
@@ -224,7 +227,7 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
         }
     }
 
-    Cy_CapSense_InitializeAllFilters(context);
+    Cy_CapSense_InitializeAllFilters_Call(context);
     Cy_CapSense_InitializeAllBaselines(context);
 
     return result;
@@ -406,7 +409,7 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * \funcusage
 * 
 * An example of pipeline implementation:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidget
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessWidget
 * 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
@@ -425,13 +428,13 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
             switch(ptrWdCfg->senseMethod)
             {
                 case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
-                    result = Cy_CapSense_DpProcessCsdWidgetRawCounts(ptrWdCfg, context);
-                    Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
+                    result = Cy_CapSense_DpProcessCsdWidgetRawCounts_Call(ptrWdCfg, context);
+                    Cy_CapSense_DpProcessCsdWidgetStatus_Call(ptrWdCfg, context);
                     break;
 
                 case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
-                    result = Cy_CapSense_DpProcessCsxWidgetRawCounts(ptrWdCfg, context);
-                    Cy_CapSense_DpProcessCsxWidgetStatus(ptrWdCfg, context);
+                    result = Cy_CapSense_DpProcessCsxWidgetRawCounts_Call(ptrWdCfg, context);
+                    Cy_CapSense_DpProcessCsxWidgetStatus_Call(ptrWdCfg, context);
                     break;
 
             default:
@@ -506,7 +509,7 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * \funcusage
 * 
 * An example of customized data processing, changed processing order:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidgetExt
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessWidgetExt
 * 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidgetExt(
@@ -587,7 +590,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 
                 if (0u != (mode & CY_CAPSENSE_PROCESS_STATUS))
                 {
-                    Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
+                    Cy_CapSense_DpProcessCsdWidgetStatus_Call(ptrWdCfg, context);
                 }
                 break;
 
@@ -633,7 +636,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 
                 if (0u != (mode & CY_CAPSENSE_PROCESS_STATUS))
                 {
-                    Cy_CapSense_DpProcessCsxWidgetStatus(ptrWdCfg, context);
+                    Cy_CapSense_DpProcessCsxWidgetStatus_Call(ptrWdCfg, context);
                 }
                 break;
 
@@ -697,7 +700,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * 
 * An example demonstrates pipeline implementation of sensor scanning and 
 * processing:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessSensorExt
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessSensorExt
 * 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessSensorExt(
@@ -790,11 +793,11 @@ cy_status Cy_CapSense_ProcessSensorExt(
 * Function Name: Cy_CapSense_Wakeup
 ****************************************************************************//**
 *
-* Resumes the middleware after Deep Sleep.
+* Resumes the middleware after CPU / System Deep Sleep.
 *
 * This function is used to resume the middleware operation after exiting 
-* Deep Sleep. In Deep Sleep power mode, the CSD HW block is powered off 
-* and an extra delay is required to establish correct operation of 
+* CPU / System Deep Sleep. After the CSD HW block has been powered off, 
+* an extra delay is required to establish correct operation of 
 * the CSD HW block.
 *
 * \param context
@@ -811,26 +814,36 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_DeepSleepCallback
 ****************************************************************************//**
 *
-* Handles Active to Deep Sleep power mode transition for the CapSense
+* Handles CPU active to CPU / System Deep Sleep power mode transition for the CapSense
 * middleware.
 *
 * Calling this function directly from the application program is not recommended.
-* Instead, Cy_SysPm_DeepSleep() should be used for the Active to Deep Sleep
+* Instead, Cy_SysPm_CpuEnterDeepSleep() should be used for the CPU active to CPU / System Deep Sleep
 * power mode transition of the device.
+* \note
+* After the CPU Deep Sleep transition, the device automatically goes 
+* to System Deep Sleep if all conditions are fulfilled: another core is 
+* in CPU Deep Sleep, all the peripherals are ready to System Deep Sleep, etc.
+* (see details in the device TRM).
 *
-* For proper operation of the CapSense middleware during the Active to
-* Deep Sleep mode transition, a callback to this function should be registered
+* For proper operation of the CapSense middleware during the CPU active to
+* CPU / System Deep Sleep mode transition, a callback to this function should be registered
 * using the Cy_SysPm_RegisterCallback() function with CY_SYSPM_DEEPSLEEP
 * type. After the callback is registered, this function is called by the
-* Cy_SysPm_DeepSleep() function to prepare the middleware to the device
+* Cy_SysPm_CpuEnterDeepSleep() function to prepare the middleware to the device
 * power mode transition.
 * 
 * When this function is called with CY_SYSPM_CHECK_READY as input, this
 * function returns CY_SYSPM_SUCCESS if no scanning is in progress. Otherwise
 * CY_SYSPM_FAIL is returned. If CY_SYSPM_FAIL status is returned, a device
 * cannot change the power mode without completing the current scan as
-* a transition to Deep Sleep during the scan can disrupt the middleware
+* a transition to CPU / System Deep Sleep during the scan can disrupt the middleware
 * operation.
+* 
+* For details of SysPm types and macros refer to the SysPm section of the 
+* PDL documentation
+* <a href="https://www.cypress.com/documentation/technical-reference-manuals/psoc-6-mcu-psoc-63-ble-architecture-technical-reference" 
+* title="PDL API Reference" >PDL API Reference</a>.
 * 
 * \param callbackParams
 * Refer to the description of the cy_stc_syspm_callback_params_t type in the
@@ -842,8 +855,8 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * \return
 * Returns the status cy_en_syspm_status_t of the operation requested 
 * by the mode parameter:
-* - CY_SYSPM_SUCCESS  - Deep Sleep power mode can be entered.
-* - CY_SYSPM_FAIL     - Deep Sleep power mode cannot be entered.
+* - CY_SYSPM_SUCCESS  - CPU / System Deep Sleep power mode can be entered.
+* - CY_SYSPM_FAIL     - CPU / System Deep Sleep power mode cannot be entered.
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
@@ -917,7 +930,7 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * \funcusage
 * 
 * An example of timestamp updating:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Timestamp
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Timestamp
 * 
 *******************************************************************************/
 void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
@@ -990,12 +1003,11 @@ void Cy_CapSense_SetGestureTimestamp(
 * \funcusage
 * 
 * An example of sharing the CSD HW block by CapSense and CSDADC middleware:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 {
-    uint32_t cpuFreqMHz;
     uint32_t watchdogCounter;
 
     cy_en_csd_key_t mvKey;
@@ -1004,42 +1016,35 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
     cy_stc_csd_context_t * ptrCsdCxt = context->ptrCommonConfig->ptrCsdContext;
     CSD_Type * ptrCsdBaseAdd = context->ptrCommonConfig->ptrCsdBase;
 
-    /* Approximate duration of Wait For Init loop */
-    const uint32_t intrInitLoopDuration = 5uL;
-
-    /* Wait For Init watchdog timeout in microseconds */
-    const uint32_t initWatchdogTimeUs = 1000000uL;
+    /* Number of cycle of one for() loop */
+    const uint32_t cyclesPerLoop = 5u;
+    /* Timeout in microseconds */
+    const uint32_t watchdogTimeoutUs = 10000u;
 
     /* Get the CSD HW block status */
     mvKey = Cy_CSD_GetLockStatus(ptrCsdBaseAdd, ptrCsdCxt);
     if(CY_CSD_NONE_KEY == mvKey)
     {
-        csdHwStatus = Cy_CSD_GetConversionStatus(ptrCsdBaseAdd, ptrCsdCxt);
-        if(CY_CSD_BUSY == csdHwStatus)
+        /* Reset CSD HW block sequencer state always to handle a corner case when the sequencer is not in the idle state */
+        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK);
+        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_CSD_SEQ_START_ABORT_MSK);
+        watchdogCounter = Cy_CapSense_WatchdogCyclesNum(watchdogTimeoutUs, 
+            context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA, cyclesPerLoop);
+        do
         {
-            Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK);
-            Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_CSD_SEQ_START_ABORT_MSK);
-
-            /* Init Watchdog Counter to prevent a hang */
-            cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / 1000000uL;
-            watchdogCounter = Cy_CapSense_WatchdogCyclesNum(initWatchdogTimeUs, cpuFreqMHz, intrInitLoopDuration);
-            while((CY_CSD_BUSY == csdHwStatus) && (0uL != watchdogCounter))
-            {
-                csdHwStatus = Cy_CSD_GetConversionStatus(ptrCsdBaseAdd, ptrCsdCxt);
-                watchdogCounter--;
-            }
+            csdHwStatus = Cy_CSD_GetConversionStatus(ptrCsdBaseAdd, ptrCsdCxt);
+            watchdogCounter--;
         }
+        while((CY_CSD_BUSY == csdHwStatus) && (0u != watchdogCounter));
 
         if(CY_CSD_SUCCESS == csdHwStatus)
         {
-            csdHwStatus = Cy_CSD_Init(
-                                ptrCsdBaseAdd, 
-                                &cy_capsense_csdCfg, 
-                                CY_CSD_CAPSENSE_KEY, 
-                                ptrCsdCxt);
-            result = CY_RET_SUCCESS;
+            csdHwStatus = Cy_CSD_Init(ptrCsdBaseAdd, &cy_capsense_csdCfg, CY_CSD_CAPSENSE_KEY, ptrCsdCxt);
+            if(CY_CSD_SUCCESS == csdHwStatus)
+            {
+                result = CY_RET_SUCCESS;
+            }
         }
-        
     }
     return (result);
 }
@@ -1084,19 +1089,19 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * 
 * An example of sharing the CSD HW block by the CapSense and CSDADC middleware.<br>
 * Declares the CapSense_ISR_cfg variable:
-* \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
 * 
 * Declares the CSDADC_ISR_cfg variable:
-* \snippet capsense\1.1\snippet\main.c snippet_m4_adc_interrupt_source_declaration
+* \snippet capsense/snippet/main.c snippet_m4_adc_interrupt_source_declaration
 * 
 * Defines the CapSense interrupt handler:
-* \snippet capsense\1.1\snippet\main.c snippet_CapSense_Interrupt
+* \snippet capsense/snippet/main.c snippet_CapSense_Interrupt
 * 
 * Defines the CSDADC interrupt handler:
-* \snippet capsense\1.1\snippet\main.c snippet_CSDADC_Interrupt
+* \snippet capsense/snippet/main.c snippet_CSDADC_Interrupt
 * 
 * The part of the main.c FW flow:
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
@@ -1104,7 +1109,7 @@ cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
     cy_status result = CY_RET_INVALID_STATE;
     cy_en_csd_status_t initStatus = CY_CSD_LOCKED;
 
-    if (CY_CAPSENSE_SW_STS_BUSY != Cy_CapSense_IsBusy(context))
+    if (CY_CAPSENSE_BUSY != Cy_CapSense_IsBusy(context))
     {
         /* Disconnect external capacitors and sensor pins from analog bus */
         Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_UNDEFINED_E, context);
@@ -1234,6 +1239,8 @@ cy_status Cy_CapSense_UnRegisterCallback(
     return(retVal);
 
 }
+
+#endif /* CY_IP_MXCSDV2 */
 
 
 /* [] END OF FILE */

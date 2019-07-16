@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.h
-* \version 1.20
+* \version 2.0
 *
 * \brief
 * This file provides the function prototypes for the centroid calculation
@@ -14,12 +14,15 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 
+
 #if !defined(CY_CAPSENSE_CENTROID_H)
 #define CY_CAPSENSE_CENTROID_H
 
 #include "cy_capsense_lib.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
+
+#if defined(CY_IP_MXCSDV2)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -61,7 +64,8 @@ void Cy_CapSense_DpCalcTouchPadCentroid(
 void Cy_CapSense_DpTouchTracking(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig);
 void Cy_CapSense_DpFilterTouchRecord(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitPositionFilters(
                 uint32_t filterConfig,
                 const cy_stc_capsense_position_t * ptrInput, 
@@ -69,21 +73,25 @@ void Cy_CapSense_InitPositionFilters(
 void Cy_CapSense_RunPositionFilters(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory);
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_RunPositionFiltersRadial(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory);
+                cy_stc_capsense_position_t * ptrHistory,
+                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_ProcessPositionFilters(
                 cy_stc_capsense_touch_t * newTouch,
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 
 /** \} \endcond */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXCSDV2 */
 
 #endif /* CY_CAPSENSE_CENTROID_H */
 

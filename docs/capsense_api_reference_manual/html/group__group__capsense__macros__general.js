@@ -1,9 +1,9 @@
 var group__group__capsense__macros__general =
 [
-    [ "CY_CAPSENSE_MDW_VERSION_MAJOR", "group__group__capsense__macros__general.html#ga75e6fc80b664fe371e18d3b430fd2f92", null ],
-    [ "CY_CAPSENSE_MDW_VERSION_MINOR", "group__group__capsense__macros__general.html#ga4796fa841e952cbfa8d609ab5a2d07c3", null ],
-    [ "CY_CAPSENSE_MDW_ID", "group__group__capsense__macros__general.html#gafc1763462674c22be6642057aea031cc", null ],
-    [ "CY_CAPSENSE_SW_STS_BUSY", "group__group__capsense__macros__general.html#ga6dda4b99954888fe593b735df069c8e9", null ],
+    [ "CY_CAPSENSE_MW_VERSION_MAJOR", "group__group__capsense__macros__general.html#ga104c621005040ae8af24f65224291585", null ],
+    [ "CY_CAPSENSE_MW_VERSION_MINOR", "group__group__capsense__macros__general.html#gad6ec980865b471c2f2dfb2cdc35d4c2b", null ],
+    [ "CY_CAPSENSE_ID", "group__group__capsense__macros__general.html#ga9d6e1a11f2bd6a660ccf4ff767e18186", null ],
+    [ "CY_CAPSENSE_BUSY", "group__group__capsense__macros__general.html#gaa3c8ba2488a71e7ab976519e39169929", null ],
     [ "CY_CAPSENSE_NOT_BUSY", "group__group__capsense__macros__general.html#ga1bd45eed2be393b7f53c20f1bae2814e", null ],
     [ "CY_CAPSENSE_ENABLE", "group__group__capsense__macros__general.html#ga24e839ab0e286fd7e0a29e94f400437c", null ],
     [ "CY_CAPSENSE_DISABLE", "group__group__capsense__macros__general.html#ga67314c7f770734272917dd987bfbb970", null ],

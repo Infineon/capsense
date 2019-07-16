@@ -52,6 +52,7 @@ var searchData=
   ['ptrdiplextable',['ptrDiplexTable',['../structcy__stc__capsense__widget__config__t.html#a6224ab7605e28404d786633b2c1c1f6b',1,'cy_stc_capsense_widget_config_t']]],
   ['ptreltdconfig',['ptrEltdConfig',['../structcy__stc__capsense__widget__config__t.html#a88a5166ff86cf001344434b0bb84d799',1,'cy_stc_capsense_widget_config_t::ptrEltdConfig()'],['../structcy__stc__active__scan__sns__t.html#abc6f5af6f05f765faaca0aa5f4d9da40',1,'cy_stc_active_scan_sns_t::ptrEltdConfig()']]],
   ['ptreoscallback',['ptrEOSCallback',['../structcy__stc__capsense__common__context__t.html#ae5ddccd94ecc0ee71482f6c6cbba947f',1,'cy_stc_capsense_common_context_t']]],
+  ['ptrfptrconfig',['ptrFptrConfig',['../structcy__stc__capsense__context__t.html#a00787c47f768578185fc57e6035ff68a',1,'cy_stc_capsense_context_t']]],
   ['ptrgestureconfig',['ptrGestureConfig',['../structcy__stc__capsense__widget__config__t.html#a0f4c0e442a86b761a8a00cd76ecc83b5',1,'cy_stc_capsense_widget_config_t']]],
   ['ptrgesturecontext',['ptrGestureContext',['../structcy__stc__capsense__widget__config__t.html#ad60be1a14aded108976eb2d66daac7f1',1,'cy_stc_capsense_widget_config_t']]],
   ['ptrinternalcontext',['ptrInternalContext',['../structcy__stc__capsense__context__t.html#a9b84076b589b363d35097eb12420fd4b',1,'cy_stc_capsense_context_t']]],
