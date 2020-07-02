@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -25,7 +25,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_filter.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -159,7 +159,7 @@ void Cy_CapSense_DpCentroidDiplex(
         }
     }
     
-    if (maxIndex != CY_CAPSENSE_NO_LOCAL_MAX)
+    if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
     {
         multiplier = (uint32_t)ptrWdConfig->xResolution << 8u;
         /* Calculate position */
@@ -220,12 +220,14 @@ void Cy_CapSense_DpCentroidLinear(
     uint32_t sum = 0u;
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
-    uint32_t maxIndex = 0u;
+    uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
     uint32_t multiplier;
     uint32_t offset;
+
+    CY_ASSERT(snsCount > 2u);
     
     if (1u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_NUMBER_MASK))
     {
@@ -262,25 +264,32 @@ void Cy_CapSense_DpCentroidLinear(
             ptrSnsCxt++;
         }
         
-        /* Calculate position */
-        multiplier = (uint32_t)ptrWdConfig->xResolution << 8u;
-        if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
-        {
-            multiplier /= (snsCount - 1u);
-            offset = 0u;
+        if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
+        {   
+            /* Calculate position */
+            multiplier = (uint32_t)ptrWdConfig->xResolution << 8u;
+            if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
+            {
+                multiplier /= (snsCount - 1u);
+                offset = 0u;
+            }
+            else
+            {
+                multiplier /= snsCount;
+                offset = multiplier >> 1u;
+            }
+            
+            denominator = (int32_t)maxSum;
+            denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);     
+
+            /* Round result and shift 8 bits left */
+            newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
+            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
         else
         {
-            multiplier /= snsCount;
-            offset = multiplier >> 1u;
+            newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
         }
-        
-        denominator = (int32_t)maxSum;
-        denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
-                    
-        /* Round result and shift 8 bits left */
-        newTouch->numPosition = 1u;
-        newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
     }
     else
     {
@@ -321,7 +330,7 @@ void Cy_CapSense_DpCentroidRadial(
     uint32_t sum = 0u;
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
-    uint32_t maxIndex = 0u;
+    uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
@@ -362,18 +371,26 @@ void Cy_CapSense_DpCentroidRadial(
             ptrSnsCxt++;
         }
 
-        /* Calculate position */
-        multiplier = ((uint32_t)ptrWdConfig->xResolution << 8u) / snsCount;
-        
-        denominator = (int32_t)maxSum;
-        denominator = ((numerator * (int32_t)multiplier) / denominator) + ((int32_t)maxIndex * (int32_t)multiplier);
-        if (denominator < 0)
-        {
-            denominator += ((int32_t)snsCount * (int32_t)multiplier);
+        if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
+        {   
+            /* Calculate position */
+            multiplier = ((uint32_t)ptrWdConfig->xResolution << 8u) / snsCount;
+            
+            denominator = (int32_t)maxSum;
+            denominator = ((numerator * (int32_t)multiplier) / denominator) + ((int32_t)maxIndex * (int32_t)multiplier);
+
+            if (denominator < 0)
+            {
+                denominator += ((int32_t)snsCount * (int32_t)multiplier);
+            }
+            /* Round result and shift 8 bits left */
+            newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
+            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
-        /* Round result and shift 8 bits left */
-        newTouch->numPosition = 1u;
-        newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+        else
+        {
+            newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
+        }
     }
     else
     {
@@ -416,12 +433,15 @@ void Cy_CapSense_DpCentroidTouchpad(
     uint32_t sum = 0u;
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
-    uint32_t maxIndex = 0u;
+    uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
     uint32_t multiplier;
     uint32_t offset;
+
+    CY_ASSERT(colCount > 2u);
+    CY_ASSERT(rowCount > 2u);
     
     if (1u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_NUMBER_MASK))
     {
@@ -465,86 +485,102 @@ void Cy_CapSense_DpCentroidTouchpad(
             ptrSnsCxt++;
         }
         
-        /* Calculate position */
-        multiplier = (uint32_t)ptrWdConfig->xResolution << 8u;
-        if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
-        {
-            multiplier /= (colCount - 1u);
-            offset = 0u;
+        if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
+        {   
+            /* Calculate position */
+            multiplier = (uint32_t)ptrWdConfig->xResolution << 8u;
+            if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
+            {
+                multiplier /= (colCount - 1u);
+                offset = 0u;
+            }
+            else
+            {
+                multiplier /= colCount;
+                offset = multiplier >> 1u;
+            }
+            
+            denominator = (int32_t)maxSum;
+            denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
+            
+            /* Round result and shift 8 bits left */
+            newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
+            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
         else
         {
-            multiplier /= colCount;
-            offset = multiplier >> 1u;
+            newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
         }
         
-        denominator = (int32_t)maxSum;
-        denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
-                    
-        /* Round result and shift 8 bits left */
-        newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
-        
-        /***********************************************************************
-        * Y Axis (Rows)
-        ***********************************************************************/
-        sum = 0u;
-        maxSum = 0u;
-        maxDiff = 0u;
-        maxIndex = 0u;
-        /* Find maximum signal */
-        ptrSnsCxt = &ptrWdConfig->ptrSnsContext[colCount];
-        for (snsIndex = colCount; snsIndex < snsCount; snsIndex++)
+        if(newTouch->numPosition != CY_CAPSENSE_POSITION_NONE)
         {
-            if (ptrSnsCxt->diff > maxDiff)
+            /***********************************************************************
+            * Y Axis (Rows)
+            ***********************************************************************/
+            sum = 0u;
+            maxSum = 0u;
+            maxDiff = 0u;
+            maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
+            /* Find maximum signal */
+            ptrSnsCxt = &ptrWdConfig->ptrSnsContext[colCount];
+            for (snsIndex = colCount; snsIndex < snsCount; snsIndex++)
             {
-                maxDiff = ptrSnsCxt->diff;
-            }
-            ptrSnsCxt++;
-        }
-        
-        /* Find index of sensor with maximum signal */
-        ptrSnsCxt = &ptrWdConfig->ptrSnsContext[colCount];
-        for (snsIndex = 0u; snsIndex < rowCount; snsIndex++)
-        {
-            /* Potential maximum */
-            if (maxDiff == ptrSnsCxt->diff)
-            {
-                /* Get sum of differences around maximum */
-                diffM = (snsIndex > 0u) ? (ptrSnsCxt - 1u)->diff : 0u;
-                diffP = (snsIndex < (rowCount - 1u)) ? (ptrSnsCxt + 1u)->diff : 0u;
-                sum = ptrSnsCxt->diff + diffM + diffP;
-                /* Check if this sum is maximum sum */
-                if (maxSum < sum)
+                if (ptrSnsCxt->diff > maxDiff)
                 {
-                    /* New maximum */
-                    maxIndex = snsIndex;
-                    maxSum = sum;
-                    numerator = (int32_t)diffP - (int32_t)diffM;
+                    maxDiff = ptrSnsCxt->diff;
                 }
+                ptrSnsCxt++;
             }
-            ptrSnsCxt++;
+            
+            /* Find index of sensor with maximum signal */
+            ptrSnsCxt = &ptrWdConfig->ptrSnsContext[colCount];
+            for (snsIndex = 0u; snsIndex < rowCount; snsIndex++)
+            {
+                /* Potential maximum */
+                if (maxDiff == ptrSnsCxt->diff)
+                {
+                    /* Get sum of differences around maximum */
+                    diffM = (snsIndex > 0u) ? (ptrSnsCxt - 1u)->diff : 0u;
+                    diffP = (snsIndex < (rowCount - 1u)) ? (ptrSnsCxt + 1u)->diff : 0u;
+                    sum = ptrSnsCxt->diff + diffM + diffP;
+                    /* Check if this sum is maximum sum */
+                    if (maxSum < sum)
+                    {
+                        /* New maximum */
+                        maxIndex = snsIndex;
+                        maxSum = sum;
+                        numerator = (int32_t)diffP - (int32_t)diffM;
+                    }
+                }
+                ptrSnsCxt++;
+            }
+            
+            if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
+            {
+                /* Calculate position */
+                multiplier = (uint32_t)ptrWdConfig->yResolution << 8u;
+                if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
+                {
+                    multiplier /= (rowCount - 1u);
+                    offset = 0u;
+                }
+                else
+                {
+                    multiplier /= rowCount;
+                    offset = multiplier >> 1u;
+                }
+                
+                denominator = (int32_t)maxSum;
+                denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
+                            
+                /* Round result and shift 8 bits left */
+                newTouch->ptrPosition[0].y = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+            }
+            else
+            {
+                newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
+            }
         }
-        
-        /* Calculate position */
-        multiplier = (uint32_t)ptrWdConfig->yResolution << 8u;
-        if (0u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CALC_METHOD_MASK))
-        {
-            multiplier /= (rowCount - 1u);
-            offset = 0u;
-        }
-        else
-        {
-            multiplier /= rowCount;
-            offset = multiplier >> 1u;
-        }
-        
-        denominator = (int32_t)maxSum;
-        denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
-                    
-        /* Round result and shift 8 bits left */
-        newTouch->ptrPosition[0].y = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
-        
-        newTouch->numPosition = 1u;
     }
     else
     {

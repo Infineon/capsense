@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -28,7 +28,7 @@
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_centroid.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -258,7 +258,7 @@ void Cy_CapSense_InitializeWidgetGestures(
 * Function Name: Cy_CapSense_DecodeWidgetGestures
 ****************************************************************************//**
 *
-* Performs processing of all gestures for the specified widget.
+* Performs decoding of all gestures for the specified widget.
 *
 * This function should be called by application program only after all sensors
 * are scanned and all data processing is executed using 
@@ -390,6 +390,8 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
     uint32_t freqChNumber;
     uint16_t * ptrHistoryCh;
     uint16_t * ptrHistorySns;
+    uint16_t * ptrBslnInvCh = ptrWdConfig->ptrBslnInv;
+    uint16_t * ptrBslnInvSns;
     uint8_t * ptrHistoryLowCh = NULL;
     uint8_t * ptrHistoryLowSns = NULL;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtCh;
@@ -410,6 +412,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
         ptrSnsCxtSns = ptrSnsCxtCh;
         ptrHistorySns = ptrHistoryCh;
         ptrHistoryLowSns = ptrHistoryLowCh;
+        ptrBslnInvSns = ptrBslnInvCh;
         for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)    
         {
             Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
@@ -417,9 +420,10 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
                                                          ptrHistorySns,
                                                          ptrHistoryLowSns,
                                                          context);
-            result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, context);
+            result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
             Cy_CapSense_DpUpdateDifferences(ptrWdConfig->ptrWdContext, ptrSnsCxtSns);
             ptrSnsCxtSns++;
+            ptrBslnInvSns++;
             ptrHistorySns += snsHistorySize;
             if(NULL != ptrHistoryLowSns)
             {
@@ -428,6 +432,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
         }
 
         ptrSnsCxtCh += context->ptrCommonConfig->numSns;
+        ptrBslnInvCh += context->ptrCommonConfig->numSns;
         ptrHistoryCh += context->ptrCommonConfig->numSns * snsHistorySize;
         if(NULL != ptrHistoryLowCh)
         {
@@ -519,6 +524,9 @@ void Cy_CapSense_DpProcessCsxWidgetStatus(
 * - CY_CAPSENSE_PROCESS_DIFFCOUNTS (0x04) Update Difference Counts
 * - CY_CAPSENSE_PROCESS_ALL               Execute all tasks
 *
+* \param ptrSnsBslnInv
+* The pointer to the sensor baseline inversion used for BIST if enabled.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
@@ -536,6 +544,7 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
                 uint16_t * ptrSnsRawHistory,
                 uint8_t * ptrSnsRawHistoryLow,
                 uint32_t mode,
+                uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t  result = CY_RET_SUCCESS;
@@ -553,7 +562,7 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
     {
-        result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, context);
+        result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, ptrSnsBslnInv, context);
     }
     if (0u != (mode & CY_CAPSENSE_PROCESS_DIFFCOUNTS))
     {
@@ -600,6 +609,8 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
     uint32_t freqChNumber;
     uint16_t * ptrHistoryCh;
     uint16_t * ptrHistorySns;
+    uint16_t * ptrBslnInvCh = ptrWdConfig->ptrBslnInv;
+    uint16_t * ptrBslnInvSns;
     uint8_t * ptrHistoryLowCh = NULL;
     uint8_t * ptrHistoryLowSns = NULL;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtCh;
@@ -620,6 +631,7 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
     {
         ptrSnsCxtSns = ptrSnsCxtCh;
         ptrHistorySns = ptrHistoryCh;
+        ptrBslnInvSns = ptrBslnInvCh;
         ptrHistoryLowSns = ptrHistoryLowCh;
         for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)
         {
@@ -644,10 +656,11 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
                 ptrNEHistory++;
             }
             
-            result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, context);
+            result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
             Cy_CapSense_DpUpdateDifferences(ptrWdConfig->ptrWdContext, ptrSnsCxtSns);
 
             ptrSnsCxtSns++;
+            ptrBslnInvSns++;
             ptrHistorySns += snsHistorySize;
             if(NULL != ptrHistoryLowSns)
             {
@@ -657,6 +670,7 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
         }
 
         ptrSnsCxtCh += context->ptrCommonConfig->numSns;
+        ptrBslnInvCh += context->ptrCommonConfig->numSns;
         ptrHistoryCh += context->ptrCommonConfig->numSns * snsHistorySize;
         if(NULL != ptrHistoryLowCh)
         {
@@ -712,15 +726,17 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
 * - CY_CAPSENSE_PROCESS_THRESHOLDS (0x10) Update Thresholds (only if FW Tuning is enabled)
 * - CY_CAPSENSE_PROCESS_ALL               Execute all tasks
 *
+* \param ptrBslnInvSns
+* The pointer to the sensor baseline inversion used for BIST if enabled.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the specified sensor processing operation:
 * - CY_RET_SUCCESS if operation was successfully completed.
-* - CY_CAPSENSE_PROCESS_BASELINE_FAILED if baseline processing of any
-* sensor of the specified widget failed. The result is concatenated with the index
-* of the failed sensor.
+* - CY_RET_BAD_DATA if baseline processing of any sensor of the specified widget
+*   failed.
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
@@ -729,6 +745,7 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
                     uint16_t * ptrSnsRawHistory,
                     uint8_t * ptrSnsRawHistoryLow,
                     uint32_t mode,
+                    uint16_t * ptrBslnInvSns,
                     const cy_stc_capsense_context_t * context)
 {
     uint32_t  result = CY_RET_SUCCESS;
@@ -736,16 +753,14 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
     {
-        Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
-                                                     ptrSnsContext,
-                                                     ptrSnsRawHistory,
-                                                     ptrSnsRawHistoryLow,
+        Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig, ptrSnsContext,
+                                                     ptrSnsRawHistory, ptrSnsRawHistoryLow,
                                                      context);
     }
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
     {
-        result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, context);
+        result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, ptrBslnInvSns, context);
     }
     if (0u != (mode & CY_CAPSENSE_PROCESS_DIFFCOUNTS))
     {
@@ -896,12 +911,15 @@ void Cy_CapSense_DpUpdateDifferences(
 *******************************************************************************/
 void Cy_CapSense_DpProcessButton(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
     uint32_t activeCount = 0u;
     uint32_t startIndex = 0u;
     uint32_t touchTh;
+
+    (void) context;
+
     uint8_t * ptrDebounceCnt = ptrWdConfig->ptrDebounceArr;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt = ptrWdConfig->ptrSnsContext;
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
@@ -1199,10 +1217,13 @@ void Cy_CapSense_DpProcessSlider(
 *******************************************************************************/
 void Cy_CapSense_DpProcessCsdMatrix(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
     uint32_t touchTh;
+
+    (void) context;
+
     uint32_t colNumber = ptrWdConfig->numCols;
     uint8_t * ptrDebounceCnt = ptrWdConfig->ptrDebounceArr;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt = ptrWdConfig->ptrSnsContext;

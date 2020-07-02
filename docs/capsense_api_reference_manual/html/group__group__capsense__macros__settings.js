@@ -43,6 +43,7 @@ var group__group__capsense__macros__settings =
     [ "CY_CAPSENSE_VREF_PASS", "group__group__capsense__macros__settings.html#gab2666ce40783ce2b0259f7fd581cb400", null ],
     [ "CY_CAPSENSE_IREF_SRSS", "group__group__capsense__macros__settings.html#gaf8db866012c77ad000f75d3174938c2c", null ],
     [ "CY_CAPSENSE_IREF_PASS", "group__group__capsense__macros__settings.html#gafcf80ee9c55e11ea09864f8a32de99b6", null ],
+    [ "CY_CAPSENSE_LOW_VOLTAGE_LIMIT", "group__group__capsense__macros__settings.html#gaeaa0712bb3ceba12e47d1d216f600e01", null ],
     [ "CY_CAPSENSE_POSITION_FILTERS_MASK", "group__group__capsense__macros__settings.html#gaee14d46514f114db4fe4bf404b237b66", null ],
     [ "CY_CAPSENSE_POSITION_MED_MASK", "group__group__capsense__macros__settings.html#gaacf8aace37a046c707ea2d97c8de5f49", null ],
     [ "CY_CAPSENSE_POSITION_IIR_MASK", "group__group__capsense__macros__settings.html#ga72f475a33ff67f2a5b9a60fbafbc92f3", null ],

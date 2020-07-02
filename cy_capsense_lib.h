@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * The file contains application programming interface to the CapSense library.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -19,7 +19,7 @@
 
 #include "cy_syslib.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -35,7 +35,7 @@ extern "C" {
 /******************************************************************************/
 /** No touch detected */
 #define CY_CAPSENSE_ADVANCED_CENTROID_NO_TOUCHES                        (0x00u)
-/** Multiple touches detected */
+/** An error in touch calculation or number of detected touches is above supported touches */
 #define CY_CAPSENSE_ADVANCED_CENTROID_POSITION_ERROR                    (0xFFu)
 /** \} */
 

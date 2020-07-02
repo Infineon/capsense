@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['pin_2drelated_20macros',['Pin-related Macros',['../group__group__capsense__macros__pin.html',1,'']]],
-  ['processing_20macros',['Processing Macros',['../group__group__capsense__macros__process.html',1,'']]]
+  ['macros',['Macros',['../group__group__capsense__macros.html',1,'']]],
+  ['miscellaneous_20macros',['Miscellaneous Macros',['../group__group__capsense__macros__miscellaneous.html',1,'']]]
 ];

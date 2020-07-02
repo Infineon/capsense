@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file contains the definitions for all the filters implementation.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -23,7 +23,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -97,6 +97,7 @@ void Cy_CapSense_FtInitializeBaseline(
 uint32_t Cy_CapSense_FtUpdateBaseline(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context);
 
 uint32_t Cy_CapSense_FtMedian(uint32_t x1, uint32_t x2, uint32_t x3);

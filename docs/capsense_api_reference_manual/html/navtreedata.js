@@ -1,6 +1,6 @@
 var NAVTREE =
 [
-  [ "Cypress CapSense Middleware Library 2.0", "index.html", [
+  [ "Cypress CapSense Middleware Library 2.10", "index.html", [
     [ "Cypress CapSense Middleware Library", "index.html", [
       [ "General Description", "index.html#section_capsense_general", [
         [ "Features", "index.html#subsection_capsense_features", null ]
@@ -24,9 +24,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__group__capsense__callbacks.html",
-"group__group__capsense__macros__settings.html#gaebc0fb6bfe7bc94a2c49da92907130ca",
-"structcy__stc__capsense__common__context__t.html#ae5ddccd94ecc0ee71482f6c6cbba947f",
-"structcy__stc__capsense__widget__config__t.html#a93e1fecbb0649d67dee102b1ef2cd1b8"
+"group__group__capsense__macros__settings.html#ga06a28983f42b3fe5a3146bb7e1cd9236",
+"structcy__stc__capsense__bist__context__t.html#a596d6e49bff364072a0ab877e14c90d5",
+"structcy__stc__capsense__gesture__context__t.html#abdb25e19025b77d4115b551bf54454b5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

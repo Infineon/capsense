@@ -1,6 +1,7 @@
 var searchData=
 [
   ['touch_2drelated_20macros',['Touch-related Macros',['../group__group__capsense__macros__touch.html',1,'']]],
+  ['testresultmask',['testResultMask',['../structcy__stc__capsense__bist__context__t.html#a85203f9070ae007e98d8e86b716ea971',1,'cy_stc_capsense_bist_context_t']]],
   ['tfsccontext',['tfscContext',['../structcy__stc__capsense__gesture__context__t.html#a56adc5033fdd287a8fefb4a6c8b1a251',1,'cy_stc_capsense_gesture_context_t']]],
   ['tfslcontext',['tfslContext',['../structcy__stc__capsense__gesture__context__t.html#a3e8c82cbc4289674f444114478fc1a7b',1,'cy_stc_capsense_gesture_context_t']]],
   ['tfzmcontext',['tfzmContext',['../structcy__stc__capsense__gesture__context__t.html#abdb25e19025b77d4115b551bf54454b5',1,'cy_stc_capsense_gesture_context_t']]],

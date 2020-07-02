@@ -38,9 +38,12 @@ var searchData=
   ['positionlast1',['positionLast1',['../structcy__stc__capsense__gesture__context__t.html#aa9ca0fa15854876acb6836093813d18f',1,'cy_stc_capsense_gesture_context_t']]],
   ['positionlast2',['positionLast2',['../structcy__stc__capsense__gesture__context__t.html#a41e2cc14c3e6e152afe249821d218619',1,'cy_stc_capsense_gesture_context_t']]],
   ['proxth',['proxTh',['../structcy__stc__capsense__widget__context__t.html#ac28a8ad287f401bde36886e1995ebd5d',1,'cy_stc_capsense_widget_context_t']]],
+  ['proxthval',['proxThVal',['../structcy__stc__capsense__widget__crc__data__t.html#ae33b026cd3a82c07e0dcdc80723b0e77',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['proxtouchcoeff',['proxTouchCoeff',['../structcy__stc__capsense__common__config__t.html#af700535efc4ea5d745cad94153d1d9a6',1,'cy_stc_capsense_common_config_t']]],
   ['ptractivescansns',['ptrActiveScanSns',['../structcy__stc__capsense__context__t.html#a2719dc3e059d012106c5f4476faec66d',1,'cy_stc_capsense_context_t']]],
   ['ptrballisticcontext',['ptrBallisticContext',['../structcy__stc__capsense__widget__config__t.html#ad510b796c693e08b4f4b8bf8f76c3fb5',1,'cy_stc_capsense_widget_config_t']]],
+  ['ptrbistcontext',['ptrBistContext',['../structcy__stc__capsense__context__t.html#a92125bdfe35272f254fcc58d857670ce',1,'cy_stc_capsense_context_t']]],
+  ['ptrbslninv',['ptrBslnInv',['../structcy__stc__capsense__widget__config__t.html#aa246164662305a0152b2736f56b67e5a',1,'cy_stc_capsense_widget_config_t']]],
   ['ptrcommonconfig',['ptrCommonConfig',['../structcy__stc__capsense__context__t.html#a7e55b9983341848b270166d72d9b50ac',1,'cy_stc_capsense_context_t']]],
   ['ptrcommoncontext',['ptrCommonContext',['../structcy__stc__capsense__context__t.html#a2f4f7d25d0816cf7fe6f04103c4d647e',1,'cy_stc_capsense_context_t']]],
   ['ptrcsdbase',['ptrCsdBase',['../structcy__stc__capsense__common__config__t.html#a314b8ab78e6a189daeb4d150d3f51512',1,'cy_stc_capsense_common_config_t']]],
@@ -50,6 +53,7 @@ var searchData=
   ['ptrcsxtouchhistory',['ptrCsxTouchHistory',['../structcy__stc__capsense__widget__config__t.html#ac662c2d9016717ff89a9fd8c26c97c02',1,'cy_stc_capsense_widget_config_t']]],
   ['ptrdebouncearr',['ptrDebounceArr',['../structcy__stc__capsense__widget__config__t.html#aa353e792734db1ff3873175bb8e832b9',1,'cy_stc_capsense_widget_config_t']]],
   ['ptrdiplextable',['ptrDiplexTable',['../structcy__stc__capsense__widget__config__t.html#a6224ab7605e28404d786633b2c1c1f6b',1,'cy_stc_capsense_widget_config_t']]],
+  ['ptreltdcapacitance',['ptrEltdCapacitance',['../structcy__stc__capsense__widget__config__t.html#aeb69ac183634b05ecb92ab57e1b8feb9',1,'cy_stc_capsense_widget_config_t']]],
   ['ptreltdconfig',['ptrEltdConfig',['../structcy__stc__capsense__widget__config__t.html#a88a5166ff86cf001344434b0bb84d799',1,'cy_stc_capsense_widget_config_t::ptrEltdConfig()'],['../structcy__stc__active__scan__sns__t.html#abc6f5af6f05f765faaca0aa5f4d9da40',1,'cy_stc_active_scan_sns_t::ptrEltdConfig()']]],
   ['ptreoscallback',['ptrEOSCallback',['../structcy__stc__capsense__common__context__t.html#ae5ddccd94ecc0ee71482f6c6cbba947f',1,'cy_stc_capsense_common_context_t']]],
   ['ptrfptrconfig',['ptrFptrConfig',['../structcy__stc__capsense__context__t.html#a00787c47f768578185fc57e6035ff68a',1,'cy_stc_capsense_context_t']]],
@@ -73,5 +77,6 @@ var searchData=
   ['ptrtunersendcallback',['ptrTunerSendCallback',['../structcy__stc__capsense__common__context__t.html#ae0c310162f4df691e7d5ac8ec7937491',1,'cy_stc_capsense_common_context_t']]],
   ['ptrtxconfig',['ptrTxConfig',['../structcy__stc__active__scan__sns__t.html#a9cceebad50f0ca6d92bbfc2408d2c21a',1,'cy_stc_active_scan_sns_t']]],
   ['ptrwdconfig',['ptrWdConfig',['../structcy__stc__active__scan__sns__t.html#ab57fc4e1bdf74350bf3c6a701ad3c56a',1,'cy_stc_active_scan_sns_t::ptrWdConfig()'],['../structcy__stc__capsense__context__t.html#a9b12863ecde08d94f68285a852e6f69b',1,'cy_stc_capsense_context_t::ptrWdConfig()']]],
-  ['ptrwdcontext',['ptrWdContext',['../structcy__stc__capsense__widget__config__t.html#adb558f384dcfa5fe3701f6c377b94da3',1,'cy_stc_capsense_widget_config_t::ptrWdContext()'],['../structcy__stc__active__scan__sns__t.html#a81beffc93033c90901da1f8debfbd59c',1,'cy_stc_active_scan_sns_t::ptrWdContext()'],['../structcy__stc__capsense__context__t.html#a1686259414950156dca1818d0db45922',1,'cy_stc_capsense_context_t::ptrWdContext()']]]
+  ['ptrwdcontext',['ptrWdContext',['../structcy__stc__capsense__widget__config__t.html#adb558f384dcfa5fe3701f6c377b94da3',1,'cy_stc_capsense_widget_config_t::ptrWdContext()'],['../structcy__stc__active__scan__sns__t.html#a81beffc93033c90901da1f8debfbd59c',1,'cy_stc_active_scan_sns_t::ptrWdContext()'],['../structcy__stc__capsense__context__t.html#a1686259414950156dca1818d0db45922',1,'cy_stc_capsense_context_t::ptrWdContext()']]],
+  ['ptrwdgtcrc',['ptrWdgtCrc',['../structcy__stc__capsense__bist__context__t.html#af1dcb8fad4599fa893c49f69abac5724',1,'cy_stc_capsense_bist_context_t']]]
 ];

@@ -45,4 +45,4 @@ The following resources contain more information:
 * [Cypress Semiconductor](http://www.cypress.com)
   
 ---
-© Cypress Semiconductor Corporation, 2019.
+© Cypress Semiconductor Corporation, 2019-2020.

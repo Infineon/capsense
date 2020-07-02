@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the common CapSense definitions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -20,7 +20,7 @@
 #include "cy_device_headers.h"
 #include "cy_sysint.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -31,13 +31,38 @@ extern "C" {
 * Macros
 *******************************************************************************/
 
+#if (defined(CY_IP_M0S8CSDV2))
+    #define CY_CAPSENSE_PSOC4_CSDV2                    (1)
+    #define CY_CAPSENSE_PSOC6_CSDV2                    (0)
+#else
+    #define CY_CAPSENSE_PSOC4_CSDV2                    (0)
+    #define CY_CAPSENSE_PSOC6_CSDV2                    (1)
+#endif
+
+
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
 #define CY_CAPSENSE_MW_VERSION_MAJOR                   (2)
 /** Middleware minor version */
-#define CY_CAPSENSE_MW_VERSION_MINOR                   (0)
+#define CY_CAPSENSE_MW_VERSION_MINOR                   (10)
+/** Middleware version */
+#define CY_CAPSENSE_MW_VERSION                         (210)
+
+/** Defined supported CSD driver version */
+#define CY_CSD_DRV_VERSION_REQUIRED                    (100)
+
+#if !defined (CY_CSD_DRV_VERSION)
+    /** If CSD driver version not defined by driver then define it here */
+    #define CY_CSD_DRV_VERSION                         (100)
+#endif
+
+/* Check used driver version */
+#if (CY_CSD_DRV_VERSION_REQUIRED > CY_CSD_DRV_VERSION)
+    #error Some of the features supported by the CapSense Middleware version CY_CAPSENSE_MW_VERSION require newer version of the PDL. Update the PDL in your project.
+#endif
+
 /** Middleware ID */
 #define CY_CAPSENSE_ID                                 (CY_PDL_DRV_ID(0x07uL))
 
@@ -179,6 +204,9 @@ extern "C" {
 #define CY_CAPSENSE_IREF_SRSS                           (0x00000000uL)
 /** Iref source is taken from PASS */
 #define CY_CAPSENSE_IREF_PASS                           (0x00000001uL)
+
+/** Voltage limit to switch to low-voltage configuration */
+#define CY_CAPSENSE_LOW_VOLTAGE_LIMIT                   (2000u)
 
 /* Position Filter Configuration */
 /** Mask of all filters enabling */
@@ -374,6 +402,29 @@ extern "C" {
 #define CY_CAPSENSE_SCAN_SCOPE_SGL_WD                   (0u)
 /** Widget scanning scope is all widgets */
 #define CY_CAPSENSE_SCAN_SCOPE_ALL_WD                   (1u)
+
+/** \} */
+
+
+/******************************************************************************/
+/** \addtogroup group_capsense_macros_bist *//** \{ */
+/******************************************************************************/
+/** The mask for a widget CRC test */
+#define CY_CAPSENSE_BIST_CRC_WDGT                       (0x0001uL)
+/** The mask for a baseline integrity test */
+#define CY_CAPSENSE_BIST_BSLN_INTEGRITY                 (0x0002uL)
+/** The mask for a rawcount integrity test */
+#define CY_CAPSENSE_BIST_RAW_INTEGRITY                  (0x0004uL)
+/** The mask for a pin integrity test */
+#define CY_CAPSENSE_BIST_SNS_INTEGRITY                  (0x0008uL)
+/** The mask for a sensor capacitance measurement test */
+#define CY_CAPSENSE_BIST_SNS_CAP                        (0x0010uL)
+/** The mask for a shield capacitance measurement test */
+#define CY_CAPSENSE_BIST_SHIELD_CAP                     (0x0020uL)
+/** The mask for an external capacitor capacitance measurement test */
+#define CY_CAPSENSE_BIST_EXTERNAL_CAP                   (0x0040uL)
+/** The mask for a VDDA measurement test */
+#define CY_CAPSENSE_BIST_VDDA                           (0x0080uL)
 
 /** \} */
 

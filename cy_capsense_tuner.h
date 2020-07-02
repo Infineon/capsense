@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides CapSense MW Tuner module function prototypes.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -20,7 +20,7 @@
 #include "cy_syslib.h"
 #include "cy_capsense_structure.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -83,7 +83,6 @@ uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket);
 /******************************************************************************/
 
 void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context);
-uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len);
 
 
 /*******************************************************************************
@@ -103,6 +102,29 @@ uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len);
 __STATIC_INLINE uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
 {
     return(Cy_CapSense_CheckTunerCmdIntegrity(commandPacket));
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_CalculateCrc16
+****************************************************************************//**
+*
+* This function is obsolete and kept for backward compatibility only.
+* The Cy_CapSense_GetCRC() function should be used instead.
+*
+* \param ptrData
+* The pointer to the data.
+*
+* \param len
+* The length of the data in bytes.
+*
+* \return
+* Returns a calculated CRC-16 value.
+*
+*******************************************************************************/
+__STATIC_INLINE uint16_t Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len)
+{
+    return(Cy_CapSense_GetCRC(ptrData, len));
 }
 
 /** \} \endcond */

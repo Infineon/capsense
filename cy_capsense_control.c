@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the source code to the Control module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -25,8 +25,9 @@
 #include "cy_capsense_filter.h"
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_tuner.h"
+#include "cy_capsense_selftest.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -194,7 +195,7 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
     {
         if (CY_CAPSENSE_CSD_SS_DIS != context->ptrCommonConfig->csdAutotuneEn)
         {
-            result |= Cy_CapSense_SsAutoTune_Call(context);
+            result = Cy_CapSense_SsAutoTune_Call(context);
         }
 
         if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdEn) &&
@@ -256,20 +257,24 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_status result;
 
     result = Cy_CapSense_CheckConfigIntegrity(context);
     if (CY_RET_SUCCESS == result)
     {
-        /* The Tuner is initialized only once */
+        Cy_CapSense_InitializeAllStatuses(context);
+        result = Cy_CapSense_SsInitialize(context);
+
+        /* The Tuner and the BIST are initialized only once */
         if (CY_CAPSENSE_INIT_NEEDED == context->ptrCommonContext->initDone)
         {
             Cy_CapSense_TuInitialize(context);
+            if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
+            {
+                Cy_CapSense_BistDsInitialize_Call(context);
+            }
             context->ptrCommonContext->initDone = CY_CAPSENSE_INIT_DONE;
         }
-
-        Cy_CapSense_InitializeAllStatuses(context);
-        result = Cy_CapSense_SsInitialize(context);
     }
     
     return (result);
@@ -380,11 +385,6 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * Cy_CapSense_Scan() functions to scan and process data for a specific
 * widget. This function is called only after all the sensors in the
 * widgets are scanned. A disabled widget is not processed by this function.
-*
-* A pipeline scan method (i.e. during scanning of a widget performing processing
-* of the previously scanned widget) can be implemented using this function and
-* it may reduce the total execution time, increase the refresh rate and
-* decrease the average power consumption.
 *
 * A pipeline scan method (i.e. during scanning of a current widget (N), 
 * perform processing of the previously scanned widget (N-1)) can be 
@@ -525,26 +525,28 @@ cy_status Cy_CapSense_ProcessWidgetExt(
     uint16_t * ptrHistoryCh;
     uint16_t * ptrHistorySns;
     uint8_t * ptrHistoryLowCh = NULL;
-    uint8_t * ptrHistoryLowSns = NULL;
+    uint8_t * ptrHistoryLowSns;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtCh;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtSns;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
-    
-    
+    uint16_t * ptrBslnInvCh;
+    uint16_t * ptrBslnInvSns;
+
     /* Check parameter validity */
     if (widgetId < context->ptrCommonConfig->numWd)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
         snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-        freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
 
+        freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
         ptrSnsCxtCh = &ptrWdCfg->ptrSnsContext[0u];
         ptrHistoryCh = &ptrWdCfg->ptrRawFilterHistory[0u];
+        ptrBslnInvCh = ptrWdCfg->ptrBslnInv;
+
         if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
         {
             ptrHistoryLowCh = &ptrWdCfg->ptrRawFilterHistoryLow[0u];
         }
-
 
         switch(ptrWdCfg->senseMethod)
         {
@@ -556,26 +558,32 @@ cy_status Cy_CapSense_ProcessWidgetExt(
                     ptrSnsCxtSns = ptrSnsCxtCh;
                     ptrHistorySns = ptrHistoryCh;
                     ptrHistoryLowSns = ptrHistoryLowCh;
+                    ptrBslnInvSns = ptrBslnInvCh;
                     for (snsIndex = 0uL; snsIndex < ptrWdCfg->numSns; snsIndex++)
                     {                    
-                        result = Cy_CapSense_DpProcessCsdSensorRawCountsExt(ptrWdCfg, ptrSnsCxtSns, ptrHistorySns, ptrHistoryLowSns, mode, context);
-
+                        result = Cy_CapSense_DpProcessCsdSensorRawCountsExt(ptrWdCfg,
+                                                                            ptrSnsCxtSns,
+                                                                            ptrHistorySns,
+                                                                            ptrHistoryLowSns,
+                                                                            mode,
+                                                                            ptrBslnInvSns,
+                                                                            context);
                         ptrSnsCxtSns++;
+                        ptrBslnInvSns++;
                         ptrHistorySns += snsHistorySize;
                         if(NULL != ptrHistoryLowSns)
                         {
                             ptrHistoryLowSns++;
                         }
-
                     }
 
                     ptrSnsCxtCh += context->ptrCommonConfig->numSns;
+                    ptrBslnInvCh += context->ptrCommonConfig->numSns;
                     ptrHistoryCh += context->ptrCommonConfig->numSns * snsHistorySize;
                     if(NULL != ptrHistoryLowCh)
                     {
                         ptrHistoryLowCh += context->ptrCommonConfig->numSns;
                     }
-
                 }
 
                 if(CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn)
@@ -602,26 +610,32 @@ cy_status Cy_CapSense_ProcessWidgetExt(
                     ptrSnsCxtSns = ptrSnsCxtCh;
                     ptrHistorySns = ptrHistoryCh;
                     ptrHistoryLowSns = ptrHistoryLowCh;
+                    ptrBslnInvSns = ptrBslnInvCh;
                     for (snsIndex = 0uL; snsIndex < ptrWdCfg->numSns; snsIndex++)
                     {
-                        result = Cy_CapSense_DpProcessCsxSensorRawCountsExt(ptrWdCfg, ptrSnsCxtSns, ptrHistorySns, ptrHistoryLowSns, mode, context);
-
+                        result = Cy_CapSense_DpProcessCsxSensorRawCountsExt(ptrWdCfg,
+                                                                            ptrSnsCxtSns,
+                                                                            ptrHistorySns,
+                                                                            ptrHistoryLowSns,
+                                                                            mode,
+                                                                            ptrBslnInvSns,
+                                                                            context);
                         ptrSnsCxtSns++;
+                        ptrBslnInvSns++;
                         ptrHistorySns += snsHistorySize;
                         if(NULL != ptrHistoryLowSns)
                         {
                             ptrHistoryLowSns++;
                         }
-
                     }
 
                     ptrSnsCxtCh += context->ptrCommonConfig->numSns;
+                    ptrBslnInvCh += context->ptrCommonConfig->numSns;
                     ptrHistoryCh += context->ptrCommonConfig->numSns * snsHistorySize;
                     if(NULL != ptrHistoryLowCh)
                     {
                         ptrHistoryLowCh += context->ptrCommonConfig->numSns;
                     }
-
                 }
 
                 if(CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn)
@@ -710,6 +724,7 @@ cy_status Cy_CapSense_ProcessSensorExt(
                 const cy_stc_capsense_context_t * context)
 {
     cy_status result = CY_RET_BAD_PARAM;
+    cy_status resultTmp;
 
     uint32_t freqChIndex;
     uint32_t freqChNumber;
@@ -721,6 +736,7 @@ cy_status Cy_CapSense_ProcessSensorExt(
     uint8_t  * ptrHistoryLow = NULL;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    uint16_t * ptrSnsBslnInv;
 
     if (widgetId < context->ptrCommonConfig->numWd)
     {
@@ -730,44 +746,51 @@ cy_status Cy_CapSense_ProcessSensorExt(
             snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
             freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
             ptrHistory = &ptrWdCfg->ptrRawFilterHistory[sensorId * snsHistorySize];
-            if((uint32_t)CY_CAPSENSE_IIR_FILTER_PERFORMANCE == ((uint32_t)ptrWdCfg->rawFilterConfig & (uint32_t)CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
+            if((uint32_t)CY_CAPSENSE_IIR_FILTER_PERFORMANCE == ((uint32_t)ptrWdCfg->rawFilterConfig &
+                                                                (uint32_t)CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
             {
                 ptrHistoryLow =  &ptrWdCfg->ptrRawFilterHistoryLow[sensorId];
             }
         
             ptrSnsCxt = &ptrWdCfg->ptrSnsContext[sensorId];
+            ptrSnsBslnInv = &ptrWdCfg->ptrBslnInv[sensorId];
             cxtOffset = context->ptrCommonConfig->numSns;
             historyOffset = snsHistorySize * context->ptrCommonConfig->numSns;
+            result = CY_RET_SUCCESS;
             
             switch(ptrWdCfg->senseMethod)
             {
                 case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
                     for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
                     {
-                        result = Cy_CapSense_DpProcessCsdSensorRawCountsExt(
-                                                ptrWdCfg,
-                                                ptrSnsCxt, 
-                                                ptrHistory,
-                                                ptrHistoryLow,
-                                                mode, context);
+                        resultTmp = Cy_CapSense_DpProcessCsdSensorRawCountsExt(ptrWdCfg, ptrSnsCxt,
+                                                                               ptrHistory, ptrHistoryLow,
+                                                                               mode, ptrSnsBslnInv, context);
+                        if (CY_RET_SUCCESS != resultTmp)
+                        {
+                            result = CY_RET_BAD_DATA;
+                        }
                         ptrSnsCxt += cxtOffset;
                         ptrHistory += historyOffset;
                         ptrHistoryLow += cxtOffset;
+                        ptrSnsBslnInv += cxtOffset;
                     }
                     break;
 
                 case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
                     for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
                     {    
-                        result = Cy_CapSense_DpProcessCsxSensorRawCountsExt(
-                                                ptrWdCfg,
-                                                ptrSnsCxt, 
-                                                ptrHistory,
-                                                ptrHistoryLow,
-                                                mode, context);
+                        resultTmp = Cy_CapSense_DpProcessCsxSensorRawCountsExt(ptrWdCfg, ptrSnsCxt,
+                                                                               ptrHistory, ptrHistoryLow,
+                                                                               mode, ptrSnsBslnInv, context);
+                        if (CY_RET_SUCCESS != resultTmp)
+                        {
+                            result = CY_RET_BAD_DATA;
+                        }
                         ptrSnsCxt += cxtOffset;
                         ptrHistory += historyOffset;
-                        ptrHistoryLow += cxtOffset;                        
+                        ptrHistoryLow += cxtOffset;
+                        ptrSnsBslnInv += cxtOffset;
                     }
                     break;
 
@@ -782,7 +805,6 @@ cy_status Cy_CapSense_ProcessSensorExt(
                 Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
             }
             
-            result = CY_RET_SUCCESS;
         }
     }
     return result;
@@ -793,10 +815,10 @@ cy_status Cy_CapSense_ProcessSensorExt(
 * Function Name: Cy_CapSense_Wakeup
 ****************************************************************************//**
 *
-* Resumes the middleware after CPU / System Deep Sleep.
+* Resumes the middleware after System Deep Sleep.
 *
 * This function is used to resume the middleware operation after exiting 
-* CPU / System Deep Sleep. After the CSD HW block has been powered off, 
+* System Deep Sleep. After the CSD HW block has been powered off,
 * an extra delay is required to establish correct operation of 
 * the CSD HW block.
 *
@@ -814,11 +836,11 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_DeepSleepCallback
 ****************************************************************************//**
 *
-* Handles CPU active to CPU / System Deep Sleep power mode transition for the CapSense
+* Handles CPU active to System Deep Sleep power mode transition for the CapSense
 * middleware.
 *
 * Calling this function directly from the application program is not recommended.
-* Instead, Cy_SysPm_CpuEnterDeepSleep() should be used for the CPU active to CPU / System Deep Sleep
+* Instead, Cy_SysPm_CpuEnterDeepSleep() should be used for the CPU active to System Deep Sleep
 * power mode transition of the device.
 * \note
 * After the CPU Deep Sleep transition, the device automatically goes 
@@ -827,7 +849,7 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * (see details in the device TRM).
 *
 * For proper operation of the CapSense middleware during the CPU active to
-* CPU / System Deep Sleep mode transition, a callback to this function should be registered
+* System Deep Sleep mode transition, a callback to this function should be registered
 * using the Cy_SysPm_RegisterCallback() function with CY_SYSPM_DEEPSLEEP
 * type. After the callback is registered, this function is called by the
 * Cy_SysPm_CpuEnterDeepSleep() function to prepare the middleware to the device
@@ -837,13 +859,11 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * function returns CY_SYSPM_SUCCESS if no scanning is in progress. Otherwise
 * CY_SYSPM_FAIL is returned. If CY_SYSPM_FAIL status is returned, a device
 * cannot change the power mode without completing the current scan as
-* a transition to CPU / System Deep Sleep during the scan can disrupt the middleware
+* a transition to System Deep Sleep during the scan can disrupt the middleware
 * operation.
 * 
 * For details of SysPm types and macros refer to the SysPm section of the 
-* PDL documentation
-* <a href="https://www.cypress.com/documentation/technical-reference-manuals/psoc-6-mcu-psoc-63-ble-architecture-technical-reference" 
-* title="PDL API Reference" >PDL API Reference</a>.
+* PDL documentation.
 * 
 * \param callbackParams
 * Refer to the description of the cy_stc_syspm_callback_params_t type in the
@@ -855,8 +875,8 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * \return
 * Returns the status cy_en_syspm_status_t of the operation requested 
 * by the mode parameter:
-* - CY_SYSPM_SUCCESS  - CPU / System Deep Sleep power mode can be entered.
-* - CY_SYSPM_FAIL     - CPU / System Deep Sleep power mode cannot be entered.
+* - CY_SYSPM_SUCCESS  - System Deep Sleep power mode can be entered.
+* - CY_SYSPM_FAIL     - System Deep Sleep power mode cannot be entered.
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
@@ -1012,7 +1032,7 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 
     cy_en_csd_key_t mvKey;
     cy_status result = CY_RET_INVALID_STATE;
-    cy_en_csd_status_t csdHwStatus = CY_CSD_SUCCESS;
+    cy_en_csd_status_t csdHwStatus;
     cy_stc_csd_context_t * ptrCsdCxt = context->ptrCommonConfig->ptrCsdContext;
     CSD_Type * ptrCsdBaseAdd = context->ptrCommonConfig->ptrCsdBase;
 
@@ -1107,12 +1127,12 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
 {
     cy_status result = CY_RET_INVALID_STATE;
-    cy_en_csd_status_t initStatus = CY_CSD_LOCKED;
+    cy_en_csd_status_t initStatus;
 
     if (CY_CAPSENSE_BUSY != Cy_CapSense_IsBusy(context))
     {
         /* Disconnect external capacitors and sensor pins from analog bus */
-        Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_UNDEFINED_E, context);
+        (void)Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_UNDEFINED_E, context);
 
         /* Release the CSD HW block */
         initStatus = Cy_CSD_DeInit(

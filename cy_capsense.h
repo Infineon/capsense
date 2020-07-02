@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file includes all the header files of the CapSense middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -167,7 +167,6 @@
 ********************************************************************************
 *
 * This version of the CapSense Middleware was validated for compatibility with the following Software and Tools:
-* 
 * <table class="doxtable">
 *   <tr>
 *     <th>Software and Tools</th>
@@ -175,27 +174,35 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox Software Environment</td>
-*     <td>2.0</td>
+*     <td>2.1</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox Device Configurator</td>
-*     <td>2.0</td>
+*     <td>2.1</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox CSD Personality in Device Configurator</td>
+*     <td>- ModusToolbox CSD Personality for PSoC4 devices in Device Configurator</td>
+*     <td>1.0</td>
+*   </tr>
+*   <tr>
+*     <td>- ModusToolbox CSD Personality for PSoC6 devices in Device Configurator</td>
 *     <td>2.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox CapSense Configurator tool</td>
-*     <td>2.0</td>
+*     <td>3.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox CapSense Tuner tool</td>
-*     <td>2.0</td>
+*     <td>3.0</td>
+*   </tr>
+*   <tr>
+*     <td>PSoC4 Peripheral Driver Library (PDL)</td>
+*     <td>1.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>PSoC6 Peripheral Driver Library (PDL)</td>
-*     <td>1.2.0</td>
+*     <td>1.5.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
@@ -210,8 +217,8 @@
 *     <td>6.11</td>
 *   </tr>
 *   <tr>
-*     <td>MBED OS</td>
-*     <td>5.13.1</td>
+*     <td>MBED OS (only for PSoC6)</td>
+*     <td>5.15.1</td>
 *   </tr>
 *   <tr>
 *     <td>FreeRTOS</td>
@@ -244,7 +251,7 @@
 *   to re-generate the middleware configuration. 
 * * The toolchains are set up properly for your environment per the settings
 *   outlined in the Supported Software and Tools.
-* * The project is re-built once the the toolchains are configured and the
+* * The project is re-built once the toolchains are configured and the
 *   configuration is completed.
 *
 * You might need to re-generate the configuration structures for either the
@@ -273,39 +280,40 @@
 * the Release mode with optimization set for Size.
 * 
 * <table class="doxtable">
-*   <tr><th>Configuration:</th><th>Configuration 1</th><th>Configuration 2</th><th>Configuration 3</th><th>Configuration 4</th><th>Configuration 5</th></tr>
+*   <tr><th>Configuration:</th><th>Configuration 1</th><th>Configuration 2</th><th>Configuration 3</th><th>Configuration 4</th><th>Configuration 5</th><th>Configuration 6</th><th>Configuration 7</th></tr>
 *   <div align="center"><b>
-*       <tr><td>Flash:</td><td>&lt; 12000</td><td>&lt; 14050</td><td>&lt; 17400</td><td>&lt; 18600</td><td>&lt; 27000</td></tr>
-*       <tr><td>SRAM:</td><td>&lt; 370</td><td>&lt; 700</td><td>&lt; 2180</td><td>&lt; 1050</td><td>&lt; 4250</td></tr>
+*       <tr><td>Flash:</td><td>&lt; 13600</td><td>&lt; 15750</td><td>&lt; 18700</td><td>&lt; 20300</td><td>&lt; 28400</td><td>&lt; 19900</td><td>&lt; 34700</td></tr>
+*       <tr><td>SRAM:</td><td>&lt; 400</td><td>&lt; 730</td><td>&lt; 2200</td><td>&lt; 1080</td><td>&lt; 4280</td><td>&lt; 600</td><td>&lt; 4480</td></tr>
 *   </b></div>
-*   <tr><th colspan=6>Widgets</th></tr>
-*   <tr><td>CSD Button</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td><td></td><td>1 (2 sensors)</td><td>1 (6 sensors)</td></tr>
-*   <tr><td>CSD Matrix Buttons</td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>CSD Slider</td><td></td><td>1 (9 segments)</td><td></td><td></td><td>1 (9 segments)</td></tr>
-*   <tr><td>CSD Touchpad</td><td></td><td></td><td></td><td>1 (9 Cols and 8 Rows)</td><td>1 (9 Cols and 8 Rows)</td></tr>
-*   <tr><td>CSD Proximity</td><td></td><td>1 (1 sensor)</td><td></td><td>1 (1 sensor)</td><td>1 (1 sensor)</td></tr>
-*   <tr><td>CSX Button</td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>CSX Matrix Buttons</td><td></td><td></td><td></td><td></td><td>1 (3 Rx and 3 Tx)</td></tr>
-*   <tr><td>CSX Touchpad</td><td></td><td></td><td>1 (9 Rx and 8 Tx)</td><td></td><td>1 (9 Rx and 8 Tx)</td></tr>
-*   <tr><th colspan=6>Features</th></tr>
-*   <tr><td>Gesture</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Ballistic Multiplier</td><td></td><td></td><td></td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Centroid Type</td><td></td><td></td><td>3x3</td><td>3x3</td><td>5x5 CSD, 3x3 CSX</td></tr>
-*   <tr><td>Supported fingers on touchpad</td><td></td><td></td><td>2</td><td>1</td><td>2</td></tr>
-*   <tr><td>Shield</td><td></td><td>enabled</td><td></td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>SmartSense</td><td></td><td></td><td></td><td></td><td>enabled</td></tr>
-*   <tr><td>CSD auto-calibration</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>CSX auto-calibration</td><td></td><td></td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><th colspan=6>Raw Count Filters</th></tr>
-*   <tr><td>IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><th colspan=6>Position Filters</th></tr>
-*   <tr><td>IIR</td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>Adaptive IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>Jitter</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
+*   <tr><th colspan=8>Widgets</th></tr>
+*   <tr><td>CSD Button</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td><td></td><td>1 (2 sensors)</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td></tr>
+*   <tr><td>CSD Matrix Buttons</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+*   <tr><td>CSD Slider</td><td></td><td>1 (9 segments)</td><td></td><td></td><td>1 (9 segments)</td><td></td><td>1 (9 segments)</td></tr>
+*   <tr><td>CSD Touchpad</td><td></td><td></td><td></td><td>1 (9 Cols and 8 Rows)</td><td>1 (9 Cols and 8 Rows)</td><td></td><td>1 (9 Cols and 8 Rows)</td></tr>
+*   <tr><td>CSD Proximity</td><td></td><td>1 (1 sensor)</td><td></td><td>1 (1 sensor)</td><td>1 (1 sensor)</td><td></td><td>1 (1 sensor)</td></tr>
+*   <tr><td>CSX Button</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+*   <tr><td>CSX Matrix Buttons</td><td></td><td></td><td></td><td></td><td>1 (3 Rx and 3 Tx)</td><td></td><td>1 (3 Rx and 3 Tx)</td></tr>
+*   <tr><td>CSX Touchpad</td><td></td><td></td><td>1 (9 Rx and 8 Tx)</td><td></td><td>1 (9 Rx and 8 Tx)</td><td></td><td>1 (9 Rx and 8 Tx)</td></tr>
+*   <tr><th colspan=8>Features</th></tr>
+*   <tr><td>Gesture</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Ballistic Multiplier</td><td></td><td></td><td></td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Centroid Type</td><td></td><td></td><td>3x3</td><td>3x3</td><td>5x5 CSD, 3x3 CSX</td><td></td><td>5x5 CSD, 3x3 CSX</td></tr>
+*   <tr><td>Supported fingers on touchpad</td><td></td><td></td><td>2</td><td>1</td><td>2</td><td></td><td>2</td></tr>
+*   <tr><td>Shield</td><td></td><td>enabled</td><td></td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>SmartSense</td><td></td><td></td><td></td><td></td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>CSD auto-calibration</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
+*   <tr><td>CSX auto-calibration</td><td></td><td></td><td>enabled</td><td></td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Self-test</td><td></td><td></td><td></td><td></td><td></td><td>enabled</td><td>enabled</td></tr>
+*   <tr><th colspan=8>Raw Count Filters</th></tr>
+*   <tr><td>IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+*   <tr><th colspan=8>Position Filters</th></tr>
+*   <tr><td>IIR</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+*   <tr><td>Adaptive IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
+*   <tr><td>Jitter</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
 * </table>
 *
 ********************************************************************************
@@ -371,6 +379,44 @@
 *         Datasheet Programmable System-on-Chip</b></a>
 *     </td>
 *   </tr>
+*   <tr>
+*     <td>3159</td>
+*     <td>
+*         Scanning a sensor with low capacitance (about 8pF and less) with low
+*         frequency (around 300kHz and less) might lead to raw count variation
+*         from scan to scan.
+*     </td>
+*     <td>
+*         There are several possible workarounds:
+*         1. Increase the Scan resolution.
+*         2. Increase the Sense clock frequency. For the best results, perform
+*            scanning with as high as possible Sense clock frequency.
+*         3. If shield is required for a design, enable the shield tank (Csh)
+*            capacitor.
+*         4. Increase the sensor capacitance by changing its layout or introduce
+*            extra capacitor between the sensor pin and ground.
+*         5. Increase number of Fine initialization cycles. Open the cycfg_capsense.c
+*            file and modify the .csdFineInitTime field of the cy_capsense_commonConfig
+*            structure.
+*         6. Increase the CSD init switch resistance. Open the cycfg_capsernse.c file
+*            and update the .csdInitSwRes field of the cy_capsense_commonConfig structure
+*            with the CY_CAPSENSE_INIT_SW_RES_HIGH value.
+*     </td> 
+*   </tr>
+*   <tr>
+*     <td>3191</td>
+*     <td>
+*         Channel 0 is scanned with the incorrect settings when all of the following
+*         conditions are met:
+*         1. Multi-frequency scan is enabled.
+*         2. The Cy_CapSense_CSDSetupWidgetExt() function called only once.
+*         3. The Cy_CapSense_CSDScanExt() function called multiple times.
+*     </td>
+*     <td>
+*         Call the Cy_CapSense_CSDSetupWidgetExt() function before each call of 
+*         the Cy_CapSense_CSDScanExt() function.
+*     </td>
+*   </tr>
 * </table>
 * 
 ********************************************************************************
@@ -379,6 +425,56 @@
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="9">2.10</td>
+*     <td>Added Built-in Self-test (BIST) library</td>
+*     <td>Support Class B (IEC-60730), safety integrity-level compliant design</td>
+*   </tr>
+*   <tr>
+*     <td>Improved the Csh and Cmod coarse initialization functionality.</td>
+*     <td>Feature enhancement</td>
+*   </tr>
+*   <tr>
+*     <td>Improved the shield performance when Csh is enabled</td>
+*     <td>Feature enhancement</td>
+*   </tr>
+*   <tr>
+*     <td>Fixed Cy_CapSense_ScanExt() operation</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Fixed the bug in the Cy_CapSense_SetPinState() function</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Optimized software watch-dog values used in monitoring CapSense
+*         scanning duration</td>
+*     <td>User experience improvement</td>
+*   </tr>
+*   <tr>
+*     <td>Improved IDAC auto-calibration</td>
+*     <td>Operation accuracy increasing</td>
+*   </tr>
+*   <tr>
+*     <td>Added the following functions:
+*         * Cy_CapSense_GetParam()
+*         * Cy_CapSense_SetParam()
+*         * Cy_CapSense_GetCRC()
+*     </td>
+*     <td>Feature enhancement</td>
+*   </tr>
+*   <tr>
+*     <td>Changed the type of context argument to const in the following 
+*         functions:
+*         * Cy_CapSense_CSDConnectSns()
+*         * Cy_CapSense_CSXConnectRx()
+*         * Cy_CapSense_CSXConnectTx()
+*         * Cy_CapSense_CSXDisconnectRx()
+*         * Cy_CapSense_CSXDisconnectTx()
+*         * Cy_CapSense_SetPinState()
+*     </td>
+*     <td>Defect fixing</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="6">2.0</td>
 *     <td>Added memory usage section to the CapSense API Ref Guide</td>
@@ -475,8 +571,7 @@
 * of a CapSense system is available in the Getting Started with CapSense
 * document and the product-specific CapSense design guide. Cypress highly 
 * recommends starting with these documents. They can be found on the 
-* Cypress web site at www.cypress.com. For details about application notes, 
-* code examples, and kits, see the References section in this datasheet.
+* Cypress web site at www.cypress.com.
 * 
 * For more information, refer to the following documents:
 *
@@ -511,7 +606,7 @@
 * * <a href="https://cypresssemiconductorco.github.io/csdidac/csdidac_api_reference_manual/html/index.html">
 *   <b>CSDIDAC Middleware API Reference Guide</b></a>
 *
-* * <a href="https://github.com/cypresssemiconductorco.github.io/psoc6pdl/pdl_api_reference_manual/html/index.html">
+* * <a href="https://cypresssemiconductorco.github.io/psoc6pdl/pdl_api_reference_manual/html/index.html">
 *   <b>PDL API Reference</b></a>
 *
 * * <a href="http://www.cypress.com/an210781"><b>AN210781 Getting Started with
@@ -570,6 +665,9 @@
 * \defgroup group_capsense_macros_miscellaneous     Miscellaneous Macros
 *   \ingroup group_capsense_macros
 *   \brief Miscellaneous macros
+* \defgroup group_capsense_macros_bist              Built-in Self-test Macros
+*   \ingroup group_capsense_macros
+*   \brief Built-in Self-test macros
 *
 * \defgroup group_capsense_callbacks                Callbacks
 *
@@ -764,6 +862,7 @@
 #include "cy_capsense_sensing.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_tuner.h"
+#include "cy_capsense_selftest.h"
 
 #endif /* CY_CAPSENSE_H */
 

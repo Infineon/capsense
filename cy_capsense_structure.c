@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -18,12 +18,29 @@
 #include <stddef.h>
 #include <string.h>
 #include "cy_syslib.h"
+#include "cy_utils.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
+#include "cy_capsense_selftest.h"
 #include "cy_capsense_lib.h"
 #include "cy_csd.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+
+/*******************************************************************************
+* Local definition
+*******************************************************************************/
+#define CY_CAPSENSE_DS_PARAM_TYPE_UINT8     (1u)
+#define CY_CAPSENSE_DS_PARAM_TYPE_UINT16    (2u)
+#define CY_CAPSENSE_DS_PARAM_TYPE_UINT32    (3u)
+#define CY_CAPSENSE_UINT16_ALIGN_MASK       (1u)
+#define CY_CAPSENSE_UINT32_ALIGN_MASK       (3u)
+#define CY_CAPSENSE_PARAM_TYPE_OFFSET       (24u)
+#define CY_CAPSENSE_PARAM_TYPE_MASK         (3uL << CY_CAPSENSE_PARAM_TYPE_OFFSET)
+#define CY_CAPSENSE_PARAM_CRC_OFFSET        (26u)
+#define CY_CAPSENSE_PARAM_CRC_MASK          (1uL << CY_CAPSENSE_PARAM_CRC_OFFSET)
+#define CY_CAPSENSE_PARAM_WIDGET_OFFSET     (16u)
+#define CY_CAPSENSE_PARAM_WIDGET_MASK       (0xFFuL << CY_CAPSENSE_PARAM_WIDGET_OFFSET)
 
 
 /*******************************************************************************
@@ -33,8 +50,8 @@
 * Reports whether any widget has detected touch.
 *
 * This function reports whether any widget has detected a touch by extracting
-* information from the widget status registers. This function does 
-* not process widget data but extracts previously processed results 
+* information from the widget status registers. This function does
+* not process widget data but extracts previously processed results
 * from the \ref group_capsense_structures.
 *
 * \param context
@@ -68,11 +85,11 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 *
 * This function reports whether the specified widget has detected a touch by
 * extracting information from the widget status register.
-* This function does not process widget data but extracts previously processed 
+* This function does not process widget data but extracts previously processed
 * results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -87,7 +104,7 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_IsWidgetActive(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t result = 0uL;
@@ -108,20 +125,20 @@ uint32_t Cy_CapSense_IsWidgetActive(
 *
 * This function reports whether the specified sensor in the widget has detected a
 * touch by extracting information from the widget status register.
-* This function does not process widget or sensor data but extracts previously  
+* This function does not process widget or sensor data but extracts previously
 * processed results from the \ref group_capsense_structures.
 *
-* For proximity sensors, this function returns the proximity detection status. 
+* For proximity sensors, this function returns the proximity detection status.
 * To get the touch status of proximity sensors, use the
 * Cy_CapSense_IsProximitySensorActive() function.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-* 
+*
 * \param sensorId
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* Specifies the ID number of the sensor within the widget. A macro for the
+* sensor ID within a specified widget can be found in the cycfg_capsense.h
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
@@ -137,8 +154,8 @@ uint32_t Cy_CapSense_IsWidgetActive(
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_IsSensorActive(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
+                uint32_t widgetId,
+                uint32_t sensorId,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t result = 0uL;
@@ -160,19 +177,19 @@ uint32_t Cy_CapSense_IsSensorActive(
 *
 * Reports the status of the specified proximity widget/sensor.
 *
-* This function reports whether the specified proximity sensor has detected 
-* a touch or proximity event by extracting information from the widget 
-* status register. This function is used only with proximity widgets. 
-* This function does not process widget data but extracts previously processed 
+* This function reports whether the specified proximity sensor has detected
+* a touch or proximity event by extracting information from the widget
+* status register. This function is used only with proximity widgets.
+* This function does not process widget data but extracts previously processed
 * results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* Specifies the ID number of the sensor within the widget. A macro for the
+* sensor ID within a specified widget can be found in the cycfg_capsense.h
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
@@ -188,8 +205,8 @@ uint32_t Cy_CapSense_IsSensorActive(
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_IsProximitySensorActive(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
+                uint32_t widgetId,
+                uint32_t sensorId,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t result = 0uL;
@@ -204,7 +221,7 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
             }
         }
     }
-    
+
     return result;
 }
 
@@ -213,31 +230,31 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 * Function Name: Cy_CapSense_GetTouchInfo
 ****************************************************************************//**
 *
-* Reports the details of touch position detected on the specified touchpad, 
+* Reports the details of touch position detected on the specified touchpad,
 * matrix buttons or slider widgets.
 *
-* This function does not process widget data but extracts previously processed 
+* This function does not process widget data but extracts previously processed
 * results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the pointer to widget cy_stc_capsense_touch_t structure that 
+* Returns the pointer to widget cy_stc_capsense_touch_t structure that
 * contains number of positions and data about each position.
-* 
+*
 *
 *******************************************************************************/
 cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
     cy_stc_capsense_touch_t * ptrTouch = NULL;
-    
+
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
 
     if (widgetId < context->ptrCommonConfig->numWd)
@@ -255,7 +272,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
                 break;
         }
     }
-    
+
     return ptrTouch;
 }
 
@@ -278,7 +295,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * context)
 {
     cy_status result = CY_RET_SUCCESS;
-    
+
     const cy_stc_capsense_common_config_t * ptrCommonCfg = context->ptrCommonConfig;
     const cy_stc_capsense_common_context_t * ptrCommonCxt = context->ptrCommonContext;
     const cy_stc_capsense_internal_context_t * ptrInternalCxt = context->ptrInternalContext;
@@ -287,34 +304,178 @@ cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * con
     const cy_stc_capsense_pin_config_t * ptrPinCfg = context->ptrPinConfig;
     const cy_stc_capsense_pin_config_t * ptrShieldPinCfg = context->ptrShieldPinConfig;
     const cy_stc_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
-    
-    if (ptrCommonCfg == NULL)       {result |= CY_RET_BAD_DATA;}
-    if (ptrCommonCxt == NULL)       {result |= CY_RET_BAD_DATA;}
-    if (ptrInternalCxt == NULL)     {result |= CY_RET_BAD_DATA;}
-    if (ptrWdCfg == NULL)           {result |= CY_RET_BAD_DATA;}
-    if (ptrWdCxt == NULL)           {result |= CY_RET_BAD_DATA;}
-    if (ptrPinCfg == NULL)          {result |= CY_RET_BAD_DATA;}
-    if (ptrCommonCfg->csdShieldEn != 0u)
+
+    if (ptrCommonCfg == NULL)       {result = CY_RET_BAD_DATA;}
+    if (ptrCommonCxt == NULL)       {result = CY_RET_BAD_DATA;}
+    if (ptrInternalCxt == NULL)     {result = CY_RET_BAD_DATA;}
+    if (ptrWdCfg == NULL)           {result = CY_RET_BAD_DATA;}
+    if (ptrWdCxt == NULL)           {result = CY_RET_BAD_DATA;}
+    if (ptrPinCfg == NULL)          {result = CY_RET_BAD_DATA;}
+    if (ptrActScanSns == NULL)      {result = CY_RET_BAD_DATA;}
+
+    if(CY_RET_SUCCESS == result)
     {
-        if((ptrCommonCfg->csdShieldNumPin > 0u) && (ptrShieldPinCfg == NULL))
+        if (ptrCommonCfg->csdShieldEn != 0u)
         {
-            result |= CY_RET_BAD_DATA;
+            if((ptrCommonCfg->csdShieldNumPin > 0u) && (ptrShieldPinCfg == NULL))
+            {
+                result = CY_RET_BAD_DATA;
+            }
+        }
+
+        if (ptrCommonCfg->bistEn != 0u)
+        {
+            if(context->ptrBistContext == NULL)
+            {
+                result = CY_RET_BAD_DATA;
+            }
         }
     }
-    if (ptrActScanSns == NULL)      {result |= CY_RET_BAD_DATA;}
-    
-    
+
     return (result);
 }
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetCRC
+****************************************************************************//**
+*
+* Calculates CRC for the specified buffer and length.
+*
+* This API is used for the CRC protection of a packet received from
+* the CapSense Tuner tool and for BIST operations.
+* CRC polynomial is 0xAC9A. It has a Hamming distance 5 for data words
+* up to 241 bits.
+*
+* Reference:  "P. Koopman, T. Chakravarthy,
+* "Cyclic Redundancy Code (CRC) Polynomial Selection for Embedded Networks",
+* The International Conference on Dependable Systems and Networks, DSN-2004"
+*
+* \param ptrData
+* The pointer to the data.
+*
+* \param len
+* The length of the data in bytes.
+*
+* \return
+* Returns a calculated CRC-16 value.
+*
+*******************************************************************************/
+uint16_t Cy_CapSense_GetCRC(const uint8_t *ptrData, uint32_t len)
+{
+    uint32_t idx;
+    uint32_t actualCrc = 0u;
+    const uint16_t crcTable[] =
+    {
+        0x0000u, 0xAC9Au, 0xF5AEu, 0x5934u, 0x47C6u, 0xEB5Cu, 0xB268u, 0x1EF2u,
+        0x8F8Cu, 0x2316u, 0x7A22u, 0xD6B8u, 0xC84Au, 0x64D0u, 0x3DE4u, 0x917Eu
+    };
+
+    for (;len-- > 0u;)
+    {
+        /* Process HI Nibble */
+        idx = ((actualCrc >> 12u) ^ (((uint32_t)*ptrData) >> 4u)) & 0xFLu;
+        actualCrc = crcTable[idx] ^ (actualCrc << 4u);
+
+        /* Process LO Nibble */
+        idx = ((actualCrc >> 12u) ^ (uint32_t)*ptrData) & 0xFLu;
+        actualCrc = crcTable[idx] ^ (actualCrc << 4u);
+
+        ptrData++;
+    }
+
+    return (uint16_t)actualCrc;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetCrcWidget
+****************************************************************************//**
+*
+* Calculates CRC for the specified widget. This function implements the
+* following functionality:
+* - Fills the \ref cy_stc_capsense_widget_crc_data_t with 0.
+* - Initializes fields of the \ref cy_stc_capsense_widget_crc_data_t with the
+*   data from corresponding fields of the \ref cy_stc_capsense_widget_context_t.
+* - Executes the Cy_CapSense_GetCRC() routine for full
+*   \ref cy_stc_capsense_widget_crc_data_t, structure, including padding.
+* If the CSD tuning mode is set to SmartSense (Full Auto-Tune) then the fields
+* of the \ref cy_stc_capsense_widget_context_t that changing it's value in the
+* run-time will be excluded from CRC calculation for the CSD widgets.
+*
+* \param widgetId
+* Specifies the ID number of the widget.
+* A macro for the widget ID can be found in the
+* CapSense Configuration header file (cycfg_capsense.h) defined as
+* CY_CAPSENSE_<WidgetName>_WDGT_ID.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns a calculated CRC-16 value.
+*
+*******************************************************************************/
+uint16_t Cy_CapSense_GetCrcWidget(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint16_t crcValue;
+    cy_stc_capsense_widget_context_t * ptrWdCxt;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+    cy_stc_capsense_widget_crc_data_t crcDataVal;
+
+    /* Get a pointer to the specified widget config structure */
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+
+    /* Get a pointer to the specified widget context structure */
+    ptrWdCxt = &context->ptrWdContext[widgetId];
+
+    (void)memset((void*)&crcDataVal, 0, sizeof(crcDataVal));
+
+    crcDataVal.fingerCapVal      = ptrWdCxt->fingerCap;
+    crcDataVal.sigPFCVal         = ptrWdCxt->sigPFC;
+    crcDataVal.resolutionVal     = ptrWdCxt->resolution;
+    crcDataVal.lowBslnRstVal     = ptrWdCxt->lowBslnRst;
+    crcDataVal.snsClkVal         = ptrWdCxt->snsClk;
+    crcDataVal.rowSnsClkVal      = ptrWdCxt->rowSnsClk;
+    crcDataVal.onDebounceVal     = ptrWdCxt->onDebounce;
+    crcDataVal.snsClkSourceVal   = ptrWdCxt->snsClkSource;
+    crcDataVal.idacModVal[0u]    = ptrWdCxt->idacMod[0u];
+    crcDataVal.idacModVal[1u]    = ptrWdCxt->idacMod[1u];
+    crcDataVal.idacModVal[2u]    = ptrWdCxt->idacMod[2u];
+    crcDataVal.idacGainIndexVal  = ptrWdCxt->idacGainIndex;
+    crcDataVal.rowIdacModVal[0u] = ptrWdCxt->rowIdacMod[0u];
+    crcDataVal.rowIdacModVal[1u] = ptrWdCxt->rowIdacMod[1u];
+    crcDataVal.rowIdacModVal[2u] = ptrWdCxt->rowIdacMod[2u];
+
+
+    if(((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E == ptrWdCfg->senseMethod) ||
+       (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
+    {
+        crcDataVal.fingerThVal       = ptrWdCxt->fingerTh;
+        crcDataVal.proxThVal         = ptrWdCxt->proxTh;
+        crcDataVal.noiseThVal        = ptrWdCxt->noiseTh;
+        crcDataVal.nNoiseThVal       = ptrWdCxt->nNoiseTh;
+        crcDataVal.hysteresisVal     = ptrWdCxt->hysteresis;
+
+    }
+
+    crcValue = Cy_CapSense_GetCRC((uint8_t *)(&crcDataVal), sizeof(crcDataVal));
+
+    return (crcValue);
+}
+
 
 /**< Internal wrapper functions for the flash optimization */
 /*******************************************************************************
 * Function Name: Cy_CapSense_CSDCalibrateWidget_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSDCalibrateWidget function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSDCalibrateWidget() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSDCalibrateWidget().
 *
 * \param widgetId
@@ -343,8 +504,10 @@ cy_status Cy_CapSense_CSDCalibrateWidget_Call(
 * Function Name: Cy_CapSense_CSDSetupWidget_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSDSetupWidget function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSDSetupWidget() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 *
 * For the operation details, refer to the Cy_CapSense_CSDSetupWidget().
 *
@@ -369,9 +532,10 @@ void Cy_CapSense_CSDSetupWidget_Call(
 * Function Name: Cy_CapSense_CSDScan_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSDScan function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSDScan() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSDScan().
 *
 * \param context
@@ -393,9 +557,10 @@ void Cy_CapSense_CSDScan_Call(
 * Function Name: Cy_CapSense_CSXSetupWidget_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSXSetupWidget function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSXSetupWidget() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSXSetupWidget().
 *
 * \param widgetId
@@ -419,9 +584,10 @@ void Cy_CapSense_CSXSetupWidget_Call(
 * Function Name: Cy_CapSense_CSXScan_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSXScan function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSXScan() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSXScan().
 *
 * \param context
@@ -443,9 +609,10 @@ void Cy_CapSense_CSXScan_Call(
 * Function Name: Cy_CapSense_CalibrateAllCsdWidgets_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CalibrateAllCsdWidgets function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CalibrateAllCsdWidgets() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CalibrateAllCsdWidgets().
 *
 * \param context
@@ -470,9 +637,10 @@ cy_status Cy_CapSense_CalibrateAllCsdWidgets_Call(
 * Function Name: Cy_CapSense_CalibrateAllCsxWidgets_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CalibrateAllCsxWidgets function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CalibrateAllCsxWidgets() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CalibrateAllCsxWidgets().
 *
 * \param context
@@ -497,9 +665,10 @@ cy_status Cy_CapSense_CalibrateAllCsxWidgets_Call(
 * Function Name: Cy_CapSense_CSDDisableMode_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSDDisableMode function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSDDisableMode() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSDDisableMode().
 *
 * \param context
@@ -521,9 +690,10 @@ void Cy_CapSense_CSDDisableMode_Call(
 * Function Name: Cy_CapSense_CSDInitialize_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSDInitialize function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSDInitialize() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSDInitialize().
 *
 * \param context
@@ -545,9 +715,10 @@ void Cy_CapSense_CSDInitialize_Call(
 * Function Name: Cy_CapSense_DpProcessButton_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessButton function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessButton() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessButton().
 *
 * \param ptrWdConfig
@@ -571,9 +742,10 @@ void Cy_CapSense_DpProcessButton_Call(
 * Function Name: Cy_CapSense_DpProcessCsxTouchpad_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessCsxTouchpad function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessCsxTouchpad() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessCsxTouchpad().
 *
 * \param ptrWdConfig
@@ -597,9 +769,10 @@ void Cy_CapSense_DpProcessCsxTouchpad_Call(
 * Function Name: Cy_CapSense_DpProcessProximity_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessProximity function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessProximity() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessProximity().
 *
 * \param ptrWdConfig
@@ -623,9 +796,10 @@ void Cy_CapSense_DpProcessProximity_Call(
 * Function Name: Cy_CapSense_DpProcessCsdTouchpad_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessCsdTouchpad function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessCsdTouchpad() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessCsdTouchpad().
 *
 * \param ptrWdConfig
@@ -649,9 +823,10 @@ void Cy_CapSense_DpProcessCsdTouchpad_Call(
 * Function Name: Cy_CapSense_DpProcessSlider_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessSlider function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessSlider() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessSlider().
 *
 * \param ptrWdConfig
@@ -675,9 +850,10 @@ void Cy_CapSense_DpProcessSlider_Call(
 * Function Name: Cy_CapSense_DpProcessCsdMatrix_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpProcessCsdMatrix function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpProcessCsdMatrix() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpProcessCsdMatrix().
 *
 * \param ptrWdConfig
@@ -702,8 +878,11 @@ void Cy_CapSense_DpProcessCsdMatrix_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_DpProcessCsdWidgetStatus function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_DpProcessCsdWidgetStatus().
+* the Cy_CapSense_DpProcessCsdWidgetStatus() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_DpProcessCsdWidgetStatus().
 *
 * \param ptrWdConfig
 * \param context
@@ -727,8 +906,11 @@ void Cy_CapSense_DpProcessCsdWidgetStatus_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_DpProcessCsdWidgetRawCounts function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_DpProcessCsdWidgetRawCounts().
+* the Cy_CapSense_DpProcessCsdWidgetRawCounts() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_DpProcessCsdWidgetRawCounts().
 *
 * \param ptrWdConfig
 * \param context
@@ -756,8 +938,11 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_DpProcessCsxWidgetStatus function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_DpProcessCsxWidgetStatus().
+* the Cy_CapSense_DpProcessCsxWidgetStatus() function. All details,
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_DpProcessCsxWidgetStatus().
 *
 * \param ptrWdConfig
 * \param context
@@ -781,8 +966,11 @@ void Cy_CapSense_DpProcessCsxWidgetStatus_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_DpProcessCsxWidgetRawCounts function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_DpProcessCsxWidgetRawCounts().
+* the Cy_CapSense_DpProcessCsxWidgetRawCounts() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_DpProcessCsxWidgetRawCounts().
 *
 * \param ptrWdConfig
 * \param context
@@ -809,8 +997,11 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_DpAdvancedCentroidTouchpad function. All details, parameters
-* and return,* For the operation details, refer to the Cy_CapSense_DpAdvancedCentroidTouchpad().
+* the Cy_CapSense_DpAdvancedCentroidTouchpad() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_DpAdvancedCentroidTouchpad().
 *
 * \param newTouch
 * \param ptrWdConfig
@@ -835,9 +1026,10 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad_Call(
 * Function Name: Cy_CapSense_InitPositionFilters_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_InitPositionFilters function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_InitPositionFilters() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_InitPositionFilters().
 *
 * \param filterConfig
@@ -865,9 +1057,10 @@ void Cy_CapSense_InitPositionFilters_Call(
 * Function Name: Cy_CapSense_RunPositionFilters_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_RunPositionFilters function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_RunPositionFilters() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_RunPositionFilters().
 *
 * \param ptrWdConfig
@@ -895,9 +1088,10 @@ void Cy_CapSense_RunPositionFilters_Call(
 * Function Name: Cy_CapSense_ProcessPositionFilters_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_ProcessPositionFilters function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_ProcessPositionFilters() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_ProcessPositionFilters().
 *
 * \param newTouch
@@ -923,9 +1117,10 @@ void Cy_CapSense_ProcessPositionFilters_Call(
 * Function Name: Cy_CapSense_InitializeAllFilters_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_InitializeAllFilters function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_InitializeAllFilters() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_InitializeAllFilters().
 *
 * \param context
@@ -948,8 +1143,11 @@ void Cy_CapSense_InitializeAllFilters_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_FtRunEnabledFiltersInternal function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_FtRunEnabledFiltersInternal().
+* the Cy_CapSense_FtRunEnabledFiltersInternal() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_FtRunEnabledFiltersInternal().
 *
 * \param ptrWdConfig
 * \param ptrSnsContext
@@ -978,9 +1176,10 @@ void Cy_CapSense_FtRunEnabledFiltersInternal_Call(
 * Function Name: Cy_CapSense_CSXDisableMode_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSXDisableMode function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSXDisableMode() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSXDisableMode().
 *
 * \param context
@@ -1002,9 +1201,10 @@ void Cy_CapSense_CSXDisableMode_Call(
 * Function Name: Cy_CapSense_CSXInitialize_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_CSXInitialize function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_CSXInitialize() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_CSXInitialize().
 *
 * \param context
@@ -1027,8 +1227,11 @@ void Cy_CapSense_CSXInitialize_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_AdaptiveFilterInitialize_Lib function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_AdaptiveFilterInitialize_Lib().
+* the Cy_CapSense_AdaptiveFilterInitialize_Lib() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_AdaptiveFilterInitialize_Lib().
 *
 * \param config
 * \param positionContext
@@ -1053,9 +1256,10 @@ void Cy_CapSense_AdaptiveFilterInitialize_Lib_Call(
 * Function Name: Cy_CapSense_AdaptiveFilterRun_Lib_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_AdaptiveFilterRun_Lib function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_AdaptiveFilterRun_Lib() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_AdaptiveFilterRun_Lib().
 *
 * \param config
@@ -1085,9 +1289,10 @@ void Cy_CapSense_AdaptiveFilterRun_Lib_Call(
 * Function Name: Cy_CapSense_BallisticMultiplier_Lib_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_BallisticMultiplier_Lib function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_BallisticMultiplier_Lib() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_BallisticMultiplier_Lib().
 *
 * \param config
@@ -1120,9 +1325,10 @@ void Cy_CapSense_BallisticMultiplier_Lib_Call(
 * Function Name: Cy_CapSense_DpUpdateThresholds_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_DpUpdateThresholds function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_DpUpdateThresholds() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_DpUpdateThresholds().
 *
 * \param ptrWdContext
@@ -1151,8 +1357,11 @@ void Cy_CapSense_DpUpdateThresholds_Call(
 ****************************************************************************//**
 *
 * This is a wrapper function for calling
-* the Cy_CapSense_InitializeNoiseEnvelope_Lib function. All details,
-* parameters and return,* For the operation details, refer to the Cy_CapSense_InitializeNoiseEnvelope_Lib().
+* the Cy_CapSense_InitializeNoiseEnvelope_Lib() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_InitializeNoiseEnvelope_Lib().
 *
 * \param rawCount
 * \param sigPFC
@@ -1179,9 +1388,10 @@ void Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(
 * Function Name: Cy_CapSense_RunNoiseEnvelope_Lib_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_RunNoiseEnvelope_Lib function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_RunNoiseEnvelope_Lib() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_RunNoiseEnvelope_Lib().
 *
 * \param rawCount
@@ -1210,9 +1420,10 @@ void Cy_CapSense_RunNoiseEnvelope_Lib_Call(
 * Function Name: Cy_CapSense_SsAutoTune_Call
 ****************************************************************************//**
 *
-* This is a wrapper of the Cy_CapSense_SsAutoTune function.
-* It calls this function if the corresponding function pointer is initialized.
+* This is a wrapper of the Cy_CapSense_SsAutoTune() function.
 *
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
 * For the operation details, refer to the Cy_CapSense_SsAutoTune().
 *
 * \param context
@@ -1229,6 +1440,287 @@ cy_status Cy_CapSense_SsAutoTune_Call(
     {
         result = ptrFptrCfg->fptrSsAutoTune(context);
     }
+    return result;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_BistDisableMode_Call
+****************************************************************************//**
+*
+* This is a wrapper of the Cy_CapSense_BistDisableMode() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_BistDisableMode().
+*
+* \param context
+*
+*******************************************************************************/
+void Cy_CapSense_BistDisableMode_Call(
+                cy_stc_capsense_context_t * context)
+{
+    cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
+
+    if(NULL != ptrFptrCfg->fptrBistDisableMode)
+    {
+        ptrFptrCfg->fptrBistDisableMode(context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_BistInitialize_Call
+****************************************************************************//**
+*
+* This is a wrapper of the Cy_CapSense_BistInitialize() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_BistInitialize().
+*
+* \param context
+*
+*******************************************************************************/
+void Cy_CapSense_BistInitialize_Call(
+                cy_stc_capsense_context_t * context)
+{
+    cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
+
+    if(NULL != ptrFptrCfg->fptrBistInitialize)
+    {
+        ptrFptrCfg->fptrBistInitialize(context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_BistDsInitialize_Call
+****************************************************************************//**
+*
+* This is a wrapper of the Cy_CapSense_BistDsInitialize() function.
+*
+* The wrapper calls the function if the corresponding function pointer
+* is initialized.
+* For the operation details, refer to the Cy_CapSense_BistDsInitialize().
+*
+* \param context
+*
+*******************************************************************************/
+void Cy_CapSense_BistDsInitialize_Call(
+                cy_stc_capsense_context_t * context)
+{
+    cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
+
+    if(NULL != ptrFptrCfg->fptrBistDsInitialize)
+    {
+        ptrFptrCfg->fptrBistDsInitialize(context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetParam
+****************************************************************************//**
+*
+* Gets a value of the specified parameter from the cy_capsense_tuner structure.
+*
+* This function gets the value of the specified parameter by the paramId
+* argument. The paramId for each register of cy_capsense_tuner is available
+* in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
+* The paramId is a special enumerated value generated by the CapSense
+* Configurator. The format of paramId is as follows:
+* 1. [ byte 3 byte 2 byte 1 byte 0 ]
+* 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
+* 3. U - indicates if the parameter affects the RAM Widget Object CRC.
+* 4. T - encodes the parameter type:
+*    * 01b: uint8_t
+*    * 10b: uint16_t
+*    * 11b: uint32_t
+* 5. I - specifies that the widgetId parameter belongs to.
+* 6. M,L - the parameter offset MSB and LSB accordingly in cy_capsense_tuner.
+* 7. R - reserved
+*
+* \param paramId
+* Specifies the ID of parameter to get its value.
+* A macro for the parameter ID can be found in the cycsg_capsense.h file
+* defined as CY_CAPSENSE_<ParameterName>_PARAM_ID.
+*
+* \param value
+* The pointer to a variable to be updated with the obtained value.
+*
+* \param ptrTuner
+* The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
+* The cy_capsense_tuner is declared in CapSense Configurator generated files:
+* * cycfg_capsense.c/h
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the operation. If CY_RET_SUCCESS is not received,
+* either paramId is invalid or ptrTuner is null.
+*
+*******************************************************************************/
+cy_status Cy_CapSense_GetParam(
+                uint32_t paramId,
+                uint32_t * value,
+                const uint8_t * ptrTuner,
+                const cy_stc_capsense_context_t * context)
+{
+    cy_status result = CY_RET_BAD_PARAM;
+    uint32_t paramType;
+    uint32_t paramOffset;
+
+    (void)context;
+    if ((value != NULL) && (ptrTuner != NULL))
+    {
+        /* Check parameter type, offset alignment and read data */
+        paramType = (paramId & CY_CAPSENSE_PARAM_TYPE_MASK) >> CY_CAPSENSE_PARAM_TYPE_OFFSET;
+        paramOffset = CY_LO16(paramId);
+        switch (paramType)
+        {
+            case CY_CAPSENSE_DS_PARAM_TYPE_UINT32:
+                if (0u == (paramOffset & CY_CAPSENSE_UINT32_ALIGN_MASK))
+                {
+                    *value = *((uint32_t *)(&ptrTuner[paramOffset]));
+                    result = CY_RET_SUCCESS;
+                }
+                break;
+            case CY_CAPSENSE_DS_PARAM_TYPE_UINT16:
+                if (0u == (paramOffset & CY_CAPSENSE_UINT16_ALIGN_MASK))
+                {
+                    *value = (uint32_t)(*((uint16_t *)(&ptrTuner[paramOffset])));
+                    result = CY_RET_SUCCESS;
+                }
+                break;
+            case CY_CAPSENSE_DS_PARAM_TYPE_UINT8:
+                *value = (uint32_t)(ptrTuner[paramOffset]);
+                result = CY_RET_SUCCESS;
+               break;
+            default:
+                break;
+        }
+    }
+    return result;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_SetParam
+****************************************************************************//**
+*
+* Sets a new value for the specified parameter in cy_capsense_tuner structure.
+*
+* This function sets the value of the specified parameter by the paramId
+* argument. The paramId for each register of cy_capsense_tuner is available
+* in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
+* The paramId is a special enumerated value generated by the CapSense
+* Configurator. The format of paramId is as follows:
+* 1. [ byte 3 byte 2 byte 1 byte 0 ]
+* 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
+* 3. U - indicates if the parameter affects the RAM Widget Object CRC.
+* 4. T - encodes the parameter type:
+*    * 01b: uint8_t
+*    * 10b: uint16_t
+*    * 11b: uint32_t
+* 5. I - specifies that the widgetId parameter belongs to
+* 6. M,L - the parameter offset MSB and LSB accordingly in cy_capsense_tuner.
+* 7. R - reserved
+*
+* This function writes specified value into the desired register without
+* other registers update. It is application layer responsibility to keep all
+* the data structure registers aligned. Repeated call of
+* Cy_CapSense_Enable() function helps aligning dependent register values.
+*
+* This function updates also the widget CRC field if Built-in Self-test
+* is enabled and paramId requires that.
+*
+* \param paramId
+* Specifies the ID of parameter to set its value.
+* A macro for the parameter ID can be found in the cycsg_capsense.h file
+* defined as CY_CAPSENSE_<ParameterName>_PARAM_ID.
+*
+* \param value
+* Specifies the new parameter's value.
+*
+* \param ptrTuner
+* The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
+* The cy_capsense_tuner is declared in CapSense Configurator generated files:
+* * cycfg_capsense.c/h
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the operation. If CY_RET_SUCCESS is not received,
+* the parameter was not updated with the new value, either paramId is invalid
+* or ptrTuner is null.
+*
+*******************************************************************************/
+cy_status Cy_CapSense_SetParam(
+                uint32_t paramId,
+                uint32_t value,
+                uint8_t * ptrTuner,
+                cy_stc_capsense_context_t * context)
+{
+    cy_status result = CY_RET_BAD_PARAM;
+    uint32_t paramOffset;
+    uint32_t paramWidget;
+    uint32_t paramType;
+    uint32_t paramCrc;
+
+    if ((context != NULL) && (ptrTuner != NULL))
+    {
+        result = CY_RET_SUCCESS;
+
+        /* Parse paramId */
+        paramOffset = CY_LO16(paramId);
+        paramType = (paramId & CY_CAPSENSE_PARAM_TYPE_MASK) >> CY_CAPSENSE_PARAM_TYPE_OFFSET;
+        paramCrc = (paramId & CY_CAPSENSE_PARAM_CRC_MASK) >> CY_CAPSENSE_PARAM_CRC_OFFSET;
+        paramWidget = (paramId & CY_CAPSENSE_PARAM_WIDGET_MASK) >> CY_CAPSENSE_PARAM_WIDGET_OFFSET;
+        if ((paramWidget > context->ptrCommonConfig->numWd) &&
+            (0u != paramCrc) &&
+            (0u != context->ptrCommonConfig->bistEn))
+        {
+            result = CY_RET_BAD_PARAM;
+        }
+
+        /* Check parameter type, offset alignment, write the specified parameter */
+        if (CY_RET_SUCCESS == result)
+        {
+            switch (paramType)
+            {
+                case CY_CAPSENSE_DS_PARAM_TYPE_UINT32:
+                    if (0u == (paramOffset & CY_CAPSENSE_UINT32_ALIGN_MASK))
+                    {
+                        *((uint32_t *)(&ptrTuner[paramOffset])) = value;
+                    }
+                    break;
+                case CY_CAPSENSE_DS_PARAM_TYPE_UINT16:
+                    if (0u == (paramOffset & CY_CAPSENSE_UINT16_ALIGN_MASK))
+                    {
+                        *((uint16_t *)(&ptrTuner[paramOffset])) = (uint16_t)value;
+                    }
+                    break;
+                case CY_CAPSENSE_DS_PARAM_TYPE_UINT8:
+                    ptrTuner[paramOffset] = (uint8_t)value;
+                   break;
+                default:
+                    result = CY_RET_BAD_PARAM;
+                    break;
+            }
+        }
+
+        /* Update widget CRC if needed */
+        if ((CY_RET_SUCCESS == result) &&
+            (0u != context->ptrCommonConfig->bistEn) &&
+            (0u != paramCrc))
+        {
+            Cy_CapSense_UpdateCrcWidget(paramWidget, context);
+        }
+    }
+
     return result;
 }
 

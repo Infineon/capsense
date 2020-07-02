@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -29,7 +29,7 @@
 #include "cy_capsense_csx.h"
 #include "cy_capsense_sensing.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -58,26 +58,26 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
 * Performs hardware and firmware initialization required for the CSX operation
 * of the CapSense middleware.
 *
-* This function initializes hardware to perform the CSX sensing operation. 
-* If both CSX and CSD sensing methods are used in the 
-* middleware, this function is called by the Cy_CapSense_SetupWidget() to 
-* change hardware configured for CSD sensing method to re-initialize for the 
+* This function initializes hardware to perform the CSX sensing operation.
+* If both CSX and CSD sensing methods are used in the
+* middleware, this function is called by the Cy_CapSense_SetupWidget() to
+* change hardware configured for CSD sensing method to re-initialize for the
 * CSX sensing method.
 *
 * If the CSD and CSX widgets are used in the middleware, do not
-* mix the CSD widgets between the CSX widgets. Instead, place all 
-* CSX widgets in the required scanning order and then place the CSD widgets 
+* mix the CSD widgets between the CSX widgets. Instead, place all
+* CSX widgets in the required scanning order and then place the CSD widgets
 * in the CapSense Configurator tool.
 * For the middleware, this action will eliminate the need for changing
-* the CSD HW block configuration for every widget scan and will increase the 
-* execution speed in the Cy_CapSense_ScanAllWidgets() when the function is 
+* the CSD HW block configuration for every widget scan and will increase the
+* execution speed in the Cy_CapSense_ScanAllWidgets() when the function is
 * called.
 *
 * Similarly, set up and scan all the CSX widgets in such
-* a sequence that the Cy_CapSense_SetupWidget() does not need to perform 
+* a sequence that the Cy_CapSense_SetupWidget() does not need to perform
 * hardware sensing-configuration switches.
 *
-* Do not call this function directly from 
+* Do not call this function directly from
 * the application program.
 *
 * \param context
@@ -86,59 +86,39 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
 *******************************************************************************/
 void Cy_CapSense_CSXInitialize(cy_stc_capsense_context_t * context)
 {
-    uint32_t interruptState;
-    uint32_t tmpRegVal;
+    uint32_t modClkDivider;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     Cy_CapSense_DischargeExtCapacitors(context);
 
-    interruptState = Cy_SysLib_EnterCriticalSection();
-    Cy_GPIO_SetDrivemode(context->ptrCommonConfig->portCintA, (uint32_t)context->ptrCommonConfig->pinCintA, CY_GPIO_DM_ANALOG);
-    Cy_GPIO_SetDrivemode(context->ptrCommonConfig->portCintB, (uint32_t)context->ptrCommonConfig->pinCintB, CY_GPIO_DM_ANALOG);
-    Cy_SysLib_ExitCriticalSection(interruptState);
+    Cy_CapSense_SsConfigPinRegisters(context->ptrCommonConfig->portCintA, (uint32_t)context->ptrCommonConfig->pinCintA, CY_GPIO_DM_ANALOG, CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM);
+    Cy_CapSense_SsConfigPinRegisters(context->ptrCommonConfig->portCintB, (uint32_t)context->ptrCommonConfig->pinCintB, CY_GPIO_DM_ANALOG, CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM);
 
     /* Clear all pending interrupts of the CSD HW block */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR, CY_CAPSENSE_CSD_INTR_ALL_MSK);
 
     /* Enable the End Of Scan interrupt */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_DEFAULT_CSD_INTR_MASK_CFG);
-    
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_SET, 0u);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_HSCMP, CY_CAPSENSE_DEFAULT_CSD_HSCMP_CFG);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_AMBUF, CY_CAPSENSE_DEFAULT_CSD_AMBUF_CFG);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_REFGEN, context->ptrInternalContext->csxRegRefgen );
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_AMBUF, context->ptrInternalContext->csxRegAMuxBuf);
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_REFGEN, context->ptrInternalContext->csxRegRefgen);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CSDCMP, CY_CAPSENSE_DEFAULT_CSD_CSDCMP_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IDACA, CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG);
-
-    if (0u != context->ptrCommonConfig->csdIdacCompEn)
-    {
-        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IDACB, CY_CAPSENSE_DEFAULT_CSD_IDACB_CFG);
-    }
-
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_RES,context->ptrInternalContext->csxRegSwResInit);
-    
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IDACB, CY_CAPSENSE_DEFAULT_CSD_IDACB_CFG);
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_RES, context->ptrInternalContext->csxRegSwResInit);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SENSE_DUTY, CY_CAPSENSE_DEFAULT_CSD_SENSE_DUTY_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_HS_P_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_HS_P_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_HS_N_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_HS_N_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_SHIELD_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_SHIELD_SEL_CFG);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_AMUXBUF_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_AMUXBUF_SEL_CFG);
-
-    tmpRegVal = Cy_CSD_ReadReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_BYP_SEL);
-    tmpRegVal &= ~(CY_CAPSENSE_CSD_SW_BYP_SEL_SW_BYA_MSK);
-    tmpRegVal |= CY_CAPSENSE_DEFAULT_CSD_SW_BYP_SEL_CFG;
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_BYP_SEL, tmpRegVal);
-
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_AMUXBUF_SEL, context->ptrInternalContext->csxRegRefgenSel);
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_BYP_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_BYP_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_CMP_P_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_CMP_P_SEL_CFG);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_CMP_N_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_CMP_N_SEL_CFG);
-
-    tmpRegVal = Cy_CSD_ReadReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_REFGEN_SEL);
-    tmpRegVal &= ~CY_CAPSENSE_DEFAULT_CSD_SW_REFGEN_SEL_MSK;
-    tmpRegVal |= context->ptrInternalContext->regSwRefGenSel ;
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_REFGEN_SEL, tmpRegVal);
-
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_CMP_N_SEL, context->ptrInternalContext->csxRegSwCmpNSel);
+    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_REFGEN_SEL, context->ptrInternalContext->csxRegSwRefGenSel);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_MOD_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_FW_MOD_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_TANK_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_FW_TANK_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_DSI_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_DSI_SEL_CFG);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IO_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_IO_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_TIME, 0u);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_INIT_CNT, (uint32_t)context->ptrCommonConfig->csxFineInitTime);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_NORM_CNT, CY_CAPSENSE_DEFAULT_CSD_SEQ_NORM_CNT_CFG);
@@ -146,10 +126,20 @@ void Cy_CapSense_CSXInitialize(cy_stc_capsense_context_t * context)
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_DEFAULT_CSD_SEQ_START_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CONFIG, context->ptrInternalContext->csxRegConfigInit);
 
-    Cy_CapSense_SetClkDivider((uint32_t)context->ptrCommonContext->modCsxClk - 1u, context);
+    #if (CY_CAPSENSE_PSOC6_CSDV2)
+        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IO_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_IO_SEL_CFG);
+    #endif
+
+    modClkDivider = (uint32_t)context->ptrCommonContext->modCsxClk;
+    if(0u == modClkDivider)
+    {
+        modClkDivider = 1u;
+    }
+
+    Cy_CapSense_SetClkDivider(modClkDivider - 1u, context);
 
     /* Set all IO states to the default state */
-    Cy_CapSense_SetIOsInDefaultState(context);
+    Cy_CapSense_SetIOsInDesiredState(CY_GPIO_DM_STRONG_IN_OFF, 0u, CY_CAPSENSE_HSIOM_SEL_GPIO, context);
 
     /* Enable the CSD HW block interrupt and set interrupt vector to CSX sensing method */
     if(NULL != ptrFptrCfg->fptrCSXScanISR)
@@ -194,6 +184,7 @@ void Cy_CapSense_CSXElectrodeCheck(cy_stc_capsense_context_t * context)
 *
 * To disable CSX mode, the following tasks are performed:
 * 1. Disconnect previous CSX electrode if it has been connected.
+* 2. Disconnect the external capacitors (CintA and CintB).
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -203,6 +194,10 @@ void Cy_CapSense_CSXDisableMode(cy_stc_capsense_context_t * context)
 {
     /* Disconnect previous CSX electrode if it has been connected */
     Cy_CapSense_CSXElectrodeCheck(context);
+
+    /* Disconnect the external capacitors (CintA and CintB) */
+    Cy_CapSense_SsConfigPinRegisters(context->ptrCommonConfig->portCintA, (uint32_t)context->ptrCommonConfig->pinCintA, CY_GPIO_DM_ANALOG, HSIOM_SEL_GPIO);
+    Cy_CapSense_SsConfigPinRegisters(context->ptrCommonConfig->portCintB, (uint32_t)context->ptrCommonConfig->pinCintB, CY_GPIO_DM_ANALOG, HSIOM_SEL_GPIO);
 }
 
 
@@ -212,10 +207,10 @@ void Cy_CapSense_CSXDisableMode(cy_stc_capsense_context_t * context)
 *
 * Performs the initialization required to scan the specified CSX widget.
 *
-* \note This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_SetupWidget() function should be used instead.
 *
-* This function prepares the middleware to scan all the sensors in the 
+* This function prepares the middleware to scan all the sensors in the
 * specified CSX widget by executing the following tasks:
 * 1. Configure the CSD HW block if it is not configured to perform the
 * CSX sensing method used by the specified widget.
@@ -227,17 +222,17 @@ void Cy_CapSense_CSXDisableMode(cy_stc_capsense_context_t * context)
 *
 * This function does not start sensor scanning. The Cy_CapSense_CSXScan()
 * function must be called to start the scan sensors in the widget. If this
-* function is called more than once, it does not break the middleware 
+* function is called more than once, it does not break the middleware
 * operation, but only the last initialized widget is in effect.
 * Calling this function directly from the application program is not
 * recommended. This function is used to implement only the user's specific
 * use cases (for example faster execution).
 *
-* The status of a sensor scan must be checked using the Cy_CapSense_IsBusy() 
+* The status of a sensor scan must be checked using the Cy_CapSense_IsBusy()
 * function prior to starting a next scan or setting up another widget.
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -251,7 +246,7 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
     uint32_t snsClkSrc;
     uint32_t tmpRegVal;
 
-    Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E, context);
+    (void)Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E, context);
     /*
     * Check whether CSX electrodes were previously connected using
     * Cy_CapSense_CSXSetupWidgetExt and if yes, disconnect them
@@ -260,14 +255,14 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
     /* Set up widget and its first sensor IDs and pointers to have assess to them after scanning  */
     Cy_CapSense_InitActivePtr(widgetId, 0u, context);
     /* Number of conversion and maxRawCount setup */
-    tmpRegVal = (uint32_t)context->ptrActiveScanSns->ptrWdContext->resolution;    
+    tmpRegVal = (uint32_t)context->ptrActiveScanSns->ptrWdContext->resolution;
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_NORM_CNT, tmpRegVal);
-    context->ptrActiveScanSns->ptrWdContext->maxRawCount = (uint16_t)tmpRegVal * 
+    context->ptrActiveScanSns->ptrWdContext->maxRawCount = (uint16_t)tmpRegVal *
         (context->ptrActiveScanSns->ptrWdContext->snsClk - CY_CAPSENSE_CSX_DEADBAND_CYCLES_NUMBER);
 
     /* SnsClk setup */
     snsClkDivider = (uint32_t) context->ptrActiveScanSns->ptrWdContext->snsClk;
-    
+
     /* Check divider value */
     if (0u == snsClkDivider)
     {
@@ -284,35 +279,35 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 * Function Name: Cy_CapSense_CSXSetupWidgetExt
 ****************************************************************************//**
 *
-* Performs extended initialization required to scan a specified sensor in 
+* Performs extended initialization required to scan a specified sensor in
 * a widget using CSX sensing method.
-* 
-* \note This function is obsolete and kept for backward compatibility only. 
+*
+* \note This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_SetupWidgetExt() function should be used instead.
 *
-* This function performs the same tasks of Cy_CapSense_CSXSetupWidget() and 
-* also connects and configures specified sensor for scan. Hence this 
-* function, along with Cy_CapSense_CSXScanExt() function, can be used to 
+* This function performs the same tasks of Cy_CapSense_CSXSetupWidget() and
+* also connects and configures specified sensor for scan. Hence this
+* function, along with Cy_CapSense_CSXScanExt() function, can be used to
 * scan a specific sensor in the widget.
-* 
-* This function should be called for a widget that is configured to use 
-* CSX sensing method. Using this function on a non-CSX sensing widget 
+*
+* This function should be called for a widget that is configured to use
+* CSX sensing method. Using this function on a non-CSX sensing widget
 * would cause an unexpected result.
-* 
-* This function requires using the Cy_CapSense_CSXScanExt() function to 
+*
+* This function requires using the Cy_CapSense_CSXScanExt() function to
 * initiate a scan.
-* 
-* Calling this function directly from the application program is not 
-* recommended. This function is used to implement only the user's 
+*
+* Calling this function directly from the application program is not
+* recommended. This function is used to implement only the user's
 * specific use cases (for example faster execution).
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* Specifies the ID number of the sensor within the widget. A macro for the
+* sensor ID within a specified widget can be found in the cycfg_capsense.h
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
@@ -320,8 +315,8 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 *
 *******************************************************************************/
 void Cy_CapSense_CSXSetupWidgetExt(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
+                uint32_t widgetId,
+                uint32_t sensorId,
                 cy_stc_capsense_context_t * context)
 {
     /* Initialize widget */
@@ -330,8 +325,10 @@ void Cy_CapSense_CSXSetupWidgetExt(
     /* Initialize sensor data structure pointer to appropriate address */
     Cy_CapSense_InitActivePtrSns(sensorId, context);
 
-    /* Connect current sensor`s Tx and Rx IOs for scan 
-    * and set flag to indicate that IOs should be disconnected */
+    /*
+    * Connect current sensor's Tx and Rx IOs for scan and set flag
+    * to indicate that IOs should be disconnected
+    */
     Cy_CapSense_CSXConnectTxExt(context);
     Cy_CapSense_CSXConnectRxExt(context);
 }
@@ -340,10 +337,10 @@ void Cy_CapSense_CSXSetupWidgetExt(
 * Function Name: Cy_CapSense_CSXScan
 ****************************************************************************//**
 *
-* This function initiates a scan for the sensors of the widget initialized 
+* This function initiates a scan for the sensors of the widget initialized
 * by the Cy_CapSense_CSXSetupWidget() function.
 *
-* \note This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_Scan() function should be used instead.
 *
 * This function does the following tasks:
@@ -370,7 +367,7 @@ void Cy_CapSense_CSXSetupWidgetExt(
 void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context)
 {
     Cy_CapSense_InitActivePtrSns(0u, context);
-    
+
     /* Connect electrodes */
     Cy_CapSense_CSXConnectTxExt(context);
     Cy_CapSense_CSXConnectRxExt(context);
@@ -387,30 +384,30 @@ void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSXScanExt()
 ****************************************************************************//**
 *
-* Starts the CSD conversion on the preconfigured sensor. 
-* 
-* \note This function is obsolete and kept for backward compatibility only. 
+* Starts the CSD conversion on the preconfigured sensor.
+*
+* \note This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_ScanExt() function should be used instead.
 *
-* This function performs scanning of a specific sensor in the widget 
-* previously initialized using the Cy_CapSense_CSXSetupWidgetExt() function. 
-* 
-* This function is called when no scanning is in progress. 
-* I.e. Cy_CapSense_IsBusy() returns a non-busy status and the widget must 
-* be preconfigured using Cy_CapSense_CSXSetupWidgetExt() function prior 
-* to calling this function. Calling this function directly from 
-* the application program is not recommended. This function is used to 
+* This function performs scanning of a specific sensor in the widget
+* previously initialized using the Cy_CapSense_CSXSetupWidgetExt() function.
+*
+* This function is called when no scanning is in progress.
+* I.e. Cy_CapSense_IsBusy() returns a non-busy status and the widget must
+* be preconfigured using Cy_CapSense_CSXSetupWidgetExt() function prior
+* to calling this function. Calling this function directly from
+* the application program is not recommended. This function is used to
 * implement only the user's specific use cases (for example faster execution).
-* 
-* This function does not disconnect sensor GPIOs from CSD HW block at the 
-* end of a scan, therefore making subsequent scan of the same sensor is faster. 
-* If sensor must be disconnected after the scan, 
+*
+* This function does not disconnect sensor GPIOs from CSD HW block at the
+* end of a scan, therefore making subsequent scan of the same sensor is faster.
+* If sensor must be disconnected after the scan,
 * the Cy_CapSense_CSXDisconnectTx() or Cy_CapSense_CSXDisconnectRx() functions
 * can be used.
-* 
-* Calling Cy_CapSense_SetupWidget(), Cy_CapSense_CSXSetupWidget(), 
-* Cy_CapSense_ScanAllWidgets(), or if Cy_CapSense_RunTuner() returns 
-* CY_CAPSENSE_STATUS_RESTART_DONE status invalidated initialization 
+*
+* Calling Cy_CapSense_SetupWidget(), Cy_CapSense_CSXSetupWidget(),
+* Cy_CapSense_ScanAllWidgets(), or if Cy_CapSense_RunTuner() returns
+* CY_CAPSENSE_STATUS_RESTART_DONE status invalidated initialization
 * made by this function.
 *
 * \param context
@@ -426,7 +423,7 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 
     /* Initialize the Active Context pointer with the CH0 context */
     ptrActive->ptrSnsContext = &ptrActive->ptrWdConfig->ptrSnsContext[ptrActive->sensorIndex];
-    
+
     /* Set busy flag and start conversion */
     Cy_CapSense_SetBusyFlags(context);
     /* Set scope flag */
@@ -443,22 +440,22 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 * Executes the IDAC calibration for all the sensors in the widget specified in
 * the input.
 *
-* \note This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_CalibrateWidget() function should be used instead.
 *
 * Performs a successive approximation search algorithm to find appropriate
-* IDAC values for all sensors in the specified widget that provide 
+* IDAC values for all sensors in the specified widget that provide
 * the raw count to the level specified by the target parameter.
 *
-* Calibration returns CYRET_BAD_DATA if the achieved raw count is outside 
+* Calibration returns CY_RET_BAD_DATA if the achieved raw count is outside
 * of the range specified by the target and acceptable calibration deviation
 * parameters.
 *
 * This function could be used when the CSX Enable IDAC auto-calibration
-* parameter is enabled. 
+* parameter is enabled.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param target
@@ -469,17 +466,17 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 *
 * \return
 * Returns the status of the specified widget calibration:
-* - CYRET_SUCCESS       - The operation is successfully completed.
-* - CYRET_BAD_PARAM     - The input parameter is invalid.
-* - CYRET_BAD_DATA      - The calibration failed and CapSense may not operate
+* - CY_RET_SUCCESS       - The operation is successfully completed.
+* - CY_RET_BAD_PARAM     - The input parameter is invalid.
+* - CY_RET_BAD_DATA      - The calibration failed and CapSense may not operate
 *                         as expected.
-* - CYRET_INVALID_STATE - The previous scanning is not completed, and 
+* - CY_RET_INVALID_STATE - The previous scanning is not completed, and
 *                         the CapSense middleware is busy.
 *
 *******************************************************************************/
 cy_status Cy_CapSense_CSXCalibrateWidget(
-                uint32_t widgetId, 
-                uint32_t target, 
+                uint32_t widgetId,
+                uint32_t target,
                 cy_stc_capsense_context_t * context)
 {
     uint32_t cpuFreqMHz;
@@ -494,21 +491,23 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
 
     uint32_t rawTarget;
     uint32_t totalSns;
+    uint32_t modClkDivider;
+    uint32_t snsClkDivider;
     uint32_t calibrationIndex;
     /* Currently used IDAC-bit */
     uint8_t curIdacMask = CY_CAPSENSE_CAL_MIDDLE_VALUE;
     /* Next used IDAC-bit */
-    uint8_t nextIdacMask = (curIdacMask >> 1u);
+    uint8_t nextIdacMask = ((uint8_t)CY_CAPSENSE_CAL_MIDDLE_VALUE) >> 1u;
 
     /* Approximate duration of Wait For Init loop */
-    const uint32_t isBusyLoopDuration = 5uL;
+    const uint32_t isBusyLoopDuration = 5u;
 
     /* Wait For Init watchdog timeout in microseconds */
-    const uint32_t isBusyWatchdogTimeUs = 200000uL;
+    uint64_t isBusyWatchdogTimeUs = 0u;
 
 
     if((context->ptrCommonConfig->numWd <= widgetId) ||
-        (CY_CAPSENSE_DISABLE == context->ptrCommonConfig->csxIdacAutocalEn)) 
+        (CY_CAPSENSE_DISABLE == context->ptrCommonConfig->csxIdacAutocalEn))
     {
         calibrateStatus = CY_RET_BAD_PARAM;
     }
@@ -521,7 +520,7 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
     if(CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         /* Previous widget is being scanned, return error */
-        calibrateStatus = CYRET_INVALID_STATE;
+        calibrateStatus = CY_RET_INVALID_STATE;
     }
 
     if(CY_RET_SUCCESS == calibrateStatus)
@@ -531,7 +530,7 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
 
         ptrActSnsContext = ptrWdCfg->ptrSnsContext;
         totalSns = ptrWdCfg->numSns;
-    
+
         /* Calculate target raw count */
         rawTarget = ((uint32_t)context->ptrWdContext[widgetId].maxRawCount * target) / CY_CAPSENSE_PERCENTAGE_100;
         freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
@@ -545,6 +544,44 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
                 ptrActSnsContext[calibrationIndex + (freqChIndex * context->ptrCommonConfig->numSns)].idacComp = curIdacMask;
             }
         }
+
+        modClkDivider = (uint32_t)context->ptrCommonContext->modCsxClk;
+        snsClkDivider = (uint32_t)ptrWdCfg->ptrWdContext->snsClk;
+
+        if(0u == modClkDivider)
+        {
+            modClkDivider = 1u;
+        }
+
+        if(0u == snsClkDivider)
+        {
+            snsClkDivider = 1u;
+        }
+
+        if(CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn)
+        {
+            if(context->ptrCommonConfig->csxMfsDividerOffsetF1 >
+               context->ptrCommonConfig->csxMfsDividerOffsetF2)
+            {
+                snsClkDivider += context->ptrCommonConfig->csxMfsDividerOffsetF1;
+            }
+            else
+        {
+                snsClkDivider += context->ptrCommonConfig->csxMfsDividerOffsetF2;
+        }
+        }
+
+        isBusyWatchdogTimeUs  = (uint64_t)totalSns * freqChNumber * ptrWdCfg->ptrWdContext->resolution;
+        isBusyWatchdogTimeUs *= (uint64_t)snsClkDivider * modClkDivider * CY_CAPSENSE_CONVERSION_MEGA;
+        isBusyWatchdogTimeUs /= context->ptrCommonConfig->periClkHz;
+
+        if(0uL == isBusyWatchdogTimeUs)
+        {
+            isBusyWatchdogTimeUs = 1u;
+        }
+
+        isBusyWatchdogTimeUs *= CY_CAPSENSE_CSX_WATCHDOG_MARGIN_COEFF;
+
         /* Perform binary search for accurate IDAC value for each sensor/node */
         do
         {
@@ -553,8 +590,8 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
             (void)Cy_CapSense_Scan(context);
 
             cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
-            watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
-            
+            watchdogCounter = Cy_CapSense_WatchdogCyclesNum((uint32_t)isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
+
             /* Wait for EOS */
             while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
             {
@@ -562,10 +599,10 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
                 {
                     break;
                 }
-                
+
                 watchdogCounter--;
             }
-            
+
             /* Set pointer to the widget's first sensor data */
             ptrActSnsContext = ptrWdCfg->ptrSnsContext;
 
@@ -601,8 +638,8 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
         (void)Cy_CapSense_Scan(context);
 
         cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
-        watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
-                    
+        watchdogCounter = Cy_CapSense_WatchdogCyclesNum((uint32_t)isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
+
         /* Wait for EOS */
         while (CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
@@ -611,11 +648,14 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
                 calibrateStatus = CY_RET_TIMEOUT;
                 break;
             }
-            
+
             watchdogCounter--;
         }
 
-        calibrateStatus = Cy_CapSense_CalibrateCheck(widgetId, target, (uint32_t)CY_CAPSENSE_SENSE_METHOD_CSX_E, context);
+        if(CY_RET_SUCCESS == calibrateStatus)
+        {
+            calibrateStatus = Cy_CapSense_CalibrateCheck(widgetId, target, (uint32_t)CY_CAPSENSE_SENSE_METHOD_CSX_E, context);
+        }
     }
 
     return(calibrateStatus);
@@ -659,14 +699,14 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 {
     /* Set up IDAC Value */
     Cy_CapSense_CSXSetUpIdacs(context);
-        
+
     /* Clear previous interrupts */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR, CY_CAPSENSE_CSD_INTR_ALL_MSK);
     (void)Cy_CSD_ReadReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR);
 
     /* Enable interrupt */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_SAMPLE_MSK);
-    
+
     if(NULL != context->ptrCommonContext->ptrSSCallback)
     {
         context->ptrCommonContext->ptrSSCallback(context->ptrActiveScanSns);
@@ -681,24 +721,24 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 ****************************************************************************//**
 *
 * Connects port pin (an Rx electrode) to the CSD HW block using AMUX bus.
-* 
-* This function can be used to customize the default sensor connection 
+*
+* This function can be used to customize the default sensor connection
 * by connecting one or more pins to an existing sensor as an Rx electrode
 * prior to initiating scan of the sensor.
-* 
-* The function ignores whether the sensor is a ganged sensor and 
-* connects only a specified port pin to the CSD HW block. This function can 
+*
+* The function ignores whether the sensor is a ganged sensor and
+* connects only a specified port pin to the CSD HW block. This function can
 * only use GPIOs that is already assigned to CapSense middleware.
-* 
-* The functions that perform a setup and scan of a sensor/widget do not 
-* take into account changes in the design made by 
-* the Cy_CapSense_CSXConnectRx() function. Hence all GPIOs connected 
-* using this function must be disconnected using 
-* the Cy_CapSense_CSXDisconnectRx() function prior to initializing 
-* new widgets. Use this function in StartSample 
-* callback (see the \ref group_capsense_callbacks section for details) 
+*
+* The functions that perform a setup and scan of a sensor/widget do not
+* take into account changes in the design made by
+* the Cy_CapSense_CSXConnectRx() function. Hence all GPIOs connected
+* using this function must be disconnected using
+* the Cy_CapSense_CSXDisconnectRx() function prior to initializing
+* new widgets. Use this function in StartSample
+* callback (see the \ref group_capsense_callbacks section for details)
 * or with low-level functions that perform a single-sensor scanning.
-* 
+*
 * Scanning should be completed before calling this function.
 *
 * \param rxPtr
@@ -709,15 +749,16 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \funcusage
-* 
-* An example of using the function to perform port pin re-connection: 
+*
+* An example of using the function to perform port pin re-connection:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
-* 
+*
 *******************************************************************************/
 void Cy_CapSense_CSXConnectRx(
-                const cy_stc_capsense_pin_config_t * rxPtr, 
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_pin_config_t * rxPtr,
+                const cy_stc_capsense_context_t * context)
 {
+    (void) context;
     Cy_CapSense_SsConfigPinRegisters(rxPtr->pcPtr, (uint32_t)rxPtr->pinNumber, CY_GPIO_DM_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA);
 }
 
@@ -727,24 +768,24 @@ void Cy_CapSense_CSXConnectRx(
 ****************************************************************************//**
 *
 * Connects port pin (a Tx electrode) to the CSD HW block.
-* 
-* This function can be used to customize the default sensor connection 
+*
+* This function can be used to customize the default sensor connection
 * by connecting one or more pins to an existing sensor as a Tx electrode
 * prior to initiating scan of the sensor.
-* 
-* The function ignores whether the sensor is a ganged sensor and 
-* connects only a specified port pin to the CSD HW block. This function can 
+*
+* The function ignores whether the sensor is a ganged sensor and
+* connects only a specified port pin to the CSD HW block. This function can
 * only use GPIOs that is already assigned to CapSense middleware.
-* 
-* The functions that perform a setup and scan of a sensor/widget do not 
-* take into account changes in the design made by 
-* the Cy_CapSense_CSXConnectTx() function. Hence all GPIOs connected 
-* using this function must be disconnected using 
-* the Cy_CapSense_CSXDisconnectTx() function prior to initializing 
-* new widgets. Use this function in StartSample 
-* callback (see the \ref group_capsense_callbacks section for details) 
+*
+* The functions that perform a setup and scan of a sensor/widget do not
+* take into account changes in the design made by
+* the Cy_CapSense_CSXConnectTx() function. Hence all GPIOs connected
+* using this function must be disconnected using
+* the Cy_CapSense_CSXDisconnectTx() function prior to initializing
+* new widgets. Use this function in StartSample
+* callback (see the \ref group_capsense_callbacks section for details)
 * or with low-level functions that perform a single-sensor scanning.
-* 
+*
 * Scanning should be completed before calling this function.
 *
 * \param txPtr
@@ -755,33 +796,34 @@ void Cy_CapSense_CSXConnectRx(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \funcusage
-* 
-* An example of using the function to perform port pin re-connection: 
+*
+* An example of using the function to perform port pin re-connection:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
-* 
+*
 *******************************************************************************/
 void Cy_CapSense_CSXConnectTx(
-                const cy_stc_capsense_pin_config_t * txPtr, 
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_pin_config_t * txPtr,
+                const cy_stc_capsense_context_t * context)
 {
-    Cy_CapSense_SsConfigPinRegisters(txPtr->pcPtr, (uint32_t)txPtr->pinNumber, CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD);
+    (void) context;
+    Cy_CapSense_SsConfigPinRegisters(txPtr->pcPtr, (uint32_t)txPtr->pinNumber, CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_CSX_TX_SCAN_PIN_HSIOM);
 }
 
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_CSXDisconnectRx
 ****************************************************************************//**
-* 
-* Disconnects port pin (an Rx electrode) from the CSD HW block by disconnecting 
+*
+* Disconnects port pin (an Rx electrode) from the CSD HW block by disconnecting
 * it from the AMUX bus.
-* 
-* This function can be used to disconnect a sensor connected 
-* using the Cy_CapSense_CSXConnectRx() function. In addition, this 
-* function can be used to customize default sensor connection by 
-* disconnecting one or more already connected sensors prior to 
+*
+* This function can be used to disconnect a sensor connected
+* using the Cy_CapSense_CSXConnectRx() function. In addition, this
+* function can be used to customize default sensor connection by
+* disconnecting one or more already connected sensors prior to
 * initiating scan of the sensor.
-* 
-* This function works identically to the Cy_CapSense_CSDConnectRx() function 
+*
+* This function works identically to the Cy_CapSense_CSDConnectRx() function
 * except it disconnects the specified port pin used by the sensor.
 *
 * Scanning should be completed before calling this function.
@@ -794,38 +836,34 @@ void Cy_CapSense_CSXConnectTx(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \funcusage
-* 
-* An example of using the function to perform port pin re-connection: 
+*
+* An example of using the function to perform port pin re-connection:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
-* 
+*
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectRx(
-                const cy_stc_capsense_pin_config_t * rxPtr, 
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_pin_config_t * rxPtr,
+                const cy_stc_capsense_context_t * context)
 {
-    uint32_t interruptState;
-    
+    (void) context;
     Cy_CapSense_SsConfigPinRegisters(rxPtr->pcPtr, (uint32_t)rxPtr->pinNumber, CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_HSIOM_SEL_GPIO);
-
-    interruptState = Cy_SysLib_EnterCriticalSection();
     Cy_GPIO_Clr(rxPtr->pcPtr, (uint32_t)rxPtr->pinNumber);
-    Cy_SysLib_ExitCriticalSection(interruptState);
 }
 
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_CSXDisconnectTx
 ****************************************************************************//**
-* 
+*
 * Disconnects port pin (a Tx electrode) from the CSD HW block.
-* 
-* This function can be used to disconnect a sensor connected 
-* using the Cy_CapSense_CSXConnectTx() function. In addition, this 
-* function can be used to customize default sensor connection by 
-* disconnecting one or more already connected sensors prior to 
+*
+* This function can be used to disconnect a sensor connected
+* using the Cy_CapSense_CSXConnectTx() function. In addition, this
+* function can be used to customize default sensor connection by
+* disconnecting one or more already connected sensors prior to
 * initiating scan of the sensor.
-* 
-* This function works identically to the Cy_CapSense_CSDConnectTx() function 
+*
+* This function works identically to the Cy_CapSense_CSDConnectTx() function
 * except it disconnects the specified port pin used by the sensor.
 *
 * Scanning should be completed before calling this function.
@@ -838,16 +876,18 @@ void Cy_CapSense_CSXDisconnectRx(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \funcusage
-* 
-* An example of using the function to perform port pin re-connection: 
+*
+* An example of using the function to perform port pin re-connection:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSXConnect
-* 
+*
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectTx(
-                const cy_stc_capsense_pin_config_t * txPtr, 
-                cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_pin_config_t * txPtr,
+                const cy_stc_capsense_context_t * context)
 {
+    (void) context;
     Cy_CapSense_SsConfigPinRegisters(txPtr->pcPtr, (uint32_t)txPtr->pinNumber, CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_HSIOM_SEL_GPIO);
+
     Cy_GPIO_Clr(txPtr->pcPtr, (uint32_t)txPtr->pinNumber);
 }
 
@@ -875,7 +915,7 @@ void Cy_CapSense_CSXConnectTxExt(cy_stc_capsense_context_t * context)
 {
     uint32_t pinIndex;
     const cy_stc_capsense_pin_config_t * pinPointer = context->ptrActiveScanSns->ptrTxConfig->ptrPin;
-    
+
     for (pinIndex = context->ptrActiveScanSns->ptrTxConfig->numPins; pinIndex-- > 0u;)
     {
         Cy_CapSense_CSXConnectTx(pinPointer, context);
@@ -908,7 +948,7 @@ void Cy_CapSense_CSXConnectRxExt(cy_stc_capsense_context_t * context)
 {
     uint32_t pinIndex;
     const cy_stc_capsense_pin_config_t * pinPointer = context->ptrActiveScanSns->ptrRxConfig->ptrPin;
-    
+
     for (pinIndex = context->ptrActiveScanSns->ptrRxConfig->numPins; pinIndex-- > 0u;)
     {
         Cy_CapSense_CSXConnectRx(pinPointer, context);
@@ -937,11 +977,11 @@ void Cy_CapSense_CSXConnectRxExt(cy_stc_capsense_context_t * context)
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
-void Cy_CapSense_CSXDisconnectTxExt(cy_stc_capsense_context_t * context)
+void Cy_CapSense_CSXDisconnectTxExt(const cy_stc_capsense_context_t * context)
 {
     uint32_t pinIndex;
     const cy_stc_capsense_pin_config_t * pinPointer = context->ptrActiveScanSns->ptrTxConfig->ptrPin;
-    
+
     for (pinIndex = context->ptrActiveScanSns->ptrTxConfig->numPins; pinIndex-- > 0u;)
     {
         Cy_CapSense_CSXDisconnectTx(pinPointer, context);
@@ -969,11 +1009,11 @@ void Cy_CapSense_CSXDisconnectTxExt(cy_stc_capsense_context_t * context)
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
-void Cy_CapSense_CSXDisconnectRxExt(cy_stc_capsense_context_t * context)
+void Cy_CapSense_CSXDisconnectRxExt(const cy_stc_capsense_context_t * context)
 {
     uint32_t pinIndex;
     const cy_stc_capsense_pin_config_t * pinPointer = context->ptrActiveScanSns->ptrRxConfig->ptrPin;
-    
+
     for (pinIndex = context->ptrActiveScanSns->ptrRxConfig->numPins; pinIndex-- > 0u;)
     {
         Cy_CapSense_CSXDisconnectRx(pinPointer, context);
@@ -1028,15 +1068,15 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
 {
     uint32_t tmpRawCount;
     cy_stc_capsense_context_t * cxt = (cy_stc_capsense_context_t *)capsenseContext;
-    cy_stc_active_scan_sns_t * ptrActive = cxt->ptrActiveScanSns;    
+    cy_stc_active_scan_sns_t * ptrActive = cxt->ptrActiveScanSns;
     uint32_t maxCount = (uint32_t) ptrActive->ptrWdContext->maxRawCount;
 
     Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK);
-        
+
     /* Clear all pending interrupts of the CSD HW block */
     Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR, CY_CAPSENSE_CSD_INTR_ALL_MSK);
     (void)Cy_CSD_ReadReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR);
-    
+
 
     tmpRawCount  = (uint16_t)(Cy_CSD_ReadReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_RESULT_VAL1) &
                                              CY_CAPSENSE_CSD_RESULT_VAL1_VALUE_MSK);
@@ -1064,21 +1104,20 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
         Cy_CapSense_ClrBusyFlags(cxt);
     }
     else
-    { 
+    {
         /* Disconnect Tx electrodes of previously scanned sensor as preparation for next sensor scan */
         Cy_CapSense_CSXDisconnectTxExt(cxt);
         /* Scan the next sensor */
         Cy_CapSense_CSXInitNextScan(cxt);
     }
-    
+
     if(CY_CAPSENSE_NOT_BUSY == (cxt->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CONFIG, cxt->ptrInternalContext->csxRegConfigInit);
         Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CSDCMP, CY_CAPSENSE_DEFAULT_CSD_CSDCMP_CFG);
         Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IDACA, CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG);
-        Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IO_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_IO_SEL_CFG);
     }
-    
+
     /* Clear previous interrupts */
     Cy_CSD_WriteReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR, CY_CAPSENSE_CSD_INTR_ALL_MSK);
     (void)Cy_CSD_ReadReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR);
@@ -1097,7 +1136,7 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
 *
 * The function increments the sensor index, updates sense clock for matrix
 * or touchpad widgets only, sets up Compensation IDAC, enables the sensor and
-* scans it. When all the sensors are scanned it continues to set up the next 
+* scans it. When all the sensors are scanned it continues to set up the next
 * widget until all the widgets are scanned.
 *
 * \param context
@@ -1107,16 +1146,16 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
 static void Cy_CapSense_CSXInitNextScan(cy_stc_capsense_context_t * context)
 {
     cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
-    
+
     ptrActive->mfsChannelIndex = 0u;
     ptrActive->ptrSnsContext = &ptrActive->ptrWdConfig->ptrSnsContext[ptrActive->sensorIndex];
-    
+
     /* Increment sensor index and sensor's context pointer to scope next sensor in widget */
     ptrActive->sensorIndex++;
     ptrActive->ptrSnsContext++;
     /* Initiate scan for next sensor in widget, if all the sensors in widget are not scanned */
     ptrActive->txIndex--;
-    
+
         if (ptrActive->txIndex > 0u)
         {
             /* Increment pointer to the next Tx electrode and connect it for scan  */
@@ -1189,8 +1228,7 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
     const uint32_t intrInitLoopDuration = 5uL;
 
     /* Wait For Init watchdog timeout in microseconds */
-    const uint32_t initWatchdogTimeUs = 200000uL;
-
+    const uint32_t initWatchdogTimeUs = CY_CAPSENSE_CSX_PRECHARGE_WATCHDOG_TIME_US;
 
     /* Configure the HW sequencer to perform the coarse initialization. */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_CONFIG, context->ptrInternalContext->csxRegConfigInit);
@@ -1201,15 +1239,13 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_SHIELD_SEL, CY_CAPSENSE_PRECHARGE_CSD_SW_SHIELD_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_MOD_SEL, CY_CAPSENSE_PRECHARGE_CSD_SW_FW_MOD_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_TANK_SEL, CY_CAPSENSE_PRECHARGE_CSD_SW_FW_TANK_SEL_CFG);
-
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_RES, context->ptrInternalContext->csxRegSwResPrech);
-
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_PRECHARGE_CSD_SEQ_START_CFG);
 
     /* Init Watchdog Counter to prevent a hang */
     cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
     watchdogCounter = Cy_CapSense_WatchdogCyclesNum(initWatchdogTimeUs, cpuFreqMHz, intrInitLoopDuration);
-    
+
     /* Approximate duration of Wait For Init loop */
     while((0u != (CY_CAPSENSE_CSD_SEQ_START_START_MSK &
         Cy_CSD_ReadReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START))))
@@ -1239,9 +1275,7 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_SHIELD_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_SHIELD_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_MOD_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_FW_MOD_SEL_CFG);
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_FW_TANK_SEL, CY_CAPSENSE_DEFAULT_CSD_SW_FW_TANK_SEL_CFG);
-
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SW_RES, context->ptrInternalContext->csxRegSwResScan);
-    Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_IO_SEL, CY_CAPSENSE_SCAN_CSD_SW_IO_SEL_CFG);
 
     /* Clear all pending interrupts of the CSD HW block */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR, CY_CAPSENSE_CSD_INTR_ALL_MSK);
@@ -1265,7 +1299,7 @@ __STATIC_INLINE void Cy_CapSense_CSXStartSampleExt(cy_stc_capsense_context_t * c
 static void Cy_CapSense_CSXInitNextChScan(cy_stc_capsense_context_t * context)
 {
     cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
-    
+
         ptrActive->mfsChannelIndex++;
         ptrActive->ptrSnsContext += context->ptrCommonConfig->numSns;
 
@@ -1293,10 +1327,10 @@ static void Cy_CapSense_CSXChangeClkFreq(uint32_t channelIndex, cy_stc_capsense_
 {
     uint32_t tmpRegVal;
     uint32_t snsClkDivider;
-        
+
     /* SnsClk setup */
     snsClkDivider = (uint32_t) context->ptrActiveScanSns->ptrWdContext->snsClk;
-    
+
     /* Check divider value */
     if (0u == snsClkDivider)
     {
@@ -1321,7 +1355,7 @@ static void Cy_CapSense_CSXChangeClkFreq(uint32_t channelIndex, cy_stc_capsense_
             break;
         }
     }
-    
+
     tmpRegVal = (uint32_t)context->ptrActiveScanSns->ptrWdContext->snsClkSource & (uint32_t)~((uint32_t)CY_CAPSENSE_CLK_SOURCE_AUTO_MASK);
     tmpRegVal = ((tmpRegVal << CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_SIZE_POS) | (snsClkDivider - 1u) |
             CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_CLEAR_MSK | CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_BITS_MSK);

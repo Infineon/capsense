@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -25,7 +25,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_lib.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 #if defined(__cplusplus)
@@ -63,7 +63,7 @@ void Cy_CapSense_InitializeWidgetStatus(
 /******************************************************************************/
 void Cy_CapSense_DpProcessButton(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpProcessCsxTouchpad(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
@@ -81,7 +81,7 @@ void Cy_CapSense_DpProcessSlider(
                 const cy_stc_capsense_context_t * context);
 void Cy_CapSense_DpProcessCsdMatrix(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpProcessCsdWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
@@ -97,6 +97,7 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
                 uint16_t * ptrSnsRawHistory,
                 uint8_t * ptrSnsRawHistoryLow,
                 uint32_t mode,
+                uint16_t * ptrBslnInvSns,
                 const cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpProcessCsxWidgetStatus(
@@ -113,6 +114,7 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
                 uint16_t * ptrSnsRawHistory,
                 uint8_t * ptrSnsRawHistoryLow,
                 uint32_t mode,
+                uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_DpUpdateDifferences(

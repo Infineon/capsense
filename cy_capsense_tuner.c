@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -21,7 +21,7 @@
 #include "cy_capsense_control.h"
 #include "cy_capsense_common.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -185,7 +185,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             receiveCallback(&commandPacket, &tunerStructure, context);
 
             /* If command exists and is correct then read command */
-            if ((NULL != commandPacket) || (NULL != tunerStructure))
+            if ((NULL != commandPacket) && (NULL != tunerStructure))
             {
                 if (CY_CAPSENSE_COMMAND_OK == Cy_CapSense_CheckTunerCmdIntegrity(commandPacket))
                 {
@@ -227,29 +227,32 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             break;
 
         case (uint16_t)CY_CAPSENSE_TU_CMD_WRITE_E:
-            /* Tuner state is not changed */
-            cmdOffset = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
-                                   (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
-            cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
+            if((NULL != receiveCallback) && (NULL != commandPacket) && (NULL != tunerStructure))
+            {
+                /* Tuner state is not changed */
+                cmdOffset = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
+                                       (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
+                cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
 
-            if (1u == cmdSize)
-            {
-                tunerStructure[cmdOffset] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-            }
-            else if (2u == cmdSize)
-            {
-                tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
-                tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-            }
-            else
-            {
-                tunerStructure[cmdOffset + 3u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 0u];
-                tunerStructure[cmdOffset + 2u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 1u];
-                tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
-                tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-            }
+                if (1u == cmdSize)
+                {
+                    tunerStructure[cmdOffset] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                }
+                else if (2u == cmdSize)
+                {
+                    tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
+                    tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                }
+                else
+                {
+                    tunerStructure[cmdOffset + 3u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 0u];
+                    tunerStructure[cmdOffset + 2u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 1u];
+                    tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
+                    tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                }
 
-            updateFlag = 1u;
+                updateFlag = 1u;
+            }
             break;
 
         default:
@@ -356,64 +359,13 @@ uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket)
     {
         crcValue = (uint16_t)((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_0_IDX] << CY_CAPSENSE_MSB_SHIFT);
         crcValue |= (uint16_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_1_IDX];
-        if (crcValue != Cy_CapSense_CalculateCrc16(&commandPacket[0u], CY_CAPSENSE_COMMAND_CRC_DATA_SIZE))
+        if (crcValue != Cy_CapSense_GetCRC(&commandPacket[0u], CY_CAPSENSE_COMMAND_CRC_DATA_SIZE))
         {
             cmdCheckStatus = CY_CAPSENSE_WRONG_CRC;
         }
     }
 
     return cmdCheckStatus;
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_CalculateCrc16
-****************************************************************************//**
-*
-* Calculates CRC for the specified buffer and length. CRC Poly: 0xAC9A
-*
-* This API is used for the CRC protection of a packet received from 
-* the CapSense Tuner tool. CRC polynomial is 0xAC9A. It has a Hamming 
-* distance 5 for data words up to 241 bits.
-*
-* Reference:  "P. Koopman, T. Chakravarthy,
-* "Cyclic Redundancy Code (CRC) Polynomial Selection for Embedded Networks",
-* The International Conference on Dependable Systems and Networks, DSN-2004"
-*
-* \param ptrData
-* The pointer to the data.
-*
-* \param len
-* The length of the data in bytes.
-*
-* \return
-* Returns a calculated CRC-16 value.
-*
-*******************************************************************************/
-uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len)
-{
-    uint32_t idx;
-    uint32_t actualCrc = 0u;
-    const uint16_t crcTable[] =
-    {
-        0x0000u, 0xAC9Au, 0xF5AEu, 0x5934u, 0x47C6u, 0xEB5Cu, 0xB268u, 0x1EF2u,
-        0x8F8Cu, 0x2316u, 0x7A22u, 0xD6B8u, 0xC84Au, 0x64D0u, 0x3DE4u, 0x917Eu
-    };
-
-    for (;len-- > 0u;)
-    {
-        /* Process HI Nibble */
-        idx = ((actualCrc >> 12u) ^ (((uint32)*ptrData) >> 4u)) & 0xFLu;
-        actualCrc = crcTable[idx] ^ (actualCrc << 4u);
-
-        /* Process LO Nibble */
-        idx = ((actualCrc >> 12u) ^ (uint32)*ptrData) & 0xFLu;
-        actualCrc = crcTable[idx] ^ (actualCrc << 4u);
-
-        ptrData++;
-    }
-
-    return (uint16_t)actualCrc;
 }
 
 #endif /* CY_IP_MXCSDV2 */

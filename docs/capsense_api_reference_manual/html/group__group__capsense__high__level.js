@@ -14,6 +14,7 @@ var group__group__capsense__high__level =
     [ "Cy_CapSense_RegisterCallback", "group__group__capsense__high__level.html#ga7ecd65a327f14eeaae772d87435efbe7", null ],
     [ "Cy_CapSense_UnRegisterCallback", "group__group__capsense__high__level.html#ga477f23d639a578224fce823f146b1f38", null ],
     [ "Cy_CapSense_DecodeWidgetGestures", "group__group__capsense__high__level.html#ga55fa694191705971b3aa2c29021fb9aa", null ],
+    [ "Cy_CapSense_RunSelfTest", "group__group__capsense__high__level.html#gab1f1514db0566e14ba20fd8647ecb3ad", null ],
     [ "Cy_CapSense_SetupWidget", "group__group__capsense__high__level.html#ga24a8c78f6b56d1567761a66b7d758e82", null ],
     [ "Cy_CapSense_Scan", "group__group__capsense__high__level.html#gabcd24da0c4f246383c58a8f2760ea264", null ],
     [ "Cy_CapSense_ScanAllWidgets", "group__group__capsense__high__level.html#ga2b680a2dfbd9ae13463fe83cba605de9", null ],

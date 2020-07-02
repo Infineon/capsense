@@ -10,6 +10,8 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fballistic_5fconfig_5ft',['cy_stc_capsense_ballistic_config_t',['../structcy__stc__capsense__ballistic__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fballistic_5fcontext_5ft',['cy_stc_capsense_ballistic_context_t',['../structcy__stc__capsense__ballistic__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fballistic_5fdelta_5ft',['cy_stc_capsense_ballistic_delta_t',['../structcy__stc__capsense__ballistic__delta__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fbist_5fcontext_5ft',['cy_stc_capsense_bist_context_t',['../structcy__stc__capsense__bist__context__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fbist_5fcustom_5fparameters_5ft',['cy_stc_capsense_bist_custom_parameters_t',['../structcy__stc__capsense__bist__custom__parameters__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcommon_5fconfig_5ft',['cy_stc_capsense_common_config_t',['../structcy__stc__capsense__common__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcommon_5fcontext_5ft',['cy_stc_capsense_common_context_t',['../structcy__stc__capsense__common__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcontext_5ft',['cy_stc_capsense_context_t',['../structcy__stc__capsense__context__t.html',1,'']]],
@@ -39,5 +41,6 @@ var searchData=
   ['cy_5fstc_5fcapsense_5ftfzm_5fcontext_5ft',['cy_stc_capsense_tfzm_context_t',['../structcy__stc__capsense__tfzm__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5ftouch_5ft',['cy_stc_capsense_touch_t',['../structcy__stc__capsense__touch__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fconfig_5ft',['cy_stc_capsense_widget_config_t',['../structcy__stc__capsense__widget__config__t.html',1,'']]],
-  ['cy_5fstc_5fcapsense_5fwidget_5fcontext_5ft',['cy_stc_capsense_widget_context_t',['../structcy__stc__capsense__widget__context__t.html',1,'']]]
+  ['cy_5fstc_5fcapsense_5fwidget_5fcontext_5ft',['cy_stc_capsense_widget_context_t',['../structcy__stc__capsense__widget__context__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fwidget_5fcrc_5fdata_5ft',['cy_stc_capsense_widget_crc_data_t',['../structcy__stc__capsense__widget__crc__data__t.html',1,'']]]
 ];

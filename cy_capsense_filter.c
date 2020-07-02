@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.c
-* \version 2.0
+* \version 2.10
 *
 * \brief
 * This file contains the source code of all filters implementation.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -19,7 +19,7 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_lib.h"
 
-#if defined(CY_IP_MXCSDV2)
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
 
 /*******************************************************************************
@@ -167,8 +167,9 @@ cy_status Cy_CapSense_UpdateSensorBaseline(
 {
     uint32_t result;
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
+    cy_stc_capsense_sensor_context_t * ptrSnsCxt = &ptrWdCfg->ptrSnsContext[sensorId];
 
-    result = Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, &ptrWdCfg->ptrSnsContext[sensorId], context);
+    result = Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, ptrSnsCxt, &ptrWdCfg->ptrBslnInv[sensorId], context);
 
     return (result);
 }
@@ -192,60 +193,77 @@ cy_status Cy_CapSense_UpdateSensorBaseline(
 * The pointer to the sensor context structure where the sensor data
 * is stored.
 *
+* \param ptrSnsBslnInv
+* The pointer to the sensor baseline inversion used for BIST if enabled.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns a status indicating whether the baseline has been updated:
-* - Zero - if baseline updating was successful.
-* - Non-zero - if present sensor's any channel baseline and its inversion
+* - CY_RET_SUCCESS - if baseline updating was successful.
+* - CY_RET_BAD_DATA - if present sensor's any channel baseline and its inversion
 * doesn't match.
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_FtUpdateBaseline(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t result = CY_RET_SUCCESS;
     uint32_t bslnHistory;
+    uint16_t bslnInv = (uint16_t)(~ptrSnsContext->bsln);
 
-    /* Reset negative baseline counter */
-    if(ptrSnsContext->raw >= ptrSnsContext->bsln)
+    if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn) && (*ptrSnsBslnInv != bslnInv))
     {
-        ptrSnsContext->negBslnRstCnt = 0u;
+        result = CY_RET_BAD_DATA;
     }
-
-    /* Reset baseline */
-    if (ptrSnsContext->bsln > (ptrWdContext->nNoiseTh + ptrSnsContext->raw))
+    if (CY_RET_SUCCESS == result)
     {
-        if (ptrSnsContext->negBslnRstCnt >= ptrWdContext->lowBslnRst)
+        /* Reset negative baseline counter */
+        if(ptrSnsContext->raw >= ptrSnsContext->bsln)
         {
-            Cy_CapSense_FtInitializeBaseline(ptrSnsContext);
+            ptrSnsContext->negBslnRstCnt = 0u;
+        }
+
+        /* Reset baseline */
+        if (ptrSnsContext->bsln > (ptrWdContext->nNoiseTh + ptrSnsContext->raw))
+        {
+            if (ptrSnsContext->negBslnRstCnt >= ptrWdContext->lowBslnRst)
+            {
+                Cy_CapSense_FtInitializeBaseline(ptrSnsContext);
+            }
+            else
+            {
+                ptrSnsContext->negBslnRstCnt++;
+            }
         }
         else
         {
-            ptrSnsContext->negBslnRstCnt++;
+            /*
+            * Update baseline only if:
+            * - signal is in range between noiseThreshold and negativenoiseThreshold
+            * or
+            * - sensor Auto-reset is enabled
+            */
+            if ((0u != context->ptrCommonConfig->swSensorAutoResetEn) ||
+                (ptrSnsContext->raw <= (ptrWdContext->noiseTh + ptrSnsContext->bsln)))
+            {
+                /* Get real baseline */
+                bslnHistory = ((uint32_t)ptrSnsContext->bsln << CY_CAPSENSE_IIR_BL_SHIFT) | ptrSnsContext->bslnExt;
+                /* Calculate baseline value */
+                bslnHistory = Cy_CapSense_FtIIR1stOrder((uint32_t)ptrSnsContext->raw << CY_CAPSENSE_IIR_BL_SHIFT, bslnHistory, (uint32_t)ptrWdContext->bslnCoeff);
+                /* Split baseline */
+                ptrSnsContext->bsln = CY_LO16(bslnHistory >> CY_CAPSENSE_IIR_BL_SHIFT);
+                ptrSnsContext->bslnExt = CY_LO8(bslnHistory);
+            }
         }
-    }
-    else
-    {
-        /* 
-        * Update baseline only if:
-        * - signal is in range between noiseThreshold and negativenoiseThreshold
-        * or
-        * - sensor Auto-reset is enabled
-        */
-        if ((0u != context->ptrCommonConfig->swSensorAutoResetEn) || 
-            (ptrSnsContext->raw <= (ptrWdContext->noiseTh + ptrSnsContext->bsln)))
+        /* If BIST enabled, update the baseline inverse duplication */
+        if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
         {
-            /* Get real baseline */
-            bslnHistory = ((uint32_t)ptrSnsContext->bsln << CY_CAPSENSE_IIR_BL_SHIFT) | ptrSnsContext->bslnExt;
-            /* Calculate baseline value */
-            bslnHistory = Cy_CapSense_FtIIR1stOrder((uint32_t)ptrSnsContext->raw << CY_CAPSENSE_IIR_BL_SHIFT, bslnHistory, (uint32_t)ptrWdContext->bslnCoeff);
-            /* Split baseline */
-            ptrSnsContext->bsln = CY_LO16(bslnHistory >> CY_CAPSENSE_IIR_BL_SHIFT);
-            ptrSnsContext->bslnExt = CY_LO8(bslnHistory);
+            *ptrSnsBslnInv = ~ptrSnsContext->bsln;
         }
     }
     return result;
@@ -362,6 +380,12 @@ void Cy_CapSense_InitializeSensorBaseline(
     {
         cxtOffset = sensorId + (freqChIndex * context->ptrCommonConfig->numSns);
         Cy_CapSense_FtInitializeBaseline(&context->ptrWdConfig[widgetId].ptrSnsContext[cxtOffset]);
+        /* If BIST enabled, create a baseline inverse duplication */
+        if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
+        {
+            context->ptrWdConfig[widgetId].ptrBslnInv[cxtOffset] =
+                                             ~context->ptrWdConfig[widgetId].ptrSnsContext[cxtOffset].bsln;
+        }
     }
 }
 
@@ -610,6 +634,9 @@ void Cy_CapSense_InitializeIIRInternal(
                 uint16_t * ptrSnsRawHistory,
                 uint8_t * ptrSnsRawHistoryLow)
 {
+    CY_ASSERT(NULL != ptrSnsRawHistory);
+    CY_ASSERT(NULL != ptrSnsRawHistoryLow);
+
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
     
     if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
