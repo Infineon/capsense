@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes of the BIST module.
@@ -135,7 +135,7 @@ void Cy_CapSense_BistDisableMode(
 void Cy_CapSense_BistDsInitialize(
                 cy_stc_capsense_context_t * context);
 void Cy_CapSense_UpdateCrcWidget(
-                uint32 widgetId,
+                uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
 
 
@@ -145,7 +145,7 @@ void Cy_CapSense_UpdateCrcWidget(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
 #endif /* CY_CAPSENSE_SELFTEST_H */
 

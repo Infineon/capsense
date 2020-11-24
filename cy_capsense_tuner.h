@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides CapSense MW Tuner module function prototypes.
@@ -20,7 +20,7 @@
 #include "cy_syslib.h"
 #include "cy_capsense_structure.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -134,7 +134,7 @@ __STATIC_INLINE uint16_t Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_TUNER_H */
 

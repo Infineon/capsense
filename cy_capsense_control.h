@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes of the Control module.
@@ -21,7 +21,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -45,16 +45,17 @@ extern "C" {
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_DeInit(cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Save(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Restore(cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_ProcessWidget(
+cy_capsense_status_t Cy_CapSense_ProcessAllWidgets(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ProcessWidget(
                 uint32_t widgetId, 
                 cy_stc_capsense_context_t * context);
 
@@ -69,11 +70,11 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
                 cy_stc_syspm_callback_params_t * callbackParams, 
                 cy_en_syspm_callback_mode_t mode);
 
-cy_status Cy_CapSense_RegisterCallback(
+cy_capsense_status_t Cy_CapSense_RegisterCallback(
                 cy_en_capsense_callback_event_t callbackType,
                 cy_capsense_callback_t callbackFunction,
                 cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_UnRegisterCallback(
+cy_capsense_status_t Cy_CapSense_UnRegisterCallback(
                 cy_en_capsense_callback_event_t callbackType,
                 cy_stc_capsense_context_t * context);
 
@@ -84,11 +85,11 @@ cy_status Cy_CapSense_UnRegisterCallback(
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_ProcessWidgetExt(
+cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                 uint32_t widgetId, 
                 uint32_t mode, 
                 cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_ProcessSensorExt(
+cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                 uint32_t widgetId, 
                 uint32_t sensorId, 
                 uint32_t mode, 
@@ -100,7 +101,8 @@ cy_status Cy_CapSense_ProcessSensorExt(
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Initialize(
+    cy_stc_capsense_context_t * context);
 
 /** \} \endcond */
 
@@ -108,7 +110,7 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context);
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_CONTROL_H */
 

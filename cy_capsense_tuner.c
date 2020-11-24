@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
@@ -21,7 +21,7 @@
 #include "cy_capsense_control.h"
 #include "cy_capsense_common.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 
 /*******************************************************************************
@@ -89,11 +89,11 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * the application program, the middleware operation is asynchronous to 
 * the Tuner tool and the following disadvantages are applicable:
 * * The raw counts displayed in the CapSense Tuner tool may be filtered 
-*   and/or non-filtered. Result – noise and SNR measurements are not accurate.
+*   and/or non-filtered. Result - noise and SNR measurements are not accurate.
 * * The CapSense Tuner tool can read sensor data (such as raw counts) from 
-*   a scan multiply. Result – noise and SNR measurement are not accurate.
+*   a scan multiply. Result - noise and SNR measurement are not accurate.
 * * The CapSense Tuner tool and Host controller should not change the 
-*   parameters via the Tuner interface – in async mode this leads to 
+*   parameters via the Tuner interface - in async mode this leads to
 *   abnormal behavior.
 * * Displaying detected gestures may be missed.
 *
@@ -368,7 +368,7 @@ uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket)
     return cmdCheckStatus;
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */

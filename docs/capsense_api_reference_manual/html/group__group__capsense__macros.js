@@ -6,6 +6,5 @@ var group__group__capsense__macros =
     [ "Processing Macros", "group__group__capsense__macros__process.html", "group__group__capsense__macros__process" ],
     [ "Touch-related Macros", "group__group__capsense__macros__touch.html", "group__group__capsense__macros__touch" ],
     [ "Gesture Macros", "group__group__capsense__macros__gesture.html", "group__group__capsense__macros__gesture" ],
-    [ "Miscellaneous Macros", "group__group__capsense__macros__miscellaneous.html", "group__group__capsense__macros__miscellaneous" ],
-    [ "Built-in Self-test Macros", "group__group__capsense__macros__bist.html", "group__group__capsense__macros__bist" ]
+    [ "Miscellaneous Macros", "group__group__capsense__macros__miscellaneous.html", "group__group__capsense__macros__miscellaneous" ]
 ];

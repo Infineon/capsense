@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy_capsense_sensing.c
-* \version 2.10
+* \file cy_capsense_sensing_v2.c
+* \version 3.0
 *
 * \brief
 * This file contains the source of functions common for different sensing
@@ -23,9 +23,9 @@
 
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
-#include "cy_capsense_sensing.h"
-#include "cy_capsense_csx.h"
-#include "cy_capsense_csd.h"
+#include "cy_capsense_sensing_v2.h"
+#include "cy_capsense_csx_v2.h"
+#include "cy_capsense_csd_v2.h"
 #include "cy_capsense_lib.h"
 #include "cy_capsense_selftest.h"
 
@@ -105,7 +105,6 @@ uint32_t Cy_CapSense_IsBusy(const cy_stc_capsense_context_t * context)
 * Sets BUSY flags of the cy_capsense_context.status register specified
 * by the flags parameter.
 *
-* \details
 * This is an internal function. Do not call this function directly from
 * the application program.
 *
@@ -187,25 +186,25 @@ void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context)
 *
 * \return
 * Returns the status of the widget setting up operation:
-* - CY_RET_SUCCESS       - The operation is successfully completed.
-* - CY_RET_BAD_PARAM     - The widget is invalid or if the specified widget is
+* - CY_CAPSENSE_STATUS_SUCCESS       - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_PARAM     - The widget is invalid or if the specified widget is
 *                          disabled.
-* - CY_RET_INVALID_STATE - The previous scanning is not completed and
+* - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and
 *                          the CSD HW block is busy.
-* - CY_RET_UNKNOWN       - An unknown sensing method is used by the widget or
+* - CY_CAPSENSE_STATUS_UNKNOWN       - An unknown sensing method is used by the widget or
 *                          any other spurious error occurred.
 *
 **********************************************************************************/
-cy_status Cy_CapSense_SetupWidget(
+cy_capsense_status_t Cy_CapSense_SetupWidget(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status widgetStatus;
+    cy_capsense_status_t widgetStatus;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
         /* Previous widget is being scanned. Return error. */
-        widgetStatus = CY_RET_INVALID_STATE;
+        widgetStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
     /*
      * Check whether widget id is valid, specified widget is enabled and widget did not
@@ -229,11 +228,11 @@ cy_status Cy_CapSense_SetupWidget(
             default:
                 break;
         }
-        widgetStatus = CY_RET_SUCCESS;
+        widgetStatus = CY_CAPSENSE_STATUS_SUCCESS;
     }
     else
     {
-        widgetStatus = CY_RET_BAD_PARAM;
+        widgetStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
     return (widgetStatus);
@@ -263,20 +262,20 @@ cy_status Cy_CapSense_SetupWidget(
 *
 * \return
 * Returns the status of the scan initiation operation:
-* - CY_RET_SUCCESS       - Scanning is successfully started.
-* - CY_RET_INVALID_STATE - The previous scan is not completed and
+* - CY_CAPSENSE_STATUS_SUCCESS       - Scanning is successfully started.
+* - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scan is not completed and
 *                          the CSD HW block is busy.
-* - CY_RET_UNKNOWN       - An unknown sensing method is used by the widget.
+* - CY_CAPSENSE_STATUS_UNKNOWN       - An unknown sensing method is used by the widget.
 *
 ********************************************************************************/
-cy_status Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
 {
-    cy_status scanStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t scanStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
         /* Previous widget is being scanned. Return error. */
-        scanStatus = CY_RET_INVALID_STATE;
+        scanStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
     else
     {
@@ -292,7 +291,7 @@ cy_status Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
                 break;
 
             default:
-                scanStatus = CY_RET_UNKNOWN;
+                scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
                 break;
         }
     }
@@ -338,17 +337,17 @@ cy_status Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 **********************************************************************************/
-cy_status Cy_CapSense_SetupWidgetExt(
+cy_capsense_status_t Cy_CapSense_SetupWidgetExt(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status widgetStatus = CY_RET_BAD_PARAM;
+    cy_capsense_status_t widgetStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
         /* Previous widget is being scanned. Return error. */
-        widgetStatus = CY_RET_INVALID_STATE;
+        widgetStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
     /*
      * Check whether widget id is valid, specified widget is enabled and widget did not
@@ -373,7 +372,7 @@ cy_status Cy_CapSense_SetupWidgetExt(
                 default:
                     break;
             }
-            widgetStatus = CY_RET_SUCCESS;
+            widgetStatus = CY_CAPSENSE_STATUS_SUCCESS;
         }
     }
     else
@@ -418,14 +417,14 @@ cy_status Cy_CapSense_SetupWidgetExt(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
 {
-    cy_status scanStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t scanStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
         /* Previous widget is being scanned. Return error. */
-        scanStatus = CY_RET_INVALID_STATE;
+        scanStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
     else
     {
@@ -441,7 +440,7 @@ cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
                 break;
 
             default:
-                scanStatus = CY_RET_UNKNOWN;
+                scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
                 break;
         }
     }
@@ -472,23 +471,23 @@ cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
 *
 * \return
 * Returns the status of the operation:
-* - CY_RET_SUCCESS       - Scanning is successfully started.
-* - CY_RET_BAD_PARAM     - All the widgets are disabled.
-* - CY_RET_INVALID_STATE - The previous scanning is not completed and the
+* - CY_CAPSENSE_STATUS_SUCCESS       - Scanning is successfully started.
+* - CY_CAPSENSE_STATUS_BAD_PARAM     - All the widgets are disabled.
+* - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and the
 *                          CSD HW block is busy.
-* - CY_RET_UNKNOWN       - There are unknown errors.
+* - CY_CAPSENSE_STATUS_UNKNOWN       - There are unknown errors.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context)
 {
     uint32_t wdgtIndex;
     cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
-    cy_status scanStatus = CY_RET_UNKNOWN;
+    cy_capsense_status_t scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
         /* Previous widget is being scanned. Return error. */
-        scanStatus = CY_RET_INVALID_STATE;
+        scanStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
     else
     {
@@ -499,7 +498,7 @@ cy_status Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context)
         for (wdgtIndex = 0u; wdgtIndex < context->ptrCommonConfig->numWd; wdgtIndex++)
         {
             scanStatus = Cy_CapSense_SetupWidget(wdgtIndex, context);
-            if (CY_RET_SUCCESS == scanStatus)
+            if (CY_CAPSENSE_STATUS_SUCCESS == scanStatus)
             {
                 ptrActive->scanScopeAll = CY_CAPSENSE_SCAN_SCOPE_ALL_WD;
 
@@ -531,9 +530,9 @@ cy_status Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context)
 * - Non-zero    - One or more errors occurred in the initialization process.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context)
 {
-    cy_status initStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t initStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t wdgtIndex;
     uint32_t temp;
 
@@ -562,7 +561,7 @@ cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context
         else
         {
             context->ptrInternalContext->csdCmodConnection = (uint8_t)CY_CAPSENSE_CMODPAD_E;
-            initStatus = CY_RET_BAD_PARAM;
+            initStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
         }
 
         if(CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdCTankShieldEn)
@@ -591,7 +590,7 @@ cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context
             else
             {
                 context->ptrInternalContext->csdCshConnection = (uint8_t)CY_CAPSENSE_CTANKPAD_E;
-                initStatus = CY_RET_BAD_PARAM;
+                initStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
             }
         }
         else
@@ -1081,9 +1080,9 @@ cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context
 * - Non-zero    - One or more errors occurred in the initialization process.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context)
 {
-    cy_status initStatus;
+    cy_capsense_status_t initStatus;
 
     initStatus = Cy_CapSense_InternalPreCalculation(context);
 
@@ -1170,8 +1169,8 @@ cy_status Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context)
 *
 * \return status
 * Returns the operation status:
-* - CY_RET_SUCCESS   - Indicates the successful electrode setting.
-* - CY_RET_BAD_PARAM - 1) widgetID or sensorElement are not valid;
+* - CY_CAPSENSE_STATUS_SUCCESS   - Indicates the successful electrode setting.
+* - CY_CAPSENSE_STATUS_BAD_PARAM - 1) widgetID or sensorElement are not valid;
 *                      2) the CSD sensing method is disabled for desired
 *                         CY_CAPSENSE_SHIELD or CY_CAPSENSE_SENSOR states;
 *                      3) the CSX sensing method is disabled for desired
@@ -1184,13 +1183,13 @@ cy_status Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context)
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_SetPinState
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SetPinState(
+cy_capsense_status_t Cy_CapSense_SetPinState(
                 uint32_t widgetId,
                 uint32_t sensorElement,
                 uint32_t state,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_status connState = CY_RET_BAD_PARAM;
+    cy_capsense_status_t connState = CY_CAPSENSE_STATUS_BAD_PARAM;
     uint32_t eltdNum;
     uint32_t eltdIndex;
     uint32_t interruptState;
@@ -1233,7 +1232,7 @@ cy_status Cy_CapSense_SetPinState(
                         Cy_GPIO_Clr(ioPtr->pcPtr, (uint32_t)ioPtr->pinNumber);
                         Cy_SysLib_ExitCriticalSection(interruptState);
 
-                        connState = CY_RET_SUCCESS;
+                        connState = CY_CAPSENSE_STATUS_SUCCESS;
                         break;
 
                     case CY_CAPSENSE_HIGHZ:
@@ -1242,7 +1241,7 @@ cy_status Cy_CapSense_SetPinState(
                         Cy_GPIO_Clr(ioPtr->pcPtr, (uint32_t)ioPtr->pinNumber);
                         Cy_SysLib_ExitCriticalSection(interruptState);
 
-                        connState = CY_RET_SUCCESS;
+                        connState = CY_CAPSENSE_STATUS_SUCCESS;
                         break;
 
                     case CY_CAPSENSE_SENSOR:
@@ -1251,7 +1250,7 @@ cy_status Cy_CapSense_SetPinState(
                             /* Enable sensor */
                             Cy_CapSense_CSDConnectSns(ioPtr, context);
 
-                            connState = CY_RET_SUCCESS;
+                            connState = CY_CAPSENSE_STATUS_SUCCESS;
                         }
                         break;
 
@@ -1260,7 +1259,7 @@ cy_status Cy_CapSense_SetPinState(
                         {
                             Cy_CapSense_SsConfigPinRegisters(ioPtr->pcPtr, (uint32_t)ioPtr->pinNumber,
                                                              CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD);
-                            connState = CY_RET_SUCCESS;
+                            connState = CY_CAPSENSE_STATUS_SUCCESS;
                         }
                         break;
 
@@ -1270,7 +1269,7 @@ cy_status Cy_CapSense_SetPinState(
                         {
                             Cy_CapSense_SsConfigPinRegisters(ioPtr->pcPtr, (uint32_t)ioPtr->pinNumber,
                                                              CY_GPIO_DM_STRONG_IN_OFF, CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD);
-                            connState = CY_RET_SUCCESS;
+                            connState = CY_CAPSENSE_STATUS_SUCCESS;
                         }
                         break;
 
@@ -1279,7 +1278,7 @@ cy_status Cy_CapSense_SetPinState(
                         {
                             Cy_CapSense_SsConfigPinRegisters(ioPtr->pcPtr, (uint32_t)ioPtr->pinNumber,
                                                              CY_GPIO_DM_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA);
-                            connState = CY_RET_SUCCESS;
+                            connState = CY_CAPSENSE_STATUS_SUCCESS;
                         }
                         break;
 
@@ -1399,7 +1398,6 @@ cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(uint8_t mode, cy_st
 *
 * Sets all CapSense pins into a desired state.
 *
-* \details
 * Sets all the CSD/CSX IOs into a desired state.
 * Default state:
 * - HSIOM   - Disconnected, the GPIO mode.
@@ -1455,7 +1453,6 @@ void Cy_CapSense_SetIOsInDesiredState(
 *
 * Sets specific CapSense pins into a default state.
 *
-* \details
 * Sets all external capacitors and shield electrodes into the default state:
 * - HSIOM   - Disconnected, the GPIO mode.
 * - DM      - High-Z Analog.
@@ -1515,7 +1512,7 @@ void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context)
     * 2. Check whether all the widgets are scanned
     * 3. If all the widgets are not scanned, set up and scan next widget
     */
-    cy_status postScanStatus;
+    cy_capsense_status_t postScanStatus;
     cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
     uint32_t widgetId = (uint32_t)ptrActive->widgetIndex + 1u;
 
@@ -1526,7 +1523,7 @@ void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context)
             /* Set up the next widget */
             context->ptrCommonContext->status = 0u;
             postScanStatus = Cy_CapSense_SetupWidget(widgetId, context);
-            if (CY_RET_SUCCESS == postScanStatus)
+            if (CY_CAPSENSE_STATUS_SUCCESS == postScanStatus)
             {
                 (void)Cy_CapSense_Scan(context);
             }
@@ -1542,9 +1539,9 @@ void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context)
             Cy_CapSense_ClrBusyFlags(context);
 
             /* Set postScanStatus to exit the while loop */
-            postScanStatus = CY_RET_SUCCESS;
+            postScanStatus = CY_CAPSENSE_STATUS_SUCCESS;
         }
-    } while (CY_RET_SUCCESS != postScanStatus);
+    } while (CY_CAPSENSE_STATUS_SUCCESS != postScanStatus);
 }
 
 
@@ -1652,15 +1649,17 @@ void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context
 *
 * \return
 * Returns the status of the specified widget calibration:
-* - CY_RET_SUCCESS - The operation is successfully completed.
-* - CY_RET_BAD_PARAM - The input parameter is invalid.
-* - CY_RET_BAD_DATA - The calibration failed and the middleware may not
+* - CY_CAPSENSE_STATUS_SUCCESS - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_PARAM - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_BAD_DATA - The calibration failed and the middleware may not
 * operate as expected.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_CalibrateWidget(
+                uint32_t widgetId, 
+                cy_stc_capsense_context_t * context)
 {
-    cy_status calibrateStatus = CY_RET_BAD_PARAM;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
 
     if(context->ptrCommonConfig->numWd > widgetId)
     {
@@ -1705,7 +1704,7 @@ cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context
 * and/or IDAC values for all sensors in CSX widgets to make sensor raw count
 * to the default value level.
 *
-* Calibration returns CY_RET_BAD_DATA if resulted raw count is outside
+* Calibration returns CY_CAPSENSE_STATUS_BAD_DATA if resulted raw count is outside
 * the limits.
 *
 * This function could be used only if Enable IDAC auto-calibration parameter
@@ -1716,14 +1715,14 @@ cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context
 *
 * \return
 * Returns the status of the calibration process:
-* - CY_RET_SUCCESS  - The operation is successfully completed.
-* - CY_RET_BAD_DATA - The calibration failed and the middleware may not
+* - CY_CAPSENSE_STATUS_SUCCESS  - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_DATA - The calibration failed and the middleware may not
 *                     operate as expected.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context)
 {
-    cy_status calibrateStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t wdgtIndex;
 
     for (wdgtIndex = 0u; wdgtIndex < context->ptrCommonConfig->numWd; wdgtIndex++)
@@ -1754,10 +1753,10 @@ cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context)
 * - Non-zero - Calibration failed for at least one widget.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context)
 {
     uint32_t widgetId;
-    cy_status calibrateStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     for(widgetId = 0uL; widgetId < context->ptrCommonConfig->numWd; widgetId++)
     {
@@ -1797,10 +1796,10 @@ cy_status Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context
 * - Non-zero - Calibration failed for at least one widget.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context)
 {
     uint32_t widgetId;
-    cy_status calibrateStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     for(widgetId = 0uL; widgetId < context->ptrCommonConfig->numWd; widgetId++)
     {
@@ -1843,9 +1842,9 @@ cy_status Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context
 * - Non-zero - Auto-tuning failed for any widget.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
 {
-    cy_status autoTuneStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t autoTuneStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t wdIndex;
 
     for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
@@ -1886,11 +1885,11 @@ cy_status Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
 * - Non-zero - Auto-tuning failed.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SsAutoTuneWidget(
+cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status autoTuneStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t autoTuneStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     uint32_t snsIndex;
     uint32_t inputSnsClk;
@@ -2061,7 +2060,7 @@ cy_status Cy_CapSense_SsAutoTuneWidget(
     /* Check tuning results */
     if (CY_CAPSENSE_AUTOTUNE_CP_MAX < maxCp)
     {
-        autoTuneStatus = CY_RET_BAD_DATA;
+        autoTuneStatus = CY_CAPSENSE_STATUS_BAD_DATA;
     }
 
     /*
@@ -2657,13 +2656,13 @@ uint32_t Cy_CapSense_WaitEndOfScan(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateCheck(
+cy_capsense_status_t Cy_CapSense_CalibrateCheck(
                 uint32_t widgetId,
                 uint32_t target,
                 uint32_t senseMethod,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_status calibrateStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t tmpRawcount;
     uint32_t snsIndex;
     uint32_t upperLimit;
@@ -2712,7 +2711,7 @@ cy_status Cy_CapSense_CalibrateCheck(
             tmpRawcount = ptrSnsCxt->raw;
             if ((tmpRawcount < lowerLimit) || (tmpRawcount > upperLimit))
             {
-                calibrateStatus = CY_RET_BAD_DATA;
+                calibrateStatus = CY_CAPSENSE_STATUS_BAD_DATA;
                 break;
             }
             ptrSnsCxt++;
@@ -2876,7 +2875,7 @@ uint32_t Cy_CapSense_GetVrefHighMv(uint32_t vrefGain, const cy_stc_capsense_cont
     return (vrefHighMv);
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
 
 /* [] END OF FILE */

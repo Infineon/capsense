@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -17,48 +17,59 @@
 #include <stddef.h>
 #include "cy_syslib.h"
 #include "cy_syspm.h"
-#include "cy_csd.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_control.h"
 #include "cy_capsense_processing.h"
 #include "cy_capsense_filter.h"
-#include "cy_capsense_sensing.h"
 #include "cy_capsense_tuner.h"
 #include "cy_capsense_selftest.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+    #include "cy_capsense_sensing_v2.h"
+    #include "cy_csd.h"
+#else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+    #include "cy_capsense_sensing_v3.h"
+    #include "cy_msc.h"
+#endif
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+
+/*******************************************************************************
+* Local definition
+*******************************************************************************/
+#define CY_CAPSENSE_PUMP_VDDA_VOLTAGE_MV   (3800u)
 
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_Init
 ****************************************************************************//**
 *
-* Captures the CSD HW block and configures it to the default state. This function is
-* called by the application program prior to calling any other function of the
-* middleware.
+* Captures HW blocks (one or more) for CapSense operations and configures them
+* to the default state. Call this function with the application program
+* prior to calling any other function of the middleware.
 *
 * The following tasks are executed:
-* 1. Capturing the CSD HW block if it is not in use. If the CSD HW block is 
-*    already in use, then the function returns fail status. In this case,
-*    the application program should perform corresponding actions like releasing
-*    the CSD HW block captured by other middleware.
-* 2. If the CSD HW block was captured this function configures it to the 
-*    default state.
+* 1. Capturing not used HW blocks. If any
+*    of HW block is
+*    already in use, then the function returns the fail status, and
+*    the application program should perform corresponding actions. For example, releasing
+*    the HW block captured by another middleware.
+* 2. If the HW block has been captured successfully, this function configures it
+*    to the default state.
 *
-* After the middleware is configured using Cy_CapSense_Init() function, 
-* application program should configure and enable the CSD block interrupt, 
-* and then call of the Cy_CapSense_Enable() function to complete the 
-* middleware initialization process. 
+* After the middleware is configured using the Cy_CapSense_Init() function,
+* the application program configures and enables the HW block interrupt(s),
+* and then call of the Cy_CapSense_Enable() function to complete the
+* middleware initialization process.
 * See the function usage example below for more details.
 *
 * When the middleware operation is stopped by the Cy_CapSense_DeInit()
-* function, subsequent call of the Cy_CapSense_Init() function repeats 
-* initialization process and it is not needed to call the Cy_CapSense_Enable() 
-* function second time. However, to implement time-multiplexed mode 
-* (sharing the CSD HW Block between multiple middleware) 
-* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used 
-* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for 
+* function, subsequent call of the Cy_CapSense_Init() function repeats
+* initialization process and it is not needed to call the Cy_CapSense_Enable()
+* function second time. However, to implement time-multiplexed mode
+* (sharing the HW block(s) between multiple middleware)
+* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used
+* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for
 * further compatibility.
 *
 * \param context
@@ -67,44 +78,40 @@
 * configuration and internal data and it is used during whole CapSense operation.
 *
 * \return
-* Returns the status of the initialization process. If CY_RET_SUCCESS is not
+* Returns the status of the initialization process. If CY_CAPSENSE_STATUS_SUCCESS is not
 * received, some of the initialization fails, the middleware may not operate
 * as expected, and repeating of initialization is required.
 *
 * \funcusage
-* 
+*
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Initialization
 * The 'cy_capsense_context' variable that is used as the parameter of the
 * Cy_CapSense_Init() and Cy_CapSense_Enable() functions is declared in the
 * cycfg_capsense.h file.
-* 
+*
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
-* For CM0+ core:
 * \snippet capsense/snippet/main.c snippet_m0p_capsense_interrupt_source_declaration
 *
-* For CM4 core:
-* \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
-* 
 * The CapSense interrupt handler should be declared by the application program
 * according to the example below:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_IntHandler
-* 
-* The CapSense_HW is the pointer to the base register address of 
-* the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
-* file defined as \<Csd_Personality_Name\>_HW. If no name specified then 
-* the default name is used csd_\<Block_Number\>_csd_\<Block_Number\>_HW.
-* 
+*
+* The CY_MSC<X>_HW is the pointer to the base register address of
+* the MSC_X HW block. A macro for the pointer is in the cycfg_peripherals.h
+* file defined as \<Msc_Personality_Name\>_HW. If no name is specified,
+* the default msc_\<Block_Number\>_msc_\<Block_Number\>_HW is used.
+*
 *******************************************************************************/
-cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_BAD_PARAM;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
 
     if (NULL != context)
     {
         result = Cy_CapSense_Restore(context);
 
-        /* The 25us interval is required for settling analog part of the CSD HW block. */
+        /* The time interval is required for settling analog part of the HW block. */
         Cy_SysLib_DelayUs(CY_CAPSENSE_ANALOG_SETTLING_TIME_US);
     }
 
@@ -116,48 +123,45 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_Enable
 ****************************************************************************//**
 *
-* Initializes the CapSense firmware modules. 
-* 
-* This function requires the Cy_CapSense_Init() function is called and 
-* the CSD HW block interrupt to be configured prior to calling this function.
+* Initializes the CapSense firmware modules.
+*
+* Call the Cy_CapSense_Init() function and configure MSC HW block interrupts
+* prior to calling this function.
 * See the function usage example below for details on usage.
 *
 * The following are executed as part of the function:
 * 1. Check CapSense configuration integrity.
 * 2. Pre-calculate of internal register values to speed up operation.
-* 3. Configure the CSD HW block to perform capacitive sensing operation.
-* 4. If SmartSense Auto-tuning is selected for the CSD Tuning mode in the
-*    Basic tab, the auto-tuning algorithm is executed to set the optimal
-*    values for the CSD HW block parameters of the widgets/sensors.
-* 5. Calibrate the sensors and find the optimal values for IDACs of each
-*    widget/sensor, if the Enable IDAC auto-calibration is enabled in the
+* 3. Configure the MSC HW block(s) to perform capacitive sensing operation.
+* 5. Calibrate the sensors and find the optimal values for CDACs of each
+*    widget/sensor, if the Enable CDAC auto-calibration is enabled in the
 *    CSD Setting or CSX Setting tabs.
 * 5. Perform scanning for all the sensors and initialize the baseline history.
 * 6. If the firmware filters are enabled in the Advanced General tab, the
 *    filter histories are also initialized.
 *
-* Any subsequent call of this function repeats initialization process. 
-* Therefore, it is possible to change the middleware configuration 
-* from the application program by writing registers to the data structure 
+* Any subsequent call of this function repeats initialization process.
+* Therefore, it is possible to change the middleware configuration
+* from the application program by writing registers to the data structure
 * and calling this function again.
 *
-* The repeated call of this function is also done inside the 
+* The repeated call of this function is also done inside the
 * Cy_CapSense_RunTuner() function when a restart command is received.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the initialization process. If CY_RET_SUCCESS is not
+* Returns the status of the initialization process. If CY_CAPSENSE_STATUS_SUCCESS is not
 * received, some of the initialization fails.
 *
 * \funcusage
-* 
+*
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Initialization
 * The 'cy_capsense_context' variable that is used as the parameter of the
 * Cy_CapSense_Init() and Cy_CapSense_Enable() functions is declared in the
 * cycfg_capsense.h file.
-* 
+*
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
 * For CM0+ core:
@@ -165,20 +169,20 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 *
 * For CM4 core:
 * \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
-* 
+*
 * The CapSense interrupt handler should be declared by the application program
 * according to the example below:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_IntHandler
-* 
-* The CapSense_HW is the pointer to the base register address of 
-* the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
-* file defined as \<Csd_Personality_Name\>_HW. If no name is specified then 
-* the default name is used csd_\<Block_Number\>_csd_\<Block_Number\>_HW.
+*
+* The CY_MSC<X>_HW is the pointer to the base register address of
+* the MSC_X HW block. A macro for the pointer is in the cycfg_peripherals.h
+* file defined as \<Msc_Personality_Name\>_HW. If no name is specified,
+* the default msc_\<Block_Number\>_msc_\<Block_Number\>_HW is used.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
 {
-    cy_status result;
+    cy_capsense_status_t result;
     uint32_t cpuFreqMHz;
     uint32_t watchdogCounter;
 
@@ -191,28 +195,35 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
     /* Initialize CapSense modules */
     result = Cy_CapSense_Initialize(context);
 
-    if(CY_RET_SUCCESS == result)
+    if(CY_CAPSENSE_STATUS_SUCCESS == result)
     {
-        if (CY_CAPSENSE_CSD_SS_DIS != context->ptrCommonConfig->csdAutotuneEn)
-        {
-            result = Cy_CapSense_SsAutoTune_Call(context);
-        }
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+            if (CY_CAPSENSE_CSD_SS_DIS != context->ptrCommonConfig->csdAutotuneEn)
+            {
+                result = Cy_CapSense_SsAutoTune_Call(context);
+            }
+            if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdEn) &&
+               (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn) &&
+               (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdIdacAutocalEn))
+            {
+                result |= Cy_CapSense_CalibrateAllCsdWidgets_Call(context);
+            }
 
-        if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdEn) &&
-           (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn) &&
-           (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csdIdacAutocalEn))
-        {
-            result |= Cy_CapSense_CalibrateAllCsdWidgets_Call(context);
-        }
+            if((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxEn) &&
+               (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxIdacAutocalEn))
+            {
+                result |= Cy_CapSense_CalibrateAllCsxWidgets_Call(context);
+            }
+        #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+            result |= Cy_CapSense_CalibrateAllSlots(context);
+        #endif
 
-        if((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxEn) &&
-           (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->csxIdacAutocalEn))
-        {
-            result |= Cy_CapSense_CalibrateAllCsxWidgets_Call(context);
-        }
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+            result |= Cy_CapSense_ScanAllWidgets(context);
+        #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+            result |= Cy_CapSense_ScanAllSlots(context);
+        #endif
 
-
-        result |= Cy_CapSense_ScanAllWidgets(context);
         /* Init Watchdog Counter to prevent a hang */
         cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(isBusyWatchdogTimeUs, cpuFreqMHz, isBusyLoopDuration);
@@ -246,21 +257,21 @@ cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
 *   on configuration.
 * - Data Processing - resets the status all widgets.
 * - Tuner - resets the tuner communication state.
-* - Sensing - prepares the CSD HW block for operation.
+* - Sensing - prepares the CapSense HW blocks for operation.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Return CY_RET_SUCCESS if the initialization was successful.
+* Return CY_CAPSENSE_STATUS_SUCCESS if the initialization was successful.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 {
-    cy_status result;
+    cy_capsense_status_t result;
 
     result = Cy_CapSense_CheckConfigIntegrity(context);
-    if (CY_RET_SUCCESS == result)
+    if (CY_CAPSENSE_STATUS_SUCCESS == result)
     {
         Cy_CapSense_InitializeAllStatuses(context);
         result = Cy_CapSense_SsInitialize(context);
@@ -269,14 +280,17 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
         if (CY_CAPSENSE_INIT_NEEDED == context->ptrCommonContext->initDone)
         {
             Cy_CapSense_TuInitialize(context);
-            if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
-            {
-                Cy_CapSense_BistDsInitialize_Call(context);
-            }
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+                if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
+                {
+                    Cy_CapSense_BistDsInitialize_Call(context);
+                }
+            #endif
+
             context->ptrCommonContext->initDone = CY_CAPSENSE_INIT_DONE;
         }
     }
-    
+
     return (result);
 }
 
@@ -285,40 +299,40 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_DeInit
 ****************************************************************************//**
 *
-* Stops the middleware operation and releases the CSD HW block.
+* Stops the middleware operation and releases the CapSense captured HW blocks.
 *
-* No sensor scanning can be executed when the middleware is stopped. 
-* This function should be called only when no scanning is in progress. 
+* No sensor scanning can be executed when the middleware is stopped.
+* This function should be called only when no scanning is in progress.
 * I.e. Cy_CapSense_IsBusy() returns a non-busy status.
-* 
-* After it is stopped, the CSD HW block may be reconfigured by the 
-* application program or other middleware for any other usage. 
-* 
+*
+* After the middleware stops, the MSC HW block(s) may be reconfigured with the
+* application program or other middleware for any other usage.
+*
 * When the middleware operation is stopped by the Cy_CapSense_DeInit()
-* function, subsequent call of the Cy_CapSense_Init() function repeats 
-* initialization process and it is not needed to call the Cy_CapSense_Enable() 
-* function second time. However, to implement time-multiplexed mode 
-* (sharing the CSD HW Block between multiple middleware) 
-* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used 
-* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for 
+* function, subsequent call of the Cy_CapSense_Init() function repeats
+* initialization process and it is not needed to call the Cy_CapSense_Enable()
+* function second time. However, to implement time-multiplexed mode
+* (sharing the MSC HW block(s) between multiple middleware)
+* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used
+* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for
 * further compatibility.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the stop process. If CY_RET_SUCCESS is not received,
+* Returns the status of the stop process. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * the stop process fails and retries may be required.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
 {
-    cy_status result;
+    cy_capsense_status_t result;
 
     result = Cy_CapSense_Save(context);
-    if (CY_RET_SUCCESS != result)
+    if (CY_CAPSENSE_STATUS_SUCCESS != result)
     {
-        result = CY_RET_BAD_DATA;
+        result = CY_CAPSENSE_STATUS_BAD_DATA;
     }
     else
     {
@@ -335,14 +349,14 @@ cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
 *
 * Performs full data processing of all enabled widgets.
 *
-* This function performs all data processes for all enabled widgets and 
-* sensors in the middleware to produce meaningful status output from widgets 
+* This function performs all data processes for all enabled widgets and
+* sensors in the middleware to produce meaningful status output from widgets
 * and sensors. The following tasks are executed as part of processing all the
 * widgets:
 * 1. Apply raw count filters to the raw counts, if they are enabled.
 * 2. Update the thresholds if the SmartSense Full Auto-Tuning is enabled.
 * 3. Update the baselines and difference counts for all the sensors.
-* 4. Update the sensor and widget output status. Updates on/off status for 
+* 4. Update the sensor and widget output status. Updates on/off status for
 *    buttons and proximity widgets, centroid/position for
 *    the sliders and the X/Y position for the touchpads.
 *
@@ -356,14 +370,14 @@ cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the processing operation. If CY_RET_SUCCESS is not received,
+* Returns the status of the processing operation. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * the processing fails and retries may be required.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 {
     uint32_t wdIndex;
-    cy_status result = CY_RET_SUCCESS;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
 
     for (wdIndex = context->ptrCommonConfig->numWd; wdIndex-- > 0u;)
     {
@@ -386,14 +400,14 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * widget. This function is called only after all the sensors in the
 * widgets are scanned. A disabled widget is not processed by this function.
 *
-* A pipeline scan method (i.e. during scanning of a current widget (N), 
-* perform processing of the previously scanned widget (N-1)) can be 
-* implemented using this function and it may reduce the total execution time, 
+* A pipeline scan method (i.e. during scanning of a current widget (N),
+* perform processing of the previously scanned widget (N-1)) can be
+* implemented using this function and it may reduce the total execution time,
 * increase the refresh rate, and decrease the average power consumption.
 * See the function usage example below for details on usage.
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -401,38 +415,40 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 *
 * \return
 * Returns the status of the widget processing:
-* - CY_RET_SUCCESS       - The operation is successfully completed
-* - CY_RET_BAD_PARAM     - The input parameter is invalid
-* - CY_RET_INVALID_STATE - The specified widget is disabled
-* - CY_RET_BAD_DATA      - The processing is failed
+* - CY_CAPSENSE_STATUS_SUCCESS       - The operation is successfully completed
+* - CY_CAPSENSE_STATUS_BAD_PARAM     - The input parameter is invalid
+* - CY_CAPSENSE_STATUS_INVALID_STATE - The specified widget is disabled
+* - CY_CAPSENSE_STATUS_BAD_DATA      - The processing is failed
 *
 * \funcusage
-* 
+*
 * An example of pipeline implementation:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessWidget
-* 
+*
 *******************************************************************************/
-cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_ProcessWidget(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_BAD_PARAM;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
 
     /* Check parameter validity */
     if (widgetId < context->ptrCommonConfig->numWd)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
-        
+
         /* Check widget enable status */
         if (0u == (ptrWdCfg->ptrWdContext->status & CY_CAPSENSE_WD_DISABLE_MASK))
         {
-            switch(ptrWdCfg->senseMethod)
+            switch(ptrWdCfg->senseGroup)
             {
-                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
+                case CY_CAPSENSE_CSD_GROUP:
                     result = Cy_CapSense_DpProcessCsdWidgetRawCounts_Call(ptrWdCfg, context);
                     Cy_CapSense_DpProcessCsdWidgetStatus_Call(ptrWdCfg, context);
                     break;
 
-                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
+                case CY_CAPSENSE_CSX_GROUP:
                     result = Cy_CapSense_DpProcessCsxWidgetRawCounts_Call(ptrWdCfg, context);
                     Cy_CapSense_DpProcessCsxWidgetStatus_Call(ptrWdCfg, context);
                     break;
@@ -444,7 +460,7 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
         }
         else
         {
-            result = CY_RET_INVALID_STATE;
+            result = CY_CAPSENSE_STATUS_INVALID_STATE;
         }
     }
     return result;
@@ -457,26 +473,26 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 *
 * Performs customized data processing on the selected widget.
 *
-* This function performs customized data processing specified by the mode 
-* parameter on a widget. This function can be used with any of the 
-* available scan functions. This function should be called only after all 
-* the sensors in the specified widget are scanned. Calling this function 
-* multiple times with the same mode without new sensor scan causes 
-* unexpected behavior. This function ignores the value of the 
+* This function performs customized data processing specified by the mode
+* parameter on a widget. This function can be used with any of the
+* available scan functions. This function should be called only after all
+* the sensors in the specified widget are scanned. Calling this function
+* multiple times with the same mode without new sensor scan causes
+* unexpected behavior. This function ignores the value of the
 * wdgtEnable register.
-* 
-* The CY_CAPSENSE_PROCESS_CALC_NOISE and CY_CAPSENSE_PROCESS_THRESHOLDS masks 
-* for mode parameter are supported only when SmartSense is enabled for 
+*
+* The CY_CAPSENSE_PROCESS_CALC_NOISE and CY_CAPSENSE_PROCESS_THRESHOLDS masks
+* for mode parameter are supported only when SmartSense is enabled for
 * CSD widgets.
-* 
-* The execution order of processing tasks starts from LSB to MSB of the 
-* mode parameter. To implement a different order of execution, call this 
-* function multiple times with the required mode parameter. 
-* 
+*
+* The execution order of processing tasks starts from LSB to MSB of the
+* mode parameter. To implement a different order of execution, call this
+* function multiple times with the required mode parameter.
+*
 * For more details, refer to function usage example below.
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param mode
@@ -484,13 +500,13 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * specified widget:
 * 1. Bits [31..6] - Reserved.
 * 2. Bits [5..0]  - CY_CAPSENSE_PROCESS_ALL - Execute all of the below tasks.
-* 3. Bit [5]      - CY_CAPSENSE_PROCESS_STATUS - Update the status 
+* 3. Bit [5]      - CY_CAPSENSE_PROCESS_STATUS - Update the status
 *                   (on/off, centroid position).
 * 4. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Update the thresholds
 *                   (only in CSD auto-tuning mode).
-* 5. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculate the noise 
+* 5. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculate the noise
 *                   (only in CSD auto-tuning mode).
-* 6. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Update the difference 
+* 6. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Update the difference
 *                   counts of each sensor.
 * 7. Bit [1]      - CY_CAPSENSE_PROCESS_BASELINE - Update the baselines
 *                   for all sensor.
@@ -502,23 +518,23 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 *
 * \return
 * Returns the status of the widget processing operation:
-* - CY_RET_SUCCESS      - The processing is successfully performed.
-* - CY_RET_BAD_PARAM    - The input parameter is invalid.
-* - CY_RET_BAD_DATA     - The processing failed.
+* - CY_CAPSENSE_STATUS_SUCCESS      - The processing is successfully performed.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_BAD_DATA     - The processing failed.
 *
 * \funcusage
-* 
+*
 * An example of customized data processing, changed processing order:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessWidgetExt
-* 
+*
 *******************************************************************************/
-cy_status Cy_CapSense_ProcessWidgetExt(
-                uint32_t widgetId, 
-                uint32_t mode, 
+cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
+                uint32_t widgetId,
+                uint32_t mode,
                 cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
-    cy_status result = CY_RET_BAD_PARAM;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
     uint32_t snsHistorySize;
     uint32_t freqChIndex;
     uint32_t freqChNumber;
@@ -548,10 +564,10 @@ cy_status Cy_CapSense_ProcessWidgetExt(
             ptrHistoryLowCh = &ptrWdCfg->ptrRawFilterHistoryLow[0u];
         }
 
-        switch(ptrWdCfg->senseMethod)
+        switch(ptrWdCfg->senseGroup)
         {
-            case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
-                
+            case CY_CAPSENSE_CSD_GROUP:
+
                 /* Run the desired processing for the all CSD widget sensors */
                 for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
                 {
@@ -560,7 +576,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
                     ptrHistoryLowSns = ptrHistoryLowCh;
                     ptrBslnInvSns = ptrBslnInvCh;
                     for (snsIndex = 0uL; snsIndex < ptrWdCfg->numSns; snsIndex++)
-                    {                    
+                    {
                         result = Cy_CapSense_DpProcessCsdSensorRawCountsExt(ptrWdCfg,
                                                                             ptrSnsCxtSns,
                                                                             ptrHistorySns,
@@ -602,7 +618,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
                 }
                 break;
 
-            case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
+            case CY_CAPSENSE_CSX_GROUP:
 
                 /* Run the desired processing for the all CSX widget sensors */
                 for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
@@ -668,24 +684,24 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 *
 * Performs customized data processing on the selected sensor.
 *
-* This function performs customized data processing specified by the mode 
+* This function performs customized data processing specified by the mode
 * parameter on a sensor. This function performs the exact same task
-* of the Cy_CapSense_ProcessWidgetExt() function but only on the specified 
+* of the Cy_CapSense_ProcessWidgetExt() function but only on the specified
 * sensor instead of all sensors in the widget.
-* 
+*
 * The pipeline scan method (i.e. during scanning of a sensor, processing
 * of a previously scanned sensor is performed) can be implemented using this
 * function and it may reduce the total scan/process time, increase the refresh
-* rate, and decrease the power consumption. For more details, refer to 
+* rate, and decrease the power consumption. For more details, refer to
 * function usage example below.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* Specifies the ID number of the sensor within the widget. A macro for the
+* sensor ID within a specified widget can be found in the cycfg_capsense.h
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param mode
@@ -693,9 +709,9 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * specified sensor:
 * 1. Bits [31..5] - Reserved
 * 2. Bits [4..0]  - CY_CAPSENSE_PROCESS_ALL - Executes all the tasks
-* 3. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Updates the thresholds 
+* 3. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Updates the thresholds
 *                   (only in auto-tuning mode)
-* 4. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculates the noise 
+* 4. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculates the noise
 *                   (only in auto-tuning mode)
 * 5. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Updates the diff count
 * 6. Bit [1]      - CY_CAPSENSE_PROCESS_BASELINE - Updates the baseline
@@ -706,25 +722,25 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 *
 * \return
 * Returns the status of the sensor process operation:
-* - CY_RET_SUCCESS      - The processing is successfully performed.
-* - CY_RET_BAD_PARAM    - The input parameter is invalid.
-* - CY_RET_BAD_DATA     - The processing failed.
+* - CY_CAPSENSE_STATUS_SUCCESS      - The processing is successfully performed.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_BAD_DATA     - The processing failed.
 *
 * \funcusage
-* 
-* An example demonstrates pipeline implementation of sensor scanning and 
+*
+* An example demonstrates pipeline implementation of sensor scanning and
 * processing:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_ProcessSensorExt
-* 
+*
 *******************************************************************************/
-cy_status Cy_CapSense_ProcessSensorExt(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                uint32_t mode, 
+cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                uint32_t mode,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_BAD_PARAM;
-    cy_status resultTmp;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
+    cy_capsense_status_t resultTmp;
 
     uint32_t freqChIndex;
     uint32_t freqChNumber;
@@ -751,24 +767,24 @@ cy_status Cy_CapSense_ProcessSensorExt(
             {
                 ptrHistoryLow =  &ptrWdCfg->ptrRawFilterHistoryLow[sensorId];
             }
-        
+
             ptrSnsCxt = &ptrWdCfg->ptrSnsContext[sensorId];
             ptrSnsBslnInv = &ptrWdCfg->ptrBslnInv[sensorId];
             cxtOffset = context->ptrCommonConfig->numSns;
             historyOffset = snsHistorySize * context->ptrCommonConfig->numSns;
-            result = CY_RET_SUCCESS;
-            
-            switch(ptrWdCfg->senseMethod)
+            result = CY_CAPSENSE_STATUS_SUCCESS;
+
+            switch(ptrWdCfg->senseGroup)
             {
-                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
+                case CY_CAPSENSE_CSD_GROUP:
                     for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
                     {
                         resultTmp = Cy_CapSense_DpProcessCsdSensorRawCountsExt(ptrWdCfg, ptrSnsCxt,
                                                                                ptrHistory, ptrHistoryLow,
                                                                                mode, ptrSnsBslnInv, context);
-                        if (CY_RET_SUCCESS != resultTmp)
+                        if (CY_CAPSENSE_STATUS_SUCCESS != resultTmp)
                         {
-                            result = CY_RET_BAD_DATA;
+                            result = CY_CAPSENSE_STATUS_BAD_DATA;
                         }
                         ptrSnsCxt += cxtOffset;
                         ptrHistory += historyOffset;
@@ -777,15 +793,15 @@ cy_status Cy_CapSense_ProcessSensorExt(
                     }
                     break;
 
-                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
+                case CY_CAPSENSE_CSX_GROUP:
                     for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
-                    {    
+                    {
                         resultTmp = Cy_CapSense_DpProcessCsxSensorRawCountsExt(ptrWdCfg, ptrSnsCxt,
                                                                                ptrHistory, ptrHistoryLow,
                                                                                mode, ptrSnsBslnInv, context);
-                        if (CY_RET_SUCCESS != resultTmp)
+                        if (CY_CAPSENSE_STATUS_SUCCESS != resultTmp)
                         {
-                            result = CY_RET_BAD_DATA;
+                            result = CY_CAPSENSE_STATUS_BAD_DATA;
                         }
                         ptrSnsCxt += cxtOffset;
                         ptrHistory += historyOffset;
@@ -804,7 +820,7 @@ cy_status Cy_CapSense_ProcessSensorExt(
                 ptrSnsCxt = ptrWdCfg->ptrSnsContext;
                 Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
             }
-            
+
         }
     }
     return result;
@@ -817,10 +833,13 @@ cy_status Cy_CapSense_ProcessSensorExt(
 *
 * Resumes the middleware after System Deep Sleep.
 *
-* This function is used to resume the middleware operation after exiting 
-* System Deep Sleep. After the CSD HW block has been powered off,
-* an extra delay is required to establish correct operation of 
-* the CSD HW block.
+* This function is used to resume the middleware operation after exiting
+* System Deep Sleep. After the MSC HW block is powered off,
+* an extra delay is required to establish the correct operation of
+* the MSC HW block.
+*
+* This function is called by the Cy_CapSense_DeepSleepCallback() function after
+* exiting System Deep Sleep if the CapSense Deep Sleep callback is registered.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -843,8 +862,8 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * Instead, Cy_SysPm_CpuEnterDeepSleep() should be used for the CPU active to System Deep Sleep
 * power mode transition of the device.
 * \note
-* After the CPU Deep Sleep transition, the device automatically goes 
-* to System Deep Sleep if all conditions are fulfilled: another core is 
+* After the CPU Deep Sleep transition, the device automatically goes
+* to System Deep Sleep if all conditions are fulfilled: another core is
 * in CPU Deep Sleep, all the peripherals are ready to System Deep Sleep, etc.
 * (see details in the device TRM).
 *
@@ -854,17 +873,25 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * type. After the callback is registered, this function is called by the
 * Cy_SysPm_CpuEnterDeepSleep() function to prepare the middleware to the device
 * power mode transition.
-* 
-* When this function is called with CY_SYSPM_CHECK_READY as input, this
-* function returns CY_SYSPM_SUCCESS if no scanning is in progress. Otherwise
+*
+* When this function is called with CY_SYSPM_CHECK_READY as an input, this
+* function returns CY_SYSPM_SUCCESS if no scanning is in progress or not
+* a single HW block is captured by the CapSense middleware. Otherwise
 * CY_SYSPM_FAIL is returned. If CY_SYSPM_FAIL status is returned, a device
 * cannot change the power mode without completing the current scan as
 * a transition to System Deep Sleep during the scan can disrupt the middleware
 * operation.
-* 
-* For details of SysPm types and macros refer to the SysPm section of the 
+*
+* When this function is called with CY_SYSPM_AFTER_TRANSITION as an input, then
+* the Cy_CapSense_Wakeup() function is called to resume the middleware
+* operation after exiting System Deep Sleep. If there are no CapSense captured
+* HW blocks the Cy_CapSense_Wakeup() function calling is omitted and restoring
+* CapSense immediately after Deep Sleep without the wake-up delay can lead to
+* unpredictable behavior.
+*
+* For details of SysPm types and macros refer to the SysPm section of the
 * PDL documentation.
-* 
+*
 * \param callbackParams
 * Refer to the description of the cy_stc_syspm_callback_params_t type in the
 * Peripheral Driver Library documentation.
@@ -873,32 +900,78 @@ void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context)
 * Specifies mode cy_en_syspm_callback_mode_t.
 *
 * \return
-* Returns the status cy_en_syspm_status_t of the operation requested 
+* Returns the status cy_en_syspm_status_t of the operation requested
 * by the mode parameter:
 * - CY_SYSPM_SUCCESS  - System Deep Sleep power mode can be entered.
 * - CY_SYSPM_FAIL     - System Deep Sleep power mode cannot be entered.
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
-                cy_stc_syspm_callback_params_t * callbackParams, 
+                cy_stc_syspm_callback_params_t * callbackParams,
                 cy_en_syspm_callback_mode_t mode)
 {
     cy_en_syspm_status_t retVal = CY_SYSPM_SUCCESS;
-    cy_en_csd_key_t mwKey;
     cy_stc_capsense_context_t * capsenseCxt = (cy_stc_capsense_context_t *)callbackParams->context;
 
-    if (CY_SYSPM_CHECK_READY == mode)
-    {
-        mwKey = Cy_CSD_GetLockStatus(capsenseCxt->ptrCommonConfig->ptrCsdBase, capsenseCxt->ptrCommonConfig->ptrCsdContext);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        cy_en_csd_key_t mwKey;
 
-        if (CY_CSD_CAPSENSE_KEY == mwKey)
+        switch(mode)
         {
-            if (CY_CAPSENSE_NOT_BUSY != Cy_CapSense_IsBusy(capsenseCxt))
-            {
-                retVal = CY_SYSPM_FAIL;
-            }
+            case CY_SYSPM_CHECK_READY:
+                mwKey = Cy_CSD_GetLockStatus(capsenseCxt->ptrCommonConfig->ptrCsdBase, capsenseCxt->ptrCommonConfig->ptrCsdContext);
+
+                if (CY_CSD_CAPSENSE_KEY == mwKey)
+                {
+                    if (CY_CAPSENSE_NOT_BUSY != Cy_CapSense_IsBusy(capsenseCxt))
+                    {
+                        retVal = CY_SYSPM_FAIL;
+                    }
+                }
+                break;
+
+            case CY_SYSPM_AFTER_TRANSITION:
+                mwKey = Cy_CSD_GetLockStatus(capsenseCxt->ptrCommonConfig->ptrCsdBase, capsenseCxt->ptrCommonConfig->ptrCsdContext);
+
+                if (CY_CSD_CAPSENSE_KEY == mwKey)
+                {
+                    Cy_CapSense_Wakeup(capsenseCxt);
+                }
+                break;
+
+            default:
+                break;
         }
-    }
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+        uint32_t curChIndex;
+        cy_stc_msc_channel_config_t * ptrMscChCfg = &capsenseCxt->ptrCommonConfig->ptrMscChConfig[0u];
+
+        switch(mode)
+        {
+            case CY_SYSPM_CHECK_READY:
+                if (CY_CAPSENSE_NOT_BUSY != Cy_CapSense_IsBusy(capsenseCxt))
+                {
+                    retVal = CY_SYSPM_FAIL;
+                }
+                break;
+
+            case CY_SYSPM_AFTER_TRANSITION:
+                for (curChIndex = 0u; curChIndex < capsenseCxt->ptrCommonConfig->numChannels; curChIndex++)
+                {
+                    if (CY_MSC_CAPSENSE_KEY == Cy_MSC_GetLockStatus(ptrMscChCfg->ptrMscBase,
+                                                                    ptrMscChCfg->ptrMscContext))
+                    {
+                        Cy_CapSense_Wakeup(capsenseCxt);
+                        break;
+                    }
+                    ptrMscChCfg++;
+                }
+                break;
+
+            default:
+                break;
+        }
+    #endif
 
     return(retVal);
 }
@@ -911,17 +984,17 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * Increments the timestamp register for the predefined timestamp interval.
 *
 * A timestamp is required for operation of the Gesture and Ballistic multiplier
-* feature. Hence this function and timestamp is required only if the Gesture 
+* feature. Hence this function and timestamp is required only if the Gesture
 * detection or Ballistic multiplier feature is enabled.
 *
 * This function increments the timestamp by the interval specified
 * in the context->ptrCommonContext->timestampInterval register. The unit for
-* the timestamp and timestamp interval is milliseconds and the default value of the 
+* the timestamp and timestamp interval is milliseconds and the default value of the
 * interval is 1.
 *
 * The application program must periodically call this
 * function or register a periodic callback to this function to keep the
-* timestamp updated and operational for the operation of the Gesture and 
+* timestamp updated and operational for the operation of the Gesture and
 * Ballistic multiplier feature.
 *
 * The timestamp can be updated in one of the three methods:
@@ -931,7 +1004,7 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 *    from the application program.
 * 3. Directly modify the timestamp using the
 *    Cy_CapSense_SetGestureTimestamp() function.
-* 
+*
 * See the function usage example below for more details.
 *
 * The interval at which this function is called should match with interval
@@ -939,8 +1012,8 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * register value can be updated to match the callback interval or the callback
 * can be made at interval set in the register.
 *
-* If a timestamp is available from another source, the application program 
-* may choose to periodically update the timestamp by using the 
+* If a timestamp is available from another source, the application program
+* may choose to periodically update the timestamp by using the
 * Cy_CapSense_SetGestureTimestamp() function instead of
 * registering a callback.
 *
@@ -948,14 +1021,14 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \funcusage
-* 
+*
 * An example of timestamp updating:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Timestamp
-* 
+*
 *******************************************************************************/
 void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 {
-    context->ptrCommonContext->timestamp += 
+    context->ptrCommonContext->timestamp +=
                 context->ptrCommonContext->timestampInterval;
 }
 
@@ -966,15 +1039,15 @@ void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 *
 * Rewrites the timestamp register by the specified value.
 *
-* This function writes the specified value into the middleware timestamp 
+* This function writes the specified value into the middleware timestamp
 * context->ptrCommonContext->timestamp register.
 *
-* If a timestamp is available from another source, the application program 
-* may choose to periodically update the timestamp by using this function 
+* If a timestamp is available from another source, the application program
+* may choose to periodically update the timestamp by using this function
 * instead of registering a callback.
 *
-* Do not modify the timestamp arbitrarily or simultaneously use with 
-* the Cy_CapSense_IncrementGestureTimestamp() function, which may result in 
+* Do not modify the timestamp arbitrarily or simultaneously use with
+* the Cy_CapSense_IncrementGestureTimestamp() function, which may result in
 * unexpected result.
 *
 * \param value
@@ -985,7 +1058,7 @@ void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 *
 *******************************************************************************/
 void Cy_CapSense_SetGestureTimestamp(
-                uint32_t value, 
+                uint32_t value,
                 cy_stc_capsense_context_t * context)
 {
     context->ptrCommonContext->timestamp = value;
@@ -999,17 +1072,17 @@ void Cy_CapSense_SetGestureTimestamp(
 * Resumes the middleware operation if the Cy_CapSense_Save() function was
 * called previously.
 *
-* This function, along with the Cy_CapSense_Save() function is specifically 
-* designed for ease of use and supports time multiplexing of the CSD HW block 
-* among multiple middlewares. When the CSD HW block is shared by two or more
-* middlewares, this function can be used to restore the previous state of 
-* the CSD HW block and CapSense middleware saved using the 
-* Cy_CapSense_Save() function. See the function usage example below for 
+* This function, along with the Cy_CapSense_Save() function is specifically
+* designed for ease of use and supports time multiplexing of the MSC HW block
+* among multiple middleware. When the MSC HW blocks are shared by multiple
+* middleware, this function can be used to restore the previous state of
+* the MSC HW block(s) and CapSense middleware is saved using the
+* Cy_CapSense_Save() function. See the function usage example below for
 * details on usage.
-* 
-* This function performs the same tasks as Cy_CapSense_Init() function and is 
-* kept for API consistency among middlewares. It is recommended to use 
-* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement 
+*
+* This function performs the same tasks as Cy_CapSense_Init() function and is
+* kept for API consistency among middlewares. It is recommended to use
+* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement
 * time-multiplexed mode instead of Cy_CapSense_DeInit() and Cy_CapSense_Init()
 * functions for further compatibility.
 *
@@ -1017,56 +1090,90 @@ void Cy_CapSense_SetGestureTimestamp(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the resume process. If CY_RET_SUCCESS is not received,
+* Returns the status of the resume process. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * the resume process fails and retries may be required.
 *
 * \funcusage
-* 
-* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
-cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 {
-    uint32_t watchdogCounter;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 
-    cy_en_csd_key_t mvKey;
-    cy_status result = CY_RET_INVALID_STATE;
-    cy_en_csd_status_t csdHwStatus;
-    cy_stc_csd_context_t * ptrCsdCxt = context->ptrCommonConfig->ptrCsdContext;
-    CSD_Type * ptrCsdBaseAdd = context->ptrCommonConfig->ptrCsdBase;
+        cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
+        cy_en_csd_key_t mvKey;
+        cy_en_csd_status_t csdHwStatus;
+        cy_stc_csd_context_t * ptrCsdCxt = context->ptrCommonConfig->ptrCsdContext;
+        CSD_Type * ptrCsdBaseAdd = context->ptrCommonConfig->ptrCsdBase;
+        uint32_t watchdogCounter;
 
-    /* Number of cycle of one for() loop */
-    const uint32_t cyclesPerLoop = 5u;
-    /* Timeout in microseconds */
-    const uint32_t watchdogTimeoutUs = 10000u;
+        /* Number of cycle of one for() loop */
+        const uint32_t cyclesPerLoop = 5u;
+        /* Timeout in microseconds */
+        const uint32_t watchdogTimeoutUs = 10000u;
 
-    /* Get the CSD HW block status */
-    mvKey = Cy_CSD_GetLockStatus(ptrCsdBaseAdd, ptrCsdCxt);
-    if(CY_CSD_NONE_KEY == mvKey)
-    {
-        /* Reset CSD HW block sequencer state always to handle a corner case when the sequencer is not in the idle state */
-        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK);
-        Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_CSD_SEQ_START_ABORT_MSK);
-        watchdogCounter = Cy_CapSense_WatchdogCyclesNum(watchdogTimeoutUs, 
-            context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA, cyclesPerLoop);
-        do
+        /* Get the CSD HW block status */
+        mvKey = Cy_CSD_GetLockStatus(ptrCsdBaseAdd, ptrCsdCxt);
+        if(CY_CSD_NONE_KEY == mvKey)
         {
-            csdHwStatus = Cy_CSD_GetConversionStatus(ptrCsdBaseAdd, ptrCsdCxt);
-            watchdogCounter--;
-        }
-        while((CY_CSD_BUSY == csdHwStatus) && (0u != watchdogCounter));
+            /* Reset CSD HW block sequencer state always to handle a corner case when the sequencer is not in the idle state */
+            Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_INTR_MASK, CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK);
+            Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_START, CY_CAPSENSE_CSD_SEQ_START_ABORT_MSK);
+            watchdogCounter = Cy_CapSense_WatchdogCyclesNum(watchdogTimeoutUs,
+                context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA, cyclesPerLoop);
+            do
+            {
+                csdHwStatus = Cy_CSD_GetConversionStatus(ptrCsdBaseAdd, ptrCsdCxt);
+                watchdogCounter--;
+            }
+            while((CY_CSD_BUSY == csdHwStatus) && (0u != watchdogCounter));
 
-        if(CY_CSD_SUCCESS == csdHwStatus)
-        {
-            csdHwStatus = Cy_CSD_Init(ptrCsdBaseAdd, &cy_capsense_csdCfg, CY_CSD_CAPSENSE_KEY, ptrCsdCxt);
             if(CY_CSD_SUCCESS == csdHwStatus)
             {
-                result = CY_RET_SUCCESS;
+                csdHwStatus = Cy_CSD_Init(ptrCsdBaseAdd, &cy_capsense_csdCfg, CY_CSD_CAPSENSE_KEY, ptrCsdCxt);
+                if(CY_CSD_SUCCESS == csdHwStatus)
+                {
+                    result = CY_CAPSENSE_STATUS_SUCCESS;
+                }
             }
         }
-    }
-    return (result);
+        return (result);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+        uint32_t curChIndex;
+        cy_en_msc_status_t mscHwStatus;
+        cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
+        cy_stc_msc_channel_config_t * ptrMscChCfg = &context->ptrCommonConfig->ptrMscChConfig[0u];
+
+        for (curChIndex = 0u; curChIndex < context->ptrCommonConfig->numChannels; curChIndex++)
+        {
+            /* Get MSC HW blocks statuses */
+            if(CY_MSC_NONE_KEY != Cy_MSC_GetLockStatus(ptrMscChCfg->ptrMscBase, ptrMscChCfg->ptrMscContext))
+            {
+                result = CY_CAPSENSE_STATUS_HW_LOCKED;
+                break;
+            }
+            ptrMscChCfg++;
+        }
+
+        if (result == CY_CAPSENSE_STATUS_SUCCESS)
+        {
+            ptrMscChCfg = &context->ptrCommonConfig->ptrMscChConfig[0u];
+            /* Capture MSC HW blocks */
+            for (curChIndex = 0u; curChIndex < context->ptrCommonConfig->numChannels; curChIndex++)
+            {
+                mscHwStatus = Cy_MSC_Init(ptrMscChCfg->ptrMscBase, &cy_capsense_mscCfg,
+                                          CY_MSC_CAPSENSE_KEY, ptrMscChCfg->ptrMscContext);
+                if(CY_MSC_SUCCESS != mscHwStatus)
+                {
+                    result = CY_CAPSENSE_STATUS_INVALID_STATE;
+                    break;
+                }
+                ptrMscChCfg++;
+            }
+        }
+
+        return (result);
+    #endif
 }
 
 
@@ -1077,77 +1184,103 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * Saves the state of CapSense so the functionality can be restored
 * using the Cy_CapSense_Restore() function.
 *
-* This function, along with the Cy_CapSense_Restore() function, is specifically 
-* designed for ease of use and supports time multiplexing of the CSD HW block 
-* among multiple middlewares. When the CSD HW block is shared by two or more 
-* middlewares, this function can be used to save the current state of 
-* the CSD HW block and CapSense middleware prior to releasing the CSD HW block 
-* for use by other middleware. See the function usage example below for 
+* This function, along with the Cy_CapSense_Restore() function, is specifically
+* designed for ease of use and supports time multiplexing of the MSC HW block
+* among multiple middleware. When the MSC HW block is shared by multiple
+* middleware, this function can be used to save the current state of
+* the MSC HW block and CapSense middleware prior to releasing the MSC HW block
+* for use by other middleware. See the function usage example below for
 * details on usage.
-* 
-* This function performs the same tasks as the Cy_CapSense_DeInit() function and is 
-* kept for API consistency among middlewares. It is recommended to use 
-* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement 
+*
+* This function performs the same tasks as the Cy_CapSense_DeInit() function and is
+* kept for API consistency among middlewares. It is recommended to use
+* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement
 * Time-multiplexed mode instead of Cy_CapSense_DeInit() and Cy_CapSense_Init()
 * functions for further compatibility.
 *
 * This function performs the following operations:
-* * Release the CSD HW block.
-* * Configure sensor pins to the default state and disconnect them from 
+* * Releases the MSC HW block.
+* * Configures sensor pins to the default state and disconnects them from
 *   analog buses.
-* * Disconnect external capacitors from analog buses.
-* * Set the middleware state to default.
+* * Disconnects external capacitors from analog buses.
+* * Sets the middleware state to default.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the process. If CY_RET_SUCCESS is not received,
+* Returns the status of the process. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * the save process fails and retries may be required.
 *
 * \funcusage
-* 
-* An example of sharing the CSD HW block by the CapSense and CSDADC middleware.<br>
-* Declares the CapSense_ISR_cfg variable:
-* \snippet capsense/snippet/main.c snippet_m4_capsense_interrupt_source_declaration
-* 
-* Declares the CSDADC_ISR_cfg variable:
-* \snippet capsense/snippet/main.c snippet_m4_adc_interrupt_source_declaration
-* 
-* Defines the CapSense interrupt handler:
-* \snippet capsense/snippet/main.c snippet_CapSense_Interrupt
-* 
-* Defines the CSDADC interrupt handler:
-* \snippet capsense/snippet/main.c snippet_CSDADC_Interrupt
-* 
-* The part of the main.c FW flow:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
-cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_Save(cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
-    cy_en_csd_status_t initStatus;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 
-    if (CY_CAPSENSE_BUSY != Cy_CapSense_IsBusy(context))
-    {
-        /* Disconnect external capacitors and sensor pins from analog bus */
-        (void)Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_UNDEFINED_E, context);
+        cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
+        cy_en_csd_status_t initStatus;
 
-        /* Release the CSD HW block */
-        initStatus = Cy_CSD_DeInit(
-                        context->ptrCommonConfig->ptrCsdBase, 
-                        CY_CSD_CAPSENSE_KEY, 
-                        context->ptrCommonConfig->ptrCsdContext);
-
-        if (CY_CSD_SUCCESS == initStatus)
+        if (CY_CAPSENSE_NOT_BUSY == Cy_CapSense_IsBusy(context))
         {
-            result = CY_RET_SUCCESS;
+            /* Disconnect external capacitors and sensor pins from analog bus */
+            (void)Cy_CapSense_SwitchSensingMode((uint8_t)CY_CAPSENSE_UNDEFINED_E, context);
 
+            /* Release the CSD HW block */
+            initStatus = Cy_CSD_DeInit(
+                            context->ptrCommonConfig->ptrCsdBase,
+                            CY_CSD_CAPSENSE_KEY,
+                            context->ptrCommonConfig->ptrCsdContext);
+
+            if (CY_CSD_SUCCESS == initStatus)
+            {
+                result = CY_CAPSENSE_STATUS_SUCCESS;
+            }
         }
-    }
 
-    return result;
+        return result;
+
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+
+        uint32_t curChIndex;
+        cy_en_msc_status_t initStatus;
+        cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
+        cy_stc_msc_channel_config_t * ptrMscChannel = context->ptrCommonConfig->ptrMscChConfig;
+
+        if (CY_CAPSENSE_NOT_BUSY == Cy_CapSense_IsBusy(context))
+        {
+            for (curChIndex = 0u; curChIndex < context->ptrCommonConfig->numChannels; curChIndex++)
+            {
+                /* Get MSC HW blocks statuses */
+                if(CY_MSC_CAPSENSE_KEY != Cy_MSC_GetLockStatus(ptrMscChannel[curChIndex].ptrMscBase, ptrMscChannel[curChIndex].ptrMscContext))
+                {
+                    result = CY_CAPSENSE_STATUS_HW_LOCKED;
+                    break;
+                }
+            }
+
+            if (CY_CAPSENSE_STATUS_SUCCESS == result)
+            {
+                for (curChIndex = 0u; curChIndex < context->ptrCommonConfig->numChannels; curChIndex++)
+                {
+                    initStatus = Cy_MSC_DeInit(ptrMscChannel[curChIndex].ptrMscBase, CY_MSC_CAPSENSE_KEY, ptrMscChannel[curChIndex].ptrMscContext);
+                    if (CY_MSC_SUCCESS != initStatus)
+                    {
+                        result = CY_CAPSENSE_STATUS_HW_LOCKED;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            result = CY_CAPSENSE_STATUS_HW_BUSY;
+        }
+
+        return result;
+
+    #endif
 }
 
 
@@ -1155,36 +1288,36 @@ cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_RegisterCallback
 ****************************************************************************//**
 *
-* Registers a callback function.
-* 
-* The registered function will be called by the CapSense middleware when 
-* the specified event \ref cy_en_capsense_callback_event_t has occurred in 
+* Registers a ures's callback function.
+*
+* The registered function will be called by the CapSense middleware when
+* the specified event \ref cy_en_capsense_callback_event_t has occurred in
 * the CapSense middleware.
 *
 * \param callbackType
-* The event on which the registered function is called by the CapSense 
+* The event on which the registered user's function is called by the CapSense
 * middleware. Refer to \ref cy_en_capsense_callback_event_t for the list of
 * supported events.
 *
 * \param callbackFunction
-* The pointer to the callback function to be called by the middleware.
+* The pointer to the user's callback function to be called by the middleware.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the callback registration:
-* - CY_RET_SUCCESS      - The action performed successfully.
-* - CY_RET_BAD_PARAM    - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_SUCCESS      - The action performed successfully.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - The input parameter is invalid.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_RegisterCallback(
+cy_capsense_status_t Cy_CapSense_RegisterCallback(
                 cy_en_capsense_callback_event_t callbackType,
                 cy_capsense_callback_t callbackFunction,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status retVal = CY_RET_SUCCESS;
-        
+    cy_capsense_status_t retVal = CY_CAPSENSE_STATUS_SUCCESS;
+
     if((NULL != callbackFunction) && (NULL != context))
     {
         switch(callbackType)
@@ -1196,13 +1329,13 @@ cy_status Cy_CapSense_RegisterCallback(
                 context->ptrCommonContext->ptrEOSCallback = callbackFunction;
                 break;
             default:
-                retVal = CY_RET_BAD_PARAM;
+                retVal = CY_CAPSENSE_STATUS_BAD_PARAM;
                 break;
         }
     }
     else
     {
-        retVal = CY_RET_BAD_PARAM;
+        retVal = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
     return(retVal);
@@ -1213,11 +1346,11 @@ cy_status Cy_CapSense_RegisterCallback(
 * Function Name: Cy_CapSense_UnRegisterCallback
 ****************************************************************************//**
 *
-* This function unregisters a previously registered callback function in the 
-* CapSense middleware.
+* This function unregisters a previously registered user's callback function
+* in the CapSense middleware.
 *
 * \param callbackType
-* The event on which the function should be unregistered.
+* The event on which the callback function should be unregistered.
 * Refer to \ref cy_en_capsense_callback_event_t for the list of
 * supported events.
 *
@@ -1226,16 +1359,16 @@ cy_status Cy_CapSense_RegisterCallback(
 *
 * \return
 * Returns the status of the callback deregistration:
-* - CY_RET_SUCCESS      - The action performed successfully.
-* - CY_RET_BAD_PARAM    - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_SUCCESS      - The action performed successfully.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - The input parameter is invalid.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_UnRegisterCallback(
+cy_capsense_status_t Cy_CapSense_UnRegisterCallback(
                 cy_en_capsense_callback_event_t callbackType,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status retVal = CY_RET_SUCCESS;
-        
+    cy_capsense_status_t retVal = CY_CAPSENSE_STATUS_SUCCESS;
+
     if(NULL != context)
     {
         switch(callbackType)
@@ -1247,20 +1380,20 @@ cy_status Cy_CapSense_UnRegisterCallback(
                 context->ptrCommonContext->ptrEOSCallback = NULL;
                 break;
             default:
-                retVal = CY_RET_BAD_PARAM;
+                retVal = CY_CAPSENSE_STATUS_BAD_PARAM;
                 break;
         }
     }
     else
     {
-        retVal = CY_RET_BAD_PARAM;
+        retVal = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
     return(retVal);
 
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */

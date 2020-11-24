@@ -1,7 +1,9 @@
-# Cypress CapSense Middleware Library
+# CapSense Middleware Library
 
 ### Overview
-CapSense is a Cypress capacitive sensing solution. Capacitive sensing can be used in a variety of applications and products where conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. These include home appliances, and automotive, IoT, and industrial applications. CapSense supports multiple interfaces (widgets) using both Self-Capacitance (CSD) and Mutual-Capacitance (CSX) sensing methods with robust performance.
+Alpha Release Content - The support for the PSoC 4100S Max family on ModusToolbox is currently at the Alpha level. Features may change without notice. Contact Cypress Support https://www.cypress.com/support for additional details.
+
+CapSense is a Cypress capacitive sensing solution. Capacitive sensing can be used in a variety of applications and products where conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. These include home appliances, automotive, IoT, and industrial applications. CapSense supports multiple interfaces (widgets) using both Self-Capacitance (CSD) and Mutual-Capacitance (CSX) sensing methods with robust performance.
 
 CapSense has become a popular technology to replace conventional mechanical- and optical-based user interfaces. There are fewer parts involved, which saves cost and increases reliability with no wear-and-tear. The main advantages of CapSense compared with other solutions are: robust performance in harsh environmental conditions and rejection of a wide range of external noise sources.
 

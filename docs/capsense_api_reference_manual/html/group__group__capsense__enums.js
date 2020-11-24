@@ -1,11 +1,5 @@
 var group__group__capsense__enums =
 [
-    [ "cy_en_capsense_bist_external_cap_id_t", "group__group__capsense__enums.html#ga07f6f8cbe8fa1cebb08e2bd44e9de29b", [
-      [ "CY_CAPSENSE_BIST_CMOD_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29baf3745617d4c520ecd77a4b87a8fe8172", null ],
-      [ "CY_CAPSENSE_BIST_CINTA_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29bacfe90ee851fdb0c5990cf9c255c2142d", null ],
-      [ "CY_CAPSENSE_BIST_CINTB_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29ba8d03343ec314140673d8b7034caeacc8", null ],
-      [ "CY_CAPSENSE_BIST_CSH_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29ba86cb63cafed2d806f3a916f9ab51890f", null ]
-    ] ],
     [ "cy_en_capsense_tuner_state_t", "group__group__capsense__enums.html#gaadb1f5ee70c7d52a5375cdae765093dc", [
       [ "CY_CAPSENSE_TU_FSM_RUNNING", "group__group__capsense__enums.html#ggaadb1f5ee70c7d52a5375cdae765093dca90d0945b863d6c568c124179622abcb8", null ],
       [ "CY_CAPSENSE_TU_FSM_SUSPENDED", "group__group__capsense__enums.html#ggaadb1f5ee70c7d52a5375cdae765093dcabd652b762757d2927ff7efc5b61d58ea", null ],
@@ -83,5 +77,9 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_BIST_FEATURE_DISABLED_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857caaaa05668fc0be7bfb934a228b0d9410c", null ],
       [ "CY_CAPSENSE_BIST_TIMEOUT_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857ca7c3531ff81e35c5a17b9bb6326027710", null ],
       [ "CY_CAPSENSE_BIST_FAIL_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857ca561a9faf24c500cc9990b46117fdcace", null ]
+    ] ],
+    [ "cy_en_capsense_msc_raw_mode_t", "group__group__capsense__enums.html#ga2f401fe83daac81512b02b33fc967f57", [
+      [ "CY_CAPSENSE_MSC_RAW_SATURATE_E", "group__group__capsense__enums.html#gga2f401fe83daac81512b02b33fc967f57a7f25b1c06cfbe093b6d3c3355a31a19c", null ],
+      [ "CY_CAPSENSE_MSC_RAW_OVERFLOW_E", "group__group__capsense__enums.html#gga2f401fe83daac81512b02b33fc967f57ad65e8f38f552e1a10fc39b779fcbe6a2", null ]
     ] ]
 ];

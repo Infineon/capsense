@@ -1,11 +1,12 @@
 var NAVTREE =
 [
-  [ "Cypress CapSense Middleware Library 2.10", "index.html", [
-    [ "Cypress CapSense Middleware Library", "index.html", [
+  [ "CapSense Middleware Library 3.0 (Alpha)", "index.html", [
+    [ "CapSense Middleware Library", "index.html", [
       [ "General Description", "index.html#section_capsense_general", [
         [ "Features", "index.html#subsection_capsense_features", null ]
       ] ],
       [ "Quick Start Guide", "index.html#group_capsense_quick_start", [
+        [ "ModusToolbox Quick Start Guide", "index.html#group_capsense_quick_start_modus", null ],
         [ "MBED OS Quick Start Guide", "index.html#group_capsense_quick_start_mbed", null ]
       ] ],
       [ "Summary of Application Programming Interface (API)", "index.html#section_capsense_configuration", null ],
@@ -24,9 +25,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__group__capsense__callbacks.html",
-"group__group__capsense__macros__settings.html#ga06a28983f42b3fe5a3146bb7e1cd9236",
-"structcy__stc__capsense__bist__context__t.html#a596d6e49bff364072a0ab877e14c90d5",
-"structcy__stc__capsense__gesture__context__t.html#abdb25e19025b77d4115b551bf54454b5"
+"group__group__capsense__macros__settings.html#ga44f4ec14da412363c028c881e081726e",
+"structcy__stc__capsense__common__config__t.html#a46dabab191776af278a263e931f0c77b",
+"structcy__stc__capsense__smartsense__csd__noise__envelope__t.html#aa946864ff892df81a594e217ceba1d55"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

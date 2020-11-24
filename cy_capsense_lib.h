@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * The file contains application programming interface to the CapSense library.
@@ -19,7 +19,7 @@
 
 #include "cy_syslib.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -550,7 +550,7 @@ void Cy_CapSense_RunNoiseEnvelope_Lib(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_LIB_H */
 

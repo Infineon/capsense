@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_gesture_lib.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * Provides the gesture interface.
@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -355,7 +355,7 @@ void Cy_CapSense_Gesture_Decode(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_GESTURE_LIB_H */
 
