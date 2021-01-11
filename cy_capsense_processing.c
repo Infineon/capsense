@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -25,10 +25,29 @@
 #include "cy_capsense_processing.h"
 #include "cy_capsense_filter.h"
 #include "cy_capsense_lib.h"
-#include "cy_capsense_sensing.h"
 #include "cy_capsense_centroid.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+
+/*******************************************************************************
+* Local definition
+*******************************************************************************/
+/* Raw data normalization and scaling */
+#define CY_CAPSENSE_SCALING_SHIFT              (15)
+#define CY_CAPSENSE_MAX_TX_PATTERN_NUM         (32)
+
+/*******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+
+/******************************************************************************/
+/** \cond SECTION_CAPSENSE_INTERNAL */
+/** \addtogroup group_capsense_internal *//** \{ */
+/******************************************************************************/
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+static uint16_t Cy_CapSense_ConvertToUint16(int32_t sample);
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_MSCV3 */
+/** \} \endcond */
 
 
 /*******************************************************************************
@@ -45,7 +64,7 @@
 * * Clear all status of widgets and sensors.
 * * Enable all the widgets.
 *
-* Calling this function is accompanied by 
+* Calling this function is accompanied by
 * * Cy_CapSense_InitializeAllBaselines().
 * * Cy_CapSense_InitializeAllFilters().
 *
@@ -90,12 +109,12 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 * All debounce counters during initialization are set to the value of the
 * onDebounce widget parameter.
 *
-* Calling this function is accompanied by 
+* Calling this function is accompanied by
 * * Cy_CapSense_InitializeWidgetBaseline().
 * * Cy_CapSense_InitializeWidgetFilter().
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -103,7 +122,7 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeWidgetStatus(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
@@ -137,7 +156,7 @@ void Cy_CapSense_InitializeWidgetStatus(
         case (uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E:
         case (uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E:
             /* Each widget requires one debounce counter */
-            if (ptrWdCfg->senseMethod == (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E)
+            if (ptrWdCfg->senseGroup == CY_CAPSENSE_CSD_GROUP)
             {
                 *(ptrWdCfg->ptrDebounceArr) = ptrWdCxt->onDebounce;
             }
@@ -191,7 +210,7 @@ void Cy_CapSense_InitializeWidgetStatus(
         {
             case (uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E:
                 /* Clean position filter history */
-                if (ptrWdCfg->senseMethod == (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E)
+                if (ptrWdCfg->senseGroup == CY_CAPSENSE_CSX_GROUP)
                 {
                     /* Reset all history IDs to undefined state */
                     ptrHistory = ptrWdCfg->ptrPosFilterHistory->ptrPosition;
@@ -224,7 +243,7 @@ void Cy_CapSense_InitializeWidgetStatus(
 * Performs initialization of all gestures for the specified widget.
 *
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -232,7 +251,7 @@ void Cy_CapSense_InitializeWidgetStatus(
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeWidgetGestures(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
@@ -261,19 +280,19 @@ void Cy_CapSense_InitializeWidgetGestures(
 * Performs decoding of all gestures for the specified widget.
 *
 * This function should be called by application program only after all sensors
-* are scanned and all data processing is executed using 
-* Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions 
+* are scanned and all data processing is executed using
+* Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions
 * for the widget. Calling this function multiple times without a new sensor
 * scan and process causes unexpected behavior.
-* 
-* \note The function (Gesture detection functionality) requires a timestamp 
-* for its operation. The timestamp should be initialized and maintained 
-* in the application program prior to calling this function. See the 
-* descriptions of the Cy_CapSense_SetGestureTimestamp() and 
+*
+* \note The function (Gesture detection functionality) requires a timestamp
+* for its operation. The timestamp should be initialized and maintained
+* in the application program prior to calling this function. See the
+* descriptions of the Cy_CapSense_SetGestureTimestamp() and
 * Cy_CapSense_IncrementGestureTimestamp() functions for details.
-* 
+*
 * \param widgetId
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
@@ -281,8 +300,8 @@ void Cy_CapSense_InitializeWidgetGestures(
 *
 * \return
 * Returns the detected Gesture mask and direction of detected gestures.
-* The same information is stored in ptrWdContext->gestureDetected and 
-* ptrWdContext->gestureDirection registers. Corresponding macros could be found 
+* The same information is stored in ptrWdContext->gestureDetected and
+* ptrWdContext->gestureDirection registers. Corresponding macros could be found
 * \ref group_capsense_macros_gesture.
 * * bit[0..15] - detected gesture masks gesture
 *   * bit[0] - one-finger single click gesture
@@ -306,16 +325,16 @@ void Cy_CapSense_InitializeWidgetGestures(
 *    * bit[8..10] - direction of one-finger flick gesture
 *
 * \funcusage
-* 
+*
 * An example of gesture decoding:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Gesture
-* 
+*
 * An example of gesture status parsing:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Gesture_Macro
-* 
+*
 *******************************************************************************/
 uint32_t Cy_CapSense_DecodeWidgetGestures(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t gestureStatus = 0u;
@@ -383,7 +402,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 const cy_stc_capsense_context_t * context)
 {
-    uint32_t result = CY_RET_SUCCESS;
+    uint32_t result = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t snsIndex;
     uint32_t snsHistorySize;
     uint32_t freqChIndex;
@@ -413,7 +432,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
         ptrHistorySns = ptrHistoryCh;
         ptrHistoryLowSns = ptrHistoryLowCh;
         ptrBslnInvSns = ptrBslnInvCh;
-        for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)    
+        for (snsIndex = 0u; snsIndex < ptrWdConfig->numSns; snsIndex++)
         {
             Cy_CapSense_FtRunEnabledFiltersInternal_Call(ptrWdConfig,
                                                          ptrSnsCxtSns,
@@ -449,7 +468,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
             ptrSnsCxtSns++;
         }
     }
-    
+
     return result;
 }
 
@@ -462,7 +481,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
 * This function determines the type of widget and runs the appropriate function
 * that implements the status update algorithm for this type of widget.
 *
-* When the widget-specific processing completes this function updates the 
+* When the widget-specific processing completes this function updates the
 * sensor and widget status registers in the data structure.
 *
 * \param ptrWdConfig
@@ -507,16 +526,16 @@ void Cy_CapSense_DpProcessCsxWidgetStatus(
 * \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext    
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory    
+* \param ptrSnsRawHistory
 * The pointer to the filter history.
 *
-* \param ptrSnsRawHistoryLow    
+* \param ptrSnsRawHistoryLow
 * The pointer to the extended filter history.
 *
-* \param mode         
+* \param mode
 * The bit-mask with the data processing tasks to be executed.
 * The mode parameters can take the following values:
 * - CY_CAPSENSE_PROCESS_FILTER     (0x01) Run Firmware Filter
@@ -532,8 +551,8 @@ void Cy_CapSense_DpProcessCsxWidgetStatus(
 *
 * \return
 * Returns the status of the specified sensor processing operation:
-* - CY_RET_SUCCESS if operation was successfully completed;
-* - CY_CAPSENSE_PROCESS_BASELINE_FAILED if baseline processing of any
+* - CY_CAPSENSE_STATUS_SUCCESS if operation was successfully completed;
+* - Non-zero - if baseline processing of any
 * sensor of the specified widget failed. The result is concatenated with the index
 * of failed sensor.
 *
@@ -547,7 +566,7 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
                 uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context)
 {
-    uint32_t  result = CY_RET_SUCCESS;
+    uint32_t  result = CY_CAPSENSE_STATUS_SUCCESS;
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
@@ -602,7 +621,7 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 const cy_stc_capsense_context_t * context)
 {
-    uint32_t result = CY_RET_SUCCESS;
+    uint32_t result = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t snsIndex;
     uint32_t snsHistorySize;
     uint32_t freqChIndex;
@@ -615,7 +634,10 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
     uint8_t * ptrHistoryLowSns = NULL;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtCh;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtSns;
-    cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory = ptrWdConfig->ptrNoiseEnvelope;
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory = ptrWdConfig->ptrNoiseEnvelope;
+    #endif
 
     snsHistorySize = (uint32_t)ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
     freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
@@ -626,7 +648,7 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
     {
         ptrHistoryLowCh = &ptrWdConfig->ptrRawFilterHistoryLow[0u];
     }
-        
+
     for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
     {
         ptrSnsCxtSns = ptrSnsCxtCh;
@@ -640,22 +662,24 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
                                                          ptrHistorySns,
                                                          ptrHistoryLowSns,
                                                          context);
-            /* Run auto-tuning activities */
-            if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
-            {
-                Cy_CapSense_RunNoiseEnvelope_Lib_Call(ptrSnsCxtSns->raw,
-                                                      ptrWdConfig->ptrWdContext->sigPFC,
-                                                      ptrNEHistory,
-                                                      context);
-                Cy_CapSense_DpUpdateThresholds_Call(ptrWdConfig->ptrWdContext, ptrNEHistory, snsIndex, context);
-                if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == ptrWdConfig->wdType)
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+                /* Run auto-tuning activities */
+                if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
                 {
-                    ptrWdConfig->ptrWdContext->proxTh = (uint16_t)(((uint32_t)ptrWdConfig->ptrWdContext->fingerTh * 
-                        context->ptrCommonConfig->proxTouchCoeff) / CY_CAPSENSE_PERCENTAGE_100);
+                    Cy_CapSense_RunNoiseEnvelope_Lib_Call(ptrSnsCxtSns->raw,
+                                                          ptrWdConfig->ptrWdContext->sigPFC,
+                                                          ptrNEHistory,
+                                                          context);
+                    Cy_CapSense_DpUpdateThresholds_Call(ptrWdConfig->ptrWdContext, ptrNEHistory, snsIndex, context);
+                    if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == ptrWdConfig->wdType)
+                    {
+                        ptrWdConfig->ptrWdContext->proxTh = (uint16_t)(((uint32_t)ptrWdConfig->ptrWdContext->fingerTh *
+                            context->ptrCommonConfig->proxTouchCoeff) / CY_CAPSENSE_PERCENTAGE_100);
+                    }
+                    ptrNEHistory++;
                 }
-                ptrNEHistory++;
-            }
-            
+            #endif
+
             result |= Cy_CapSense_FtUpdateBaseline(ptrWdConfig->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
             Cy_CapSense_DpUpdateDifferences(ptrWdConfig->ptrWdContext, ptrSnsCxtSns);
 
@@ -701,22 +725,22 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
 * Performs customized processing of the CSX sensor raw counts.
 *
 * If all bits are set at once, the default processing order will take place.
-* For a custom order, this function can be called multiple times and execute 
+* For a custom order, this function can be called multiple times and execute
 * one task at a time.
 *
 * \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext    
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory    
+* \param ptrSnsRawHistory
 * The pointer to the filter history.
 *
-* \param ptrSnsRawHistoryLow    
+* \param ptrSnsRawHistoryLow
 * The pointer to the extended filter history.
 *
-* \param mode         
+* \param mode
 * The bit-mask with the data processing tasks to be executed.
 * The mode parameters can take the following values:
 * - CY_CAPSENSE_PROCESS_FILTER     (0x01) Run Firmware Filter
@@ -734,8 +758,8 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
 *
 * \return
 * Returns the status of the specified sensor processing operation:
-* - CY_RET_SUCCESS if operation was successfully completed.
-* - CY_RET_BAD_DATA if baseline processing of any sensor of the specified widget
+* - CY_CAPSENSE_STATUS_SUCCESS if operation was successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_DATA if baseline processing of any sensor of the specified widget
 *   failed.
 *
 *******************************************************************************/
@@ -748,7 +772,7 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
                     uint16_t * ptrBslnInvSns,
                     const cy_stc_capsense_context_t * context)
 {
-    uint32_t  result = CY_RET_SUCCESS;
+    uint32_t  result = CY_CAPSENSE_STATUS_SUCCESS;
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
 
     if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
@@ -779,7 +803,7 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
 * This function determines the type of widget and runs the appropriate function
 * that implements the status update algorithm for this type of widget.
 *
-* When the widget-specific processing completes this function updates the 
+* When the widget-specific processing completes this function updates the
 * sensor and widget status registers in the data structure.
 *
 * \param ptrWdConfig
@@ -830,13 +854,13 @@ void Cy_CapSense_DpProcessCsdWidgetStatus(
 *
 * This algorithm is a part of SmartSense feature.
 *
-* \param ptrWdContext       
+* \param ptrWdContext
 * The pointer to the widget context structure.
 *
-* \param ptrNoiseEnvelope 
+* \param ptrNoiseEnvelope
 * The pointer to the noise-envelope history structure.
 *
-* \param startFlag        
+* \param startFlag
 * The flag indicates when a new widget is processed.
 *
 *******************************************************************************/
@@ -871,10 +895,10 @@ void Cy_CapSense_DpUpdateThresholds(
 * Otherwise the difference is set to zero. The final difference value is saved
 * with the subtracted noise threshold value.
 *
-* \param ptrWdContext       
+* \param ptrWdContext
 * The pointer to the widget context structure.
 *
-* \param ptrSnsContext       
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
 *******************************************************************************/
@@ -967,7 +991,7 @@ void Cy_CapSense_DpProcessButton(
     }
     /* Update position struct */
     if (((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdConfig->wdType) &&
-        ((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E == ptrWdConfig->senseMethod))
+        (CY_CAPSENSE_CSX_GROUP == ptrWdConfig->senseGroup))
     {
         ptrWdCxt->wdTouch.numPosition = (uint8_t)activeCount;
         ptrWdCxt->wdTouch.ptrPosition->id = (uint16_t)startIndex;
@@ -1195,9 +1219,9 @@ void Cy_CapSense_DpProcessSlider(
 * This function processes the status of the CSD Matrix Button widget.
 * It applies the hysteresis and debounce algorithm to each sensor value.
 *
-* Then the function analyzes how many row and column sensors are active. 
-* If only one per row and one per column, the function considers this as 
-* a valid touch and updates the corresponding Data Structure registers 
+* Then the function analyzes how many row and column sensors are active.
+* If only one per row and one per column, the function considers this as
+* a valid touch and updates the corresponding Data Structure registers
 * with the button id and active row and column sensors.
 *
 * If multiple sensors are active in row or column sensors, this function sets
@@ -1452,7 +1476,7 @@ void Cy_CapSense_DpProcessCsdTouchpad(
 ****************************************************************************//**
 *
 * Processes the status of the CSX Touchpad widget.
-* The process involves running the 3x3 centroid algorithm with the 
+* The process involves running the 3x3 centroid algorithm with the
 * tracking of finger id.
 *
 * \param ptrWdConfig
@@ -1500,7 +1524,712 @@ void Cy_CapSense_RunMfsFiltering(
                   (uint32_t)ptrSnsContext[CY_CAPSENSE_MFS_CH2_INDEX * context->ptrCommonConfig->numSns].diff);
 }
 
-#endif /* CY_IP_MXCSDV2 */
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+/******************************************************************************
+* Function Name: Cy_CapSense_ConvertToUint16
+******************************************************************************
+*
+* Converts input value to uint16 range
+*
+* \param sample
+* The sample is a value of int32.
+*
+* \return
+* Returns the sample converted to uint16(0,65535)
+*
+*****************************************************************************/
+static uint16_t Cy_CapSense_ConvertToUint16(int32_t sample)
+{
+    if (0 > sample)
+    {
+        sample = 0;
+    }
+
+    if ((int32_t)UINT16_MAX < sample)
+    {
+        sample = (int32_t)UINT16_MAX;
+    }
+
+    return (uint16_t)(sample);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_ProcessWidgetMptxDeconvolution
+****************************************************************************//**
+*
+* Performs raw count deconvolution for the specified CSX widget when
+* Multi-phase Tx is enabled.
+*
+* This function decodes raw counts received after scanning into normal view by
+* perfoming deconvolution algorithm. If the function is called for a widget with
+* disabled Multi-phase Tx, the function returns CY_CAPSENSE_STATUS_BAD_DATA.
+*
+* No need to call this function from application layer since the
+* Cy_CapSense_ProcessAllWidgets() and Cy_CapSense_ProcessWidget() functions calls
+* deconvolution automatically.
+*
+* DAC auto-calibration when enabled performs sensor auto-calibration without
+* performing deconvolution.
+* The deconvolution algorithm for even number of TX electrodes decreases raw count
+* level twice (keeping the signal on the same level).
+*
+* \param widgetId
+* Specifies the ID number of the widget.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the processing operation.
+*
+*******************************************************************************/
+cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(uint32_t widgetId, cy_stc_capsense_context_t * context)
+{
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+    uint32_t idx;
+    uint32_t sumIdx;
+    uint32_t ceIdx;
+    uint32_t rotIdx;
+    /* Order of multi-TX sequence */
+    uint32_t mptxOrderLocal;
+    int32_t localBuf[CY_CAPSENSE_MPTX_MAX_ORDER];
+    int16_t deconvCoefRot[CY_CAPSENSE_MAX_TX_PATTERN_NUM * 2];
+    int32_t accum;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_DATA;
+
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+    mptxOrderLocal = ptrWdCfg->mptxOrder;
+    if (mptxOrderLocal >= CY_CAPSENSE_MPTX_MIN_ORDER)
+    {
+        result = CY_CAPSENSE_STATUS_SUCCESS;
+        memcpy(&deconvCoefRot[0], (const void *)&ptrWdCfg->ptrMptxTable->deconvCoef[0u], mptxOrderLocal * 2);
+        memcpy(&deconvCoefRot[mptxOrderLocal], (const void *)&ptrWdCfg->ptrMptxTable->deconvCoef[0u], mptxOrderLocal * 2);
+
+        ceIdx = ptrWdCfg->numRows * ptrWdCfg->numCols;
+        while (ceIdx >= mptxOrderLocal)
+        {
+            ceIdx -= mptxOrderLocal;
+            /* Copy vector formed by RX[rxIdx] and TX[txIdx..txIdx+mptxOrderLocal]
+            * from sensors to localBuf */
+            idx = mptxOrderLocal;
+            while (idx--)
+            {
+                localBuf[idx] = (int32_t)ptrWdCfg->ptrSnsContext[idx + ceIdx].raw;
+            }
+
+            /* Multiply vector stored in localBuf by the matrix of deconvolution coefficients. */
+            idx = mptxOrderLocal;
+            while (idx--)
+            {
+                accum = 0;
+                rotIdx = idx + mptxOrderLocal - 1u;
+                sumIdx = mptxOrderLocal;
+                while (sumIdx--)
+                {
+                    accum += localBuf[sumIdx] * deconvCoefRot[rotIdx];
+                    rotIdx--;
+                }
+                /* Shift the result in such a way that guarantees no overflow */
+                accum >>= CY_CAPSENSE_SCALING_SHIFT;
+                /* Convert the result to unsigned 16 bit and store in the target buffer */
+                ptrWdCfg->ptrSnsContext[idx + ceIdx].raw = Cy_CapSense_ConvertToUint16(accum);
+            }
+        }
+    }
+    return result;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessAllRaw
+****************************************************************************//**
+*
+* This internal function executes the pre-processing of
+* raw data for all widgets produced by the fifth CapSense HW generation.
+* The pre-processing routine implements the following operations:
+* - Executes the CIC2 post-processing if the filter mode is set to CIC2.
+* - Executes the raw data inversion for the CSX sensors in CS-DMA scan mode.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessAllRaw(
+        const cy_stc_capsense_context_t * context)
+{
+    uint32_t i;
+
+    for(i = 0u; i < context->ptrCommonConfig->numWd; i++)
+    {
+        Cy_CapSense_PreProcessWidgetRaw(i, context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessWidgetRaw
+****************************************************************************//**
+*
+* This internal function executes the pre-processing
+* of raw data for specified widgets produced by the fifth CapSense HW generation.
+* The pre-processing routine implements the following operations:
+* - Executes the CIC2 post-processing if the filter mode is set to CIC2.
+* - Executes the raw data inversion for the CSX sensors in CS-DMA scan mode.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessWidgetRaw(
+        uint32_t widgetId,
+        const cy_stc_capsense_context_t * context)
+{
+    if(CY_CAPSENSE_CIC2_FILTER == context->ptrCommonConfig->cicFilterMode)
+    {
+        Cy_CapSense_PreProcessWidgetCIC2Raw(widgetId, context);
+    }
+
+    if((CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseGroup) &&
+       (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == context->ptrCommonConfig->scanningMode))
+    {
+        Cy_CapSense_InvertWidgetRaw(widgetId, context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessSnsRaw
+****************************************************************************//**
+*
+* This internal function executes the pre-processing
+* of raw data for specified sensors produced by the fifth CapSense HW generation.
+* The pre-processing routine implements the following operations:
+* - Executes the CIC2 post-processing if the filter mode is set to CIC2.
+* - Executes the raw data inversion for the CSX sensors in CS-DMA scan mode.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param sensorId
+* The sensor ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessSnsRaw(
+        uint32_t widgetId,
+        uint32_t sensorId,
+        const cy_stc_capsense_context_t * context)
+{
+    if(CY_CAPSENSE_CIC2_FILTER == context->ptrCommonConfig->cicFilterMode)
+    {
+        Cy_CapSense_PreProcessSnsCIC2Raw(widgetId, sensorId, context);
+    }
+
+    if((CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseGroup) &&
+       (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == context->ptrCommonConfig->scanningMode))
+
+    {
+        Cy_CapSense_InvertSnsRaw(widgetId, sensorId, context);
+    }
+
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_InvertWidgetRaw
+****************************************************************************//**
+*
+* This internal function executes the raw data inversion for specified
+* widgets. Raw data is inverted relative to the theoretical MAX value.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_InvertWidgetRaw(
+        uint32_t widgetId,
+        const cy_stc_capsense_context_t * context)
+{
+    uint32_t snsIndex;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+
+    for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+    {
+        Cy_CapSense_InvertSnsRaw(widgetId, snsIndex, context);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_InvertSnsRaw
+****************************************************************************//**
+*
+* This internal function executes the raw data inversion for specified
+* sensors. The raw data is inverted relative to the theoretical MAX value.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param sensorId
+* The sensor ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_InvertSnsRaw(
+        uint32_t widgetId,
+        uint32_t sensorId,
+        const cy_stc_capsense_context_t * context)
+{
+    uint32_t maxCount;
+    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+    ptrSnsCxt = &ptrWdCfg->ptrSnsContext[sensorId];
+
+    maxCount = ptrWdCfg->ptrWdContext->maxRawCount;
+    if(ptrSnsCxt->raw > maxCount)
+    {
+        ptrSnsCxt->raw = maxCount;
+    }
+    ptrSnsCxt->raw = maxCount - ptrSnsCxt->raw;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessWidgetCIC2Raw
+****************************************************************************//**
+*
+* This internal function executes the pre-processing
+* of raw data, for specified widgets produced by the fifth CapSense HW generation with the
+* filter mode set to CIC2.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessWidgetCIC2Raw(
+        uint32_t widgetId,
+        const cy_stc_capsense_context_t * context)
+{
+    uint32_t snsIndex;
+    uint16_t cicRateSqr;
+    uint8_t cic2HwDividerCol;
+    uint8_t cic2SamplesCol;
+    uint8_t cic2HwDividerRow;
+    uint8_t cic2SamplesRow;
+    uint8_t wdTwoDimensionCsd;
+
+    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+
+    if((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseGroup) &&
+       ((CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType) ||
+        (CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType)))
+    {
+        wdTwoDimensionCsd = 1u;
+    }
+    else
+    {
+        wdTwoDimensionCsd = 0u;
+    }
+
+    cicRateSqr = ptrWdCfg->ptrWdContext->cicRate;
+    cicRateSqr *= cicRateSqr;
+
+    cic2SamplesCol = Cy_CapSense_GetCIC2SamplesNum(
+                                     ptrWdCfg->numChopCycles,
+                                     ptrWdCfg->ptrWdContext->numSubConversions,
+                                     ptrWdCfg->ptrWdContext->snsClk,
+                                     ptrWdCfg->ptrWdContext->cicRate);
+    cic2HwDividerCol = Cy_CapSense_GetCIC2HwDivider(cic2SamplesCol);
+
+    if(1u == wdTwoDimensionCsd)
+    {
+        cic2SamplesRow = Cy_CapSense_GetCIC2SamplesNum(
+                                         ptrWdCfg->numChopCycles,
+                                         ptrWdCfg->ptrWdContext->numSubConversions,
+                                         ptrWdCfg->ptrWdContext->rowSnsClk,
+                                         ptrWdCfg->ptrWdContext->cicRate);
+        cic2HwDividerRow = Cy_CapSense_GetCIC2HwDivider(cic2SamplesRow);
+    }
+
+    ptrSnsCxt = &ptrWdCfg->ptrSnsContext[0u];
+    for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+    {
+        if((1u == wdTwoDimensionCsd) &&
+           (ptrWdCfg->numCols <= snsIndex))
+        {
+            ptrSnsCxt->raw = Cy_CapSense_PreProcessCIC2Data(
+                                             cic2SamplesRow,
+                                             cic2HwDividerRow,
+                                             cicRateSqr,
+                                             context->ptrInternalContext->filterBitFormat,
+                                             ptrSnsCxt->raw);
+        }
+        else
+        {
+            ptrSnsCxt->raw = Cy_CapSense_PreProcessCIC2Data(
+                                             cic2SamplesCol,
+                                             cic2HwDividerCol,
+                                             cicRateSqr,
+                                             context->ptrInternalContext->filterBitFormat,
+                                             ptrSnsCxt->raw);
+
+        }
+        ptrSnsCxt++;
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessSnsCIC2Raw
+****************************************************************************//**
+*
+* This internal function executes the pre-processing
+* of raw data for specified widgets produced by the fifth CapSense HW generation, with the
+* filter mode set to CIC2.
+*
+* \param widgetId
+* The widget ID, for which the post-processing should be executed.
+*
+* \param sensorId
+* The sensor ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessSnsCIC2Raw(
+        uint32_t widgetId,
+        uint32_t sensorId,
+        const cy_stc_capsense_context_t * context)
+{
+
+    uint32_t tmpVal;
+    uint32_t cicRateSqr;
+    uint32_t cic2HwDivider;
+    uint32_t cic2SamplesNum;
+    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+
+    ptrWdCfg = &context->ptrWdConfig[widgetId];
+    ptrSnsCxt = &ptrWdCfg->ptrSnsContext[sensorId];
+
+    cicRateSqr = ptrWdCfg->ptrWdContext->cicRate;
+    cicRateSqr *= cicRateSqr;
+
+    if ((CY_CAPSENSE_CSD_GROUP == context->ptrWdConfig[widgetId].senseGroup) &&
+        (context->ptrWdConfig[widgetId].numCols <= sensorId))
+    {
+        tmpVal = context->ptrWdContext[widgetId].rowSnsClk;
+    }
+    else
+    {
+        tmpVal = context->ptrWdContext[widgetId].snsClk;
+    }
+
+    cic2SamplesNum = Cy_CapSense_GetCIC2SamplesNum(
+                                     ptrWdCfg->numChopCycles,
+                                     ptrWdCfg->ptrWdContext->numSubConversions,
+                                     tmpVal,
+                                     ptrWdCfg->ptrWdContext->cicRate);
+
+    cic2HwDivider = Cy_CapSense_GetCIC2HwDivider(cic2SamplesNum);
+    ptrSnsCxt->raw = Cy_CapSense_PreProcessCIC2Data(
+                                     cic2SamplesNum,
+                                     cic2HwDivider,
+                                     cicRateSqr,
+                                     context->ptrInternalContext->filterBitFormat,
+                                     ptrSnsCxt->raw);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessSlotCIC2Raw
+****************************************************************************//**
+*
+* This internal function executes the post-processing of
+* raw data for specified slots produced by the fifth CapSense HW genetation with the
+* filter mode set to CIC2.
+*
+* \param slotId
+* The slot ID, for which the post-processing should be executed.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_PreProcessSlotCIC2Raw(
+        uint32_t slotId,
+        const cy_stc_capsense_context_t * context)
+{
+    uint32_t chNumber;
+    uint32_t curChIndex;
+    uint32_t slotStcIndex;
+    const cy_stc_capsense_scan_slot_t * slotPtr;
+
+    chNumber = context->ptrCommonConfig->numChannels;
+    for(curChIndex = 0u; curChIndex < chNumber; curChIndex++)
+    {
+        slotStcIndex = curChIndex * context->ptrCommonConfig->numSlots + slotId;
+        slotPtr = &context->ptrScanSlots[slotStcIndex];
+        if((slotPtr->wdId != CY_CAPSENSE_SLOT_SHIELD_ONLY) &&
+           (slotPtr->wdId != CY_CAPSENSE_SLOT_TX_ONLY) &&
+           (slotPtr->wdId != CY_CAPSENSE_SLOT_EMPTY))
+        {
+            Cy_CapSense_PreProcessSnsCIC2Raw(slotPtr->wdId, slotPtr->snsId, context);
+        }
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetCIC2SamplesNum
+****************************************************************************//**
+*
+* This internal function determines the number CIC2 samples that will be
+* accumulated for specified sensing parameters.
+*
+* \param convsNumber
+* The number of conversions.
+*
+* \param subConvsNumber
+* The number of sub-conversions.
+*
+* \param snsClkDivider
+* The divider value for the sense clock.
+*
+* \param cicRate
+* The filter decimation rate.
+*
+* \return
+* The number of CIC2 samples.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetCIC2SamplesNum(
+            uint32_t convsNumber,
+            uint32_t subConvsNumber,
+            uint32_t snsClkDivider,
+            uint32_t cicRate)
+{
+    uint32_t tmpVal;
+
+    tmpVal = (snsClkDivider * subConvsNumber / cicRate) - 1u;
+    tmpVal *= convsNumber;
+
+    return(tmpVal);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetCIC2HwDivider
+****************************************************************************//**
+*
+* This internal function determines the value of the divider that will be
+* applied to the data, accumulated by the CIC2 HW for the specified number of
+* samples.
+*
+* \param cic2SamplesNum
+* The number of CIC2 samples for the specified sensing parameters. This value
+* can be obtained by using the Cy_CapSense_GetCIC2SamplesNum function.
+*
+* \return
+* The CIC2 HW divider value.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetCIC2HwDivider(
+            uint32_t cic2SamplesNum)
+{
+    uint32_t tmpVal;
+
+    if(cic2SamplesNum > 8u)
+    {
+        tmpVal = 16u;
+    }
+    else if(cic2SamplesNum > 4u)
+    {
+        tmpVal = 8u;
+    }
+    else if(cic2SamplesNum > 2u)
+    {
+        tmpVal = 4u;
+    }
+    else if(cic2SamplesNum > 1u)
+    {
+        tmpVal = 2u;
+    }
+    else
+    {
+        tmpVal = 1u;
+    }
+
+    return(tmpVal);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_PreProcessCIC2Data
+****************************************************************************//**
+*
+* This internal function executes the post-processing of raw data
+* produced by the fifth CapSense HW generation with the filter mode set
+* to CIC2.
+*
+* \param cic2SamplesNum
+* The number of CIC2 samples for specified sensing parameters. This value
+* can be obtained by using the Cy_CapSense_GetCIC2SamplesNum function.
+*
+* \param cic2HwDivider
+* The the value of the divider to be applied to the data accumulated by
+* the CIC2 HW for the specified sensing parameters. This value can be obtained
+* by using the Cy_CapSense_GetCIC2HwDivider function.
+*
+* \param cicRateSqr
+* The squared value of the filter decimation rate.
+*
+* \param rawDataIn
+* The input raw-data value.
+*
+* \param bitFormat
+* Determines the CIC2 filtering mode. 0-unsigned mode. 1-signed mode.
+*
+* \return
+* Final raw data, ready to be used by the sensor/widget processing routines.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_PreProcessCIC2Data(
+            uint32_t cic2SamplesNum,
+            uint32_t cic2HwDivider,
+            uint32_t cicRateSqr,
+            uint32_t bitFormat,
+            uint32_t rawDataIn)
+{
+    uint32_t tmpVal;
+
+    tmpVal = rawDataIn;
+    if(0u != bitFormat)
+    {
+        tmpVal = (tmpVal * cic2HwDivider) / cic2SamplesNum;
+        tmpVal += (cicRateSqr);
+    }
+    else
+    {
+        tmpVal = (tmpVal * cic2HwDivider) / cic2SamplesNum;
+    }
+
+    return (tmpVal);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetMaxRawCIC1
+****************************************************************************//**
+*
+* This internal function determines the MAX raw count value that can be obtained
+* from the fifth CapSense HW generation if the filter mode is set to CIC1.
+*
+* \param convsNumber
+* The number of conversions.
+*
+* \param subConvsNumber
+* The number of sub-conversions.
+*
+* \param snsClkDivider
+* The divider value for the sense clock.
+*
+* \param numEpiCycles
+* Number of ModClk cycles to be run during epilogue.
+*
+* \return
+* Theoretical MAX raw count.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetMaxRawCIC1(
+            uint32_t convsNumber,
+            uint32_t subConvsNumber,
+            uint32_t snsClkDivider,
+            uint32_t numEpiCycles)
+{
+    uint32_t maxRawTmp;
+
+    maxRawTmp = (numEpiCycles * convsNumber - 1u);
+    maxRawTmp += (subConvsNumber * convsNumber * snsClkDivider);
+    maxRawTmp = (maxRawTmp > MSC_STATUS1_RAW_COUNT_Msk) ?
+                 ((uint16_t)MSC_STATUS1_RAW_COUNT_Msk) : maxRawTmp;
+
+    return (maxRawTmp);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetMaxRawCIC2
+****************************************************************************//**
+*
+* This internal function determines the MAX raw count value that can be obtained
+* from the fifth CapSense HW generation if the filter mode is set to CIC2.
+*
+* \param convsNumber
+* The number of conversions.
+*
+* \param subConvsNumber
+* The number of sub-conversions.
+*
+* \param snsClkDivider
+* The divider value for the sense clock.
+*
+* \param cicRate
+* The filter decimation rate.
+*
+* \return
+* Theoretical MAX raw count.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetMaxRawCIC2(
+            uint32_t convsNumber,
+            uint32_t subConvsNumber,
+            uint32_t snsClkDivider,
+            uint32_t cicRate)
+{
+    uint32_t maxRawTmp;
+    uint32_t cic2SamplesNum;
+    uint32_t cic2HwDivider;
+
+    cic2SamplesNum = Cy_CapSense_GetCIC2SamplesNum(convsNumber,
+                                                   subConvsNumber,
+                                                   snsClkDivider,
+                                                   cicRate);
+    cic2HwDivider = Cy_CapSense_GetCIC2HwDivider(cic2SamplesNum);
+    maxRawTmp = (cicRate * cicRate * cic2SamplesNum) / cic2HwDivider;
+
+    maxRawTmp = (maxRawTmp > MSC_STATUS1_RAW_COUNT_Msk) ?
+                 ((uint16_t)MSC_STATUS1_RAW_COUNT_Msk) : maxRawTmp;
+
+    return (maxRawTmp);
+}
+
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_MSCV3 */
+
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */

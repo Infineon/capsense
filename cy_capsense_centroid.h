@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes for the centroid calculation
@@ -22,7 +22,7 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -91,7 +91,7 @@ void Cy_CapSense_ProcessPositionFilters(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_CENTROID_H */
 

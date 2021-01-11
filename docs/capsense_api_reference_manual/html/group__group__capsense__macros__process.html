@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Cypress CapSense Middleware Library 2.10: Processing Macros</title>
+<title>CapSense Middleware Library 3.0 (Alpha): Processing Macros</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,9 +28,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="cypress_logo.png"/></a></td>
+  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Cypress CapSense Middleware Library 2.10</div>
+   <div id="projectname">CapSense Middleware Library 3.0 (Alpha)</div>
   </td>
  </tr>
  </tbody>
@@ -118,6 +118,14 @@ Macros</h2></td></tr>
 <tr class="memitem:gaa84b286a4e106b5eeed0141339f7ab6b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__process.html#gaa84b286a4e106b5eeed0141339f7ab6b">CY_CAPSENSE_PROCESS_ALL</a></td></tr>
 <tr class="memdesc:gaa84b286a4e106b5eeed0141339f7ab6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definition that combines all possible processing tasks.  <a href="#gaa84b286a4e106b5eeed0141339f7ab6b">More...</a><br /></td></tr>
 <tr class="separator:gaa84b286a4e106b5eeed0141339f7ab6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6dfc332e06a74a6932bedaba71700071"><td class="memItemLeft" align="right" valign="top"><a id="ga6dfc332e06a74a6932bedaba71700071"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__process.html#ga6dfc332e06a74a6932bedaba71700071">CY_CAPSENSE_MPTX_MIN_ORDER</a>&#160;&#160;&#160;(4u)</td></tr>
+<tr class="memdesc:ga6dfc332e06a74a6932bedaba71700071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-phase TX min order. <br /></td></tr>
+<tr class="separator:ga6dfc332e06a74a6932bedaba71700071"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0ce8f40602fa2d1adac3e8aadda2afe0"><td class="memItemLeft" align="right" valign="top"><a id="ga0ce8f40602fa2d1adac3e8aadda2afe0"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__process.html#ga0ce8f40602fa2d1adac3e8aadda2afe0">CY_CAPSENSE_MPTX_MAX_ORDER</a>&#160;&#160;&#160;(32u)</td></tr>
+<tr class="memdesc:ga0ce8f40602fa2d1adac3e8aadda2afe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-phase TX max order. <br /></td></tr>
+<tr class="separator:ga0ce8f40602fa2d1adac3e8aadda2afe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="gaa84b286a4e106b5eeed0141339f7ab6b"></a>
@@ -131,7 +139,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(<a class="code" href="group__group__capsense__macros__process.html#gaa3b890d5a6646b1c990093614f904b7c">CY_CAPSENSE_PROCESS_FILTER</a> | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_BASELINE | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_DIFFCOUNTS | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_CALC_NOISE | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_THRESHOLDS | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_STATUS)</div><div class="ttc" id="group__group__capsense__macros__process_html_gaa3b890d5a6646b1c990093614f904b7c"><div class="ttname"><a href="group__group__capsense__macros__process.html#gaa3b890d5a6646b1c990093614f904b7c">CY_CAPSENSE_PROCESS_FILTER</a></div><div class="ttdeci">#define CY_CAPSENSE_PROCESS_FILTER</div><div class="ttdoc">Applies all enabled filters in the default order to the raw counts. </div><div class="ttdef"><b>Definition:</b> cy_capsense_common.h:340</div></div>
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code" href="group__group__capsense__macros__process.html#gaa3b890d5a6646b1c990093614f904b7c">CY_CAPSENSE_PROCESS_FILTER</a> | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_BASELINE | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_DIFFCOUNTS | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_CALC_NOISE | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_THRESHOLDS | \</div><div class="line">                                                         CY_CAPSENSE_PROCESS_STATUS)</div><div class="ttc" id="group__group__capsense__macros__process_html_gaa3b890d5a6646b1c990093614f904b7c"><div class="ttname"><a href="group__group__capsense__macros__process.html#gaa3b890d5a6646b1c990093614f904b7c">CY_CAPSENSE_PROCESS_FILTER</a></div><div class="ttdeci">#define CY_CAPSENSE_PROCESS_FILTER</div><div class="ttdoc">Applies all enabled filters in the default order to the raw counts. </div><div class="ttdef"><b>Definition:</b> cy_capsense_common.h:509</div></div>
 </div><!-- fragment -->
 <p>Definition that combines all possible processing tasks. </p>
 
@@ -143,7 +151,7 @@ Macros</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>Cypress CapSense Middleware Library 2.10</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CapSense Middleware Library 3.0 (Alpha)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

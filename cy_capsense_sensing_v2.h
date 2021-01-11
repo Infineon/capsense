@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy_capsense_sensing.h
-* \version 2.10
+* \file cy_capsense_sensing_v2.h
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes specific to the sensing module.
@@ -14,8 +14,8 @@
 *******************************************************************************/
 
 
-#if !defined(CY_CAPSENSE_SENSING_H)
-#define CY_CAPSENSE_SENSING_H
+#if !defined(CY_CAPSENSE_SENSING_V2_H)
+#define CY_CAPSENSE_SENSING_V2_H
 
 #include "cy_gpio.h"
 #include "cy_syslib.h"
@@ -38,11 +38,15 @@ extern "C" {
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_SetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_Scan(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SetupWidget(
+                uint32_t widgetId, 
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_IsBusy(const cy_stc_capsense_context_t * context);
-void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context_t * context);
+void Cy_CapSense_InterruptHandler(
+                const CSD_Type * base, 
+                cy_stc_capsense_context_t * context);
 
 /** \} */
 
@@ -50,18 +54,18 @@ void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_SetupWidgetExt(
+cy_capsense_status_t Cy_CapSense_SetupWidgetExt(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context);
-
-cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context);
-
-cy_status Cy_CapSense_SetPinState(
+cy_capsense_status_t Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateWidget(
+                uint32_t widgetId, 
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SetPinState(
                 uint32_t widgetId,
                 uint32_t sensorElement,
                 uint32_t state,
@@ -76,7 +80,7 @@ cy_status Cy_CapSense_SetPinState(
 
 void Cy_CapSense_SetBusyFlags(cy_stc_capsense_context_t * context);
 void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context);
 void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetIOsInDesiredState(
                 uint32_t desiredDriveMode,
@@ -88,8 +92,8 @@ void Cy_CapSense_SetSpecificIOsInDefaultState(const cy_stc_capsense_context_t * 
 
 cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(uint8_t mode, cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_SsAutoTuneWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_InitializeSourceSenseClk(const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_SsCalcLfsrSize(uint32_t clkDivider, uint32_t conversionsNum);
@@ -106,12 +110,15 @@ void Cy_CapSense_SsReadPinRegisters(GPIO_PRT_Type * base, uint32_t pinNum, uint3
 void Cy_CapSense_SetClkDivider(uint32_t dividerValue, const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_WatchdogCyclesNum(uint32_t desiredTimeUs, uint32_t cpuFreqMHz, uint32_t cyclesPerLoop);
 
-cy_status Cy_CapSense_CalibrateCheck(uint32_t widgetId, uint32_t target, uint32_t senseMethod,
-                                                                    const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateCheck(
+                uint32_t widgetId, 
+                uint32_t target, 
+                uint32_t senseMethod,
+                const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_GetVrefAutoMv(const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_GetVrefHighGain(uint32_t vrefDesiredMv, const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_GetVrefHighMv(uint32_t vrefGain, const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_WaitForSeqIdle(uint32_t watchdogCycleNum, const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_WaitEndOfScan(uint32_t watchdogCycleNum, const cy_stc_capsense_context_t * context);
 
@@ -617,9 +624,9 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
-#endif /* CY_CAPSENSE_SENSING_H */
+#endif /* CY_CAPSENSE_SENSING_V2_H */
 
 
 /* [] END OF FILE */

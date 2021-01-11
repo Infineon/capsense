@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the top-level declarations of the CapSense data
@@ -20,12 +20,16 @@
 
 #include "cy_syslib.h"
 #include "cy_device_headers.h"
-#include "cy_csd.h"
 #include "cy_capsense_lib.h"
 #include "cy_capsense_gesture_lib.h"
 #include "cy_capsense_common.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+    #include "cy_csd.h"
+#else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+    #include "cy_msc.h"
+#endif
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -167,6 +171,13 @@ typedef enum
 } cy_en_capsense_bist_status_t;
 
 
+/** Defines the raw count accumulation mode for MSC HW block */
+typedef enum
+{
+    CY_CAPSENSE_MSC_RAW_SATURATE_E         = 0x00u,             /**< In this scenario, RAW_COUNT is clamped at 0xFFFF and RESULT_FIFO_RD.OVERFLOW is set. */
+    CY_CAPSENSE_MSC_RAW_OVERFLOW_E         = 0x01u,             /**< In this scenario, RAW_COUNT rolls over and RESULT_FIFO_RD.OVERFLOW is set. This mode allows more sensitive tuning if measuring baseline capacitance */
+} cy_en_capsense_msc_raw_mode_t;
+
 /** \} */
 
 
@@ -178,6 +189,20 @@ typedef enum
 /** \addtogroup group_capsense_structures *//** \{ */
 /******************************************************************************/
 
+/** Unified return status of CapSense operation:
+ * * CY_CAPSENSE_STATUS_SUCCESS
+ * * CY_CAPSENSE_STATUS_BAD_PARAM
+ * * CY_CAPSENSE_STATUS_BAD_DATA
+ * * CY_CAPSENSE_STATUS_TIMEOUT
+ * * CY_CAPSENSE_STATUS_INVALID_STATE
+ * * CY_CAPSENSE_STATUS_BAD_CONFIG
+ * * CY_CAPSENSE_STATUS_CONFIG_OVERFLOW
+ * * CY_CAPSENSE_STATUS_HW_BUSY
+ * * CY_CAPSENSE_STATUS_UNKNOWN
+ */
+typedef uint32_t cy_capsense_status_t;
+
+
 /** Sensor context structure */
 typedef struct
 {
@@ -186,8 +211,13 @@ typedef struct
     uint16_t diff;                                              /**< Sensor difference count */
     uint8_t status;                                             /**< Sensor status */
     uint8_t negBslnRstCnt;                                      /**< Negative baseline reset counter */
-    uint8_t idacComp;                                           /**< Compensation IDAC of CSD or IDAC in CSX */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t idacComp;                                       /**< Compensation IDAC of CSD or IDAC in CSX */
+    #endif
     uint8_t bslnExt;                                            /**< Sensor baseline fractional */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint8_t cdacComp;                                       /**< Compensation CDAC */
+    #endif
 } cy_stc_capsense_sensor_context_t;
 
 /** CSX Touchpad touch tracking history */
@@ -208,7 +238,7 @@ typedef struct
 typedef struct
 {
     int32_t distanceMap[CY_CAPSENSE_CSX_TOUCHPAD_MAX_PEAKS * CY_CAPSENSE_CSX_TOUCHPAD_MAX_PEAKS];
-                                                               /**< Buffer for distance map data */
+                                                                /**< Buffer for distance map data */
     int32_t colMap[CY_CAPSENSE_CSX_TOUCHPAD_MAX_PEAKS];         /**< Buffer for column map data */
     int32_t rowMap[CY_CAPSENSE_CSX_TOUCHPAD_MAX_PEAKS];         /**< Buffer for row map data */
     int32_t minsMap[CY_CAPSENSE_CSX_TOUCHPAD_MAX_PEAKS];        /**< Buffer for minimums map data */
@@ -229,8 +259,10 @@ typedef struct
     uint16_t fingerCap;                                         /**< Widget finger capacitance parameter used for the CSD
                                                                    * widgets only when SmartSense is enabled */
     uint16_t sigPFC;                                            /**< The 75% of signal per user-defined finger capacitance */
-    uint16_t resolution;                                        /**< Provides scan resolution for the CSD Widgets.
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint16_t resolution;                                    /**< Provides scan resolution for the CSD Widgets.
                                                                    * Provides number of sub-conversions for the CSX Widgets */
+    #endif
     uint16_t maxRawCount;                                       /**< Calculated maximum raw count of widget */
     uint16_t fingerTh;                                          /**< Widget Finger Threshold */
     uint16_t proxTh;                                            /**< Widget Proximity Threshold */
@@ -261,25 +293,46 @@ typedef struct
                                                                    *   * 4 - SSC10 (CY_CAPSENSE_CLK_SOURCE_SSC10)
                                                                    *   * 5 - PRS8 (CY_CAPSENSE_CLK_SOURCE_PRS8)
                                                                    *   * 6 - PRS12 (CY_CAPSENSE_CLK_SOURCE_PRS12) */
-    uint8_t idacMod[CY_CAPSENSE_FREQ_CHANNELS_NUM];             /**< Sets the current of the modulation IDAC for the CSD widgets.
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t idacMod[CY_CAPSENSE_FREQ_CHANNELS_NUM];         /**< Sets the current of the modulation IDAC for the CSD widgets.
                                                                 * For the CSD Touchpad and Matrix Button widgets sets the current of the
                                                                 * modulation IDAC for the column sensors. Not used for the CSX widgets. */
-    uint8_t idacGainIndex;                                      /**< Index of IDAC gain in table \ref cy_stc_capsense_idac_gain_table_t */
-    uint8_t rowIdacMod[CY_CAPSENSE_FREQ_CHANNELS_NUM];          /**< Sets the current of the modulation IDAC for the row sensors
+        uint8_t idacGainIndex;                                  /**< Index of IDAC gain in table \ref cy_stc_capsense_idac_gain_table_t */
+        uint8_t rowIdacMod[CY_CAPSENSE_FREQ_CHANNELS_NUM];      /**< Sets the current of the modulation IDAC for the row sensors
                                                                 * for the CSD Touchpad and Matrix Button widgets. Not used for the CSX widgets. */
+    #endif
     uint8_t bslnCoeff;                                          /**< Baseline IIR filter coefficient. Lower value leads to higher filtering. */
     uint8_t status;                                             /**< Contains masks:
                                                                    * * bit[0] - Widget Active (CY_CAPSENSE_WD_ACTIVE_MASK)
                                                                    * * bit[1] - Widget Disabled (CY_CAPSENSE_WD_DISABLE_MASK)
                                                                    * * bit[2] - Widget Working (CY_CAPSENSE_WD_WORKING_MASK) */
     cy_stc_capsense_touch_t wdTouch;                            /**< Widget touch structure used for Matrix Buttons, Sliders, and Touchpads */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint16_t numSubConversions;                             /**< Number of sub-conversions in a scan */
+        uint8_t cdacRef[CY_CAPSENSE_FREQ_CHANNELS_NUM];         /**< Sets the capacitance of the reference CDAC */
+        uint8_t rowCdacRef[CY_CAPSENSE_FREQ_CHANNELS_NUM];      /**< Sets the capacitance of the reference CDAC for CSD
+                                                                   * Touchpad and CSD Matrix buttons widgets */
+        uint8_t cicRate;                                        /**< Sets decimation rate when CIC2 is enabled */
+        uint8_t cdacDitherEn;                                   /**< Enabled CDAC dithering */
+        uint8_t cdacDitherValue;                                /**< CDAC dither value in percentage */
+        uint8_t coarseInitBypassEn;                             /**< Skip Cmod coarse initialization sensors scan within widget */
+        uint16_t cdacCompDivider;                               /**< Number of time DAC switched in sense clock period */
+    #endif
+
 } cy_stc_capsense_widget_context_t;
 
-/** Pin configuration structure */
+/** Legacy mode pin configuration structure */
 typedef struct
 {
     GPIO_PRT_Type * pcPtr;                                      /**< Pointer to the base port register of the IO */
     uint8_t pinNumber;                                          /**< Position of the IO in the port */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint8_t padNumber;                                      /**< Control Mux pad number */
+        uint8_t chId;                                           /**< Channel Id the pin belongs to */
+    #endif
+
 } cy_stc_capsense_pin_config_t;
 
 /** Electrode objects configuration structure */
@@ -288,6 +341,9 @@ typedef struct
     const cy_stc_capsense_pin_config_t * ptrPin;                /**< Pointer to pin configuration structure */
     uint8_t type;                                               /**< Electrode type \ref cy_en_capsense_eltd_t */
     uint8_t numPins;                                            /**< Total number of pins in this sensor */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint8_t chId;                                           /**< Channel Id the electrode belongs to */
+    #endif
 } cy_stc_capsense_electrode_config_t;
 
 /** Configuration structure of advanced touchpad */
@@ -314,6 +370,17 @@ typedef struct
     uint8_t reserved1;                                          /**< Reserved field */
     uint8_t reserved2;                                          /**< Reserved field */
 } cy_stc_capsense_advanced_touchpad_config_t;
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+/** Multi-phase TX table for de-convolution structure */
+typedef struct
+{
+    uint32_t vector;                                            /**< TX vector / pattern */
+    int16_t deconvCoef[32u];                                    /**< De-convolution coefficients */
+} cy_stc_capsense_mptx_table_t;
+#endif
+
 
 /** Widget configuration structure */
 typedef struct
@@ -363,17 +430,63 @@ typedef struct
     uint32_t posFilterConfig;                                   /**< Position filters configuration */
     uint16_t rawFilterConfig;                                   /**< Raw count filters configuration */
 
-    uint8_t senseMethod;                                        /**< Specifies the widget sensing method */
+    uint8_t senseMethod;                                        /**< Specifies the widget sensing method:
+                                                                    * * 1 - CSD    (CY_CAPSENSE_CSD_SENSING_METHOD)
+                                                                    * * 2 - CSX_RM (CY_CAPSENSE_CSX_RM_SENSING_METHOD)
+                                                                    * * 3 - CSD_RM (CY_CAPSENSE_CSD_RM_SENSING_METHOD) */
     uint8_t wdType;                                             /**< Specifies the widget type */
+    uint8_t senseGroup;                                         /**< Specifies the widget group:
+                                                                   * * 1 - CSD (CY_CAPSENSE_CSD_GROUP)
+                                                                   * * 2 - CSX (CY_CAPSENSE_CSX_GROUP) */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        cy_stc_capsense_mptx_table_t * ptrMptxTable;            /**< Pointer to the multi-phase TX vector and de-convolution coefficients */
+        uint16_t firstSlotId;                                   /**< The slot ID in the widget to start scan from */
+        uint16_t numSlots;                                      /**< The number of slots in the widget */
+        uint8_t numChopCycles;                                  /**< Defines number of chopping cycles. One cycle means the feature is disabled */
+        uint8_t mptxOrder;                                      /**< Multi-phase TX order */
+    #endif
 
 } cy_stc_capsense_widget_config_t;
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 /** Declares the IDAC gain table */
 typedef struct
 {
     uint32_t gainReg;                                           /**< Register value of IDAC gain */
     uint32_t gainValue;                                         /**< Absolute gain value in pA */
 } cy_stc_capsense_idac_gain_table_t;
+#endif
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+/** Declares the scan order of widget and sensor */
+typedef struct
+{
+    uint16_t wdId;                                              /**< Specifies the widget ID for the current scan slot */
+    uint16_t snsId;                                             /**< Specifies the sensor ID for the current scan slot */
+} cy_stc_capsense_scan_slot_t;
+#endif
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+/** Declares MSC channel (HW block) configuration */
+typedef struct
+{
+    MSC_Type * ptrMscBase;                                  /**< Pointer to the MSC HW block register */
+    cy_stc_msc_context_t * ptrMscContext;                   /**< Pointer to the MSC driver context */
+
+    GPIO_PRT_Type * portCmod1;                              /**< The pointer to the Cmod1 pin base port register */
+    uint8_t pinCmod1;                                       /**< The Cmod1 pin position (bit number) in the port */
+
+    GPIO_PRT_Type * portCmod2;                              /**< The pointer to the Cmod2 pin base port register */
+    uint8_t pinCmod2;                                       /**< The Cmod2 pin position (bit number) in the port */
+
+    uint8_t dmaWrChIndex;                                   /**< Specifies the DMA Write channel index */
+    uint8_t dmaChainWrChIndex;                              /**< Specifies the DMA Chain Write channel index */
+    uint8_t dmaRdChIndex;                                   /**< Specifies the DMA Read channel index */
+    uint8_t dmaChainRdChIndex;                              /**< Specifies the DMA Chain Read channel index */
+} cy_stc_msc_channel_config_t;
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+
 
 /** Common configuration structure */
 typedef struct
@@ -396,84 +509,152 @@ typedef struct
     uint8_t periDividerType;                                    /**< Peripheral clock type (8- or 16-bit type) */
     uint8_t periDividerIndex;                                   /**< Peripheral divider index */
     uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of the CSD HW block after power up or System Deep Sleep. */
-
-    uint8_t ssIrefSource;                                       /**< Iref source */
-    uint8_t ssVrefSource;                                       /**< Vref source */
-
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t ssIrefSource;                                   /**< Iref source */
+        uint8_t ssVrefSource;                                   /**< Vref source */
+    #endif
     uint16_t proxTouchCoeff;                                    /**< Proximity touch coefficient in percentage used in SmartSense */
     uint8_t swSensorAutoResetEn;                                /**< Sensor auto reset enabled */
-
-    uint8_t portCmodPadNum;                                     /**< Number of port of dedicated Cmod pad */
-    uint8_t pinCmodPad;                                         /**< Position of the dedicated Cmod pad in the port */
-    uint8_t portCshPadNum;                                      /**< Number of port of dedicated Csh pad */
-    uint8_t pinCshPad;                                          /**< Position of the dedicated Csh pad in the port */
-    uint8_t portShieldPadNum;                                   /**< Number of port of dedicated Shield pad */
-    uint8_t pinShieldPad;                                       /**< Position of the dedicated Shield pad in the port */
-    uint8_t portVrefExtPadNum;                                  /**< Number of port of dedicated VrefExt pad */
-    uint8_t pinVrefExtPad;                                      /**< Position of the dedicated VrefExt pad in the port */
-    uint8_t portCmodNum;                                        /**< Number of port of Cmod pin */
-
-    cy_stc_capsense_idac_gain_table_t idacGainTable[CY_CAPSENSE_IDAC_GAIN_NUMBER];
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t portCmodPadNum;                                 /**< Number of port of dedicated Cmod pad */
+        uint8_t pinCmodPad;                                     /**< Position of the dedicated Cmod pad in the port */
+        uint8_t portCshPadNum;                                  /**< Number of port of dedicated Csh pad */
+        uint8_t pinCshPad;                                      /**< Position of the dedicated Csh pad in the port */
+        uint8_t portShieldPadNum;                               /**< Number of port of dedicated Shield pad */
+        uint8_t pinShieldPad;                                   /**< Position of the dedicated Shield pad in the port */
+        uint8_t portVrefExtPadNum;                              /**< Number of port of dedicated VrefExt pad */
+        uint8_t pinVrefExtPad;                                  /**< Position of the dedicated VrefExt pad in the port */
+        uint8_t portCmodNum;                                    /**< Number of port of Cmod pin */
+        cy_stc_capsense_idac_gain_table_t idacGainTable[CY_CAPSENSE_IDAC_GAIN_NUMBER];
                                                                 /**< Table with the supported IDAC gains and corresponding register values */
-
-    CSD_Type * ptrCsdBase;                                      /**< Pointer to the CSD HW block register */
-    cy_stc_csd_context_t * ptrCsdContext;                       /**< Pointer to the CSD driver context */
-    GPIO_PRT_Type * portCmod;                                   /**< Pointer to the base port register of the Cmod pin */
-    GPIO_PRT_Type * portCsh;                                    /**< Pointer to the base port register of the Csh pin */
-    GPIO_PRT_Type * portCintA;                                  /**< Pointer to the base port register of the CintA pin */
-    GPIO_PRT_Type * portCintB;                                  /**< Pointer to the base port register of the CintB pin */
-
-    uint8_t pinCmod;                                            /**< Position of the Cmod pin in the port */
-    uint8_t portCshNum;                                         /**< Number of port of Csh pin */
-    uint8_t pinCsh;                                             /**< Position of the Csh pin in the port */
-    uint8_t pinCintA;                                           /**< Position of the CintA pin in the port */
-    uint8_t pinCintB;                                           /**< Position of the CintB pin in the port */
-
-    uint8_t csdShieldEn;                                        /**< Shield enabled */
+        CSD_Type * ptrCsdBase;                                  /**< Pointer to the CSD HW block register */
+        cy_stc_csd_context_t * ptrCsdContext;                   /**< Pointer to the CSD driver context */
+        GPIO_PRT_Type * portCmod;                               /**< Pointer to the base port register of the Cmod pin */
+        GPIO_PRT_Type * portCsh;                                /**< Pointer to the base port register of the Csh pin */
+        GPIO_PRT_Type * portCintA;                              /**< Pointer to the base port register of the CintA pin */
+        GPIO_PRT_Type * portCintB;                              /**< Pointer to the base port register of the CintB pin */
+        uint8_t pinCmod;                                        /**< Position of the Cmod pin in the port */
+        uint8_t portCshNum;                                     /**< Number of port of Csh pin */
+        uint8_t pinCsh;                                         /**< Position of the Csh pin in the port */
+        uint8_t pinCintA;                                       /**< Position of the CintA pin in the port */
+        uint8_t pinCintB;                                       /**< Position of the CintB pin in the port */
+        uint8_t csdShieldEn;                                    /**< Shield enabled */
+    #endif
     uint8_t csdInactiveSnsConnection;                           /**< Inactive sensor connection state:
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_SHIELD
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
-    uint8_t csdShieldDelay;                                     /**< Shield signal delay */
-    uint16_t csdVref;                                           /**< Vref for CSD method */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdShieldDelay;                                 /**< Shield signal delay */
+        uint16_t csdVref;                                       /**< Vref for CSD method */
+    #endif
     uint16_t csdRConst;                                         /**< Sensor resistance in series used by SmartSense */
-    uint8_t csdCTankShieldEn;                                   /**< Csh enabled */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdCTankShieldEn;                               /**< Csh enabled */
+    #endif
     uint8_t csdShieldNumPin;                                    /**< Number of shield IOs */
-    uint8_t csdShieldSwRes;                                     /**< Shield switch resistance */
-    uint8_t csdInitSwRes;                                       /**< Switch resistance at coarse initialization */
-    uint8_t csdChargeTransfer;                                  /**< IDAC sensing configuration */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdShieldSwRes;                                 /**< Shield switch resistance */
+        uint8_t csdInitSwRes;                                   /**< Switch resistance at coarse initialization */
+        uint8_t csdChargeTransfer;                              /**< IDAC sensing configuration */
+    #endif
     uint8_t csdRawTarget;                                       /**< Raw count target in percentage for CSD calibration */
     uint8_t csdAutotuneEn;                                      /**< SmartSense enabled */
-    uint8_t csdIdacAutocalEn;                                   /**< CSD IDAC calibration enabled */
-    uint8_t csdIdacGainInitIndex;                               /**< IDAC gain index per \ref idacGainTable */
-    uint8_t csdIdacAutoGainEn;                                  /**< IDAC gain auto-calibration enabled */
-    uint8_t csdCalibrationError;                                /**< Acceptable calibration error */
-    uint8_t csdIdacMin;                                         /**< Min acceptable IDAC value in CSD calibration */
-    uint8_t csdIdacCompEn;                                      /**< Compensation IDAC enabled */
-    uint8_t csdFineInitTime;                                    /**< Number of dummy SnsClk periods at fine initialization */
-    uint8_t csdIdacRowColAlignEn;                               /**< Row-Column alignment enabled. It adjusts modulator IDAC for rows
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdIdacAutocalEn;                               /**< CSD IDAC calibration enabled */
+        uint8_t csdIdacGainInitIndex;                           /**< IDAC gain index per \ref idacGainTable */
+        uint8_t csdIdacAutoGainEn;                              /**< IDAC gain auto-calibration enabled */
+    #endif
+        uint8_t csdCalibrationError;                            /**< Acceptable calibration error */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdIdacMin;                                     /**< Min acceptable IDAC value in CSD calibration */
+        uint8_t csdIdacCompEn;                                  /**< Compensation IDAC enabled */
+        uint8_t csdFineInitTime;                                /**< Number of dummy SnsClk periods at fine initialization */
+        uint8_t csdIdacRowColAlignEn;                           /**< Row-Column alignment enabled. It adjusts modulator IDAC for rows
                                                                    * and for columns to achieve the similar sensitivity */
-    uint8_t  csdMfsDividerOffsetF1;                             /**< Frequency divider offset for channel 1. This value is added to
+    #endif
+    uint8_t csdMfsDividerOffsetF1;                              /**< Frequency divider offset for channel 1. This value is added to
                                                                    * base (channel 0) SnsClk divider to form channel 1 frequency */
-    uint8_t  csdMfsDividerOffsetF2;                             /**< Frequency divider offset for channel 2. This value is added to
+    uint8_t csdMfsDividerOffsetF2;                              /**< Frequency divider offset for channel 2. This value is added to
                                                                    * base (channel 0) SnsClk divider to form channel 2 frequency */
     uint8_t csxRawTarget;                                       /**< Raw count target in percentage for CSX calibration */
-    uint8_t csxIdacGainInitIndex;                               /**< IDAC gain for CSX method */
-    uint8_t csxRefGain;                                         /**< Refgen gain for CSX method */
-    uint8_t csxIdacAutocalEn;                                   /**< CSX IDAC calibration enabled */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csxIdacGainInitIndex;                           /**< IDAC gain for CSX method */
+        uint8_t csxRefGain;                                     /**< Refgen gain for CSX method */
+        uint8_t csxIdacAutocalEn;                               /**< CSX IDAC calibration enabled */
+    #endif
     uint8_t csxCalibrationError;                                /**< Acceptable calibration error */
-    uint8_t csxFineInitTime;                                    /**< Number of dummy TX periods at fine initialization */
-    uint8_t csxInitSwRes;                                       /**< Switch resistance at fine initialization */
-    uint8_t csxScanSwRes;                                       /**< Switch resistance at scanning */
-    uint8_t csxInitShieldSwRes;                                 /**< Switch resistance at fine initialization */
-    uint8_t csxScanShieldSwRes;                                 /**< Switch resistance at scanning */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csxFineInitTime;                                /**< Number of dummy TX periods at fine initialization */
+        uint8_t csxInitSwRes;                                   /**< Switch resistance at fine initialization */
+        uint8_t csxScanSwRes;                                   /**< Switch resistance at scanning */
+        uint8_t csxInitShieldSwRes;                             /**< Switch resistance at fine initialization */
+        uint8_t csxScanShieldSwRes;                             /**< Switch resistance at scanning */
+    #endif
     uint8_t csxMfsDividerOffsetF1;                              /**< Frequency divider offset for channel 1. This value is added to
                                                                    * base (channel 0) Tx divider to form channel 1 frequency */
     uint8_t csxMfsDividerOffsetF2;                              /**< Frequency divider offset for channel 2. This value is added to
                                                                    * base (channel 0) Tx divider to form channel 2 frequency */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        cy_stc_msc_channel_config_t * ptrMscChConfig;           /**< The pointer to the CapSense enabled MSC channel (HW block) configuration */
+
+        DMAC_Type * ptrDmacBase;                                /**< Pointer to the DMAC HW block base register */
+        const uint32_t ** ptrDmaWrChSnsCfgAddr;                 /**< Pointer to the array containing the addresses of sensor configurations
+                                                                   * used as a source for the DMA Chain Write channel */
+        const uint16_t ** ptrDmaRdChSnsCfgAddr;                 /**< Pointer to the array containing the addresses of sensor configurations
+                                                                   * used as a source for the DMA Chain Read channel */
+
+        uint16_t numEpiCycles;                                  /**< Number of clk_mod cycles to be run during EPILOGUE */
+        uint16_t numCoarseInitChargeCycles;                     /**< Configure duration of Cmod initialization, phase 1 */
+        uint16_t numCoarseInitSettleCycles;                     /**< Configure duration of Cmod initialization, phase 2 */
+        uint16_t numSlots;                                      /**< Total number of slots */
+
+        uint8_t csdShieldMode;                                  /**< Shield mode
+                                                                   * * CY_CAPSENSE_SHIELD_DISABLED
+                                                                   * * CY_CAPSENSE_SHIELD_ACTIVE
+                                                                   * * CY_CAPSENSE_SHIELD_PASSIVE */
+        uint8_t sensorConnection;                                  /**< Sensor Connection. In CS-DMA mode, sensor connection set to CTRLMUX.
+                                                                   * * 0 - CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD:
+                                                                   *       All AMUX capable GPIOs available as sensor.
+                                                                   * * 1 - CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD:
+                                                                   *       Only dedicated GPIO available as sensor.
+                                                                   */
+        uint8_t csdCdacAutocalEn;                               /**< CSD CDAC calibration enabled */
+        uint8_t csdCdacCompEn;                                  /**< CSD Compensation CDAC enabled */
+        uint8_t csxCdacAutocalEn;                               /**< CSX CDAC calibration enabled */
+        uint8_t csxCdacCompEn;                                  /**< CSX Compensation CDAC enabled */
+        uint8_t csxAutotuneEn;                                  /**< CSX SmartSense enabled */
+        uint8_t scanningMode;                                   /**< Scanning Mode:
+                                                                   * * 0 - CY_CAPSENSE_SCAN_MODE_INT_DRIVEN
+                                                                   * * 1 - CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN */
+        uint8_t mptxEn;                                         /**< Mupti-phase TX enabled */
+        uint8_t chopPolarity;                                   /**< Select polarity for system level chopping */
+        uint8_t cicFilterMode;                                  /**< CIC filter mode:
+                                                                   * * 0 - CY_CAPSENSE_CIC_FILTER
+                                                                   * * 1 - CY_CAPSENSE_CIC2_FILTER */
+        uint8_t numBadScans;                                    /**< 1 to 7, repeat scan upon "bad" scan. Disabled = 0. */
+        uint8_t counterMode;                                    /**< Select overflow or saturate mode for raw count:
+                                                                   * * 0 - CY_CAPSENSE_COUNTER_MODE_SATURATE
+                                                                   * * 1 - CY_CAPSENSE_COUNTER_MODE_OVERFLOW */
+        uint8_t syncFrameStartEn;                               /**< Enable external synchronization signals */
+        uint8_t syncClockEn;                                    /**< Enable external synchronization signals */
+        uint8_t syncMode;                                       /**< Synchronization mode:
+                                                                   * * 0 - CY_CAPSENSE_SYNC_MODE_OFF
+                                                                   * * 1 - CY_CAPSENSE_SYNC_EXTERNAL
+                                                                   * * 2 - CY_CAPSENSE_SYNC_INTERNAL */
+        uint8_t masterChannelId;                                /**< The ID of the Master channel MULTI-CHIP solution.
+                                                                   * This channel will generate msc_ext_frm_start_out
+                                                                   * and msc_ext_sync_clk_out signals */
+        uint8_t numChips;                                       /**< The chip number for MULTI-CHIP solution. For SINGLE-CHIP is equal to 1u */
+        uint8_t numChannels;                                    /**< The number of CapSense enabled MSCv3 blocks in the current chip */
+        uint8_t channelOffset;                                  /**< The ID of the first channel that belongs to the current chip */
+    #endif
+
 } cy_stc_capsense_common_config_t;
 
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 /** Declares BIST Context Data Structure */
 typedef struct
 {
@@ -578,13 +759,15 @@ typedef struct
     uint8_t idacGainIndex;                                      /**< Index of IDAC gain in table \ref cy_stc_capsense_idac_gain_table_t */
     uint8_t fineInitTime;                                       /**< Number of dummy SnsClk periods at fine initialization for a custom scan */
 }cy_stc_capsense_bist_custom_parameters_t;
+#endif
 
 
 /** Declares active sensor details */
 typedef struct
 {
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
     void (* ptrISRCallback)(void * context);                    /**< Pointer to the interrupt handler of the active sensor */
-
+#endif
     const cy_stc_capsense_widget_config_t * ptrWdConfig;        /**< Pointer to the widget configuration structure of the active sensor */
     cy_stc_capsense_widget_context_t * ptrWdContext;            /**< Pointer to the widget context structure of the active sensor */
 
@@ -594,83 +777,19 @@ typedef struct
 
     cy_stc_capsense_sensor_context_t * ptrSnsContext;           /**< Pointer to the sensor context structure */
 
-    volatile uint16_t sensorIndex;                              /**< Current sensor ID */
-    volatile uint8_t widgetIndex;                               /**< Current widget ID */
-    volatile uint8_t rxIndex;                                   /**< Current Rx ID */
-    volatile uint8_t txIndex;                                   /**< Current Tx ID */
-    volatile uint8_t connectedSnsState;                         /**< Shows if the current sensor is connected to analog bus */
-    volatile uint8_t scanScopeAll;                              /**< Request of scanning all widgets */
-    volatile uint8_t scanScopeSns;                              /**< Request of scanning a single sensor */
-    volatile uint8_t mfsChannelIndex;                           /**< MFS channel index */
-    volatile uint8_t currentSenseMethod;                        /**< Current sensing method */
+    uint16_t currentChannelSlotIndex;                           /**< Current slot Index for channel */
+    uint16_t sensorIndex;                                       /**< Current sensor ID */
+    uint8_t widgetIndex;                                        /**< Current widget ID */
+    uint8_t rxIndex;                                            /**< Current Rx ID */
+    uint8_t txIndex;                                            /**< Current Tx ID */
+    uint8_t connectedSnsState;                                  /**< Shows if the current sensor is connected to analog bus */
+    uint8_t scanScopeAll;                                       /**< Request of scanning all widgets */
+    uint8_t scanScopeSns;                                       /**< Request of scanning a single sensor */
+    uint8_t mfsChannelIndex;                                    /**< MFS channel index */
+    uint8_t currentSenseMethod;                                 /**< Current sensing method */
+    uint8_t currentSenseGroup;                                  /**< Current sensing group */
+    uint8_t currentHwMode;                                      /**< Current hw mode */
 } cy_stc_active_scan_sns_t;
-
-
-/** Declares internal Context Data Structure */
-typedef struct
-{
-    uint32_t csdInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegConfig;                                      /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwHsPSelScan;                                /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwHsPSelCmodInit;                            /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwHsPSelCtankInit;                           /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwBypSel;                                    /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwResScan;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwResInit;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwDsiSel;                                    /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegAmuxbufInit;                                 /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwAmuxbufSel;                                /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwShieldSelScan;                             /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegHscmpInit;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegHscmpScan;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdIdacAConfig;                                    /**< Internal pre-calculated data for faster operation */
-    uint32_t csdIdacBConfig;                                    /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwCmpPSel;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwCmpNSel;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegIoSel;                                       /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegRefgen;                                      /**< Internal pre-calculated data for faster operation */
-    uint32_t csdRegSwRefGenSel;                                 /**< Internal pre-calculated data for faster operation */
-
-    uint32_t csxRegConfigInit;                                  /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegConfigScan;                                  /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegSwResInit;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegSwResPrech;                                  /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegSwResScan;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegAMuxBuf;                                     /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegRefgen;                                      /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegRefgenSel;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegSwCmpNSel;                                   /**< Internal pre-calculated data for faster operation */
-    uint32_t csxRegSwRefGenSel;                                 /**< Internal pre-calculated data for faster operation */
-
-    uint8_t csdCmodConnection;                                  /**< Internal pre-calculated data for faster operation */
-    uint8_t csdCshConnection;                                   /**< Internal pre-calculated data for faster operation */
-    en_hsiom_sel_t csdInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
-    uint8_t csdVrefGain;                                        /**< Internal pre-calculated data for faster operation */
-    uint16_t csdVrefVoltageMv;                                  /**< Internal pre-calculated data for faster operation */
-}cy_stc_capsense_internal_context_t;
-
-
-/** Declares the structure that is intended to store the \ref cy_stc_capsense_widget_context_t
-    data structure fields, the CRC checking should be applied for.  */
-typedef struct
-{
-    uint16_t fingerThVal;                                   /**< The value of the .fingerTh field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t proxThVal;                                     /**< The value of the .proxTh field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t fingerCapVal;                                  /**< The value of the .fingerCap field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t sigPFCVal;                                     /**< The value of the .sigPFC field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t resolutionVal;                                 /**< The value of the .resolution field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t lowBslnRstVal;                                 /**< The value of the .lowBslnRst field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t snsClkVal;                                     /**< The value of the .snsClk field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint16_t rowSnsClkVal;                                  /**< The value of the .rowSnsClk field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  onDebounceVal;                                 /**< The value of the .onDebounce field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  snsClkSourceVal;                               /**< The value of the .snsClkSource  field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  idacModVal[CY_CAPSENSE_FREQ_CHANNELS_NUM];     /**< The value of the .idacMod field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  idacGainIndexVal;                              /**< The value of the .idacGainIndex field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  rowIdacModVal[CY_CAPSENSE_FREQ_CHANNELS_NUM];  /**< The value of the .rowIdacMod field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  noiseThVal;                                    /**< The value of the .noiseTh field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  nNoiseThVal;                                   /**< The value of the .nNoiseTh field of the \ref cy_stc_capsense_widget_context_t structure */
-    uint8_t  hysteresisVal;                                 /**< The value of the .hysteresis field of the \ref cy_stc_capsense_widget_context_t structure */
-}cy_stc_capsense_widget_crc_data_t;
 
 
 /**
@@ -678,6 +797,16 @@ typedef struct
 * the \ref cy_en_capsense_callback_event_t events occurs.
 */
 typedef void (*cy_capsense_callback_t)(cy_stc_active_scan_sns_t * ptrActiveScan);
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+    /**
+    * Provides the typedef for the callback function that is called by the
+    * Cy_CapSense_Enable() function to change the CapSense configuration from
+    * the default configuration to the user's specific use cases.
+    * Refer to \ref group_capsense_callbacks section.
+    */
+    typedef void (*cy_capsense_ds_init_callback_t)(void * context);
+#endif
 
 /**
 * Provides the typedef for the callback function that is called by the
@@ -695,8 +824,103 @@ typedef void (*cy_capsense_tuner_send_callback_t)(void * context);
 */
 typedef void (*cy_capsense_tuner_receive_callback_t)(uint8_t ** commandPacket, uint8_t ** tunerPacket, void * context);
 
-/** \} */
 
+/** Declares internal Context Data Structure */
+typedef struct
+{
+    uint32_t csdInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint32_t csdRegConfig;                                  /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwHsPSelScan;                            /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwHsPSelCmodInit;                        /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwHsPSelCtankInit;                       /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwBypSel;                                /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwResScan;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwResInit;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwDsiSel;                                /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegAmuxbufInit;                             /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwAmuxbufSel;                            /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwShieldSelScan;                         /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegHscmpInit;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegHscmpScan;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdIdacAConfig;                                /**< Internal pre-calculated data for faster operation */
+        uint32_t csdIdacBConfig;                                /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwCmpPSel;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwCmpNSel;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegIoSel;                                   /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegRefgen;                                  /**< Internal pre-calculated data for faster operation */
+        uint32_t csdRegSwRefGenSel;                             /**< Internal pre-calculated data for faster operation */
+
+        uint32_t csxRegConfigInit;                              /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegConfigScan;                              /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegSwResInit;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegSwResPrech;                              /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegSwResScan;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegAMuxBuf;                                 /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegRefgen;                                  /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegRefgenSel;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegSwCmpNSel;                               /**< Internal pre-calculated data for faster operation */
+        uint32_t csxRegSwRefGenSel;                             /**< Internal pre-calculated data for faster operation */
+
+        uint8_t csdCmodConnection;                              /**< Internal pre-calculated data for faster operation */
+        uint8_t csdCshConnection;                               /**< Internal pre-calculated data for faster operation */
+    #endif
+
+    en_hsiom_sel_t csdInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t csdVrefGain;                                    /**< Internal pre-calculated data for faster operation */
+        uint16_t csdVrefVoltageMv;                              /**< Internal pre-calculated data for faster operation */
+    #endif
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint8_t snsConfigSize;                                  /**< The size of sensor configuration structure */
+        uint8_t numSenseMethod;                                 /**< The number of sense methods, used in the project */
+        uint8_t numFunc;                                        /**< The number of CTRLMUX pin functions, used in the project */
+        uint8_t mapSenseMethod[CY_CAPSENSE_REG_MODE_NUMBER];    /**< The map array of sense methods, used in the project */
+        uint8_t mapPinState[CY_CAPSENSE_PIN_STATE_NUMBER];      /**< The map array of CTRLMUX pin functions, used in the project */
+
+        uint16_t slotIndex;                                     /**< Slot ID */
+        uint16_t currentSlotIndex;                              /**< Current slot ID */
+        uint16_t endSlotIndex;                                  /**< The last slot ID for the current frame */
+        void (* ptrISRCallback)(void * context);                /**< Pointer to the scan interrupt handler */
+
+        cy_capsense_callback_t ptrSSCallback;                       /**< Pointer to a user's Start Sample callback function. Refer to \ref group_capsense_callbacks section */
+        cy_capsense_callback_t ptrEOSCallback;                      /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
+
+        cy_capsense_tuner_send_callback_t ptrTunerSendCallback;     /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+        cy_capsense_tuner_receive_callback_t ptrTunerReceiveCallback;  /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+        cy_capsense_ds_init_callback_t ptrEODsInitCallback;     /**< Pointer to a user's End Of Data Structure Initialization callback function. Refer to \ref group_capsense_callbacks section */
+        uint8_t filterBitFormat;                                /**< Internal pre-calculated data for faster operation */
+    #endif
+
+}cy_stc_capsense_internal_context_t;
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+/** Declares the structure that is intended to store the \ref cy_stc_capsense_widget_context_t
+    data structure fields, the CRC checking should be applied for.  */
+typedef struct
+{
+    uint16_t fingerThVal;                                       /**< The value of the .fingerTh field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t proxThVal;                                         /**< The value of the .proxTh field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t fingerCapVal;                                      /**< The value of the .fingerCap field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t sigPFCVal;                                         /**< The value of the .sigPFC field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t resolutionVal;                                     /**< The value of the .resolution field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t lowBslnRstVal;                                     /**< The value of the .lowBslnRst field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t snsClkVal;                                         /**< The value of the .snsClk field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint16_t rowSnsClkVal;                                      /**< The value of the .rowSnsClk field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  onDebounceVal;                                     /**< The value of the .onDebounce field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  snsClkSourceVal;                                   /**< The value of the .snsClkSource  field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  idacModVal[CY_CAPSENSE_FREQ_CHANNELS_NUM];         /**< The value of the .idacMod field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  idacGainIndexVal;                                  /**< The value of the .idacGainIndex field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  rowIdacModVal[CY_CAPSENSE_FREQ_CHANNELS_NUM];      /**< The value of the .rowIdacMod field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  noiseThVal;                                        /**< The value of the .noiseTh field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  nNoiseThVal;                                       /**< The value of the .nNoiseTh field of the \ref cy_stc_capsense_widget_context_t structure */
+    uint8_t  hysteresisVal;                                     /**< The value of the .hysteresis field of the \ref cy_stc_capsense_widget_context_t structure */
+}cy_stc_capsense_widget_crc_data_t;
+#endif
+/** \} */
 
 
 /******************************************************************************/
@@ -713,19 +937,37 @@ typedef struct
     uint16_t scanCounter;                                       /**< This counter increments after each scan. */
     uint8_t tunerSt;                                            /**< State of CapSense middleware tuner module. \ref cy_en_capsense_tuner_state_t */
     uint8_t initDone;                                           /**< Keep information whether initialization was done or not */
-    cy_capsense_callback_t ptrSSCallback;                       /**< Pointer to a user's Start Sample callback function. Refer to \ref group_capsense_callbacks section */
-    cy_capsense_callback_t ptrEOSCallback;                      /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
 
-    cy_capsense_tuner_send_callback_t ptrTunerSendCallback;     /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
-    cy_capsense_tuner_receive_callback_t ptrTunerReceiveCallback;  /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        cy_capsense_callback_t ptrSSCallback;                       /**< Pointer to a user's Start Sample callback function. Refer to \ref group_capsense_callbacks section */
+        cy_capsense_callback_t ptrEOSCallback;                      /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
 
-    volatile uint32_t status;                                   /**< Middleware status information, scan in progress or not */
+        cy_capsense_tuner_send_callback_t ptrTunerSendCallback;     /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+        cy_capsense_tuner_receive_callback_t ptrTunerReceiveCallback;  /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+    #endif
+
+    volatile uint32_t status;                                   /**< Middleware status information, scan in progress (1) or not (0).
+                                                                   * For MSCv3 each bit shows the correspondent channel status */
     uint32_t timestampInterval;                                 /**< Timestamp interval used at increasing the timestamp by Cy_CapSense_IncrementGestureTimestamp() */
     uint32_t timestamp;                                         /**< Current timestamp should be kept updated and operational, which is vital for the
                                                                    * operation of Gesture and Ballistic multiplier features */
-    uint8_t modCsdClk;                                          /**< The modulator clock divider for the CSD widgets */
-    uint8_t modCsxClk;                                          /**< The modulator clock divider for the CSX widgets */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        uint8_t modCsdClk;                                      /**< The modulator clock divider for the CSD widgets */
+        uint8_t modCsxClk;                                      /**< The modulator clock divider for the CSX widgets */
+    #endif
+
     uint8_t tunerCnt;                                           /**< Command counter of CapSense middleware tuner module */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        uint8_t numFineInitCycles;                              /**< Number of ProDummy SubConversions */
+        uint16_t numFineInitWaitCycles;                         /**< Number of ProDummy Wait Cycles */
+        uint16_t lfsrPoly;                                      /**< LFSR Polynomial */
+        uint8_t lfsrScale;                                      /**< LFSR Scale value */
+        uint8_t cdacDitherSeed;                                 /**< Dither CDAC Seed */
+        uint8_t cdacDitherPoly;                                 /**< Dither CDAC Polynomial */
+        uint8_t modClk;                                         /**< The modulator clock divider */
+    #endif
+
 } cy_stc_capsense_common_context_t;
 
 
@@ -741,7 +983,14 @@ typedef struct
     const cy_stc_capsense_pin_config_t * ptrShieldPinConfig;    /**< Pointer to the shield pin configuration structure */
     cy_stc_active_scan_sns_t * ptrActiveScanSns;                /**< Pointer to the current active sensor structure */
     const void * ptrFptrConfig;                                 /**< Pointer to the function pointers structure */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
     cy_stc_capsense_bist_context_t * ptrBistContext;            /**< Pointer to the BIST context structure */
+    #endif
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+        cy_stc_msc_base_config_t * ptrBaseFrameContext;         /**< Pointer to the first member of the context structure of base configuration array */
+        uint32_t * ptrSensorFrameContext;                       /**< Pointer to the context structure of sensor configuration */
+        const cy_stc_capsense_scan_slot_t * ptrScanSlots;       /**< Pointer to the scan order slot structure */
+    #endif
 } cy_stc_capsense_context_t;
 
 /** The type of a pointer to the Cy_CapSense_CSDSetupWidget() function */
@@ -861,18 +1110,18 @@ typedef void (*cy_func_capsense_dp_process_csx_touchpad_ptr_t)
                         (const cy_stc_capsense_widget_config_t * ptrWdConfig,
                          const cy_stc_capsense_context_t * context);
 /** The type of a pointer to the Cy_CapSense_CalibrateAllCsdWidgets() function */
-typedef cy_status (*cy_func_capsense_calibrate_all_csd_widgets_ptr_t)
+typedef cy_capsense_status_t (*cy_func_capsense_calibrate_all_csd_widgets_ptr_t)
                         (cy_stc_capsense_context_t * context);
 /** The type of a pointer to the Cy_CapSense_CSDCalibrateWidget() function */
-typedef cy_status (*cy_func_capsense_csd_calibrate_widget_ptr_t)
+typedef cy_capsense_status_t (*cy_func_capsense_csd_calibrate_widget_ptr_t)
                         (uint32_t widgetId,
                          uint32_t target,
                          cy_stc_capsense_context_t * context);
 /** The type of a pointer to the Cy_CapSense_CalibrateAllCsxWidgets() function */
-typedef cy_status (*cy_func_capsense_calibrate_all_csx_widgets_ptr_t)
+typedef cy_capsense_status_t (*cy_func_capsense_calibrate_all_csx_widgets_ptr_t)
                         (cy_stc_capsense_context_t * context);
 /** The type of a pointer to the Cy_CapSense_SsAutoTune() function */
-typedef cy_status (*cy_func_capsense_ss_auto_tune_ptr_t)
+typedef cy_capsense_status_t (*cy_func_capsense_ss_auto_tune_ptr_t)
                         (cy_stc_capsense_context_t * context);
 /** The type of a pointer to the Cy_CapSense_RunNoiseEnvelope_Lib() function */
 typedef void (*cy_func_capsense_run_noise_envelope_lib_ptr_t)
@@ -1005,15 +1254,15 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_GetParam(
+cy_capsense_status_t Cy_CapSense_GetParam(
                 uint32_t paramId,
                 uint32_t * value,
-                const uint8_t * ptrTuner,
+                const void * ptrTuner,
                 const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_SetParam(
+cy_capsense_status_t Cy_CapSense_SetParam(
                 uint32_t paramId,
                 uint32_t value,
-                uint8_t * ptrTuner,
+                void * ptrTuner,
                 cy_stc_capsense_context_t * context);
 uint16_t Cy_CapSense_GetCRC(
                 const uint8_t *ptrData,
@@ -1027,11 +1276,12 @@ uint16_t Cy_CapSense_GetCRC(
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_CheckConfigIntegrity(
+cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(
                 const cy_stc_capsense_context_t * context);
 
 /**< Internal wrapper functions for the flash optimization definitions */
-cy_status Cy_CapSense_CSDCalibrateWidget_Call(
+
+cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget_Call(
                 uint32_t widgetId,
                 uint32_t target,
                 cy_stc_capsense_context_t * context);
@@ -1045,9 +1295,9 @@ void Cy_CapSense_CSXSetupWidget_Call(
                 cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXScan_Call(
                 cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsdWidgets_Call(
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets_Call(
                 cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsxWidgets_Call(
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets_Call(
                 cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDDisableMode_Call(
                 cy_stc_capsense_context_t * context);
@@ -1145,7 +1395,7 @@ void Cy_CapSense_RunNoiseEnvelope_Lib_Call(
                 uint16_t sigPFC,
                 cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
                 const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_SsAutoTune_Call(
+cy_capsense_status_t Cy_CapSense_SsAutoTune_Call(
                 cy_stc_capsense_context_t * context);
 void Cy_CapSense_BistInitialize_Call(
                 cy_stc_capsense_context_t * context);
@@ -1153,10 +1403,12 @@ void Cy_CapSense_BistDisableMode_Call(
                 cy_stc_capsense_context_t * context);
 void Cy_CapSense_BistDsInitialize_Call(
                 cy_stc_capsense_context_t * context);
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 uint16_t Cy_CapSense_GetCrcWidget(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
-
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2) */
 
 /** \} \endcond */
 
@@ -1165,7 +1417,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_STRUCTURE_H */
 

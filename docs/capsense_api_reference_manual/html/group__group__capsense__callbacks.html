@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Cypress CapSense Middleware Library 2.10: Callbacks</title>
+<title>CapSense Middleware Library 3.0 (Alpha): Callbacks</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,9 +28,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="cypress_logo.png"/></a></td>
+  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Cypress CapSense Middleware Library 2.10</div>
+   <div id="projectname">CapSense Middleware Library 3.0 (Alpha)</div>
   </td>
  </tr>
  </tbody>
@@ -85,7 +85,7 @@ $(document).ready(function(){initNavTree('group__group__capsense__callbacks.html
 </div><!--header-->
 <div class="contents">
 <p>Callbacks allow the user to execute Custom code called from the CapSense middleware when an event occurs. </p>
-<p>CapSense supports two callbacks.</p>
+<p>CapSense supports several callbacks.</p>
 <table class="doxtable">
 <tr>
 <th># </th><th>Callback Name </th><th>Associated Register </th><th>Callback Function Prototype </th><th>Description  </th></tr>
@@ -94,24 +94,25 @@ $(document).ready(function(){initNavTree('group__group__capsense__callbacks.html
 <tr>
 <td>2 </td><td>End Of Scan </td><td>ptrEOSCallback </td><td><a class="el" href="group__group__capsense__structures.html#ga908447ccc2720f31c861d9eb79ff75d2">cy_capsense_callback_t</a> </td><td>This is called after sensor scan completion and there is no other sensor in the queue to be scanned.  </td></tr>
 <tr>
-<td>3 </td><td>Tuner Send Callback </td><td>ptrTunerSendCallback </td><td><a class="el" href="group__group__capsense__structures.html#gabf58e6ce283cb73f9b8a398abf6bad17">cy_capsense_tuner_send_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
+<td>3 </td><td>Tuner Send Callback </td><td>ptrTunerSendCallback </td><td><a class="el" href="group__group__capsense__structures.html#gabf58e6ce283cb73f9b8a398abf6bad17">cy_capsense_tuner_send_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronous communication with the Tuner tool.  </td></tr>
 <tr>
-<td>4 </td><td>Tuner Receive Callback </td><td>ptrTunerReceiveCallback </td><td><a class="el" href="group__group__capsense__structures.html#gade1f00c852892b0fc498c9a3b9d28594">cy_capsense_tuner_receive_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronus communication with the Tuner tool.  </td></tr>
+<td>4 </td><td>Tuner Receive Callback </td><td>ptrTunerReceiveCallback </td><td><a class="el" href="group__group__capsense__structures.html#gade1f00c852892b0fc498c9a3b9d28594">cy_capsense_tuner_receive_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4" title="Establishes synchronized operation between the CapSense Middleware and the CapSense Tuner tool...">Cy_CapSense_RunTuner()</a> function to establish synchronous communication with the Tuner tool.  </td></tr>
+<tr>
+<td>5 </td><td>CapSense Data Structure Initialization Callback </td><td>ptrEODsInitCallback </td><td><a class="el" href="group__group__capsense__structures.html#gaeebeea548d4c2235b14aba63f1dd4bcf">cy_capsense_ds_init_callback_t</a> </td><td>This is called by the <a class="el" href="group__group__capsense__high__level.html#gade28f1f915ce6b97f13399074a819c0d" title="Initializes the CapSense firmware modules. ">Cy_CapSense_Enable()</a> function after CapSense Data Structure initialization complete and before launching the first initialization scan. Using this callback is not recommended. It is used only to implement only user's specific use cases (while changing the CapSense default configuration). The callback is available for Fifth Generation CapSense devices.  </td></tr>
 </table>
-<dl class="section note"><dt>Note</dt><dd><ol type="1">
-<li>Callbacks 1 and 2 are called by the <a class="el" href="group__group__capsense__high__level.html#ga484f29b24760bd087f19ea598de15078" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> function and lengthen this function execution. Usually, <a class="el" href="group__group__capsense__high__level.html#ga484f29b24760bd087f19ea598de15078" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> is called inside the CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.</li>
-<li>Callbacks 2 and 3 can only be registered by direct CapSense Data Structure assignment.</li>
-</ol>
-</dd></dl>
-<p>All callbacks can be registered by direct assignment of the function pointers to the corresponding CapSense Data Structure field as follows: <code>context-&gt;ptrCommonContext-&gt;&lt;Associated Register&gt; = &amp;CallbackFunction;</code></p>
-<p>Callbacks 2 and 3 can be registered / unregistered using the <a class="el" href="group__group__capsense__high__level.html#ga7ecd65a327f14eeaae772d87435efbe7" title="Registers a callback function. ">Cy_CapSense_RegisterCallback()</a> and <a class="el" href="group__group__capsense__high__level.html#ga477f23d639a578224fce823f146b1f38" title="This function unregisters a previously registered callback function in the CapSense middleware...">Cy_CapSense_UnRegisterCallback()</a> function. </p>
+<dl class="section note"><dt>Note</dt><dd>Callbacks 1 and 2 are called by the <a class="el" href="group__group__capsense__high__level.html#ga694cd350c85fcdc9dd1bc984a91d2c38" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> function and lengthen this function execution. Usually, <a class="el" href="group__group__capsense__high__level.html#ga694cd350c85fcdc9dd1bc984a91d2c38" title="Implements interrupt service routine for CapSense Middleware. ">Cy_CapSense_InterruptHandler()</a> is called inside the ISR. Then these callbacks also lengthen the ISR execution.</dd></dl>
+<p>All callbacks can be registered by direct assignment of the function pointers to the corresponding CapSense Data Structure field after call of the <a class="el" href="group__group__capsense__high__level.html#ga19b3aa9e14a04b76188f917c0dc004f5" title="Captures HW blocks (one or more) for CapSense operations and configures them to the default state...">Cy_CapSense_Init()</a> function as follows:</p><ul>
+<li>Fifth Generation CapSense devices: <code>context-&gt;ptrInternalContext-&gt;&lt;Associated Register&gt; = &amp;CallbackFunction;</code></li>
+<li>Fourth Generation CapSense devices: <code>context-&gt;ptrCommonContext-&gt;&lt;Associated Register&gt; = &amp;CallbackFunction;</code></li>
+</ul>
+<p>Callbacks 1 and 2 can be registered / unregistered using the <a class="el" href="group__group__capsense__high__level.html#ga289c4fd495135399a9ad9897920836a7" title="Registers a ures&#39;s callback function. ">Cy_CapSense_RegisterCallback()</a> and <a class="el" href="group__group__capsense__high__level.html#gaf43b3cdfce7a3e8c0e5622f42e0a6319" title="This function unregisters a previously registered user&#39;s callback function in the CapSense middleware...">Cy_CapSense_UnRegisterCallback()</a> functions. </p>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>Cypress CapSense Middleware Library 2.10</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CapSense Middleware Library 3.0 (Alpha)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

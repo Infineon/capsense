@@ -2,6 +2,8 @@ var searchData=
 [
   ['cy_5fcapsense_5fcallback_5ft',['cy_capsense_callback_t',['../group__group__capsense__structures.html#ga908447ccc2720f31c861d9eb79ff75d2',1,'cy_capsense_structure.h']]],
   ['cy_5fcapsense_5fdp_5fprocess_5fcsx_5fwidget_5fraw_5fcounts_5fptr_5ft',['cy_capsense_dp_process_csx_widget_raw_counts_ptr_t',['../group__group__capsense__structures.html#ga641cf5855af13800c3213a3af5f74dbe',1,'cy_capsense_structure.h']]],
+  ['cy_5fcapsense_5fds_5finit_5fcallback_5ft',['cy_capsense_ds_init_callback_t',['../group__group__capsense__structures.html#gaeebeea548d4c2235b14aba63f1dd4bcf',1,'cy_capsense_structure.h']]],
+  ['cy_5fcapsense_5fstatus_5ft',['cy_capsense_status_t',['../group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7',1,'cy_capsense_structure.h']]],
   ['cy_5fcapsense_5ftuner_5freceive_5fcallback_5ft',['cy_capsense_tuner_receive_callback_t',['../group__group__capsense__structures.html#gade1f00c852892b0fc498c9a3b9d28594',1,'cy_capsense_structure.h']]],
   ['cy_5fcapsense_5ftuner_5fsend_5fcallback_5ft',['cy_capsense_tuner_send_callback_t',['../group__group__capsense__structures.html#gabf58e6ce283cb73f9b8a398abf6bad17',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fadaptive_5ffilter_5finitialize_5flib_5fptr_5ft',['cy_func_capsense_adaptive_filter_initialize_lib_ptr_t',['../group__group__capsense__structures.html#ga42f17205210e0402c0eac7cf9a2f3d05',1,'cy_capsense_structure.h']]],
@@ -10,9 +12,9 @@ var searchData=
   ['cy_5ffunc_5fcapsense_5fbist_5fdisable_5fmode_5fptr_5ft',['cy_func_capsense_bist_disable_mode_ptr_t',['../group__group__capsense__structures.html#ga3c36c89033827129e099f8de4a248615',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fbist_5fds_5finitialize_5fptr_5ft',['cy_func_capsense_bist_ds_initialize_ptr_t',['../group__group__capsense__structures.html#gadf5e95ff3a7b27b3e632eaeda5b23a93',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fbist_5finitialize_5fptr_5ft',['cy_func_capsense_bist_initialize_ptr_t',['../group__group__capsense__structures.html#ga2b1c51db9f5e2ae34f13a9d7be2fa90c',1,'cy_capsense_structure.h']]],
-  ['cy_5ffunc_5fcapsense_5fcalibrate_5fall_5fcsd_5fwidgets_5fptr_5ft',['cy_func_capsense_calibrate_all_csd_widgets_ptr_t',['../group__group__capsense__structures.html#gabfc57fe60da3198143ad631ac928678f',1,'cy_capsense_structure.h']]],
-  ['cy_5ffunc_5fcapsense_5fcalibrate_5fall_5fcsx_5fwidgets_5fptr_5ft',['cy_func_capsense_calibrate_all_csx_widgets_ptr_t',['../group__group__capsense__structures.html#ga74c5279fde94519d94bc5acb30cf3f25',1,'cy_capsense_structure.h']]],
-  ['cy_5ffunc_5fcapsense_5fcsd_5fcalibrate_5fwidget_5fptr_5ft',['cy_func_capsense_csd_calibrate_widget_ptr_t',['../group__group__capsense__structures.html#ga1da7eba114e21cc7be97a0e1703b741e',1,'cy_capsense_structure.h']]],
+  ['cy_5ffunc_5fcapsense_5fcalibrate_5fall_5fcsd_5fwidgets_5fptr_5ft',['cy_func_capsense_calibrate_all_csd_widgets_ptr_t',['../group__group__capsense__structures.html#ga447be9213b46eca2c929fcc6910f51e7',1,'cy_capsense_structure.h']]],
+  ['cy_5ffunc_5fcapsense_5fcalibrate_5fall_5fcsx_5fwidgets_5fptr_5ft',['cy_func_capsense_calibrate_all_csx_widgets_ptr_t',['../group__group__capsense__structures.html#gae5add9afd30518c4418dce764259619d',1,'cy_capsense_structure.h']]],
+  ['cy_5ffunc_5fcapsense_5fcsd_5fcalibrate_5fwidget_5fptr_5ft',['cy_func_capsense_csd_calibrate_widget_ptr_t',['../group__group__capsense__structures.html#ga4d88dd185b9b8daa94901aac54ca490a',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fcsd_5fdisable_5fmode_5fptr_5ft',['cy_func_capsense_csd_disable_mode_ptr_t',['../group__group__capsense__structures.html#gad6c5af43b24207594de60f2cdc92d465',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fcsd_5finitialize_5fptr_5ft',['cy_func_capsense_csd_initialize_ptr_t',['../group__group__capsense__structures.html#ga8f05dac4d107c9a521408ad2ae815261',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5fcsd_5fscan_5fisr_5fptr_5ft',['cy_func_capsense_csd_scan_isr_ptr_t',['../group__group__capsense__structures.html#ga7b78283a72feffcf94948e7a26b20b0f',1,'cy_capsense_structure.h']]],
@@ -41,5 +43,5 @@ var searchData=
   ['cy_5ffunc_5fcapsense_5fprocess_5fposition_5ffilters_5fptr_5ft',['cy_func_capsense_process_position_filters_ptr_t',['../group__group__capsense__structures.html#ga6324a408708a58794f1a94bceb8d15f2',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5frun_5fnoise_5fenvelope_5flib_5fptr_5ft',['cy_func_capsense_run_noise_envelope_lib_ptr_t',['../group__group__capsense__structures.html#gae938941d618b2e112b0070dba1cc502b',1,'cy_capsense_structure.h']]],
   ['cy_5ffunc_5fcapsense_5frun_5fposition_5ffilters_5fptr_5ft',['cy_func_capsense_run_position_filters_ptr_t',['../group__group__capsense__structures.html#ga659199bc1e80b1ac967718564ad92f8d',1,'cy_capsense_structure.h']]],
-  ['cy_5ffunc_5fcapsense_5fss_5fauto_5ftune_5fptr_5ft',['cy_func_capsense_ss_auto_tune_ptr_t',['../group__group__capsense__structures.html#gaf66c75b4d79fb156c2cd9b34f0c577f7',1,'cy_capsense_structure.h']]]
+  ['cy_5ffunc_5fcapsense_5fss_5fauto_5ftune_5fptr_5ft',['cy_func_capsense_ss_auto_tune_ptr_t',['../group__group__capsense__structures.html#ga3e4a31e900e0528e9690e72557ed51a4',1,'cy_capsense_structure.h']]]
 ];

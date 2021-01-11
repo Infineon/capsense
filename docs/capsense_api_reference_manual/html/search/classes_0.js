@@ -10,8 +10,6 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fballistic_5fconfig_5ft',['cy_stc_capsense_ballistic_config_t',['../structcy__stc__capsense__ballistic__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fballistic_5fcontext_5ft',['cy_stc_capsense_ballistic_context_t',['../structcy__stc__capsense__ballistic__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fballistic_5fdelta_5ft',['cy_stc_capsense_ballistic_delta_t',['../structcy__stc__capsense__ballistic__delta__t.html',1,'']]],
-  ['cy_5fstc_5fcapsense_5fbist_5fcontext_5ft',['cy_stc_capsense_bist_context_t',['../structcy__stc__capsense__bist__context__t.html',1,'']]],
-  ['cy_5fstc_5fcapsense_5fbist_5fcustom_5fparameters_5ft',['cy_stc_capsense_bist_custom_parameters_t',['../structcy__stc__capsense__bist__custom__parameters__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcommon_5fconfig_5ft',['cy_stc_capsense_common_config_t',['../structcy__stc__capsense__common__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcommon_5fcontext_5ft',['cy_stc_capsense_common_context_t',['../structcy__stc__capsense__common__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fcontext_5ft',['cy_stc_capsense_context_t',['../structcy__stc__capsense__context__t.html',1,'']]],
@@ -22,8 +20,8 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fgesture_5fconfig_5ft',['cy_stc_capsense_gesture_config_t',['../structcy__stc__capsense__gesture__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fgesture_5fcontext_5ft',['cy_stc_capsense_gesture_context_t',['../structcy__stc__capsense__gesture__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fgesture_5fposition_5ft',['cy_stc_capsense_gesture_position_t',['../structcy__stc__capsense__gesture__position__t.html',1,'']]],
-  ['cy_5fstc_5fcapsense_5fidac_5fgain_5ftable_5ft',['cy_stc_capsense_idac_gain_table_t',['../structcy__stc__capsense__idac__gain__table__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5finternal_5fcontext_5ft',['cy_stc_capsense_internal_context_t',['../structcy__stc__capsense__internal__context__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fmptx_5ftable_5ft',['cy_stc_capsense_mptx_table_t',['../structcy__stc__capsense__mptx__table__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fofcd_5fcontext_5ft',['cy_stc_capsense_ofcd_context_t',['../structcy__stc__capsense__ofcd__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fofdc_5fcontext_5ft',['cy_stc_capsense_ofdc_context_t',['../structcy__stc__capsense__ofdc__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fofes_5fcontext_5ft',['cy_stc_capsense_ofes_context_t',['../structcy__stc__capsense__ofes__context__t.html',1,'']]],
@@ -33,6 +31,7 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fofsl_5fcontext_5ft',['cy_stc_capsense_ofsl_context_t',['../structcy__stc__capsense__ofsl__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fpin_5fconfig_5ft',['cy_stc_capsense_pin_config_t',['../structcy__stc__capsense__pin__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fposition_5ft',['cy_stc_capsense_position_t',['../structcy__stc__capsense__position__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fscan_5fslot_5ft',['cy_stc_capsense_scan_slot_t',['../structcy__stc__capsense__scan__slot__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fsensor_5fcontext_5ft',['cy_stc_capsense_sensor_context_t',['../structcy__stc__capsense__sensor__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fsmartsense_5fcsd_5fnoise_5fenvelope_5ft',['cy_stc_capsense_smartsense_csd_noise_envelope_t',['../structcy__stc__capsense__smartsense__csd__noise__envelope__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fsmartsense_5fupdate_5fthresholds_5ft',['cy_stc_capsense_smartsense_update_thresholds_t',['../structcy__stc__capsense__smartsense__update__thresholds__t.html',1,'']]],
@@ -42,5 +41,5 @@ var searchData=
   ['cy_5fstc_5fcapsense_5ftouch_5ft',['cy_stc_capsense_touch_t',['../structcy__stc__capsense__touch__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fconfig_5ft',['cy_stc_capsense_widget_config_t',['../structcy__stc__capsense__widget__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fcontext_5ft',['cy_stc_capsense_widget_context_t',['../structcy__stc__capsense__widget__context__t.html',1,'']]],
-  ['cy_5fstc_5fcapsense_5fwidget_5fcrc_5fdata_5ft',['cy_stc_capsense_widget_crc_data_t',['../structcy__stc__capsense__widget__crc__data__t.html',1,'']]]
+  ['cy_5fstc_5fmsc_5fchannel_5fconfig_5ft',['cy_stc_msc_channel_config_t',['../structcy__stc__msc__channel__config__t.html',1,'']]]
 ];

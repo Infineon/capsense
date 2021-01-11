@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy_capsense_csx.h
-* \version 2.10
+* \file cy_capsense_csx_v2.h
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes specific to the CSX sensing
@@ -15,8 +15,8 @@
 *******************************************************************************/
 
 
-#if !defined(CY_CAPSENSE_CSX_H)
-#define CY_CAPSENSE_CSX_H
+#if !defined(CY_CAPSENSE_CSX_V2_H)
+#define CY_CAPSENSE_CSX_V2_H
 
 #include "cy_syslib.h"
 #include "cy_capsense_structure.h"
@@ -37,7 +37,7 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_CSXCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CSXCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context);
@@ -200,9 +200,9 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext);
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
-#endif  /* End of CY_CAPSENSE_CSX_H */
+#endif  /* CY_CAPSENSE_CSX_V2_H */
 
 
 /* [] END OF FILE */

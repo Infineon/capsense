@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -20,7 +20,7 @@
 #include "cy_syslib.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
-#include "cy_capsense_sensing.h"
+#include "cy_capsense_sensing_v2.h"
 #include "cy_capsense_lib.h"
 #include "cy_capsense_selftest.h"
 #include "cy_gpio.h"
@@ -634,7 +634,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_CheckAllWidgetCRC(
 *
 *******************************************************************************/
 void Cy_CapSense_UpdateCrcWidget(
-                uint32 widgetId,
+                uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
     uint16_t crcValue;
@@ -666,7 +666,7 @@ void Cy_CapSense_UpdateCrcWidget(
 * processing functions like Cy_CapSense_ProcessAllWidgets()
 * or Cy_CapSense_UpdateSensorBaseline() automatically verify the baseline
 * value before using it and update its inverse copy after processing.
-* If a baseline update fails, a CY_RET_BAD_DATA result
+* If a baseline update fails, a CY_CAPSENSE_STATUS_BAD_DATA result
 * is returned. The baseline initialization functions do not verify the
 * baseline and update the baseline inverse copy.
 *
@@ -4424,7 +4424,7 @@ static uint32_t Cy_CapSense_BistWaitEndOfScan(
 }
 
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
 
 /* [] END OF FILE */

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -25,7 +25,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_filter.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 
 /*******************************************************************************
@@ -2194,7 +2194,7 @@ void Cy_CapSense_ProcessPositionFilters(
     ptrWdConfig->ptrPosFilterHistory->numPosition = (uint8_t)numPos;
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */

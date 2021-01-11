@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file contains the source code of all filters implementation.
@@ -19,7 +19,7 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_lib.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 
 /*******************************************************************************
@@ -62,14 +62,15 @@
 *
 * \return
 * Returns the status of the update baseline operation of all the widgets:
-* - CY_RET_SUCCESS  - The operation is successfully completed.
-* - CY_RET_BAD_DATA - The baseline processing failed.
+* - CY_CAPSENSE_STATUS_SUCCESS  - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_DATA - The baseline processing failed.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_UpdateAllBaselines(
+                const cy_stc_capsense_context_t * context)
 {
     uint32_t wdIndex;
-    cy_status bslnStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t bslnStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     for(wdIndex = context->ptrCommonConfig->numWd; wdIndex-- > 0u;)
     {
@@ -105,16 +106,16 @@ cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * conte
 *
 * \return
 * Returns the status of the specified widget update baseline operation:
-* - CY_RET_SUCCESS - The operation is successfully completed.
-* - CY_RET_BAD_DATA - The baseline processing failed.
+* - CY_CAPSENSE_STATUS_SUCCESS - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_DATA - The baseline processing failed.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_UpdateWidgetBaseline(
+cy_capsense_status_t Cy_CapSense_UpdateWidgetBaseline(
                 uint32_t widgetId, 
                 const cy_stc_capsense_context_t * context)
 {
     uint32_t snsIndex;
-    cy_status bslnStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t bslnStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     for(snsIndex = context->ptrWdConfig[widgetId].numSns; snsIndex-- > 0u;)
     {
@@ -156,11 +157,11 @@ cy_status Cy_CapSense_UpdateWidgetBaseline(
 *
 * \return
 * Returns the status of the specified sensor update baseline operation:
-* - CY_RET_SUCCESS - The operation is successfully completed.
-* - CY_RET_BAD_DATA - The baseline processing failed.
+* - CY_CAPSENSE_STATUS_SUCCESS - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_DATA - The baseline processing failed.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_UpdateSensorBaseline(
+cy_capsense_status_t Cy_CapSense_UpdateSensorBaseline(
                 uint32_t widgetId, 
                 uint32_t sensorId, 
                 const cy_stc_capsense_context_t * context)
@@ -201,26 +202,26 @@ cy_status Cy_CapSense_UpdateSensorBaseline(
 *
 * \return
 * Returns a status indicating whether the baseline has been updated:
-* - CY_RET_SUCCESS - if baseline updating was successful.
-* - CY_RET_BAD_DATA - if present sensor's any channel baseline and its inversion
+* - CY_CAPSENSE_STATUS_SUCCESS - if baseline updating was successful.
+* - CY_CAPSENSE_STATUS_BAD_DATA - if present sensor's any channel baseline and its inversion
 * doesn't match.
 *
 *******************************************************************************/
-uint32_t Cy_CapSense_FtUpdateBaseline(
+cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
                 uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context)
 {
-    uint32_t result = CY_RET_SUCCESS;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t bslnHistory;
     uint16_t bslnInv = (uint16_t)(~ptrSnsContext->bsln);
 
     if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn) && (*ptrSnsBslnInv != bslnInv))
     {
-        result = CY_RET_BAD_DATA;
+        result = CY_CAPSENSE_STATUS_BAD_DATA;
     }
-    if (CY_RET_SUCCESS == result)
+    if (CY_CAPSENSE_STATUS_SUCCESS == result)
     {
         /* Reset negative baseline counter */
         if(ptrSnsContext->raw >= ptrSnsContext->bsln)
@@ -471,7 +472,9 @@ void Cy_CapSense_InitializeWidgetFilter(
     uint8_t * ptrHistoryLow = NULL;
     uint16_t * ptrHistory;
     cy_stc_capsense_sensor_context_t * ptrSnsCtx ;
-    cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory;
+    #endif
 
     freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
     snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
@@ -508,24 +511,26 @@ void Cy_CapSense_InitializeWidgetFilter(
         }
     }
     
-    if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
-    {
-        /* Noise envelope is available for CSD widgets only */
-        if ((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E == ptrWdCfg->senseMethod)
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+        if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
         {
-            ptrSnsCtx = ptrWdCfg->ptrSnsContext;
-            ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
-            for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+            /* Noise envelope is available for CSD widgets only */
+            if ((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E == ptrWdCfg->senseMethod)
             {
-                Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(ptrSnsCtx->raw,
-                                                             ptrWdCfg->ptrWdContext->sigPFC,
-                                                             ptrNEHistory,
-                                                             context);
-                ptrSnsCtx++;
-                ptrNEHistory++;
+                ptrSnsCtx = ptrWdCfg->ptrSnsContext;
+                ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
+                for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+                {
+                    Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(ptrSnsCtx->raw,
+                                                                 ptrWdCfg->ptrWdContext->sigPFC,
+                                                                 ptrNEHistory,
+                                                                 context);
+                    ptrSnsCtx++;
+                    ptrNEHistory++;
+                }
             }
         }
-    }
+    #endif
 }
 
 
@@ -1123,7 +1128,7 @@ uint32_t Cy_CapSense_FtJitter(uint32_t input, uint32_t prevOutput)
     return input;
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */

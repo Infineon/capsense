@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy_capsense_csd.h
-* \version 2.10
+* \file cy_capsense_csd_v2.h
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes specific to the CSD sensing
@@ -15,8 +15,8 @@
 *******************************************************************************/
 
 
-#if !defined(CY_CAPSENSE_CSD_H)
-#define CY_CAPSENSE_CSD_H
+#if !defined(CY_CAPSENSE_CSD_V2_H)
+#define CY_CAPSENSE_CSD_V2_H
 
 #include "cy_syslib.h"
 #include "cy_capsense_common.h"
@@ -47,7 +47,7 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_CSDCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context);
@@ -87,9 +87,9 @@ void Cy_CapSense_CSDDischargeCmod(cy_stc_capsense_context_t * context);
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
-#endif /* CY_CAPSENSE_CSD_H */
+#endif /* CY_CAPSENSE_CSD_V2_H */
 
 
 /* [] END OF FILE */

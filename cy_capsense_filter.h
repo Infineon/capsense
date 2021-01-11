@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file contains the definitions for all the filters implementation.
@@ -23,7 +23,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -49,9 +49,9 @@ void Cy_CapSense_InitializeSensorBaseline(uint32_t widgetId, uint32_t sensorId, 
 void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeWidgetFilter(uint32_t widgetId, const cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_UpdateWidgetBaseline(uint32_t widgetId, const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_UpdateSensorBaseline(uint32_t widgetId, uint32_t sensorId, const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_UpdateWidgetBaseline(uint32_t widgetId, const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_UpdateSensorBaseline(uint32_t widgetId, uint32_t sensorId, const cy_stc_capsense_context_t * context);
 
 /** \} */
 
@@ -94,7 +94,7 @@ void Cy_CapSense_RunAverage(
 
 void Cy_CapSense_FtInitializeBaseline(
                 cy_stc_capsense_sensor_context_t * ptrSnsContext);
-uint32_t Cy_CapSense_FtUpdateBaseline(
+cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
                 uint16_t * ptrSnsBslnInv,
@@ -142,7 +142,7 @@ void Cy_CapSense_RunAverageInternal(
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_FILTER_H */
 

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -25,7 +25,7 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_lib.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 
 #if defined(__cplusplus)
@@ -41,7 +41,7 @@ extern "C" {
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
 uint32_t Cy_CapSense_DecodeWidgetGestures(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 /** \} */
 
@@ -49,11 +49,11 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 void Cy_CapSense_InitializeWidgetGestures(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeWidgetStatus(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 /** \} */
 
@@ -130,13 +130,69 @@ void Cy_CapSense_RunMfsFiltering(
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
                 const cy_stc_capsense_context_t * context);
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
+cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
+                uint32_t wdId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessAllRaw(
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessWidgetRaw(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessSnsRaw(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InvertWidgetRaw(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InvertSnsRaw(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessWidgetCIC2Raw(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessSnsCIC2Raw(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessSlotCIC2Raw(
+                uint32_t slotId,
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_GetCIC2SamplesNum(
+                uint32_t convsNumber,
+                uint32_t subConvsNumber,
+                uint32_t snsClkDivider,
+                uint32_t cicRate);
+uint32_t Cy_CapSense_GetCIC2HwDivider(
+                uint32_t cic2SamplesNum);
+uint32_t Cy_CapSense_PreProcessCIC2Data(
+                uint32_t cic2SamplesNum,
+                uint32_t cic2HwDivider,
+                uint32_t cicRateSqr,
+                uint32_t bitFormat,
+                uint32_t rawDataIn);
+uint32_t Cy_CapSense_GetMaxRawCIC1(
+                uint32_t convsNumber,
+                uint32_t subConvsNumber,
+                uint32_t snsClkDivider,
+                uint32_t numEpiCycles);
+uint32_t Cy_CapSense_GetMaxRawCIC2(
+                uint32_t convsNumber,
+                uint32_t subConvsNumber,
+                uint32_t snsClkDivider,
+                uint32_t cicRate);
+
+
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_MSCV3 */
 /** \} \endcond */
 
 #if defined(__cplusplus)
 }
 #endif
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_PROCESSING_H */
 

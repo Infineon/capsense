@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['built_2din_20self_2dtest_20macros',['Built-in Self-test Macros',['../group__group__capsense__macros__bist.html',1,'']]]
+  ['callbacks',['Callbacks',['../group__group__capsense__callbacks.html',1,'']]],
+  ['capsense_20data_20structure',['CapSense Data Structure',['../group__group__capsense__data__structure.html',1,'']]],
+  ['capsense_20structures',['CapSense Structures',['../group__group__capsense__structures.html',1,'']]]
 ];

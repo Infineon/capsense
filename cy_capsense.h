@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file includes all the header files of the CapSense middleware.
@@ -15,145 +15,164 @@
 
 /**
 ********************************************************************************
-* \mainpage Cypress CapSense Middleware Library
+* \mainpage CapSense Middleware Library 3.0 (Alpha)
 ********************************************************************************
 *
-* CapSense is a Cypress capacitive sensing solution. Capacitive sensing can be 
-* used in a variety of applications and products where conventional mechanical 
-* buttons can be replaced with sleek human interfaces to transform the way 
+* Alpha Release
+* The support for the PSoC 4100S Max family on ModusToolbox is currently 
+* at the Alpha level. Features may change without notice.
+* Contact <a href="https://www.cypress.com/support">
+* <b>Cypress Support</b></a> for additional details.
+*
+* \note This documentation includes only the new version to support 
+* fifth CapSense generation devices with MSCv3 HW blocks. 
+* For detail, contact Cypress support team.
+*
+* CapSense is a Cypress capacitive sensing solution. Capacitive sensing can be
+* used in a variety of applications and products where conventional mechanical
+* buttons can be replaced with sleek human interfaces to transform the way
 * users interact with electronic systems. These include home appliances, and
-* automotive, IoT, and industrial applications. CapSense supports multiple 
-* interfaces (widgets) using both CSX and CSD sensing methods with robust 
+* automotive, IoT, and industrial applications. CapSense supports multiple
+* interfaces (widgets) using both CSX and CSD sensing methods with robust
 * performance.
-* 
-* CapSense has become a popular technology to replace conventional 
-* mechanical- and optical-based user interfaces. There are fewer parts 
-* involved, which saves cost and increases reliability with no wear-and-tear. 
-* The main advantages of CapSense compared with other solutions are:  
-* robust performance in harsh environmental conditions and rejection of a 
-* wide range of external noise sources. 
-* 
+*
+* CapSense has become a popular technology to replace conventional
+* mechanical- and optical-based user interfaces. There are fewer parts
+* involved, which saves cost and increases reliability with no wear-and-tear.
+* The main advantages of CapSense compared with other solutions are:
+* robust performance in harsh environmental conditions and rejection of a
+* wide range of external noise sources.
+*
 * Use CapSense for:
 * * Touch and gesture detection for various interfaces
-* * Proximity detection for innovative user experiences and low-power 
+* * Proximity detection for innovative user experiences and low-power
 *   optimization
 * * Contactless liquid-level sensing in a variety of applications
 * * Touch-free operations in hazardous materials
-* 
+*
 ********************************************************************************
 * \section section_capsense_general General Description
 ********************************************************************************
 *
-* The CSD HW block enables multiple sensing capabilities on PSoC devices 
-* including self-cap and mutual-cap capacitive touch sensing solution, 
-* a 10-bit ADC, IDAC, and Comparator. The CSD driver is a low-level 
-* peripheral driver, a wrapper to manage access to the CSD HW block. 
-* Each middleware access to the CSD HW block is through the CSD Driver. 
-* 
-* The CSD HW block can support only one function at a time. However, all  
-* supported functionality (like CapSense, ADC, etc.) can be 
-* time-multiplexed in a design. I.e. you can save the existing state 
-* of the CapSense middleware, restore the state of the ADC middleware, perform 
-* ADC measurements, and then switch back to the CapSense functionality.
-* For more details and code examples refer to the description of the 
+* The MSCv3 HW block enables multiple sensing capabilities on PSoC devices
+* including the self-cap and mutual-cap capacitive touch sensing solutions,
+* inductive sensing, impedance measurement, and other features.
+* The MSC driver is a low-level
+* peripheral driver, a wrapper to access the MSCv3 HW block.
+* Middleware access available MSC HW blocks through the MSC Driver.
+*
+* The MSCv3 HW block can support only one function at a time. However, all
+* supported functionality (like CapSense, IndSense, etc.) can be
+* time-multiplexed in a design. I.e. you can save the existing state
+* of the CapSense middleware, restore the state of the IndSense middleware, perform
+* IndSense scans, and then switch back to the CapSense functionality.
+* For detail and code examples, refer to the description of the
 * Cy_CapSense_Save() and Cy_CapSense_Restore() functions.
-* 
-* \image html capsense_solution.png "CapSense Solution" width=800px
-* \image latex capsense_solution.png
-* 
-* This section describes only CapSense middleware. Refer to the corresponding 
-* sections for documentation of other middleware supported by the CSD HW block.
-* 
-* A CapSense solution includes: 
-* * The CapSense Configurator tool, which is a configuration wizard to create 
-*   and configure CapSense widgets. It could be launched in ModusToolbox 
-*   from the CSD personality as well as in standalone mode. 
-*   It contains a separate document about how to create and 
+*
+* \image html CAPSENSE_SOLUTION_MSC_V3.png "CapSense Solution" width=800px
+* \image latex CAPSENSE_SOLUTION_MSC_V3.png
+*
+* This section describes only CapSense middleware. Refer to the corresponding
+* sections for documentation of other middleware supported by the MSCv3 HW block.
+*
+* A CapSense solution includes:
+* * The CapSense Configurator to create
+*   and configure CapSense widgets. It can be launched in ModusToolbox
+*   from the CapSense superblock personality and in Stand-alone mode.
+*   It contains a separate document about how to create and
 *   configure widgets, parameters and algorithm descriptions.
-* * API to control the design from the application program. This documentation 
+* * API to control the design from the application program. This documentation
 *   describes API with code snippets of how to use them.
 * * The CapSense Tuner tool for real-time tuning, testing, and debugging,
-*   for easy and smooth designing of human interfaces on customer products. 
-*   The Tuner tool communicates with a device through a HW bridge and 
-*   communication drivers (EzI2C, UART, etc.) and allows to monitor 
+*   for easy and smooth designing of human interfaces on customer products.
+*   The Tuner tool communicates with a device through a HW bridge and
+*   communication drivers (EzI2C, UART, etc.) and allows to monitor
 *   widget statuses, sensor signals, detected touch positions, gestures, etc.
-* The application program does not need to interact with the CSD driver 
-* and/or other drivers such as GPIO, SysClk directly. All of that is 
+* The application program does not need to interact with the CSD driver
+* and/or other drivers such as GPIO, SysClk directly. All of that is
 * configured and managed by middleware.
-* 
-* Include cy_capsense.h to get access to all functions and other declarations 
-* in this library. If you are using the ModusToolbox CapSense Configurator tool, 
+*
+* Include cy_capsense.h to get access to all functions and other declarations
+* in this library. If you are using the ModusToolbox CapSense Configurator tool,
 * you can include cycfg_capsense.h only.
-* 
+*
 * \subsection subsection_capsense_features Features
 *
 * * Offers best-in-class signal-to-noise ratio (SNR)
-* * Supports Self-Capacitance (CSD) and Mutual-Capacitance (CSX) 
-*   sensing methods
-* * Features SmartSense auto-tuning technology for CSD sensing to avoid 
-*   complex manual tuning process
-* * Supports various Widgets, such as Buttons, Matrix Buttons, Sliders, 
+* * Supports Self-Capacitance (CSD RM) and Mutual-Capacitance (CSX RM)
+*   ratio metric sensing methods
+* * Supports various Widgets, such as Buttons, Matrix Buttons, Sliders,
 *   Touchpads, and Proximity Sensors
-* * Provides ultra-low power consumption and liquid-tolerant capacitive 
+* * Provides ultra-low power consumption and liquid-tolerant capacitive
 *   sensing technology
-* * Contains the integrated graphical CapSense Tuner tool for real-time tuning, 
+* * Contains the integrated graphical CapSense Tuner tool for real-time tuning,
 *   testing, and debugging
-* * Provides superior immunity against external noise and low-radiated 
+* * Provides superior immunity against external noise and low-radiated
 *   emission
 * * Offers best-in-class liquid tolerance
-* * Supports one-finger and two-finger gestures 
+* * Supports one-finger and two-finger gestures
 *
 ********************************************************************************
 * \section group_capsense_quick_start Quick Start Guide
 ********************************************************************************
 *
-* Cypress CapSense middleware can be used in various Development Environments
+* CapSense middleware can be used in various Development Environments
 * such as ModusToolbox, MBED, etc. Refer to the \ref section_capsense_toolchain.
-* The quickest way to get started is using the Code Examples. Cypress 
-* Semiconductor continuously extends its portfolio of the code examples at the 
+* The quickest way to get started is using the Code Examples. Cypress
+* Semiconductor continuously extends its portfolio of the code examples at the
 * <a href="http://www.cypress.com"><b>Cypress Semiconductor website</b></a>
 * and at the <a href="https://github.com/cypresssemiconductorco">
 * <b>Cypress Semiconductor GitHub</b></a>.
-* 
+*
+* \subsection group_capsense_quick_start_modus ModusToolbox Quick Start Guide
+*
 * This quick start guide assumes that the environment is configured to use the
-* PSoC 6 Peripheral Driver Library(psoc6pdl) for development and the
-* PSoC 6 Peripheral Driver Library(psoc6pdl) is included in the project.
-* It also assumes the 
+* PSoC 4 Peripheral Driver Library(psoc4pdl) for development and the
+* PSoC 4 Peripheral Driver Library(psoc4pdl) is included in the project.
+* It also assumes the
 * <a href="https://www.cypress.com/ModusToolboxDeviceConfig">
-* <b>ModusToolbox Device Configurator Tool</b></a>, 
+* <b>ModusToolbox Device Configurator Tool</b></a>,
 * <a href="https://www.cypress.com/ModusToolboxCapSenseConfig">
-* <b>ModusToolbox CapSense Configurator Tool</b></a>, and 
+* <b>ModusToolbox CapSense Configurator Tool</b></a>, and
 * <a href="https://www.cypress.com/ModusToolboxCapSenseTuner">
 * <b>ModusToolbox CapSense Tuner Tool</b></a>
-* are installed on your machine. 
+* are installed on your machine.
+*
+* \note Ensure to set up the device power voltages correctly
+* to the proper operation of the device power domains. The Setup is
+* on the System Tab of the Device Configurator. Enable the Power check-box
+* and set up the voltages as they are red-outlined in the picture below.
+*
+* \image html check_power.png "Power Setup" width=800px
+* \image latex check_power.png
 *
 * \subsection group_capsense_quick_start_mbed MBED OS Quick Start Guide
 *
 * You can immediately start with the following MBED OS code example available
 * at the <a href="https://github.com/cypresssemiconductorco">
-* <b> Cypress Semiconductor GitHub</b></a>: 
+* <b> Cypress Semiconductor GitHub</b></a>:
 * * <a href="https://github.com/cypresssemiconductorco/mbed-os-example-capsense">
-*   <b>CapSense buttons and slider for PSoC 6 MCU with Mbed OS</b></a>
+*   <b>CapSense buttons and slider for PSoC 4AS4 MCU with Mbed OS</b></a>
 *
 * If you are doing your own project, remember to include cycfg.h file:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Resource_Include
-* 
-* and call the resource initialization functions in main() at the beginning: 
+*
+* and call the resource initialization functions in main() at the beginning:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Resource_Initialization
 *
 ********************************************************************************
 * \section section_capsense_configuration Summary of Application Programming Interface (API)
 ********************************************************************************
 *
-* The CapSense operates on the top of the CapSense Sigma Delta (CSD) driver.
+* CapSense operates on the top of the CapSense MSC (Multi-Sensor Converter) driver.
 * Refer to the PDL API Reference Manual.
 *
-* This document provides descriptions of the functions in the CapSense 
-* middleware library, and descriptions of the data structures (register map) 
+* This document provides descriptions of the functions in the CapSense
+* middleware library, and descriptions of the data structures (register map)
 * used by the middleware library.
-* 
-* The Application Programming Interface (API) routines allow controlling and 
-* executing specific tasks using the CapSense middleware. The CapSense API 
+*
+* The Application Programming Interface (API) routines allow controlling and
+* executing specific tasks using the CapSense middleware. The CapSense API
 * is described in the following sections:
 * * \ref group_capsense_high_level
 * * \ref group_capsense_low_level
@@ -161,12 +180,13 @@
 * * \ref group_capsense_enums
 * * \ref group_capsense_macros
 * * \ref group_capsense_callbacks
-* 
+*
 ********************************************************************************
 * \section section_capsense_toolchain Supported Software and Tools
 ********************************************************************************
 *
-* This version of the CapSense Middleware was validated for compatibility with the following Software and Tools:
+* This version of the CapSense Middleware was validated for compatibility 
+* with the following Software and Tools:
 * <table class="doxtable">
 *   <tr>
 *     <th>Software and Tools</th>
@@ -174,47 +194,51 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox Software Environment</td>
-*     <td>2.1</td>
+*     <td>2.2</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox Device Configurator</td>
-*     <td>2.1</td>
+*     <td>2.20</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox CSD Personality for PSoC4 devices in Device Configurator</td>
+*     <td>- ModusToolbox CapSense Superblock Personality for PSoC4AS4 devices in the Device Configurator</td>
 *     <td>1.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox CSD Personality for PSoC6 devices in Device Configurator</td>
+*     <td>- ModusToolbox MSC Personality for PSoC4AS4 devices in the Device Configurator</td>
+*     <td>1.0</td>
+*   </tr>
+*   <tr>
+*     <td>- ModusToolbox CSD Personality for PSoC6 devices in the Device Configurator</td>
 *     <td>2.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox CapSense Configurator tool</td>
-*     <td>3.0</td>
+*     <td>3.20</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox CapSense Tuner tool</td>
-*     <td>3.0</td>
+*     <td>3.20</td>
 *   </tr>
 *   <tr>
-*     <td>PSoC4 Peripheral Driver Library (PDL)</td>
-*     <td>1.0.0</td>
-*   </tr>
-*   <tr>
-*     <td>PSoC6 Peripheral Driver Library (PDL)</td>
+*     <td>CAT1 Peripheral Driver Library (PDL)</td>
 *     <td>1.5.0</td>
 *   </tr>
 *   <tr>
+*     <td>CAT2 Peripheral Driver Library (PDL)</td>
+*     <td>1.0.0</td>
+*   </tr>
+*   <tr>
 *     <td>GCC Compiler</td>
-*     <td>7.2.1</td>
+*     <td>9.3.1</td>
 *   </tr>
 *   <tr>
 *     <td>IAR Compiler</td>
-*     <td>8.32</td>
+*     <td>8.42.2</td>
 *   </tr>
 *   <tr>
 *     <td>Arm Compiler 6 <sup><b>(Note 1)</b></sup></td>
-*     <td>6.11</td>
+*     <td>6.13</td>
 *   </tr>
 *   <tr>
 *     <td>MBED OS (only for PSoC6)</td>
@@ -222,17 +246,17 @@
 *   </tr>
 *   <tr>
 *     <td>FreeRTOS</td>
-*     <td>10.0.1</td>
+*     <td>10.3.1</td>
 *   </tr>
 * </table>
 *
 * <b>Note 1</b> The CapSense middleware includes the pre-compiled libraries for
-* Arm Compiler 6. They are built with the following options to be compatible  
+* Arm Compiler 6. They are built with the following options to be compatible
 * with ModusToolbox and MBED:
 *
-* * -fshort-enums – Set the size of an enumeration type to the smallest
+* * -fshort-enums - Set the size of an enumeration type to the smallest
 *                   data type that can hold all enumerator values
-* * -fshort-wchar - Set the size of wchar_t to 2 bytes 
+* * -fshort-wchar - Set the size of wchar_t to 2 bytes
 *
 * To operate in custom environments with Arm Compiler 6, apply
 * the above mentioned build options.
@@ -246,9 +270,9 @@
 *
 * Ensure:
 * * The specified version of the ModusToolbox Device Configurator and
-*   the CSD personality are used to re-generate the device configuration.
+*   the MSC personality are used to re-generate the device configuration.
 * * The specified version of the ModusToolbox CapSense Configurator is used
-*   to re-generate the middleware configuration. 
+*   to re-generate the middleware configuration.
 * * The toolchains are set up properly for your environment per the settings
 *   outlined in the Supported Software and Tools.
 * * The project is re-built once the toolchains are configured and the
@@ -268,53 +292,12 @@
 *
 * The CapSense middleware Flash and RAM memory consumption varies:
 * * marginally - depending on the compiler and device
-* * significantly - depending on the project CapSense configuration and 
+* * significantly - depending on the project CapSense configuration and
 *   number of APIs called by the application program.
-* 
-* The table below provides the middleware total memory consumption for 
-* specific CapSense configurations. Memory consumption for any custom 
-* design/configuration can be determined by analyzing a *.map file 
+*
+* Memory consumption for any custom
+* design/configuration can be determined by analyzing a *.map file
 * generated by the compiler.
-
-* The measurements were done with GCC compiler configured in
-* the Release mode with optimization set for Size.
-* 
-* <table class="doxtable">
-*   <tr><th>Configuration:</th><th>Configuration 1</th><th>Configuration 2</th><th>Configuration 3</th><th>Configuration 4</th><th>Configuration 5</th><th>Configuration 6</th><th>Configuration 7</th></tr>
-*   <div align="center"><b>
-*       <tr><td>Flash:</td><td>&lt; 13600</td><td>&lt; 15750</td><td>&lt; 18700</td><td>&lt; 20300</td><td>&lt; 28400</td><td>&lt; 19900</td><td>&lt; 34700</td></tr>
-*       <tr><td>SRAM:</td><td>&lt; 400</td><td>&lt; 730</td><td>&lt; 2200</td><td>&lt; 1080</td><td>&lt; 4280</td><td>&lt; 600</td><td>&lt; 4480</td></tr>
-*   </b></div>
-*   <tr><th colspan=8>Widgets</th></tr>
-*   <tr><td>CSD Button</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td><td></td><td>1 (2 sensors)</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td><td>1 (6 sensors)</td></tr>
-*   <tr><td>CSD Matrix Buttons</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>CSD Slider</td><td></td><td>1 (9 segments)</td><td></td><td></td><td>1 (9 segments)</td><td></td><td>1 (9 segments)</td></tr>
-*   <tr><td>CSD Touchpad</td><td></td><td></td><td></td><td>1 (9 Cols and 8 Rows)</td><td>1 (9 Cols and 8 Rows)</td><td></td><td>1 (9 Cols and 8 Rows)</td></tr>
-*   <tr><td>CSD Proximity</td><td></td><td>1 (1 sensor)</td><td></td><td>1 (1 sensor)</td><td>1 (1 sensor)</td><td></td><td>1 (1 sensor)</td></tr>
-*   <tr><td>CSX Button</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>CSX Matrix Buttons</td><td></td><td></td><td></td><td></td><td>1 (3 Rx and 3 Tx)</td><td></td><td>1 (3 Rx and 3 Tx)</td></tr>
-*   <tr><td>CSX Touchpad</td><td></td><td></td><td>1 (9 Rx and 8 Tx)</td><td></td><td>1 (9 Rx and 8 Tx)</td><td></td><td>1 (9 Rx and 8 Tx)</td></tr>
-*   <tr><th colspan=8>Features</th></tr>
-*   <tr><td>Gesture</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Ballistic Multiplier</td><td></td><td></td><td></td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Centroid Type</td><td></td><td></td><td>3x3</td><td>3x3</td><td>5x5 CSD, 3x3 CSX</td><td></td><td>5x5 CSD, 3x3 CSX</td></tr>
-*   <tr><td>Supported fingers on touchpad</td><td></td><td></td><td>2</td><td>1</td><td>2</td><td></td><td>2</td></tr>
-*   <tr><td>Shield</td><td></td><td>enabled</td><td></td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>SmartSense</td><td></td><td></td><td></td><td></td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>CSD auto-calibration</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td>enabled</td></tr>
-*   <tr><td>CSX auto-calibration</td><td></td><td></td><td>enabled</td><td></td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Self-test</td><td></td><td></td><td></td><td></td><td></td><td>enabled</td><td>enabled</td></tr>
-*   <tr><th colspan=8>Raw Count Filters</th></tr>
-*   <tr><td>IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><th colspan=8>Position Filters</th></tr>
-*   <tr><td>IIR</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>Median</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Average</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-*   <tr><td>Adaptive IIR</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-*   <tr><td>Jitter</td><td></td><td></td><td>enabled</td><td>enabled</td><td>enabled</td><td></td><td>enabled</td></tr>
-* </table>
 *
 ********************************************************************************
 * \section section_capsense_misra MISRA-C Compliance
@@ -330,18 +313,18 @@
 *   <tr>
 *     <td>11.4</td>
 *     <td>A</td>
-*     <td>A conversion should not be performed between a pointer to object 
+*     <td>A conversion should not be performed between a pointer to object
 *         and an integer type.</td>
-*     <td>Such conversion is performed with CapSense context in two cases: 
+*     <td>Such conversion is performed with CapSense context in two cases:
 *         interrupt handler and DeepSleepCallback function.
 *         Both cases are verified on correct operation.</td>
 *   </tr>
 *   <tr>
 *     <td>12.13</td>
 *     <td>A</td>
-*     <td>The increment (++) and decrement (--) operators should not be mixed 
+*     <td>The increment (++) and decrement (--) operators should not be mixed
 *         with other operators in an expression.</td>
-*     <td>These violations are reported for the GCC ARM optimized form of 
+*     <td>These violations are reported for the GCC ARM optimized form of
 *         the "for" loop that have the following syntax:
 *         for(index = COUNT; index --> 0u;)
 *         It is used to improve performance.</td>
@@ -351,8 +334,8 @@
 *     <td rowspan=2> R</td>
 *     <td rowspan=2> Constant: Dereference of NULL pointer.</td>
 *     <td rowspan=2> These violations are reported as a result of using of offset macros
-*         of CSD Driver with corresponding documented violation 20.6. Refer 
-*         to CSD Driver API Ref Guide.</td>
+*         of CSD Driver with corresponding documented violation 20.6. Refer
+*         to CSD and MSC Driver API Ref Guide.</td>
 *   </tr>
 *   <tr>
 *     <td>20.3</td>
@@ -364,9 +347,9 @@
 ********************************************************************************
 *
 * This section lists the known problems with the CapSense middleware.
-* 
+*
 * <table class="doxtable">
-*   <tr><th>Cypress ID</th><th>Known Issue</th><th>Workaround</th></tr>
+*   <tr><th>ID</th><th>Known Issue</th><th>Workaround</th></tr>
 *   <tr>
 *     <td>319100</td>
 *     <td>
@@ -374,9 +357,7 @@
 *         creates noise that can affect CapSense operation.
 *     </td>
 *     <td>
-*         Refer to the errata section of the device datasheet for details.<br>
-*         <a href="http://www.cypress.com/ds218787"><b>PSoC 63 with BLE 
-*         Datasheet Programmable System-on-Chip</b></a>
+*         For detail, refer to the errata section of the device datasheet.
 *     </td>
 *   </tr>
 *   <tr>
@@ -401,7 +382,7 @@
 *         6. Increase the CSD init switch resistance. Open the cycfg_capsernse.c file
 *            and update the .csdInitSwRes field of the cy_capsense_commonConfig structure
 *            with the CY_CAPSENSE_INIT_SW_RES_HIGH value.
-*     </td> 
+*     </td>
 *   </tr>
 *   <tr>
 *     <td>3191</td>
@@ -413,18 +394,32 @@
 *         3. The Cy_CapSense_CSDScanExt() function called multiple times.
 *     </td>
 *     <td>
-*         Call the Cy_CapSense_CSDSetupWidgetExt() function before each call of 
+*         Call the Cy_CapSense_CSDSetupWidgetExt() function before each call of
 *         the Cy_CapSense_CSDScanExt() function.
 *     </td>
 *   </tr>
 * </table>
-* 
+*
 ********************************************************************************
 * \section section_capsense_changelog Changelog
 ********************************************************************************
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="3">3.0</td>
+*     <td>Added fifth CapSense generation device support</td>
+*     <td>New CapSense platform covering</td>
+*   </tr>
+*   <tr>
+*     <td>Removed usage of deprecated return error and status codes,
+*         cy_status enum was replaced with the cy_capsense_status_t variable</td>
+*     <td>Defect fixing</td>
+*   </tr>
+*   <tr>
+*     <td>Removed usage of deprecated types, such as uint32 and uint16</td>
+*     <td>Defect fixing</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="9">2.10</td>
 *     <td>Added Built-in Self-test (BIST) library</td>
@@ -464,7 +459,7 @@
 *     <td>Feature enhancement</td>
 *   </tr>
 *   <tr>
-*     <td>Changed the type of context argument to const in the following 
+*     <td>Changed the type of context argument to const in the following
 *         functions:
 *         * Cy_CapSense_CSDConnectSns()
 *         * Cy_CapSense_CSXConnectRx()
@@ -489,7 +484,7 @@
 *     <td>User experience improvement</td>
 *   </tr>
 *   <tr>
-*     <td>CapSense MW sources are enclosed with the conditional compilation to 
+*     <td>CapSense MW sources are enclosed with the conditional compilation to
 *         ensure a successful compilation for non-CapSense-capable devices</td>
 *     <td>Fixing a compilation error for non CapSense-capable devices</td>
 *   </tr>
@@ -498,7 +493,7 @@
 *     <td>Flash foot-print optimization</td>
 *   </tr>
 *   <tr>
-*     <td>Renamed function Cy_CapSense_CheckCommandIntegrity() to 
+*     <td>Renamed function Cy_CapSense_CheckCommandIntegrity() to
 *         Cy_CapSense_CheckTunerCmdIntegrity()</td>
 *     <td>User experience improvement</td>
 *   </tr>
@@ -565,14 +560,14 @@
 * \section section_capsense_more_information More Information
 ********************************************************************************
 *
-* Important information about the CapSense-technology overview, appropriate 
-* Cypress device for the design, CapSense system and sensor design guidelines, 
-* different interfaces and tuning guidelines necessary for a successful design 
+* Important information about the CapSense-technology overview, appropriate
+* Cypress device for the design, CapSense system and sensor design guidelines,
+* different interfaces and tuning guidelines necessary for a successful design
 * of a CapSense system is available in the Getting Started with CapSense
-* document and the product-specific CapSense design guide. Cypress highly 
-* recommends starting with these documents. They can be found on the 
+* document and the product-specific CapSense design guide. Cypress highly
+* recommends starting with these documents. They can be found on the
 * Cypress web site at www.cypress.com.
-* 
+*
 * For more information, refer to the following documents:
 *
 * * <a href="https://www.cypress.com/products/modustoolbox-software-environment">
@@ -600,14 +595,11 @@
 * * <a href="https://www.cypress.com/documentation/application-notes/an85951-psoc-4-and-psoc-6-mcu-capsense-design-guide">
 *   <b>CapSense Design Guide</b></a>
 *
-* * <a href="https://cypresssemiconductorco.github.io/csdadc/csdadc_api_reference_manual/html/index.html">
-*   <b>CSDADC Middleware API Reference Guide</b></a>
-*
-* * <a href="https://cypresssemiconductorco.github.io/csdidac/csdidac_api_reference_manual/html/index.html">
-*   <b>CSDIDAC Middleware API Reference Guide</b></a>
-*
 * * <a href="https://cypresssemiconductorco.github.io/psoc6pdl/pdl_api_reference_manual/html/index.html">
-*   <b>PDL API Reference</b></a>
+*   <b>CAT1 PDL API Reference</b></a>
+*
+* * <a href="https://cypresssemiconductorco.github.io/psoc4pdl/pdl_api_reference_manual/html/index.html">
+*   <b>CAT2 PDL API Reference</b></a>
 *
 * * <a href="http://www.cypress.com/an210781"><b>AN210781 Getting Started with
 *   PSoC 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
@@ -621,9 +613,9 @@
 * * <a href="http://www.cypress.com"><b>Cypress Semiconductor</b></a>
 *
 * \note
-* The links to another software component’s documentation (middleware and PDL) 
-* point to GitHub to the latest available version of the software. 
-* To get documentation of the specified version, download from GitHub and unzip 
+* The links to another software component's documentation (middleware and PDL)
+* point to GitHub to the latest available version of the software.
+* To get documentation of the specified version, download from GitHub and unzip
 * the component archive. The documentation is available in the <i>docs</i> folder.
 *
 * \defgroup group_capsense_high_level               High-level Functions
@@ -665,9 +657,6 @@
 * \defgroup group_capsense_macros_miscellaneous     Miscellaneous Macros
 *   \ingroup group_capsense_macros
 *   \brief Miscellaneous macros
-* \defgroup group_capsense_macros_bist              Built-in Self-test Macros
-*   \ingroup group_capsense_macros
-*   \brief Built-in Self-test macros
 *
 * \defgroup group_capsense_callbacks                Callbacks
 *
@@ -678,23 +667,23 @@
 **/
 
 /******************************************************************************/
-/** \addtogroup group_capsense_high_level 
+/** \addtogroup group_capsense_high_level
 * \{
 *
-* High-level functions represent the highest abstraction layer of the 
+* High-level functions represent the highest abstraction layer of the
 * CapSense middleware.
-* 
-* These functions perform tasks such as scanning, data processing, data 
-* reporting and tuning interfaces. When performing a task, different 
-* initialization is required based on a sensing method or type of 
-* widgets is automatically handled by these functions. Therefore, these 
-* functions are sensing methods, features, and widget type agnostics. 
-* 
-* All the tasks required to implement a sensing system can be fulfilled 
-* by the high-level functions. But, there is a set of 
+*
+* These functions perform tasks such as scanning, data processing, data
+* reporting and tuning interfaces. When performing a task, different
+* initialization is required based on a sensing method or type of
+* widgets is automatically handled by these functions. Therefore, these
+* functions are sensing methods, features, and widget type agnostics.
+*
+* All the tasks required to implement a sensing system can be fulfilled
+* by the high-level functions. But, there is a set of
 * \ref group_capsense_low_level that provides access to lower level
-* and specific tasks. If a design requires access to low-level tasks, 
-* these functions can be used. The functions related to a given sensing 
+* and specific tasks. If a design requires access to low-level tasks,
+* these functions can be used. The functions related to a given sensing
 * methods are not available if the corresponding method is disabled.
 *
 * \} */
@@ -703,19 +692,16 @@
 /** \addtogroup group_capsense_low_level
 * \{
 *
-* The low-level functions represent the lower layer of abstraction in 
+* The Low-level functions represent the lower layer of abstraction in
 * support of \ref group_capsense_high_level.
-* 
-* These functions also enable implementation of special case designs 
+*
+* These functions also enable implementation of special case designs
 * requiring performance optimization and non-typical functionalities.
-* 
-* The functions that contain CSD or CSX in the name are specified for 
-* that sensing method appropriately and should be used only with 
-* dedicated widgets having that mode.
-* All other functions are general to all sensing methods. Some of the 
-* functions detect the sensing method used by the widget and execute 
+*
+* All functions are general to all sensing methods. Some of the
+* functions detect the sensing method used by the widget and execute
 * tasks as appropriate.
-* 
+*
 * \} */
 
 /******************************************************************************/
@@ -749,32 +735,32 @@
 /** \addtogroup group_capsense_data_structure
 * \{
 *
-* The CapSense Data Structure organizes configuration parameters, input, and 
-* output data shared among different FW modules within the CapSense. 
-* 
+* The CapSense Data Structure organizes configuration parameters, input, and
+* output data shared among different FW modules within the CapSense.
+*
 * The key responsibilities of the Data Structure are as follows:
 * * The Data Structure is the only data container in the CapSense middleware.
 * * It serves as storage for the configuration and the output data.
-* * All CapSense modules use the data structure for the communication 
+* * All CapSense modules use the data structure for the communication
 *   and data exchange.
-* 
-* The CapSense Data Structure is a composite of several smaller structures 
-* (for global / common data, widget data, sensor data, and pin data). 
-* Furthermore, the data is split between RAM and Flash to achieve a 
-* reasonable balance between resources consumption and configuration / tuning 
-* flexibility at runtime and compile time. A graphical representation of 
+*
+* The CapSense Data Structure is a composite of several smaller structures
+* (for global / common data, widget data, sensor data, and pin data).
+* Furthermore, the data is split between RAM and Flash to achieve a
+* reasonable balance between resources consumption and configuration / tuning
+* flexibility at runtime and compile time. A graphical representation of
 * the CapSense Data Structure is shown below.
-* 
-* Note that figure below shows a sample representation and documents the 
-* high-level design of the data structure, it does not include all the 
+*
+* Note that figure below shows a sample representation and documents the
+* high-level design of the data structure, it does not include all the
 * parameters and elements in each object.
 *
 * \image html capsense_ds.png "CapSense Data Structure" width=800px
 * \image latex capsense_ds.png
-* 
-* CapSense Data Structure does not perform error checking on the data 
-* written to CapSense Data Structure. It is the responsibility of application 
-* program to ensure register map rule are not violated while 
+*
+* CapSense Data Structure does not perform error checking on the data
+* written to CapSense Data Structure. It is the responsibility of application
+* program to ensure register map rule are not violated while
 * modifying the value of data field in CapSense Data Structure.
 *
 * \} */
@@ -783,8 +769,8 @@
 /** \addtogroup group_capsense_callbacks
 * \{
 *
-* Callbacks allow the user to execute Custom code called from the CapSense 
-* middleware when an event occurs. CapSense supports two callbacks.
+* Callbacks allow the user to execute Custom code called from the CapSense
+* middleware when an event occurs. CapSense supports several callbacks.
 *
 * <table>
 *   <tr>
@@ -799,8 +785,8 @@
 *     <td>Start Sample</td>
 *     <td>ptrSSCallback</td>
 *     <td>\ref cy_capsense_callback_t</td>
-*     <td>This is called before each sensor scan triggering. Such a callback 
-*         can be used to implement user-specific use cases like changing scan 
+*     <td>This is called before each sensor scan triggering. Such a callback
+*         can be used to implement user-specific use cases like changing scan
 *         parameters depending on whether a sensor is going to be scanned.</td>
 *   </tr>
 *   <tr>
@@ -808,7 +794,7 @@
 *     <td>End Of Scan</td>
 *     <td>ptrEOSCallback</td>
 *     <td>\ref cy_capsense_callback_t</td>
-*     <td>This is called after sensor scan completion and there is no other 
+*     <td>This is called after sensor scan completion and there is no other
 *         sensor in the queue to be scanned.</td>
 *   </tr>
 *   <tr>
@@ -817,7 +803,7 @@
 *     <td>ptrTunerSendCallback</td>
 *     <td>\ref cy_capsense_tuner_send_callback_t</td>
 *     <td>This is called by the Cy_CapSense_RunTuner() function to establish
-*         synchronus communication with the Tuner tool.</td>
+*         synchronous communication with the Tuner tool.</td>
 *   </tr>
 *   <tr>
 *     <td>4</td>
@@ -825,23 +811,40 @@
 *     <td>ptrTunerReceiveCallback</td>
 *     <td>\ref cy_capsense_tuner_receive_callback_t</td>
 *     <td>This is called by the Cy_CapSense_RunTuner() function to establish
-*         synchronus communication with the Tuner tool.</td>
+*         synchronous communication with the Tuner tool.</td>
+*   </tr>
+*   <tr>
+*     <td>5</td>
+*     <td>CapSense Data Structure Initialization Callback</td>
+*     <td>ptrEODsInitCallback</td>
+*     <td>\ref cy_capsense_ds_init_callback_t</td>
+*     <td>This is called by the Cy_CapSense_Enable() function after CapSense
+*         Data Structure initialization complete and before launching
+*         the first initialization scan. Using this callback is not
+*         recommended. It is used only to implement only user's
+*         specific use cases (while changing the CapSense
+*         default configuration). The callback is available for Fifth
+*         Generation CapSense devices.</td>
 *   </tr>
 * </table>
 *
 * \note
-* 1. Callbacks 1 and 2 are called by the Cy_CapSense_InterruptHandler() function and
-*   lengthen this function execution. Usually, Cy_CapSense_InterruptHandler() is called inside the
-*   CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.
+* Callbacks 1 and 2 are called by the Cy_CapSense_InterruptHandler()
+* function and lengthen this function execution. Usually,
+* Cy_CapSense_InterruptHandler() is called inside the ISR.
+* Then these callbacks also lengthen the ISR execution.
 *
-* 2. Callbacks 2 and 3 can only be registered by direct CapSense Data Structure assignment.
-*
-* All callbacks can be registered by direct assignment of the function pointers to the corresponding
-* CapSense Data Structure field as follows:
+* All callbacks can be registered by direct assignment of the function
+* pointers to the corresponding CapSense Data Structure field after call of
+* the Cy_CapSense_Init() function as follows:
+* * Fifth Generation CapSense devices:
+*   <tt>context-\>ptrInternalContext-\>\<Associated Register\> = \&CallbackFunction;</tt>
+* * Fourth Generation CapSense devices:
 *   <tt>context-\>ptrCommonContext-\>\<Associated Register\> = \&CallbackFunction;</tt>
 *
-* Callbacks 2 and 3 can be registered / unregistered using the Cy_CapSense_RegisterCallback() and 
-* Cy_CapSense_UnRegisterCallback() function.
+* Callbacks 1 and 2 can be registered / unregistered using
+* the Cy_CapSense_RegisterCallback() and Cy_CapSense_UnRegisterCallback()
+* functions.
 *
 * \} */
 
@@ -853,16 +856,22 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_centroid.h"
 #include "cy_capsense_control.h"
-#include "cy_capsense_csd.h"
-#include "cy_capsense_csx.h"
 #include "cy_capsense_filter.h"
 #include "cy_capsense_lib.h"
 #include "cy_capsense_gesture_lib.h"
 #include "cy_capsense_processing.h"
-#include "cy_capsense_sensing.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_tuner.h"
-#include "cy_capsense_selftest.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+    #include "cy_capsense_csd_v2.h"
+    #include "cy_capsense_csx_v2.h"
+    #include "cy_capsense_sensing_v2.h"
+    #include "cy_capsense_selftest.h"
+#else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+    #include "cy_capsense_generator_v3.h"
+    #include "cy_capsense_sensing_v3.h"
+    #include "cy_capsense_sm_base_full_wave_v3.h"
+#endif
 
 #endif /* CY_CAPSENSE_H */
 

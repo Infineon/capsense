@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy_capsense_csx.c
-* \version 2.10
+* \file cy_capsense_csx_v2.c
+* \version 3.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -26,8 +26,8 @@
 #include "cy_device_headers.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
-#include "cy_capsense_csx.h"
-#include "cy_capsense_sensing.h"
+#include "cy_capsense_csx_v2.h"
+#include "cy_capsense_sensing_v2.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
@@ -447,7 +447,7 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 * IDAC values for all sensors in the specified widget that provide
 * the raw count to the level specified by the target parameter.
 *
-* Calibration returns CY_RET_BAD_DATA if the achieved raw count is outside
+* Calibration returns CY_CAPSENSE_STATUS_BAD_DATA if the achieved raw count is outside
 * of the range specified by the target and acceptable calibration deviation
 * parameters.
 *
@@ -466,15 +466,15 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 *
 * \return
 * Returns the status of the specified widget calibration:
-* - CY_RET_SUCCESS       - The operation is successfully completed.
-* - CY_RET_BAD_PARAM     - The input parameter is invalid.
-* - CY_RET_BAD_DATA      - The calibration failed and CapSense may not operate
+* - CY_CAPSENSE_STATUS_SUCCESS       - The operation is successfully completed.
+* - CY_CAPSENSE_STATUS_BAD_PARAM     - The input parameter is invalid.
+* - CY_CAPSENSE_STATUS_BAD_DATA      - The calibration failed and CapSense may not operate
 *                         as expected.
-* - CY_RET_INVALID_STATE - The previous scanning is not completed, and
+* - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed, and
 *                         the CapSense middleware is busy.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CSXCalibrateWidget(
+cy_capsense_status_t Cy_CapSense_CSXCalibrateWidget(
                 uint32_t widgetId,
                 uint32_t target,
                 cy_stc_capsense_context_t * context)
@@ -485,7 +485,7 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
     uint32_t freqChIndex;
     uint32_t freqChNumber;
 
-    cy_status calibrateStatus = CY_RET_SUCCESS;
+    cy_capsense_status_t calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
     cy_stc_capsense_sensor_context_t * ptrActSnsContext;
 
@@ -509,21 +509,21 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
     if((context->ptrCommonConfig->numWd <= widgetId) ||
         (CY_CAPSENSE_DISABLE == context->ptrCommonConfig->csxIdacAutocalEn))
     {
-        calibrateStatus = CY_RET_BAD_PARAM;
+        calibrateStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
     if((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E != context->ptrWdConfig[widgetId].senseMethod)
     {
-        calibrateStatus = CY_RET_BAD_PARAM;
+        calibrateStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
     if(CY_CAPSENSE_BUSY  == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         /* Previous widget is being scanned, return error */
-        calibrateStatus = CY_RET_INVALID_STATE;
+        calibrateStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
 
-    if(CY_RET_SUCCESS == calibrateStatus)
+    if(CY_CAPSENSE_STATUS_SUCCESS == calibrateStatus)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
         ptrWdCfg->ptrWdContext->idacGainIndex = context->ptrCommonConfig->csxIdacGainInitIndex;
@@ -627,10 +627,10 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
             nextIdacMask = nextIdacMask >> 1u;
         }
         while (curIdacMask != 0u);
-        calibrateStatus = CY_RET_SUCCESS;
+        calibrateStatus = CY_CAPSENSE_STATUS_SUCCESS;
     }
 
-    if(CY_RET_SUCCESS == calibrateStatus)
+    if(CY_CAPSENSE_STATUS_SUCCESS == calibrateStatus)
     {
         /* Perform specified widget scan to check calibration result */
         /* Scan all the sensors/nodes in widget */
@@ -645,14 +645,14 @@ cy_status Cy_CapSense_CSXCalibrateWidget(
         {
             if(0uL == watchdogCounter)
             {
-                calibrateStatus = CY_RET_TIMEOUT;
+                calibrateStatus = CY_CAPSENSE_STATUS_TIMEOUT;
                 break;
             }
 
             watchdogCounter--;
         }
 
-        if(CY_RET_SUCCESS == calibrateStatus)
+        if(CY_CAPSENSE_STATUS_SUCCESS == calibrateStatus)
         {
             calibrateStatus = Cy_CapSense_CalibrateCheck(widgetId, target, (uint32_t)CY_CAPSENSE_SENSE_METHOD_CSX_E, context);
         }
@@ -1084,7 +1084,7 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
     tmpRawCount += (uint16_t)(Cy_CSD_ReadReg(cxt->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_RESULT_VAL2) &
                                              CY_CAPSENSE_CSD_RESULT_VAL2_VALUE_MSK);
 
-    /* This workaround needed to prevent overflow in the SW register map. Cypress ID #234358 */
+    /* This workaround needed to prevent overflow in the SW register map. ID #234358 */
     if(tmpRawCount > maxCount)
     {
         tmpRawCount = maxCount;
@@ -1364,7 +1364,7 @@ static void Cy_CapSense_CSXChangeClkFreq(uint32_t channelIndex, cy_stc_capsense_
 
 }
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2)) */
 
 
 /* [] END OF FILE */

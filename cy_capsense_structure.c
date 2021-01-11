@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 2.10
+* \version 3.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -21,11 +21,15 @@
 #include "cy_utils.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
-#include "cy_capsense_selftest.h"
 #include "cy_capsense_lib.h"
-#include "cy_csd.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+    #include "cy_capsense_selftest.h"
+    #include "cy_csd.h"
+#else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+    #include "cy_msc.h"
+#endif
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 /*******************************************************************************
 * Local definition
@@ -292,9 +296,9 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 * - Non-zero    - One or more errors occurred in the initialization process.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * context)
+cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_SUCCESS;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
 
     const cy_stc_capsense_common_config_t * ptrCommonCfg = context->ptrCommonConfig;
     const cy_stc_capsense_common_context_t * ptrCommonCxt = context->ptrCommonContext;
@@ -302,35 +306,15 @@ cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * con
     const cy_stc_capsense_widget_config_t * ptrWdCfg = context->ptrWdConfig;
     const cy_stc_capsense_widget_context_t * ptrWdCxt = context->ptrWdContext;
     const cy_stc_capsense_pin_config_t * ptrPinCfg = context->ptrPinConfig;
-    const cy_stc_capsense_pin_config_t * ptrShieldPinCfg = context->ptrShieldPinConfig;
     const cy_stc_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
 
-    if (ptrCommonCfg == NULL)       {result = CY_RET_BAD_DATA;}
-    if (ptrCommonCxt == NULL)       {result = CY_RET_BAD_DATA;}
-    if (ptrInternalCxt == NULL)     {result = CY_RET_BAD_DATA;}
-    if (ptrWdCfg == NULL)           {result = CY_RET_BAD_DATA;}
-    if (ptrWdCxt == NULL)           {result = CY_RET_BAD_DATA;}
-    if (ptrPinCfg == NULL)          {result = CY_RET_BAD_DATA;}
-    if (ptrActScanSns == NULL)      {result = CY_RET_BAD_DATA;}
-
-    if(CY_RET_SUCCESS == result)
-    {
-        if (ptrCommonCfg->csdShieldEn != 0u)
-        {
-            if((ptrCommonCfg->csdShieldNumPin > 0u) && (ptrShieldPinCfg == NULL))
-            {
-                result = CY_RET_BAD_DATA;
-            }
-        }
-
-        if (ptrCommonCfg->bistEn != 0u)
-        {
-            if(context->ptrBistContext == NULL)
-            {
-                result = CY_RET_BAD_DATA;
-            }
-        }
-    }
+    if (ptrCommonCfg == NULL)       {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrCommonCxt == NULL)       {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrInternalCxt == NULL)     {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrWdCfg == NULL)           {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrWdCxt == NULL)           {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrPinCfg == NULL)          {result = CY_CAPSENSE_STATUS_BAD_DATA;}
+    if (ptrActScanSns == NULL)      {result = CY_CAPSENSE_STATUS_BAD_DATA;}
 
     return (result);
 }
@@ -365,13 +349,14 @@ uint16_t Cy_CapSense_GetCRC(const uint8_t *ptrData, uint32_t len)
 {
     uint32_t idx;
     uint32_t actualCrc = 0u;
+    uint32_t length = len;
     const uint16_t crcTable[] =
     {
         0x0000u, 0xAC9Au, 0xF5AEu, 0x5934u, 0x47C6u, 0xEB5Cu, 0xB268u, 0x1EF2u,
         0x8F8Cu, 0x2316u, 0x7A22u, 0xD6B8u, 0xC84Au, 0x64D0u, 0x3DE4u, 0x917Eu
     };
 
-    for (;len-- > 0u;)
+    for (;length-- > 0u;)
     {
         /* Process HI Nibble */
         idx = ((actualCrc >> 12u) ^ (((uint32_t)*ptrData) >> 4u)) & 0xFLu;
@@ -388,6 +373,7 @@ uint16_t Cy_CapSense_GetCRC(const uint8_t *ptrData, uint32_t len)
 }
 
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetCrcWidget
 ****************************************************************************//**
@@ -450,7 +436,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
     crcDataVal.rowIdacModVal[2u] = ptrWdCxt->rowIdacMod[2u];
 
 
-    if(((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E == ptrWdCfg->senseMethod) ||
+    if((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseGroup) ||
        (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
     {
         crcDataVal.fingerThVal       = ptrWdCxt->fingerTh;
@@ -465,6 +451,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 
     return (crcValue);
 }
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2) */
 
 
 /**< Internal wrapper functions for the flash optimization */
@@ -484,12 +471,12 @@ uint16_t Cy_CapSense_GetCrcWidget(
 * \return
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CSDCalibrateWidget_Call(
+cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget_Call(
                 uint32_t widgetId,
                 uint32_t target,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     if(NULL != ptrFptrCfg->fptrCSDCalibrateWidget)
@@ -541,8 +528,7 @@ void Cy_CapSense_CSDSetupWidget_Call(
 * \param context
 *
 *******************************************************************************/
-void Cy_CapSense_CSDScan_Call(
-                cy_stc_capsense_context_t * context)
+void Cy_CapSense_CSDScan_Call(cy_stc_capsense_context_t * context)
 {
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
@@ -619,10 +605,10 @@ void Cy_CapSense_CSXScan_Call(
 * \return
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateAllCsdWidgets_Call(
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets_Call(
                 cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     if(NULL != ptrFptrCfg->fptrCalibrateAllCsdWidgets)
@@ -647,10 +633,10 @@ cy_status Cy_CapSense_CalibrateAllCsdWidgets_Call(
 * \return
 *
 *******************************************************************************/
-cy_status Cy_CapSense_CalibrateAllCsxWidgets_Call(
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets_Call(
                 cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     if(NULL != ptrFptrCfg->fptrCalibrateAllCsxWidgets)
@@ -922,7 +908,7 @@ uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts_Call(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     if(NULL != ptrFptrCfg->fptrDpProcessCsdWidgetRawCounts)
@@ -982,7 +968,7 @@ uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts_Call(
                 const cy_stc_capsense_context_t * context)
 {
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
-    uint32_t result = CY_RET_INVALID_STATE;
+    uint32_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
 
     if(NULL != ptrFptrCfg->fptrDpProcessCsxWidgetRawCounts)
     {
@@ -1430,10 +1416,10 @@ void Cy_CapSense_RunNoiseEnvelope_Lib_Call(
 * \return
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SsAutoTune_Call(
+cy_capsense_status_t Cy_CapSense_SsAutoTune_Call(
                 cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_INVALID_STATE;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_INVALID_STATE;
     cy_stc_capsense_fptr_config_t * ptrFptrCfg = (cy_stc_capsense_fptr_config_t *)context->ptrFptrConfig;
 
     if(NULL != ptrFptrCfg->fptrSsAutoTune)
@@ -1558,19 +1544,23 @@ void Cy_CapSense_BistDsInitialize_Call(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the operation. If CY_RET_SUCCESS is not received,
+* Returns the status of the operation. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * either paramId is invalid or ptrTuner is null.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_GetParam(
+cy_capsense_status_t Cy_CapSense_GetParam(
                 uint32_t paramId,
                 uint32_t * value,
-                const uint8_t * ptrTuner,
+                const void * ptrTuner,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_BAD_PARAM;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
     uint32_t paramType;
     uint32_t paramOffset;
+
+    uint8_t * bytePtr;
+    uint16_t * halfWordPtr;
+    uint32_t * wordPtr;
 
     (void)context;
     if ((value != NULL) && (ptrTuner != NULL))
@@ -1583,20 +1573,25 @@ cy_status Cy_CapSense_GetParam(
             case CY_CAPSENSE_DS_PARAM_TYPE_UINT32:
                 if (0u == (paramOffset & CY_CAPSENSE_UINT32_ALIGN_MASK))
                 {
-                    *value = *((uint32_t *)(&ptrTuner[paramOffset]));
-                    result = CY_RET_SUCCESS;
+                    paramOffset >>= 2u;
+                    wordPtr = (uint32_t *)ptrTuner;
+                    *value = (uint32_t)wordPtr[paramOffset];
+                    result = CY_CAPSENSE_STATUS_SUCCESS;
                 }
                 break;
             case CY_CAPSENSE_DS_PARAM_TYPE_UINT16:
                 if (0u == (paramOffset & CY_CAPSENSE_UINT16_ALIGN_MASK))
                 {
-                    *value = (uint32_t)(*((uint16_t *)(&ptrTuner[paramOffset])));
-                    result = CY_RET_SUCCESS;
+                    paramOffset >>= 1u;
+                    halfWordPtr = (uint16_t *)ptrTuner;
+                    *value = (uint32_t)halfWordPtr[paramOffset];
+                    result = CY_CAPSENSE_STATUS_SUCCESS;
                 }
                 break;
             case CY_CAPSENSE_DS_PARAM_TYPE_UINT8:
-                *value = (uint32_t)(ptrTuner[paramOffset]);
-                result = CY_RET_SUCCESS;
+                bytePtr = (uint8_t *)ptrTuner;
+                *value = (uint32_t)bytePtr[paramOffset];
+                result = CY_CAPSENSE_STATUS_SUCCESS;
                break;
             default:
                 break;
@@ -1653,26 +1648,30 @@ cy_status Cy_CapSense_GetParam(
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the status of the operation. If CY_RET_SUCCESS is not received,
+* Returns the status of the operation. If CY_CAPSENSE_STATUS_SUCCESS is not received,
 * the parameter was not updated with the new value, either paramId is invalid
 * or ptrTuner is null.
 *
 *******************************************************************************/
-cy_status Cy_CapSense_SetParam(
+cy_capsense_status_t Cy_CapSense_SetParam(
                 uint32_t paramId,
                 uint32_t value,
-                uint8_t * ptrTuner,
+                void * ptrTuner,
                 cy_stc_capsense_context_t * context)
 {
-    cy_status result = CY_RET_BAD_PARAM;
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
     uint32_t paramOffset;
     uint32_t paramWidget;
     uint32_t paramType;
     uint32_t paramCrc;
 
+    uint8_t * bytePtr;
+    uint16_t * halfWordPtr;
+    uint32_t * wordPtr;
+
     if ((context != NULL) && (ptrTuner != NULL))
     {
-        result = CY_RET_SUCCESS;
+        result = CY_CAPSENSE_STATUS_SUCCESS;
 
         /* Parse paramId */
         paramOffset = CY_LO16(paramId);
@@ -1683,49 +1682,57 @@ cy_status Cy_CapSense_SetParam(
             (0u != paramCrc) &&
             (0u != context->ptrCommonConfig->bistEn))
         {
-            result = CY_RET_BAD_PARAM;
+            result = CY_CAPSENSE_STATUS_BAD_PARAM;
         }
 
         /* Check parameter type, offset alignment, write the specified parameter */
-        if (CY_RET_SUCCESS == result)
+        if (CY_CAPSENSE_STATUS_SUCCESS == result)
         {
             switch (paramType)
             {
                 case CY_CAPSENSE_DS_PARAM_TYPE_UINT32:
                     if (0u == (paramOffset & CY_CAPSENSE_UINT32_ALIGN_MASK))
                     {
-                        *((uint32_t *)(&ptrTuner[paramOffset])) = value;
+                        paramOffset >>= 2u;
+                        wordPtr = (uint32_t *)ptrTuner;
+                        wordPtr[paramOffset] = value;
                     }
                     break;
                 case CY_CAPSENSE_DS_PARAM_TYPE_UINT16:
                     if (0u == (paramOffset & CY_CAPSENSE_UINT16_ALIGN_MASK))
                     {
-                        *((uint16_t *)(&ptrTuner[paramOffset])) = (uint16_t)value;
+                        paramOffset >>= 1u;
+                        halfWordPtr = (uint16_t *)ptrTuner;
+                        halfWordPtr[paramOffset] = (uint16_t)value;
                     }
                     break;
                 case CY_CAPSENSE_DS_PARAM_TYPE_UINT8:
-                    ptrTuner[paramOffset] = (uint8_t)value;
+                   bytePtr = (uint8_t *)ptrTuner;
+                   bytePtr[paramOffset] = (uint8_t)value;
                    break;
                 default:
-                    result = CY_RET_BAD_PARAM;
+                    result = CY_CAPSENSE_STATUS_BAD_PARAM;
                     break;
             }
         }
 
-        /* Update widget CRC if needed */
-        if ((CY_RET_SUCCESS == result) &&
-            (0u != context->ptrCommonConfig->bistEn) &&
-            (0u != paramCrc))
-        {
-            Cy_CapSense_UpdateCrcWidget(paramWidget, context);
-        }
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+            /* Update widget CRC if needed */
+            if ((CY_CAPSENSE_STATUS_SUCCESS == result) &&
+                (0u != context->ptrCommonConfig->bistEn) &&
+                (0u != paramCrc))
+            {
+                Cy_CapSense_UpdateCrcWidget(paramWidget, context);
+            }
+        #else /* (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3) */
+        #endif
     }
 
     return result;
 }
 
 
-#endif /* CY_IP_MXCSDV2 */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 
 /* [] END OF FILE */
