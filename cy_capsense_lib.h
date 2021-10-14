@@ -3,11 +3,12 @@
 * \version 3.0
 *
 * \brief
-* The file contains application programming interface to the CapSense library.
+* The file contains application programming interface to the CAPSENSE&trade; library.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -18,8 +19,6 @@
 #define CY_CAPSENSE_LIB_H
 
 #include "cy_syslib.h"
-
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -141,7 +140,7 @@ typedef struct
                                                     */
 } cy_stc_capsense_touch_t;
 
-/** Declares HW SmartSense data structure for CSD widgets */
+/** Declares HW smart sensing algorithm data structure for CSD widgets for fourth-generation CAPSENSE&trade; */
 typedef struct
 {
     uint32_t sensorCap;                             /**< Sensor parasitic capacitance in fF 10^-15 */
@@ -157,7 +156,24 @@ typedef struct
     uint8_t iDacComp;                               /**< Compensation idac code */
 } cy_stc_capsense_auto_tune_config_t;
 
-/** Declares Noise envelope data structure for CSD widgets when SmartSense is enabled */
+/** Declares HW smart sensing algorithm data structure for CSD widgets for fifth-generation CAPSENSE&trade; */
+typedef struct
+{
+    uint32_t snsCapacitance;                        /**< Sensor parasitic capacitance in fF 10^-15 */
+    uint32_t modClock;                              /**< Modulation clock frequency in Hz */
+    uint16_t nSub0;                                 /**< Base number of sub-conversions */
+    uint16_t nSub1;                                 /**< Final number of sub-conversions */
+    uint16_t raw;                                   /**< Sensor raw counts */
+    uint16_t snsResistance;                         /**< Resistance in series to a sensor */
+    uint16_t kRef0;                                 /**< Base sense frequency */
+    uint16_t kRef1;                                 /**< Final sense frequency */
+    uint16_t fingerCap;                             /**< Finger capacitance in fF 10^-15 (Set in Basic tab in pF 10^-12) */
+    uint16_t sigPFC;                                /**< sigPFC value (Signal Per Finger Capacitance) */
+    uint8_t refCdac;                                /**< Reference CAP DAC code */
+    uint8_t correctionCoeff;                        /**< Correction coefficient for CTRL_MUX mode */
+} cy_stc_capsense_hw_smartsense_config_t;
+
+/** Declares Noise envelope data structure for CSD widgets when smart sensing algorithm is enabled */
 typedef struct
 {
     uint16_t param0;                                /**< Parameter 0 configuration */
@@ -476,6 +492,63 @@ uint8_t Cy_CapSense_TuneSensitivity_Lib(
                 cy_stc_capsense_auto_tune_config_t * config);
 
 /*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseCapacitance
+****************************************************************************//**
+*
+* Returns capacitance that corresponds to the provided parameters.
+*
+* Calculates sensor capacitance as follows:
+*     Cp = Raw * RefCDAC / Nsub0
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns capacitance in femto-farads.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseCapacitance(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseFrequencyDivider
+****************************************************************************//**
+*
+* Returns minimum sense clock divider.
+*
+* Calculates minimal sense clock divider as follows:
+*     Kref = 4 * 5tau * Fmod * R * Cp
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns sense clock divider.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseFrequencyDivider(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseNumSubconversions
+****************************************************************************//**
+*
+* Returns optimum number of sub-conversions.
+*
+* Calculates number of sub-conversions as follows:
+*     Nsub = RoundUp(minRaw * RefCDAC * kRef0 /(sigPFC * kRef1)
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns number of sub-conversions.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseNumSubconversions(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
+/*******************************************************************************
 * Function Name: Cy_CapSense_UpdateThresholds_Lib
 ****************************************************************************//**
 *
@@ -549,8 +622,6 @@ void Cy_CapSense_RunNoiseEnvelope_Lib(
 #if defined(__cplusplus)
 }
 #endif
-
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 
 #endif /* CY_CAPSENSE_LIB_H */
 

@@ -4,11 +4,12 @@
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
-* of the CapSense middleware.
+* of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -24,8 +25,10 @@
 #include "cy_capsense_lib.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_filter.h"
+#include "cycfg_capsense_defines.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
 
 
 /*******************************************************************************
@@ -35,6 +38,10 @@
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_PREVIOUS      (0u)
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_CENTER        (1u)
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_NEXT          (2u)
+#define CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT         (3u)
+#define CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT          (3u)
+#define CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT          (3u)
+
 /* Minimum valid age */
 #define CY_CAPSENSE_CSX_TOUCHPAD_AGE_START              (0x0100u)
 #define CY_CAPSENSE_CSX_TOUCHPAD_Z_SHIFT                (0x04u)
@@ -50,30 +57,48 @@
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
-static void Cy_CapSense_TransferTouch(
-                uint32_t newIndex, 
-                uint32_t oldIndex, 
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-static void Cy_CapSense_NewTouch(
-                uint32_t newIndex, 
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-static uint32_t Cy_CapSense_CalcDistance(
-                uint32_t newIndex, 
-                uint32_t oldIndex,
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-static void Cy_CapSense_Hungarian(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-static void Cy_CapSense_CopyTouchRecord(
-                cy_stc_capsense_position_t * destination,
-                const cy_stc_capsense_position_t * source);
-__STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-__STATIC_INLINE void Cy_CapSense_SortByAge(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig);
-__STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask);
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    static void Cy_CapSense_TransferTouch(
+                    uint32_t newIndex,
+                    uint32_t oldIndex,
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    static void Cy_CapSense_NewTouch(
+                    uint32_t newIndex,
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    static uint32_t Cy_CapSense_CalcDistance(
+                    uint32_t newIndex,
+                    uint32_t oldIndex,
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    static void Cy_CapSense_Hungarian(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    static void Cy_CapSense_CopyTouchRecord(
+                    cy_stc_capsense_position_t * destination,
+                    const cy_stc_capsense_position_t * source);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    __STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    __STATIC_INLINE void Cy_CapSense_SortByAge(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask);
+#endif
 /** \} \endcond */
 
 
+#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_DIPLEX_SLIDER_EN) ||\
+    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_DIPLEX_SLIDER_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidDiplex
 ****************************************************************************//**
@@ -107,7 +132,7 @@ void Cy_CapSense_DpCentroidDiplex(
     uint32_t diffM;
     uint32_t diffP;
     uint32_t snsIndex;
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     const uint8_t * ptrDpxTable;
     uint32_t snsCount = ptrWdConfig->numSns;
     
@@ -179,15 +204,19 @@ void Cy_CapSense_DpCentroidDiplex(
                     
         /* Round result and shift 8 bits left */
         newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
-        newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+        newTouch->ptrPosition[0u].x = (uint16_t)(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
     }
     else
     {
         newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
     }
 }
+#endif /*((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_DIPLEX_SLIDER_EN) ||\
+          (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_DIPLEX_SLIDER_EN)) */
 
 
+#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_LINEAR_SLIDER_EN) ||\
+    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_LINEAR_SLIDER_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidLinear
 ****************************************************************************//**
@@ -214,21 +243,24 @@ void Cy_CapSense_DpCentroidLinear(
 {
     uint32_t snsIndex = 0u;
     uint32_t snsCount = ptrWdConfig->numSns;
-    
+
     uint32_t diffM;
     uint32_t diffP;
     uint32_t sum = 0u;
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
     uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
     uint32_t multiplier;
     uint32_t offset;
 
-    CY_ASSERT(snsCount > 2u);
-    
+    if(snsCount < CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT)
+    {
+        snsCount = CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT;
+    }
+
     if (1u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_NUMBER_MASK))
     {
         /* Find maximum signal */
@@ -284,7 +316,7 @@ void Cy_CapSense_DpCentroidLinear(
 
             /* Round result and shift 8 bits left */
             newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
-            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+            newTouch->ptrPosition[0u].x = (uint16_t)(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
         else
         {
@@ -296,8 +328,11 @@ void Cy_CapSense_DpCentroidLinear(
         /* This is a place holder for local maximum searching when number of centroids could be more than one */
     }
 }
+#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_LINEAR_SLIDER_EN) ||\
+           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_LINEAR_SLIDER_EN)) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidRadial
 ****************************************************************************//**
@@ -331,7 +366,7 @@ void Cy_CapSense_DpCentroidRadial(
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
     uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
     uint32_t multiplier;
@@ -385,7 +420,7 @@ void Cy_CapSense_DpCentroidRadial(
             }
             /* Round result and shift 8 bits left */
             newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
-            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+            newTouch->ptrPosition[0u].x = (uint16_t)(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
         else
         {
@@ -397,8 +432,10 @@ void Cy_CapSense_DpCentroidRadial(
         /* This is a place holder for local maximum searching when number of centroids could be more than one */
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidTouchpad
 ****************************************************************************//**
@@ -427,22 +464,29 @@ void Cy_CapSense_DpCentroidTouchpad(
     uint32_t snsCount = ptrWdConfig->numSns;
     uint32_t colCount = ptrWdConfig->numCols;
     uint32_t rowCount = ptrWdConfig->numRows;
-    
+
     uint32_t diffM;
     uint32_t diffP;
     uint32_t sum = 0u;
     uint32_t maxSum = 0u;
     uint32_t maxDiff = 0u;
     uint32_t maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt;
     int32_t numerator = 0;
     int32_t denominator = 0;
     uint32_t multiplier;
     uint32_t offset;
 
-    CY_ASSERT(colCount > 2u);
-    CY_ASSERT(rowCount > 2u);
-    
+    if(CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT > colCount)
+    {
+        colCount = CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT;
+    }
+
+    if(CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT > rowCount)
+    {
+        rowCount = CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT;
+    }
+
     if (1u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_NUMBER_MASK))
     {
         /***********************************************************************
@@ -499,19 +543,19 @@ void Cy_CapSense_DpCentroidTouchpad(
                 multiplier /= colCount;
                 offset = multiplier >> 1u;
             }
-            
+
             denominator = (int32_t)maxSum;
             denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
-            
+
             /* Round result and shift 8 bits left */
             newTouch->numPosition = CY_CAPSENSE_POSITION_ONE;
-            newTouch->ptrPosition[0u].x = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+            newTouch->ptrPosition[0u].x = (uint16_t)(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         }
         else
         {
             newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
         }
-        
+
         if(newTouch->numPosition != CY_CAPSENSE_POSITION_NONE)
         {
             /***********************************************************************
@@ -531,7 +575,7 @@ void Cy_CapSense_DpCentroidTouchpad(
                 }
                 ptrSnsCxt++;
             }
-            
+
             /* Find index of sensor with maximum signal */
             ptrSnsCxt = &ptrWdConfig->ptrSnsContext[colCount];
             for (snsIndex = 0u; snsIndex < rowCount; snsIndex++)
@@ -554,7 +598,7 @@ void Cy_CapSense_DpCentroidTouchpad(
                 }
                 ptrSnsCxt++;
             }
-            
+
             if ((maxIndex != CY_CAPSENSE_NO_LOCAL_MAX) && (maxSum > 0u))
             {
                 /* Calculate position */
@@ -569,12 +613,12 @@ void Cy_CapSense_DpCentroidTouchpad(
                     multiplier /= rowCount;
                     offset = multiplier >> 1u;
                 }
-                
+
                 denominator = (int32_t)maxSum;
                 denominator = ((numerator * (int32_t)multiplier) / denominator) + (((int32_t)maxIndex * (int32_t)multiplier) + (int32_t)offset);
-                            
+
                 /* Round result and shift 8 bits left */
-                newTouch->ptrPosition[0].y = CY_LO16(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+                newTouch->ptrPosition[0].y = (uint16_t)(((uint32_t)denominator + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
             }
             else
             {
@@ -587,8 +631,9 @@ void Cy_CapSense_DpCentroidTouchpad(
         /* This is a place holder for local maximum searching when number of centroids could be more than one */
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN) */
 
-
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADVANCED_CENTROID_5X5_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpAdvancedCentroidTouchpad
 ****************************************************************************//**
@@ -611,7 +656,7 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
     uint32_t i;
-    cy_stc_capsense_sensor_context_t * ptrSnsIndex = ptrWdConfig->ptrSnsContext;
+    const cy_stc_capsense_sensor_context_t * ptrSnsIndex = ptrWdConfig->ptrSnsContext;
     uint16_t * ptrDiffIndex = ptrWdConfig->ptrCsdTouchBuffer;
     cy_stc_capsense_advanced_centroid_config_t advCfg;
     
@@ -644,8 +689,10 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad(
                 ptrWdConfig->ptrCsdTouchBuffer, 
                 newTouch);
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADVANCED_CENTROID_5X5_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpFindLocalMaxDd
 ****************************************************************************//**
@@ -664,8 +711,8 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad(
 void Cy_CapSense_DpFindLocalMaxDd(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
-    cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt =  ptrWdConfig->ptrSnsContext;
+    const cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt =  ptrWdConfig->ptrSnsContext;
     uint32_t thresholdOff = (uint32_t)ptrWdCxt->fingerTh - ptrWdCxt->hysteresis;
     uint32_t thresholdOn = (uint32_t)ptrWdCxt->fingerTh + ptrWdCxt->hysteresis;
     uint16_t currDiff;
@@ -704,7 +751,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                 */
                 if (rx > 0u)
                 {
-                    /* Sensor(i-1, j+1) */
+                    /* Check the sensor from the previous row and the next column */
                     snsShift = lastTx;
                     if ((tx < lastTx) && (currDiff <= (ptrSnsCxt - snsShift)->diff))
                     {
@@ -712,7 +759,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                     }
                     if (0u == proceed)
                     {
-                        /* Sensor(i-1, j) */
+                        /* Check the sensor from the previous row and the same column */
                         snsShift++;
                         if (currDiff <= (ptrSnsCxt - snsShift)->diff)
                         {
@@ -721,7 +768,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                     }
                     if (0u == proceed)
                     {
-                        /* Sensor(i-1, j-1) */
+                        /* Check the sensor from the previous row and the previous column */
                         snsShift++;
                         if ((tx > 0u) && (currDiff <= (ptrSnsCxt - snsShift)->diff))
                         {
@@ -736,7 +783,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                 */
                 if ((0u == proceed) && (rx < lastRx))
                 {
-                    /* Sensor(i+1, j+1) */
+                    /* Check the sensor from the next row and the next column */
                     snsShift = lastTx + 2u;
                     if ((tx < lastTx) && (currDiff < (ptrSnsCxt + snsShift)->diff))
                     {
@@ -744,7 +791,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                     }
                     if (0u == proceed)
                     {
-                        /* Sensor(i+1, j) */
+                        /* Check the sensor from the next row and the same column */
                         snsShift--;
                         if (currDiff < (ptrSnsCxt + snsShift)->diff)
                         {
@@ -753,7 +800,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                     }
                     if (0u == proceed)
                     {
-                        /* Sensor(i+1, j-1) */
+                        /* Check the sensor from the next row and the previous column */
                         snsShift--;
                         if ((tx > 0u) && (currDiff < (ptrSnsCxt + snsShift)->diff))
                         {
@@ -764,7 +811,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                 /* 
                 * Check local maximum requirement: Comparing raw count 
                 * of a local maximum candidate with raw counts of sensors 
-                * from the same row Sensor(i, j+1). */
+                * from the same row and the next column. */
                 if ((0u == proceed) && (tx < lastTx))
                 {
                     if (currDiff < (ptrSnsCxt + 1u)->diff)
@@ -772,7 +819,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
                         proceed = 1u;
                     }
                 }
-                /* Sensor(i, j-1) */
+                /* Check the sensor from the same row and the previous column */
                 if ((0u == proceed) && (tx > 0u))
                 {
                     if (currDiff <= (ptrSnsCxt - 1u)->diff)
@@ -806,8 +853,10 @@ void Cy_CapSense_DpFindLocalMaxDd(
     }
     ptrWdConfig->ptrCsxTouchBuffer->newPeakNumber = (uint8_t)touchNum;
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /* CY_ID633 */
 #if defined(__ICCARM__)
     #pragma optimize=none
@@ -830,7 +879,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
 void Cy_CapSense_DpCalcTouchPadCentroid(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
-    cy_stc_capsense_sensor_context_t * ptrSnsCxt =  ptrWdConfig->ptrSnsContext;
+    const cy_stc_capsense_sensor_context_t * ptrSnsCxt =  ptrWdConfig->ptrSnsContext;
     uint8_t number;
     uint8_t i;
     uint8_t j;
@@ -938,7 +987,7 @@ void Cy_CapSense_DpCalcTouchPadCentroid(
                         ((((int32_t)ptrNewPeak->x) * (int32_t)multiplierX) + (int32_t)offsetX);
 
         /* The X position is rounded to the nearest integer value and normalized to the resolution range */
-        ptrNewPeak->x = CY_LO16(((uint32_t)weightedSumX + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+        ptrNewPeak->x = (uint16_t)(((uint32_t)weightedSumX + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
         /* The Y position is calculated.
         * The weightedSumY value depends on a finger position shifted regarding the Y electrode (ptrWdConfig->ptrNewTouches.y)
         * The multiplier ptrWdConfig->yCentroidMultiplier is a short from:
@@ -949,15 +998,17 @@ void Cy_CapSense_DpCalcTouchPadCentroid(
                         ((((int32_t)ptrNewPeak->y) * (int32_t)multiplierY) + (int32_t)offsetY);
 
         /* The Y position is rounded to the nearest integer value and normalized to the resolution range */
-        ptrNewPeak->y = CY_LO16(((uint32_t)weightedSumY + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
+        ptrNewPeak->y = (uint16_t)(((uint32_t)weightedSumY + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
 
         /* The z value is a sum of raw counts of sensors that form 3x3 matrix with a local maximum in the center */
-        ptrNewPeak->z = CY_LO8(totalSum >> CY_CAPSENSE_CSX_TOUCHPAD_Z_SHIFT);
+        ptrNewPeak->z = (uint8_t)(totalSum >> CY_CAPSENSE_CSX_TOUCHPAD_Z_SHIFT);
         ptrNewPeak++;
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpTouchTracking
 ****************************************************************************//**
@@ -983,7 +1034,7 @@ void Cy_CapSense_DpTouchTracking(
 {
     uint32_t i;
     
-    cy_stc_capsense_position_t * ptrNewPeak;
+    const cy_stc_capsense_position_t * ptrNewPeak;
     cy_stc_capsense_position_t * ptrOldPeak;
         
     uint32_t newTouchNum = ptrWdConfig->ptrCsxTouchBuffer->newPeakNumber;
@@ -1099,7 +1150,10 @@ void Cy_CapSense_DpTouchTracking(
         }
     }
  }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
+
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_TransferTouch
 ****************************************************************************//**
@@ -1130,7 +1184,7 @@ static void Cy_CapSense_TransferTouch(
     uint32_t touchAge;
     uint32_t touchDebounce;
     cy_stc_capsense_position_t * ptrNewPeak = &ptrWdConfig->ptrCsxTouchBuffer->newPeak[newIndex];
-    cy_stc_capsense_position_t * ptrOldPeak = &ptrWdConfig->ptrCsxTouchHistory->oldPeak[oldIndex];
+    const cy_stc_capsense_position_t * ptrOldPeak = &ptrWdConfig->ptrCsxTouchHistory->oldPeak[oldIndex];
 
     touchId = (uint32_t)ptrOldPeak->id & CY_CAPSENSE_CSX_TOUCHPAD_ID_MASK;
     touchAge = ((uint32_t)ptrOldPeak->z & CY_CAPSENSE_CSX_TOUCHPAD_AGE_MASK) >> CY_CAPSENSE_CSX_TOUCHPAD_BYTE_SHIFT;
@@ -1151,8 +1205,10 @@ static void Cy_CapSense_TransferTouch(
     ptrNewPeak->z &= (uint16_t)~CY_CAPSENSE_CSX_TOUCHPAD_AGE_MASK;
     ptrNewPeak->z |= (uint16_t)(touchAge << CY_CAPSENSE_CSX_TOUCHPAD_BYTE_SHIFT);
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_NewTouch
 ****************************************************************************//**
@@ -1197,8 +1253,10 @@ static void Cy_CapSense_NewTouch(
         ptrNewPeak->id = (uint16_t)idx | (uint16_t)(((uint16_t)ptrWdConfig->ptrWdContext->onDebounce - 1u) << CY_CAPSENSE_CSX_TOUCHPAD_BYTE_SHIFT);
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetLowestId
 ****************************************************************************//**
@@ -1217,25 +1275,28 @@ __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask)
 {
     uint32_t idx;
     uint32_t touchId = CY_CAPSENSE_CSX_TOUCHPAD_ID_ABSENT;
+    uint32_t idMaskLocal = (uint32_t)idMask;
 
     /* Search for the lowest available ID */
     for (idx = CY_CAPSENSE_CSX_TOUCHPAD_ID_MIN; idx <= CY_CAPSENSE_CSX_TOUCHPAD_ID_MAX; idx++)
     {
         /* Determine whether the new ID is available */
-        if (0u == (idMask & 1u))
+        if (0u == (idMaskLocal & 1u))
         {
             touchId = idx;
             break;
         }
 
-        idMask >>= 1u;
+        idMaskLocal >>= 1u;
     }
 
     /* Return an indicator of failure */
     return (uint8_t)(touchId);
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_TouchDownDebounce
 ****************************************************************************//**
@@ -1269,8 +1330,10 @@ __STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
         ptrNewPeak++;
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_CalcDistance
 ****************************************************************************//**
@@ -1297,8 +1360,8 @@ static uint32_t Cy_CapSense_CalcDistance(
                 uint32_t oldIndex,
                 const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
-    cy_stc_capsense_position_t * ptrNewPeak = &ptrWdConfig->ptrCsxTouchBuffer->newPeak[newIndex];
-    cy_stc_capsense_position_t * ptrOldPeak = &ptrWdConfig->ptrCsxTouchHistory->oldPeak[oldIndex];
+    const cy_stc_capsense_position_t * ptrNewPeak = &ptrWdConfig->ptrCsxTouchBuffer->newPeak[newIndex];
+    const cy_stc_capsense_position_t * ptrOldPeak = &ptrWdConfig->ptrCsxTouchHistory->oldPeak[oldIndex];
     
     int32_t xDistance = (int32_t)(ptrOldPeak->x) - (int32_t)(ptrNewPeak->x);
     int32_t yDistance = (int32_t)(ptrOldPeak->y) - (int32_t)(ptrNewPeak->y);
@@ -1308,8 +1371,10 @@ static uint32_t Cy_CapSense_CalcDistance(
     
     return ((uint32_t)xDistance + (uint32_t)yDistance);
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_Hungarian
 ****************************************************************************//**
@@ -1443,6 +1508,11 @@ static void Cy_CapSense_Hungarian(
                 }
             }
 
+            if(j == -1)
+            {
+                j = 0;
+            }
+
             delta = mins[j];
 
             /* Go through all rows */
@@ -1484,8 +1554,10 @@ static void Cy_CapSense_Hungarian(
         }
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_SortByAge
 ****************************************************************************//**
@@ -1572,8 +1644,10 @@ __STATIC_INLINE void Cy_CapSense_SortByAge(
         ptrNewPeak++;
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_CopyTouchRecord
 ****************************************************************************//**
@@ -1593,8 +1667,10 @@ static void Cy_CapSense_CopyTouchRecord(
 {
     *destination = *source;
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpFilterTouchRecord
 ****************************************************************************//**
@@ -1610,26 +1686,29 @@ static void Cy_CapSense_CopyTouchRecord(
 * The pointer to the widget configuration structure
 * \ref cy_stc_capsense_widget_config_t.
 *
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
 *******************************************************************************/
 void Cy_CapSense_DpFilterTouchRecord(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
     uint32_t i;
-    uint32_t j;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_POSITION_FILTER_EN)
+        uint32_t j;
+    #endif
     uint32_t reportedTouchNum = 0u;
     uint32_t peakNum = ptrWdConfig->ptrCsxTouchBuffer->newPeakNumber;
-    uint32_t filterSize;
     uint32_t maxTouch;
-    uint32_t newTouchFlag = 0u;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_POSITION_FILTER_EN)
+        uint32_t filterSize;
+        uint32_t newTouchFlag = 0u;
+    #endif
+
     cy_stc_capsense_position_t * ptrWdTouch = ptrWdConfig->ptrWdContext->wdTouch.ptrPosition;
     cy_stc_capsense_position_t * ptrNewPeak = ptrWdConfig->ptrCsxTouchBuffer->newPeak;
-    cy_stc_capsense_position_t * ptrHistory;
-    uint32_t historyFlag[CY_CAPSENSE_MAX_CENTROIDS] = {0u};
-    
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_POSITION_FILTER_EN)
+        cy_stc_capsense_position_t * ptrHistory;
+        uint32_t historyFlag[CY_CAPSENSE_MAX_CENTROIDS] = {0u};
+    #endif
+
     /* Define number of touches that should be reported */
     for (i = 0u; i < CY_CAPSENSE_MAX_CENTROIDS; i++)
     {
@@ -1651,11 +1730,12 @@ void Cy_CapSense_DpFilterTouchRecord(
         reportedTouchNum = maxTouch;
     }
     
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_POSITION_FILTER_EN)
     if (0u != (ptrWdConfig->posFilterConfig & CY_CAPSENSE_POSITION_FILTERS_MASK))
     {
         filterSize = (ptrWdConfig->posFilterConfig & CY_CAPSENSE_POSITION_FILTERS_SIZE_MASK) >>
                         CY_CAPSENSE_POSITION_FILTERS_SIZE_OFFSET;
-        
+                        
         /* Go through all new touches */
         ptrNewPeak = ptrWdConfig->ptrCsxTouchBuffer->newPeak;
         for (i = 0u; i < reportedTouchNum; i++)
@@ -1669,7 +1749,7 @@ void Cy_CapSense_DpFilterTouchRecord(
                 if (ptrHistory->id == ptrNewPeak->id)
                 {
                     /* Filter X and Y position of touch that exists from previous scan */
-                    Cy_CapSense_RunPositionFilters_Call(ptrWdConfig, ptrNewPeak, ptrHistory, context);
+                    Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrNewPeak, ptrHistory);
                     /* Mark history touch as assigned */
                     historyFlag[j] = 1u;
                     newTouchFlag = 1u;
@@ -1687,10 +1767,9 @@ void Cy_CapSense_DpFilterTouchRecord(
                 {
                     if (0u == historyFlag[j])
                     {
-                        Cy_CapSense_InitPositionFilters_Call(ptrWdConfig->posFilterConfig,
-                                                             ptrNewPeak,
-                                                             ptrHistory,
-                                                             context);
+                        Cy_CapSense_InitPositionFilters(ptrWdConfig->posFilterConfig,
+                                                        ptrNewPeak,
+                                                        ptrHistory);
                         historyFlag[j] = 1u;
                         /* Assignment is done; go to the next new touch */
                         break;
@@ -1711,7 +1790,8 @@ void Cy_CapSense_DpFilterTouchRecord(
             ptrHistory += filterSize;
         }
     }
-    
+    #endif /*(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_POSITION_FILTER_EN)*/
+
     /* Go through all touch fields in the data structure */
     ptrNewPeak = ptrWdConfig->ptrCsxTouchBuffer->newPeak;
     for (i = 0u; i < maxTouch; i++)
@@ -1740,8 +1820,10 @@ void Cy_CapSense_DpFilterTouchRecord(
         ptrWdConfig->ptrWdContext->status = CY_CAPSENSE_WD_ACTIVE_MASK;
     }
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitPositionFilters
 ****************************************************************************//**
@@ -1762,39 +1844,53 @@ void Cy_CapSense_DpFilterTouchRecord(
 *******************************************************************************/
 void Cy_CapSense_InitPositionFilters(
                 uint32_t filterConfig,
-                const cy_stc_capsense_position_t * ptrInput, 
+                const cy_stc_capsense_position_t * ptrInput,
                 cy_stc_capsense_position_t * ptrHistory)
 {
     cy_stc_capsense_position_t * ptrHistoryIndex = ptrHistory;
     
-    if (0u != (filterConfig & CY_CAPSENSE_POSITION_MED_MASK))
-    {
-        *ptrHistoryIndex = *ptrInput;
-        ptrHistoryIndex++;
-        *ptrHistoryIndex = *ptrInput;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterConfig & CY_CAPSENSE_POSITION_IIR_MASK))
-    {
-        *ptrHistoryIndex = *ptrInput;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterConfig & CY_CAPSENSE_POSITION_AIIR_MASK))
-    {
-        ptrHistoryIndex->x = ptrInput->x;
-        ptrHistoryIndex->y = ptrInput->y;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterConfig & CY_CAPSENSE_POSITION_AVG_MASK))
-    {
-        *ptrHistoryIndex = *ptrInput;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterConfig & CY_CAPSENSE_POSITION_JIT_MASK))
-    {
-        *ptrHistoryIndex = *ptrInput;
-        ptrHistoryIndex++;
-    }
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_MEDIAN_FILTER_EN)
+        if (0u != (filterConfig & CY_CAPSENSE_POSITION_MED_MASK))
+        {
+            *ptrHistoryIndex = *ptrInput;
+            ptrHistoryIndex++;
+            *ptrHistoryIndex = *ptrInput;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_IIR_FILTER_EN)
+        if (0u != (filterConfig & CY_CAPSENSE_POSITION_IIR_MASK))
+        {
+            *ptrHistoryIndex = *ptrInput;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADAPTIVE_FILTER_EN)
+        if (0u != (filterConfig & CY_CAPSENSE_POSITION_AIIR_MASK))
+        {
+            ptrHistoryIndex->x = ptrInput->x;
+            ptrHistoryIndex->y = ptrInput->y;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_AVERAGE_FILTER_EN)
+        if (0u != (filterConfig & CY_CAPSENSE_POSITION_AVG_MASK))
+        {
+            *ptrHistoryIndex = *ptrInput;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_JITTER_FILTER_EN)
+        if (0u != (filterConfig & CY_CAPSENSE_POSITION_JIT_MASK))
+        {
+            *ptrHistoryIndex = *ptrInput;
+            ptrHistoryIndex++;
+        }
+    #endif
 }
 
 
@@ -1817,71 +1913,85 @@ void Cy_CapSense_InitPositionFilters(
 * The pointer to the position structure that holds previous historical 
 * position values.
 *
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
 *******************************************************************************/
 void Cy_CapSense_RunPositionFilters(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory,
-                const cy_stc_capsense_context_t * context)
+                cy_stc_capsense_position_t * ptrHistory)
 {
-    uint32_t temp;
+    #if (CY_CAPSENSE_POS_MEDIAN_FILTER_EN || CY_CAPSENSE_POS_AVERAGE_FILTER_EN)
+        uint32_t temp;
+    #endif
     uint32_t xPos = ptrInput->x;
     uint32_t yPos = ptrInput->y;
     cy_stc_capsense_position_t * ptrHistoryIndex = ptrHistory;
     uint32_t filterCfg = ptrWdConfig->posFilterConfig;
-    uint32_t coeffIIR = (uint32_t)(filterCfg & CY_CAPSENSE_POSITION_IIR_COEFF_MASK) >> CY_CAPSENSE_POSITION_IIR_COEFF_OFFSET;
-    
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_MED_MASK))
-    {
-        temp = Cy_CapSense_FtMedian((uint32_t)ptrHistoryIndex[1u].x, (uint32_t)ptrHistoryIndex[0u].x, xPos);
-        ptrHistoryIndex[1u].x = ptrHistoryIndex[0u].x;
-        ptrHistoryIndex[0u].x = (uint16_t)xPos;
-        xPos = temp;
-        temp = Cy_CapSense_FtMedian((uint32_t)ptrHistoryIndex[1u].y, (uint32_t)ptrHistoryIndex[0u].y, yPos);
-        ptrHistoryIndex[1u].y = ptrHistoryIndex[0u].y;
-        ptrHistoryIndex[0u].y = (uint16_t)yPos;
-        yPos = temp;
-        ptrHistoryIndex++;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_IIR_MASK))
-    {
-        xPos = Cy_CapSense_FtIIR1stOrder(xPos, (uint32_t)ptrHistoryIndex->x, coeffIIR);
-        ptrHistoryIndex->x = (uint16_t)xPos;
-        yPos = Cy_CapSense_FtIIR1stOrder(yPos, (uint32_t)ptrHistoryIndex->y, coeffIIR);
-        ptrHistoryIndex->y = (uint16_t)yPos;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_AIIR_MASK))
-    {
-        Cy_CapSense_AdaptiveFilterRun_Lib_Call(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos, context);
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_AVG_MASK))
-    {
-        temp = xPos;
-        xPos = (xPos + ptrHistoryIndex->x) >> 1u;
-        ptrHistoryIndex->x = (uint16_t)temp;
-        temp = yPos;
-        yPos = (yPos + ptrHistoryIndex->y) >> 1u;
-        ptrHistoryIndex->y = (uint16_t)temp;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_JIT_MASK))
-    {
-        xPos = Cy_CapSense_FtJitter(xPos, (uint32_t)ptrHistoryIndex->x);
-        ptrHistoryIndex->x = (uint16_t)xPos;
-        yPos = Cy_CapSense_FtJitter(yPos, (uint32_t)ptrHistoryIndex->y);
-        ptrHistoryIndex->y = (uint16_t)yPos;
-    }
+    #if (0u != CY_CAPSENSE_POS_IIR_FILTER_EN)
+        uint32_t coeffIIR = (uint32_t)(filterCfg & CY_CAPSENSE_POSITION_IIR_COEFF_MASK) >> CY_CAPSENSE_POSITION_IIR_COEFF_OFFSET;
+    #endif
+
+    #if (0u != CY_CAPSENSE_POS_MEDIAN_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_MED_MASK))
+        {
+            temp = Cy_CapSense_FtMedian((uint32_t)ptrHistoryIndex[1u].x, (uint32_t)ptrHistoryIndex[0u].x, xPos);
+            ptrHistoryIndex[1u].x = ptrHistoryIndex[0u].x;
+            ptrHistoryIndex[0u].x = (uint16_t)xPos;
+            xPos = temp;
+            temp = Cy_CapSense_FtMedian((uint32_t)ptrHistoryIndex[1u].y, (uint32_t)ptrHistoryIndex[0u].y, yPos);
+            ptrHistoryIndex[1u].y = ptrHistoryIndex[0u].y;
+            ptrHistoryIndex[0u].y = (uint16_t)yPos;
+            yPos = temp;
+            ptrHistoryIndex++;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (0u != CY_CAPSENSE_POS_IIR_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_IIR_MASK))
+        {
+            xPos = Cy_CapSense_FtIIR1stOrder(xPos, (uint32_t)ptrHistoryIndex->x, coeffIIR);
+            ptrHistoryIndex->x = (uint16_t)xPos;
+            yPos = Cy_CapSense_FtIIR1stOrder(yPos, (uint32_t)ptrHistoryIndex->y, coeffIIR);
+            ptrHistoryIndex->y = (uint16_t)yPos;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADAPTIVE_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_AIIR_MASK))
+        {
+            Cy_CapSense_AdaptiveFilterRun_Lib(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos);
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (0u != CY_CAPSENSE_POS_AVERAGE_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_AVG_MASK))
+        {
+            temp = xPos;
+            xPos = (xPos + ptrHistoryIndex->x) >> 1u;
+            ptrHistoryIndex->x = (uint16_t)temp;
+            temp = yPos;
+            yPos = (yPos + ptrHistoryIndex->y) >> 1u;
+            ptrHistoryIndex->y = (uint16_t)temp;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (0u != CY_CAPSENSE_POS_JITTER_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_JIT_MASK))
+        {
+            xPos = Cy_CapSense_FtJitter(xPos, (uint32_t)ptrHistoryIndex->x);
+            ptrHistoryIndex->x = (uint16_t)xPos;
+            yPos = Cy_CapSense_FtJitter(yPos, (uint32_t)ptrHistoryIndex->y);
+            ptrHistoryIndex->y = (uint16_t)yPos;
+        }
+    #endif
     ptrInput->x = (uint16_t)xPos;
     ptrInput->y = (uint16_t)yPos;
 }
 
-
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_POSITION_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_RunPositionFiltersRadial
 ****************************************************************************//**
@@ -1902,15 +2012,11 @@ void Cy_CapSense_RunPositionFilters(
 * The pointer to the position structure that holds previous historical 
 * position values.
 *
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
 *******************************************************************************/
 void Cy_CapSense_RunPositionFiltersRadial(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_position_t * ptrInput, 
-                cy_stc_capsense_position_t * ptrHistory,
-                const cy_stc_capsense_context_t * context)
+                cy_stc_capsense_position_t * ptrInput,
+                cy_stc_capsense_position_t * ptrHistory)
 {
     /*
     * If new position crosses the zero point in one or another direction, 
@@ -1925,92 +2031,201 @@ void Cy_CapSense_RunPositionFiltersRadial(
     * is correct average result for the provided example.
     */
 
-    uint32_t z1;
-    uint32_t z2;
-    uint32_t temp;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_MEDIAN_FILTER_EN)
+        uint32_t z1;
+        uint32_t z2;
+    #endif
+    #if (CY_CAPSENSE_POS_IIR_FILTER_EN || CY_CAPSENSE_ADAPTIVE_FILTER_EN || CY_CAPSENSE_POS_AVERAGE_FILTER_EN)
+        uint32_t temp;
+    #endif
     /* The register contains max position value, so therefore it is increased by 1 */
     uint32_t centroidResolution = (uint32_t)ptrWdConfig->xResolution + 1u;
     uint32_t halfResolution = centroidResolution >> 1u;
     uint32_t xPos = ptrInput->x;
-    uint32_t yPos = 0u;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADAPTIVE_FILTER_EN)
+        uint32_t yPos = 0u;
+    #endif
     cy_stc_capsense_position_t * ptrHistoryIndex = ptrHistory;
     uint32_t filterCfg = ptrWdConfig->posFilterConfig;
-    uint32_t coeffIIR = (uint32_t)(filterCfg & CY_CAPSENSE_POSITION_IIR_COEFF_MASK) >> CY_CAPSENSE_POSITION_IIR_COEFF_OFFSET;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_IIR_FILTER_EN)
+        uint32_t coeffIIR = (uint32_t)(filterCfg & CY_CAPSENSE_POSITION_IIR_COEFF_MASK) >> CY_CAPSENSE_POSITION_IIR_COEFF_OFFSET;
+    #endif
     
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_MED_MASK))
-    {
-        /* Get the filter history for further zero-cross correction */
-        z1 = ptrHistoryIndex[0u].x;
-        z2 = ptrHistoryIndex[1u].x;
-        /* Preserve the filter history without zero-cross correction */
-        ptrHistoryIndex[1u].x = ptrHistoryIndex[0u].x;
-        ptrHistoryIndex[0u].x = (uint16_t)xPos;
- 
-        /* Perform zero-cross correction */
-        if (z1 > (halfResolution + xPos))
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_MEDIAN_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_MED_MASK))
         {
-            xPos += centroidResolution;
-        }
-        if (xPos > (halfResolution + z1))
-        {
-            z1 += centroidResolution;
-            z2 += centroidResolution;
-        }
-        if (z2 > (halfResolution + z1))
-        {
-            z1 += centroidResolution;
-            xPos += centroidResolution;
-        }
-        if (z1 > (halfResolution + z2))
-        {
-            z2 += centroidResolution;
-        }
+            /* Get the filter history for further zero-cross correction */
+            z1 = ptrHistoryIndex[0u].x;
+            z2 = ptrHistoryIndex[1u].x;
+            /* Preserve the filter history without zero-cross correction */
+            ptrHistoryIndex[1u].x = ptrHistoryIndex[0u].x;
+            ptrHistoryIndex[0u].x = (uint16_t)xPos;
+    
+            /* Perform zero-cross correction */
+            if (z1 > (halfResolution + xPos))
+            {
+                xPos += centroidResolution;
+            }
+            if (xPos > (halfResolution + z1))
+            {
+                z1 += centroidResolution;
+                z2 += centroidResolution;
+            }
+            if (z2 > (halfResolution + z1))
+            {
+                z1 += centroidResolution;
+                xPos += centroidResolution;
+            }
+            if (z1 > (halfResolution + z2))
+            {
+                z2 += centroidResolution;
+            }
 
-        /* Perform filtering */
-        xPos = Cy_CapSense_FtMedian(z2, z1, xPos);
-        /* Perform zero-cross correction of filtered position */
-        if (xPos >= centroidResolution)
-        {
-            xPos -= centroidResolution;
-        }
-        ptrHistoryIndex++;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_IIR_MASK))
-    {
-        /* Perform zero-cross correction */
-        if (ptrHistoryIndex->x > (halfResolution + xPos))
-        {
-            xPos += centroidResolution;
-        }
-        if (xPos > (halfResolution + ptrHistoryIndex->x))
-        {
-            ptrHistoryIndex->x += (uint16_t)centroidResolution;
-        }
-        if (ptrHistoryIndex->x > xPos)
-        {
-            temp = ptrHistoryIndex->x - xPos;
-        }
-        else
-        {
-            temp = xPos - ptrHistoryIndex->x;
-        }
-        
-        /*
-        * IIR filter can accumulate a delay up to a full circle and even more.
-        * This situation is not supported by the middleware. If the difference 
-        * between the new position and IIR filter history is bigger than 
-        * half of resolution, then all enabled position filters are reset.
-        */
-        if(temp >= halfResolution)
-        {
-            /* Perform Initialization */
-            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrInput, ptrHistory, context);
-        }
-        else
-        {
             /* Perform filtering */
-            xPos = Cy_CapSense_FtIIR1stOrder(xPos, (uint32_t)ptrHistoryIndex->x, coeffIIR);
+            xPos = Cy_CapSense_FtMedian(z2, z1, xPos);
+            /* Perform zero-cross correction of filtered position */
+            if (xPos >= centroidResolution)
+            {
+                xPos -= centroidResolution;
+            }
+            ptrHistoryIndex++;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_IIR_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_IIR_MASK))
+        {
+            /* Perform zero-cross correction */
+            if (ptrHistoryIndex->x > (halfResolution + xPos))
+            {
+                xPos += centroidResolution;
+            }
+            if (xPos > (halfResolution + ptrHistoryIndex->x))
+            {
+                ptrHistoryIndex->x += (uint16_t)centroidResolution;
+            }
+            if (ptrHistoryIndex->x > xPos)
+            {
+                temp = ptrHistoryIndex->x - xPos;
+            }
+            else
+            {
+                temp = xPos - ptrHistoryIndex->x;
+            }
+
+            /*
+            * IIR filter can accumulate a delay up to a full circle and even more.
+            * This situation is not supported by the middleware. If the difference 
+            * between the new position and IIR filter history is bigger than 
+            * half of resolution, then all enabled position filters are reset.
+            */
+            if(temp >= halfResolution)
+            {
+                /* Perform Initialization */
+                Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
+            }
+            else
+            {
+                /* Perform filtering */
+                xPos = Cy_CapSense_FtIIR1stOrder(xPos, (uint32_t)ptrHistoryIndex->x, coeffIIR);
+                /* Perform zero-cross correction of filtered position */
+                if (xPos >= centroidResolution)
+                {
+                    xPos -= centroidResolution;
+                }
+                ptrHistoryIndex->x = (uint16_t)xPos;
+            }
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADAPTIVE_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_AIIR_MASK))
+        {
+            /* Perform zero-cross correction */
+            if (ptrHistoryIndex->x > (halfResolution + xPos))
+            {
+                xPos += centroidResolution;
+            }
+            if (xPos > (halfResolution + ptrHistoryIndex->x))
+            {
+                ptrHistoryIndex->x += (uint16_t)centroidResolution;
+            }
+            if (ptrHistoryIndex->x > xPos)
+            {
+                temp = ptrHistoryIndex->x - xPos;
+            }
+            else
+            {
+                temp = xPos - ptrHistoryIndex->x;
+            }
+            
+            /*
+            * IIR filter can accumulate delay up to full circle and even more.
+            * This situation is not supported by the middleware. If the difference 
+            * between the new position and IIR filter history is bigger than 
+            * half of resolution, then all enabled position filters are reset.
+            */
+            if(temp >= halfResolution)
+            {
+                /* Perform Initialization */
+                Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
+            }
+            else
+            {
+                /* Perform filtering */
+                Cy_CapSense_AdaptiveFilterRun_Lib(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos);
+                /* Perform zero-cross correction of filtered position */
+                if (xPos >= centroidResolution)
+                {
+                    xPos -= centroidResolution;
+                }
+                ptrHistoryIndex->x = (uint16_t)xPos;
+            }
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_AVERAGE_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_AVG_MASK))
+        {
+            temp = xPos;
+            /* Perform zero-cross correction */
+            if (ptrHistoryIndex->x > (halfResolution + xPos))
+            {
+                xPos += centroidResolution;
+            }
+            if (xPos > (halfResolution + ptrHistoryIndex->x))
+            {
+                ptrHistoryIndex->x += (uint16_t)centroidResolution;
+            }
+            /* Perform filtering */
+            xPos = (xPos + ptrHistoryIndex->x) >> 1u;
+            /* Perform zero-cross correction of filtered position */
+            if (xPos >= centroidResolution)
+            {
+                xPos -= centroidResolution;
+            }
+            ptrHistoryIndex->x = (uint16_t)temp;
+            ptrHistoryIndex++;
+        }
+    #endif
+
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_JITTER_FILTER_EN)
+        if (0u != (filterCfg & CY_CAPSENSE_POSITION_JIT_MASK))
+        {
+            /* Perform zero-cross correction */
+            if (ptrHistoryIndex->x > (halfResolution + xPos))
+            {
+                xPos += centroidResolution;
+            }
+            if (xPos > (halfResolution + ptrHistoryIndex->x))
+            {
+                ptrHistoryIndex->x += (uint16_t)centroidResolution;
+            }
+            /* Perform filtering */
+            xPos = Cy_CapSense_FtJitter(xPos, (uint32_t)ptrHistoryIndex->x);
             /* Perform zero-cross correction of filtered position */
             if (xPos >= centroidResolution)
             {
@@ -2018,97 +2233,11 @@ void Cy_CapSense_RunPositionFiltersRadial(
             }
             ptrHistoryIndex->x = (uint16_t)xPos;
         }
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_AIIR_MASK))
-    {
-        /* Perform zero-cross correction */
-        if (ptrHistoryIndex->x > (halfResolution + xPos))
-        {
-            xPos += centroidResolution;
-        }
-        if (xPos > (halfResolution + ptrHistoryIndex->x))
-        {
-            ptrHistoryIndex->x += (uint16_t)centroidResolution;
-        }
-        if (ptrHistoryIndex->x > xPos)
-        {
-            temp = ptrHistoryIndex->x - xPos;
-        }
-        else
-        {
-            temp = xPos - ptrHistoryIndex->x;
-        }
-        
-        /*
-        * IIR filter can accumulate delay up to full circle and even more.
-        * This situation is not supported by the middleware. If the difference 
-        * between the new position and IIR filter history is bigger than 
-        * half of resolution, then all enabled position filters are reset.
-        */
-        if(temp >= halfResolution)
-        {
-            /* Perform Initialization */
-            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrInput, ptrHistory, context);
-        }
-        else
-        {
-            /* Perform filtering */
-            Cy_CapSense_AdaptiveFilterRun_Lib_Call(&ptrWdConfig->aiirConfig, ptrHistoryIndex, &xPos, &yPos, context);
-            /* Perform zero-cross correction of filtered position */
-            if (xPos >= centroidResolution)
-            {
-                xPos -= centroidResolution;
-            }
-            ptrHistoryIndex->x = (uint16_t)xPos;
-        }
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_AVG_MASK))
-    {
-        temp = xPos;
-        /* Perform zero-cross correction */
-        if (ptrHistoryIndex->x > (halfResolution + xPos))
-        {
-            xPos += centroidResolution;
-        }
-        if (xPos > (halfResolution + ptrHistoryIndex->x))
-        {
-            ptrHistoryIndex->x += (uint16_t)centroidResolution;
-        }
-        /* Perform filtering */
-        xPos = (xPos + ptrHistoryIndex->x) >> 1u;
-        /* Perform zero-cross correction of filtered position */
-        if (xPos >= centroidResolution)
-        {
-            xPos -= centroidResolution;
-        }
-        ptrHistoryIndex->x = (uint16_t)temp;
-        ptrHistoryIndex++;
-    }
-    if (0u != (filterCfg & CY_CAPSENSE_POSITION_JIT_MASK))
-    {
-        /* Perform zero-cross correction */
-        if (ptrHistoryIndex->x > (halfResolution + xPos))
-        {
-            xPos += centroidResolution;
-        }
-        if (xPos > (halfResolution + ptrHistoryIndex->x))
-        {
-            ptrHistoryIndex->x += (uint16_t)centroidResolution;
-        }
-        /* Perform filtering */
-        xPos = Cy_CapSense_FtJitter(xPos, (uint32_t)ptrHistoryIndex->x);
-        /* Perform zero-cross correction of filtered position */
-        if (xPos >= centroidResolution)
-        {
-            xPos -= centroidResolution;
-        }
-        ptrHistoryIndex->x = (uint16_t)xPos;
-    }
+    #endif
+
     ptrInput->x = (uint16_t)xPos;
 }
-
+#endif /*(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_POSITION_FILTER_EN)*/
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_ProcessPositionFilters
@@ -2123,14 +2252,10 @@ void Cy_CapSense_RunPositionFiltersRadial(
 * The pointer to the widget configuration structure
 * \ref cy_stc_capsense_widget_config_t.
 *
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
 *******************************************************************************/
 void Cy_CapSense_ProcessPositionFilters(
                 cy_stc_capsense_touch_t * newTouch,
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context)
+                const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
     uint32_t posIndex;
     uint32_t filterCfg;
@@ -2148,7 +2273,7 @@ void Cy_CapSense_ProcessPositionFilters(
         ptrPos = newTouch->ptrPosition;
         ptrHistory = ptrWdConfig->ptrPosFilterHistory->ptrPosition;
         filterSize = (filterCfg & CY_CAPSENSE_POSITION_FILTERS_SIZE_MASK) >> CY_CAPSENSE_POSITION_FILTERS_SIZE_OFFSET;
-        
+
         /* The same actions should be done for cases with no touches or multiple touches */
         if (CY_CAPSENSE_POSITION_MULTIPLE == numPosMin)
         {
@@ -2160,32 +2285,40 @@ void Cy_CapSense_ProcessPositionFilters(
         {
             numPosMin = numPos;
         }
-        
-        /* Process touches that exists from previous processing */
 
-        if((uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
-        {
+        /* Process touches that exists from previous processing */
+        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN) &&\
+            (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_POSITION_FILTER_EN))
+            if((uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
+            {
+                for (posIndex = 0u; posIndex < numPosMin; posIndex++)
+                {
+                    Cy_CapSense_RunPositionFiltersRadial(ptrWdConfig, ptrPos, ptrHistory);
+                    ptrPos++;
+                    ptrHistory += filterSize;
+                }
+            }
+            else
+            {
+                for (posIndex = 0u; posIndex < numPosMin; posIndex++)
+                {
+                    Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrPos, ptrHistory);
+                    ptrPos++;
+                    ptrHistory += filterSize;
+                }
+            }
+        #else
             for (posIndex = 0u; posIndex < numPosMin; posIndex++)
             {
-                Cy_CapSense_RunPositionFiltersRadial(ptrWdConfig, ptrPos, ptrHistory, context);
+                Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrPos, ptrHistory);
                 ptrPos++;
                 ptrHistory += filterSize;
             }
-        }
-        else
-        {
-            for (posIndex = 0u; posIndex < numPosMin; posIndex++)
-            {
-                Cy_CapSense_RunPositionFilters_Call(ptrWdConfig, ptrPos, ptrHistory, context);
-                ptrPos++;
-                ptrHistory += filterSize;
-            }
-        }
-        
+        #endif
         /* Initialize all rest newly detected touches */
         for (; posIndex < numPos; posIndex++)
         {
-            Cy_CapSense_InitPositionFilters_Call(filterCfg, ptrPos, ptrHistory, context);
+            Cy_CapSense_InitPositionFilters(filterCfg, ptrPos, ptrHistory);
             ptrPos++;
             ptrHistory += filterSize;
         }
@@ -2193,8 +2326,8 @@ void Cy_CapSense_ProcessPositionFilters(
     /* Finally, copy number of positions */
     ptrWdConfig->ptrPosFilterHistory->numPosition = (uint8_t)numPos;
 }
-
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN) */
+#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN)) */
 #endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
-
 
 /* [] END OF FILE */

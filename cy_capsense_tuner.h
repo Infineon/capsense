@@ -3,11 +3,12 @@
 * \version 3.0
 *
 * \brief
-* This file provides CapSense MW Tuner module function prototypes.
+* This file provides CAPSENSE&trade; MW Tuner module function prototypes.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -89,7 +90,7 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context);
 * Function Name: Cy_CapSense_CheckCommandIntegrity
 ****************************************************************************//**
 *
-* This function is obsolete and kept for backward compatibility only. 
+* \deprecated This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_CheckTunerCmdIntegrity() function should be used instead.
 *
 * \param commandPacket
@@ -109,7 +110,7 @@ __STATIC_INLINE uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * comma
 * Function Name: Cy_CapSense_CalculateCrc16
 ****************************************************************************//**
 *
-* This function is obsolete and kept for backward compatibility only.
+* \deprecated This function is obsolete and kept for backward compatibility only.
 * The Cy_CapSense_GetCRC() function should be used instead.
 *
 * \param ptrData

@@ -8,7 +8,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2020-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -46,23 +47,23 @@ cy_capsense_status_t Cy_CapSense_GenerateSensorConfig(
                 uint32_t scanSlot,
                 uint32_t * ptrSensorCfg,
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_GenerateAllSensorConfig(
+void Cy_CapSense_GenerateAllSensorConfig(
                 uint32_t chId,
                 uint32_t * ptrSensorCfg,
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
                 uint32_t scanSlot,
                 uint32_t * ptrSensorCfg,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_context_t * context);
 
+#if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
+void Cy_CapSense_CalculateMaskRegisters(
+                uint32_t mask,
+                uint32_t funcState,
+                uint32_t * ptrCfg);
+#endif
 
 /** \} \endcond */
-
-
-/*******************************************************************************
-* Definition
-*******************************************************************************/
-extern const cy_stc_msc_base_config_t cy_capsense_smTemplate;
 
 
 /*******************************************************************************
@@ -77,72 +78,64 @@ extern const cy_stc_msc_base_config_t cy_capsense_smTemplate;
 
 
 /*******************************************************************************
+* Macros for Cmod selection
+*******************************************************************************/
+#define CY_CAPSENSE_MSC0_CMOD1PADD_PIN                                          (2u)
+#define CY_CAPSENSE_MSC1_CMOD1PADD_PIN                                          (1u)
+
+#define CY_CAPSENSE_CMOD12_PAIR_SELECTION                                       (0u)
+#define CY_CAPSENSE_CMOD34_PAIR_SELECTION                                       (1u)
+
+
+/*******************************************************************************
 * Register definition for FW CSD CTRLMUX with Active Shielding
 *******************************************************************************/
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_TOP_MASK                (0x4FFC0000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_SH_MASK                 (0x80050000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_TOP_VALUE               (0x44280000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_SH_VALUE                (0x80050000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_CSW_VALUE               (0x84022000UL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_TOP_MASK                (0x4FFC0000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_SH_MASK                 (0x80050000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_TOP_VALUE               (0x44280000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_SH_VALUE                (0x80050000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_CSW_VALUE               (0x84022000uL)
 
 
 /*******************************************************************************
 * Register definition for FW CSD CTRLMUX with Passive Shielding
 *******************************************************************************/
-#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_TOP_MASK               (0x0FFC0000UL)
-#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_TOP_VALUE              (0x09880000UL)
-#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_CSW_VALUE              (0x89080000UL)
+#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_TOP_MASK               (0x0FFC0000uL)
+#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_TOP_VALUE              (0x09800000uL)
+#define CY_CAPSENSE_FW_SHIELD_PASSIVE_CTRLMUX_REG_SW_SEL_CSW_VALUE              (0x09080000uL)
 
 
 /*******************************************************************************
 * Register definition for FW CSD AMUX with Active Shielding
 *******************************************************************************/
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_TOP_MASK                   (0x40000000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_SH_MASK                    (0x80010100UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_TOP_VALUE                  (0x40000000UL)
-#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_SH_VALUE                   (0x80010100UL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_TOP_MASK                   (0x40000000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_SH_MASK                    (0x80010100uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_TOP_VALUE                  (0x40000000uL)
+#define CY_CAPSENSE_FW_SHIELD_ACTIVE_AMUX_REG_SW_SEL_SH_VALUE                   (0x80010100uL)
 
 
 /*******************************************************************************
-* Masks definition for Compensation CAPDAC Control
+* Register definition for FW CSX VDDA/2
 *******************************************************************************/
-#define CY_CAPSENSE_CCOMP_CDAC_CTL_MASK                                         (MSC_CCOMP_CDAC_CTL_SEL_CO_PRO_OFFSET_Msk |\
-                                                                                 MSC_CCOMP_CDAC_CTL_EPILOGUE_EN_Msk)
-
-#define CY_CAPSENSE_CCOMP_CDAC_SW_SEL_MASK                                      (MSC_SW_SEL_CDAC_CO_SW_COTCA_Msk |\
-                                                                                 MSC_SW_SEL_CDAC_CO_SW_COCB_Msk  |\
-                                                                                 MSC_SW_SEL_CDAC_CO_SW_COTV_Msk  |\
-                                                                                 MSC_SW_SEL_CDAC_CO_SW_COTG_Msk  |\
-                                                                                 MSC_SW_SEL_CDAC_CO_SW_COBV_Msk  |\
-                                                                                 MSC_SW_SEL_CDAC_CO_SW_COBG_Msk)
-
-#define CY_CAPSENSE_ENABLE_CCOMP_CDAC_CTL_SEL_VALUE                             ((0x33u << MSC_CCOMP_CDAC_CTL_SEL_CO_PRO_OFFSET_Pos) |\
-                                                                                 (0x00u << MSC_CCOMP_CDAC_CTL_EPILOGUE_EN_Pos))
-
-#define CY_CAPSENSE_ENABLE_CCOMP_CDAC_SW_SEL_VALUE                              ((0x03u << MSC_SW_SEL_CDAC_CO_SW_COTCA_Pos) |\
-                                                                                 (0x02u << MSC_SW_SEL_CDAC_CO_SW_COCB_Pos) |\
-                                                                                 (0x00u << MSC_SW_SEL_CDAC_CO_SW_COTV_Pos) |\
-                                                                                 (0x00u << MSC_SW_SEL_CDAC_CO_SW_COTG_Pos) |\
-                                                                                 (0x02u << MSC_SW_SEL_CDAC_CO_SW_COBV_Pos) |\
-                                                                                 (0x03u << MSC_SW_SEL_CDAC_CO_SW_COBG_Pos))
+#define CY_CAPSENSE_FW_CSX_VDDA2_CTLMUX_MODE_SW_SEL_SH_VALUE                    (0x87050000uL)
+#define CY_CAPSENSE_FW_CSX_VDDA2_AMUX_MODE_SW_SEL_SH_VALUE                      (0x87010100uL)
 
 
 /*******************************************************************************
-* Masks definition for CAPDAC Dithering Control
+* The MODE_SENSE_DUTY_CTL register configuration for the FW CSX AMUX
 *******************************************************************************/
-#define CY_CAPSENSE_CSD_FW_CAPDAC_DITHERING_REG_SW_SEL_CDAC_FL_VALUE            (0x00763223uL)
-#define CY_CAPSENSE_CSX_FW_CAPDAC_DITHERING_REG_SW_SEL_CDAC_FL_VALUE            (0x00320054uL)
+#define CY_CAPSENSE_FW_CSX_AMUX_MODE_SENSE_DUTY_CTL_VALUE                       (0x11000000uL)
 
 
 /*******************************************************************************
 * The MODE_SW_SEL_TOP register configuration for the FW CSX
 *******************************************************************************/
-#define CY_CAPSENSE_CSX_FW_CTLMUX_MODE_SW_SEL_TOP_VALUE            (1u << MSC_MODE_SW_SEL_TOP_SHG_Pos)
-#define CY_CAPSENSE_CSX_FW_AMUX_MODE_SW_SEL_TOP_VALUE              ((2u << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) |\
-                                                                    (1u << MSC_MODE_SW_SEL_TOP_AYA_EN_Pos)  |\
-                                                                    (2u << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) |\
-                                                                    (1u << MSC_MODE_SW_SEL_TOP_AYB_EN_Pos)  |\
-                                                                    (1u << MSC_MODE_SW_SEL_TOP_SHG_Pos))
+#define CY_CAPSENSE_CSX_FW_CTLMUX_MODE_SW_SEL_TOP_VALUE            (1uL << MSC_MODE_SW_SEL_TOP_SHG_Pos)
+#define CY_CAPSENSE_CSX_FW_AMUX_MODE_SW_SEL_TOP_VALUE              ((2uL << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) |\
+                                                                    (1uL << MSC_MODE_SW_SEL_TOP_AYA_EN_Pos)  |\
+                                                                    (2uL << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) |\
+                                                                    (1uL << MSC_MODE_SW_SEL_TOP_AYB_EN_Pos)  |\
+                                                                    (1uL << MSC_MODE_SW_SEL_TOP_SHG_Pos))
 
 /* CSW0 = RX MUX */
 #define CY_CAPSENSE_SM_REG_SW_SEL_CSW0_RX_VALUE \
@@ -194,18 +187,32 @@ extern const cy_stc_msc_base_config_t cy_capsense_smTemplate;
  (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW4_FLD_REF_MODE << MSC_SW_SEL_CSW_REF_MODE_Pos) | \
  (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW4_FLD_ENABLED  << MSC_SW_SEL_CSW_ENABLED_Pos)) \
 
-/* CSW4 = High Z */
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_VALUE      (0u)
+/* CSW5 = High Z */
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_VALUE \
+((CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_SW_SNCA  << MSC_SW_SEL_CSW_SW_SNCA_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_SW_SNCB  << MSC_SW_SEL_CSW_SW_SNCB_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_SW_SNCC  << MSC_SW_SEL_CSW_SW_SNCC_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_SW_SNCV  << MSC_SW_SEL_CSW_SW_SNCV_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_SW_SNCG  << MSC_SW_SEL_CSW_SW_SNCG_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_REF_MODE << MSC_SW_SEL_CSW_REF_MODE_Pos) | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW5_FLD_ENABLED  << MSC_SW_SEL_CSW_ENABLED_Pos)) \
 
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW0_RX_INDEX          (0u)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW1_TX_INDEX          (1u)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW2_NEG_TX_INDEX      (2u)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW3_SNS_INDEX         (3u)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW4_GND_INDEX         (4u)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_INDEX      (5u)
+/* CSW6 = CSDBUSC connection */
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW6_VDDA2_VALUE \
+((CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_SW_SNCA  << MSC_SW_SEL_CSW_SW_SNCA_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_SW_SNCB  << MSC_SW_SEL_CSW_SW_SNCB_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_SW_SNCC  << MSC_SW_SEL_CSW_SW_SNCC_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_SW_SNCV  << MSC_SW_SEL_CSW_SW_SNCV_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_SW_SNCG  << MSC_SW_SEL_CSW_SW_SNCG_Pos)  | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_REF_MODE << MSC_SW_SEL_CSW_REF_MODE_Pos) | \
+ (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_ENABLED  << MSC_SW_SEL_CSW_ENABLED_Pos)) \
 
-#define CY_CAPSENSE_CSD_RM_SENSING_METHOD_INDEX   (0u)
-#define CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX   (1u)
+
+#define CY_CAPSENSE_CSD_RM_SENSING_METHOD_INDEX         (0u)
+#define CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX         (1u)
+#define CY_CAPSENSE_CSD_DITHERING_SENSING_METHOD_INDEX  (2u)
+#define CY_CAPSENSE_CSX_DITHERING_SENSING_METHOD_INDEX  (3u)
+
 
 /** Initialization of sensing method template variable */
 #define CY_CAPSENSE_SENSING_METHOD_BASE_TEMPLATE            \
@@ -331,6 +338,11 @@ extern const cy_stc_msc_base_config_t cy_capsense_smTemplate;
                     (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_OBS_CTL_FLD_OBSERVE1  << MSC_OBS_CTL_OBSERVE1_Pos)  | \
                     (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_OBS_CTL_FLD_OBSERVE2  << MSC_OBS_CTL_OBSERVE2_Pos)  | \
                     (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_OBS_CTL_FLD_OBSERVE3  << MSC_OBS_CTL_OBSERVE3_Pos)), \
+        .status1            = 0x00uL, \
+        .status2            = 0x00uL, \
+        .status3            = 0x00uL, \
+        .resultFifoStatus   = 0x00uL, \
+        .resultFifoRd       = 0x00uL, \
         .intr = \
                     ((CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_INTR_FLD_SUB_SAMPLE    << MSC_INTR_SUB_SAMPLE_Pos)     | \
                     (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_INTR_FLD_SAMPLE         << MSC_INTR_SAMPLE_Pos)         | \
@@ -355,153 +367,328 @@ extern const cy_stc_msc_base_config_t cy_capsense_smTemplate;
                         (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_INTR_MASK_FLD_FRAME          << MSC_INTR_MASK_FRAME_Pos)          | \
                         (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_INTR_MASK_FLD_FIFO_UNDERFLOW << MSC_INTR_MASK_FIFO_UNDERFLOW_Pos) | \
                         (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_INTR_MASK_FLD_FIFO_OVERFLOW  << MSC_INTR_MASK_FIFO_OVERFLOW_Pos)), \
+        .intrMasked         = 0x00uL, \
         .frameCmd = \
                     (CY_CAPSENSE_SM_BASE_FULL_WAVE_REG_FRAME_CMD_FLD_START_FRAME), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW0_RX_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW0_RX_VALUE), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW1_TX_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW1_TX_VALUE), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW2_NEG_TX_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW2_NEG_TX_VALUE), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW3_SNS_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW3_SNS_VALUE), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW4_GND_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW4_GND_VALUE), \
-        .swSelCsw[CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_INDEX] = \
-                    (CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_VALUE), \
-        .swSelCswFunc[0u] = \
-                    (0x00u), \
-        .mode[CY_CAPSENSE_CSD_RM_SENSING_METHOD_INDEX] = \
+        .sensorConfig = \
         { \
-            .senseDutyCtl = \
-                    ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
-            .swSelCdacFl = \
-                    ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
-            .swSelTop = \
-                    ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
-            .swSelComp = \
-                    ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
-            .swSelSh = \
-                    ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
-                     (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            .snsSwSelCswMask2   = 0x00uL, \
+            .snsSwSelCswMask1   = 0x00uL, \
+            .snsSwSelCswMask0   = 0x00uL, \
+            .snsScanCtl         = 0x00uL, \
+            .snsCdacCtl         = 0x00uL, \
+            .snsCtl             = 0x00uL, \
         }, \
-        .mode[CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX] = \
+        .swSelCsw = \
         { \
-            .senseDutyCtl = \
-                    ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
-            .swSelCdacFl = \
-                    ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
-            .swSelTop = \
-                    ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
-            .swSelComp = \
-                    ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
-            .swSelSh = \
-                    ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
-                     (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            [0u]       = 0x00uL, \
+            [1u]       = 0x00uL, \
+            [2u]       = 0x00uL, \
+            [3u]       = 0x00uL, \
+            [4u]       = 0x00uL, \
+            [5u]       = 0x00uL, \
+            [6u]       = 0x00uL, \
+            [7u]       = 0x00uL, \
+            [8u]       = 0x00uL, \
+            [9u]       = 0x00uL, \
+            [10u]      = 0x00uL, \
+            [11u]      = 0x00uL, \
+            [12u]      = 0x00uL, \
+            [13u]      = 0x00uL, \
+            [14u]      = 0x00uL, \
+            [15u]      = 0x00uL, \
+            [16u]      = 0x00uL, \
+            [17u]      = 0x00uL, \
+            [18u]      = 0x00uL, \
+            [19u]      = 0x00uL, \
+            [20u]      = 0x00uL, \
+            [21u]      = 0x00uL, \
+            [22u]      = 0x00uL, \
+            [23u]      = 0x00uL, \
+            [24u]      = 0x00uL, \
+            [25u]      = 0x00uL, \
+            [26u]      = 0x00uL, \
+            [27u]      = 0x00uL, \
+            [28u]      = 0x00uL, \
+            [29u]      = 0x00uL, \
+            [30u]      = 0x00uL, \
+            [31u]      = 0x00uL, \
         }, \
-    } \
+        .swSelCswFunc = \
+        { \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_RX] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW0_RX_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_TX] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW1_TX_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_TX_NEGATIVE] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW2_NEG_TX_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_SNS] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW3_SNS_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_GND] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW4_GND_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_HIGH_Z] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW5_HIGH_Z_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_VDDA2] = (CY_CAPSENSE_SM_REG_SW_SEL_CSW6_VDDA2_VALUE), \
+            [CY_CAPSENSE_CTRLMUX_PIN_STATE_SHIELD] = (CY_CAPSENSE_FW_SHIELD_ACTIVE_CTRLMUX_REG_SW_SEL_CSW_VALUE), \
+        }, \
+        .mode = \
+        { \
+            [CY_CAPSENSE_CSD_RM_SENSING_METHOD_INDEX] = \
+            { \
+                .senseDutyCtl = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
+                .swSelCdacFl = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
+                .swSelTop = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
+                .swSelComp = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
+                .swSelSh = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            }, \
+            [CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX] = \
+            { \
+                .senseDutyCtl = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
+                .swSelCdacFl = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
+                .swSelTop = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
+                .swSelComp = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
+                .swSelSh = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            }, \
+            [CY_CAPSENSE_CSD_DITHERING_SENSING_METHOD_INDEX] = \
+            { \
+                .senseDutyCtl = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
+                .swSelCdacFl = \
+                        ((CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
+                .swSelTop = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
+                .swSelComp = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
+                .swSelSh = \
+                        ((CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
+                         (CY_CAPSENSE_SM_CSD_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            }, \
+            [CY_CAPSENSE_CSX_DITHERING_SENSING_METHOD_INDEX] = \
+            { \
+                .senseDutyCtl = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH2_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN     << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH3_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH0_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_FS2_PH1_EN_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN     << MSC_MODE_SENSE_DUTY_CTL_PH_GAP_2CYCLE_EN_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH0X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN    << MSC_MODE_SENSE_DUTY_CTL_PHASE_GAP_PH1X_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN    << MSC_MODE_SENSE_DUTY_CTL_PHX_GAP_2CYCLE_EN_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN       << MSC_MODE_SENSE_DUTY_CTL_PHASE_SHIFT_EN_Pos)       | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL       << MSC_MODE_SENSE_DUTY_CTL_PHASE_MODE_SEL_Pos)),      \
+                .swSelCdacFl = \
+                        ((CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA        << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLCB_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLTG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG         << MSC_MODE_SW_SEL_CDAC_FL_SW_FLBG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE << MSC_MODE_SW_SEL_CDAC_FL_ACTIVATION_MODE_Pos)), \
+                .swSelTop = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACB     << MSC_MODE_SW_SEL_TOP_CACB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CACC     << MSC_MODE_SW_SEL_TOP_CACC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_CBCC     << MSC_MODE_SW_SEL_TOP_CBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBCC     << MSC_MODE_SW_SEL_TOP_MBCC_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYA_CTL  << MSC_MODE_SW_SEL_TOP_AYA_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_AYB_CTL  << MSC_MODE_SW_SEL_TOP_AYB_CTL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BYB      << MSC_MODE_SW_SEL_TOP_BYB_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SOSH     << MSC_MODE_SW_SEL_TOP_SOSH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHV      << MSC_MODE_SW_SEL_TOP_SHV_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_SHG      << MSC_MODE_SW_SEL_TOP_SHG_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_BGRF     << MSC_MODE_SW_SEL_TOP_BGRF_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_RMF      << MSC_MODE_SW_SEL_TOP_RMF_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_TOP_FLD_MBF      << MSC_MODE_SW_SEL_TOP_MBF_Pos)),    \
+                .swSelComp = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS1        << MSC_MODE_SW_SEL_COMP_CPCS1_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCS3        << MSC_MODE_SW_SEL_COMP_CPCS3_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPMA         << MSC_MODE_SW_SEL_COMP_CPMA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCA         << MSC_MODE_SW_SEL_COMP_CPCA_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPCB         << MSC_MODE_SW_SEL_COMP_CPCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCB         << MSC_MODE_SW_SEL_COMP_CMCB_Pos)         | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CPF          << MSC_MODE_SW_SEL_COMP_CPF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS2        << MSC_MODE_SW_SEL_COMP_CMCS2_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMCS4        << MSC_MODE_SW_SEL_COMP_CMCS4_Pos)        | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMV          << MSC_MODE_SW_SEL_COMP_CMV_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMG          << MSC_MODE_SW_SEL_COMP_CMG_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_CMF          << MSC_MODE_SW_SEL_COMP_CMF_Pos)          | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_COMP_FLD_HALF_WAVE_EN << MSC_MODE_SW_SEL_COMP_HALF_WAVE_EN_Pos)), \
+                .swSelSh = \
+                        ((CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SHG   << MSC_MODE_SW_SEL_SH_C1SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C1SH    << MSC_MODE_SW_SEL_SH_C1SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SHG   << MSC_MODE_SW_SEL_SH_C3SHG_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_C3SH    << MSC_MODE_SW_SEL_SH_C3SH_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SOMB    << MSC_MODE_SW_SEL_SH_SOMB_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CBSO    << MSC_MODE_SW_SEL_SH_CBSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS1   << MSC_MODE_SW_SEL_SH_SPCS1_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_SPCS3   << MSC_MODE_SW_SEL_SH_SPCS3_Pos)   | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_FSP     << MSC_MODE_SW_SEL_SH_FSP_Pos)     | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_CCSO    << MSC_MODE_SW_SEL_SH_CCSO_Pos)    | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_SEL << MSC_MODE_SW_SEL_SH_BUF_SEL_Pos) | \
+                         (CY_CAPSENSE_SM_CSX_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_SH_FLD_BUF_EN  << MSC_MODE_SW_SEL_SH_BUF_EN_Pos)), \
+            }, \
+        }, \
+    }
 
 #if defined(__cplusplus)
 }

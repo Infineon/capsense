@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['capsense_20middleware_20library_203_2e0_20_28alpha_29',['CapSense Middleware Library 3.0 (Alpha)',['../index.html',1,'']]]
+  ['capsense_26trade_3b_20middleware_20library_203_2e0',['CAPSENSE&amp;trade; Middleware Library 3.0',['../index.html',1,'']]]
 ];

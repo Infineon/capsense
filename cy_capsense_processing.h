@@ -11,7 +11,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -21,6 +22,7 @@
 #if !defined(CY_CAPSENSE_PROCESSING_H)
 #define CY_CAPSENSE_PROCESSING_H
 
+#include "cycfg_capsense_defines.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 #include "cy_capsense_lib.h"
@@ -40,55 +42,91 @@ extern "C" {
 /******************************************************************************/
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
-uint32_t Cy_CapSense_DecodeWidgetGestures(
-                uint32_t widgetId,
-                const cy_stc_capsense_context_t * context);
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN)
+    uint32_t Cy_CapSense_DecodeWidgetGestures(
+                    uint32_t widgetId,
+                    const cy_stc_capsense_context_t * context);
+#endif
 /** \} */
 
 /******************************************************************************/
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
-void Cy_CapSense_InitializeWidgetGestures(
-                uint32_t widgetId,
-                const cy_stc_capsense_context_t * context);
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN)
+    void Cy_CapSense_InitializeWidgetGestures(
+                    uint32_t widgetId,
+                    const cy_stc_capsense_context_t * context);
+#endif
 void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeWidgetStatus(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_ENABLED)
+        cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
+                        uint32_t widgetId,
+                        cy_stc_capsense_context_t * context);
+    #endif
+void Cy_CapSense_PreProcessWidget(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_PreProcessSensor(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                const cy_stc_capsense_context_t * context);
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
+        cy_capsense_status_t Cy_CapSense_RunMfsMedian(
+                        uint32_t widgetId,
+                        const cy_stc_capsense_context_t * context);
+    #endif
+#endif
+
 /** \} */
 
 /******************************************************************************/
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
-void Cy_CapSense_DpProcessButton(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
+#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) ||\
+    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN))
+    void Cy_CapSense_DpProcessButton(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
 
-void Cy_CapSense_DpProcessCsxTouchpad(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+    void Cy_CapSense_DpProcessCsxTouchpad(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
 
-void Cy_CapSense_DpProcessProximity(
-                cy_stc_capsense_widget_config_t const * ptrWdConfig);
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+    void Cy_CapSense_DpProcessProximity(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
 
-void Cy_CapSense_DpProcessCsdTouchpad(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
+    void Cy_CapSense_DpProcessCsdTouchpad(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                    const cy_stc_capsense_context_t * context);
+#endif
 
-void Cy_CapSense_DpProcessSlider(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
-void Cy_CapSense_DpProcessCsdMatrix(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN)
+    void Cy_CapSense_DpProcessSlider(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
 
+#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN)
+    void Cy_CapSense_DpProcessCsdMatrix(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
 void Cy_CapSense_DpProcessCsdWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_context_t * context);
 
 uint32_t Cy_CapSense_DpProcessCsdWidgetRawCounts(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 
 uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
@@ -99,13 +137,14 @@ uint32_t Cy_CapSense_DpProcessCsdSensorRawCountsExt(
                 uint32_t mode,
                 uint16_t * ptrBslnInvSns,
                 const cy_stc_capsense_context_t * context);
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
 
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
 void Cy_CapSense_DpProcessCsxWidgetStatus(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                cy_stc_capsense_context_t * context);
+                const cy_stc_capsense_widget_config_t * ptrWdConfig);
 
 uint32_t Cy_CapSense_DpProcessCsxWidgetRawCounts(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 
 uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
@@ -116,6 +155,7 @@ uint32_t Cy_CapSense_DpProcessCsxSensorRawCountsExt(
                 uint32_t mode,
                 uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context);
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
 
 void Cy_CapSense_DpUpdateDifferences(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
@@ -126,66 +166,44 @@ void Cy_CapSense_DpUpdateThresholds(
                 const cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
                 uint32_t startFlag);
 
-void Cy_CapSense_RunMfsFiltering(
-                cy_stc_capsense_sensor_context_t * ptrSnsContext,
-                const cy_stc_capsense_context_t * context);
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) 
+    void Cy_CapSense_RunMfsFiltering(
+                    cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                    const cy_stc_capsense_context_t * context);
+#endif
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
-cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
-                uint32_t wdId,
-                cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessAllRaw(
-                const cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessWidgetRaw(
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+void Cy_CapSense_PreProcessWidgetInvertRaw(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessSnsRaw(
+void Cy_CapSense_PreProcessSensorInvertRaw(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 const cy_stc_capsense_context_t * context);
-void Cy_CapSense_InvertWidgetRaw(
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
+
+void Cy_CapSense_PreProcessWidgetLimitRaw(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
-void Cy_CapSense_InvertSnsRaw(
-                uint32_t widgetId,
-                uint32_t sensorId,
-                const cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessWidgetCIC2Raw(
-                uint32_t widgetId,
-                const cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessSnsCIC2Raw(
+void Cy_CapSense_PreProcessSensorLimitRaw(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 const cy_stc_capsense_context_t * context);
-void Cy_CapSense_PreProcessSlotCIC2Raw(
-                uint32_t slotId,
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN)
+void Cy_CapSense_PreProcessWidgetCic2Raw(
+                uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_GetCIC2SamplesNum(
-                uint32_t convsNumber,
-                uint32_t subConvsNumber,
-                uint32_t snsClkDivider,
-                uint32_t cicRate);
+void Cy_CapSense_PreProcessSensorCic2Raw(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                const cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_GetCIC2HwDivider(
-                uint32_t cic2SamplesNum);
-uint32_t Cy_CapSense_PreProcessCIC2Data(
-                uint32_t cic2SamplesNum,
-                uint32_t cic2HwDivider,
-                uint32_t cicRateSqr,
-                uint32_t bitFormat,
-                uint32_t rawDataIn);
-uint32_t Cy_CapSense_GetMaxRawCIC1(
-                uint32_t convsNumber,
-                uint32_t subConvsNumber,
-                uint32_t snsClkDivider,
-                uint32_t numEpiCycles);
-uint32_t Cy_CapSense_GetMaxRawCIC2(
-                uint32_t convsNumber,
-                uint32_t subConvsNumber,
-                uint32_t snsClkDivider,
-                uint32_t cicRate);
+                uint32_t cic2Samples);
+#endif
 
-
-#endif /* CY_CAPSENSE_PLATFORM_BLOCK_MSCV3 */
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
 /** \} \endcond */
 
 #if defined(__cplusplus)

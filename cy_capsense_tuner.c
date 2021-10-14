@@ -7,7 +7,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -28,7 +29,7 @@
 * Function Name: Cy_CapSense_TuInitialize
 ****************************************************************************//**
 *
-* Initializes the communication interface with the CapSense Tuner tool.
+* Initializes the communication interface with the CAPSENSE&trade; Tuner tool.
 *
 *******************************************************************************/
 void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
@@ -43,11 +44,11 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_RunTuner
 ****************************************************************************//**
 *
-* Establishes synchronized operation between the CapSense Middleware and 
-* the CapSense Tuner tool.
+* Establishes synchronized operation between the CAPSENSE&trade; Middleware and 
+* the CAPSENSE&trade; Tuner tool.
 *
 * This function is called periodically in the application program. It serves
-* the CapSense Tuner tool requests and commands to synchronize the operation. 
+* the CAPSENSE&trade; Tuner tool requests and commands to synchronize the operation. 
 * Mostly, the best place to call this function is between processing and next 
 * scanning.
 * If the user changes some parameters in the Tuner tool, the middleware is 
@@ -69,15 +70,15 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * The application program must: 
 * * Form a transmission data packet
 * * Validate the data package on receiver implementation prior to passing 
-*   to the CapSense Middleware.
+*   to the CAPSENSE&trade; Middleware.
 * 
-* The transmission packet includes a CapSense context structure sandwiched 
+* The transmission packet includes a CAPSENSE&trade; context structure sandwiched 
 * between a header (0x0D0A) and a tail (0x00FFFF), hence the package size 
-* is dependent on CapSense context information. The receiver packet is 
+* is dependent on CAPSENSE&trade; context information. The receiver packet is 
 * 16-byte (fixed length) data explained under the 
 * Cy_CapSense_CheckTunerCmdIntegrity() function. 
 * The Cy_CapSense_CheckTunerCmdIntegrity() function is used to validate 
-* the received data package prior to passing it to the CapSense middleware.
+* the received data package prior to passing it to the CAPSENSE&trade; middleware.
 * 
 * Periodical calling the Cy_CapSense_RunTuner() function is:
 * * mandatory for operation of a UART-based tuner interface. The middleware 
@@ -88,11 +89,11 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * If the Cy_CapSense_RunTuner() function is not periodically called by 
 * the application program, the middleware operation is asynchronous to 
 * the Tuner tool and the following disadvantages are applicable:
-* * The raw counts displayed in the CapSense Tuner tool may be filtered 
+* * The raw counts displayed in the CAPSENSE&trade; Tuner tool may be filtered 
 *   and/or non-filtered. Result - noise and SNR measurements are not accurate.
-* * The CapSense Tuner tool can read sensor data (such as raw counts) from 
+* * The CAPSENSE&trade; Tuner tool can read sensor data (such as raw counts) from 
 *   a scan multiply. Result - noise and SNR measurement are not accurate.
-* * The CapSense Tuner tool and Host controller should not change the 
+* * The CAPSENSE&trade; Tuner tool and Host controller should not change the 
 *   parameters via the Tuner interface - in async mode this leads to
 *   abnormal behavior.
 * * Displaying detected gestures may be missed.
@@ -106,13 +107,13 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * the Function Usage section for examples.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * The return parameter indicates whether a middleware re-start was executed 
 * by this function or not:
 * - CY_CAPSENSE_STATUS_RESTART_DONE - Based on a received command, the
-* CapSense was re-initialized.
+* CAPSENSE&trade; was re-initialized.
 * - CY_CAPSENSE_STATUS_RESTART_NONE - Re-start was not executed by this
 * function.
 *
@@ -149,13 +150,8 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
     volatile cy_stc_capsense_common_context_t * ptrCommonCxt = context->ptrCommonContext;
     uint8_t tunerState = ptrCommonCxt->tunerSt;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_MSCV3)
-        cy_capsense_tuner_send_callback_t sendCallback = context->ptrInternalContext->ptrTunerSendCallback;
-        cy_capsense_tuner_receive_callback_t receiveCallback = context->ptrInternalContext->ptrTunerReceiveCallback;
-    #else
-        cy_capsense_tuner_send_callback_t sendCallback = context->ptrCommonContext->ptrTunerSendCallback;
-        cy_capsense_tuner_receive_callback_t receiveCallback = context->ptrCommonContext->ptrTunerReceiveCallback;
-    #endif
+    cy_capsense_tuner_send_callback_t sendCallback = context->ptrInternalContext->ptrTunerSendCallback;
+    cy_capsense_tuner_receive_callback_t receiveCallback = context->ptrInternalContext->ptrTunerReceiveCallback;
 
     do
     {
@@ -172,7 +168,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             Cy_SysLib_ExitCriticalSection(interruptState);
         }
 
-        /* Send Data to the CapSense Tuner tool */
+        /* Send Data to the CAPSENSE&trade; Tuner tool */
         if(NULL != sendCallback)
         {
             sendCallback((void *)context);
@@ -261,6 +257,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             break;
 
         default:
+            /* No action on other commands */
             break;
         }
 
@@ -294,7 +291,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 *
 * This function checks whether the specified packet with the size
 * CY_CAPSENSE_COMMAND_PACKET_SIZE could be represented as a
-* command received from the CapSense Tuner tool.
+* command received from the CAPSENSE&trade; Tuner tool.
 * The verification includes the following items:
 * * Header
 * * Tail

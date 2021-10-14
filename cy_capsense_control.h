@@ -7,7 +7,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -31,9 +32,6 @@ extern "C" {
 /*******************************************************************************
 * Local definition
 *******************************************************************************/
-#define CY_CAPSENSE_INIT_DONE                           (1u)
-#define CY_CAPSENSE_INIT_NEEDED                         (0u)
-
 #define CY_CAPSENSE_ANALOG_SETTLING_TIME_US             (25u)
 
 
@@ -59,10 +57,13 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
                 uint32_t widgetId, 
                 cy_stc_capsense_context_t * context);
 
-void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context);
-void Cy_CapSense_SetGestureTimestamp(
-                uint32_t value, 
-                cy_stc_capsense_context_t * context);
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN) || \
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_BALLISTIC_MULTIPLIER_EN))
+    void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context);
+    void Cy_CapSense_SetGestureTimestamp(
+                    uint32_t value, 
+                    cy_stc_capsense_context_t * context);
+#endif
 
 void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context);
 

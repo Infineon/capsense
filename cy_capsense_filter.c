@@ -7,7 +7,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -15,6 +16,7 @@
 
 
 #include <stddef.h>
+#include "cycfg_capsense_defines.h"
 #include "cy_capsense_filter.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_lib.h"
@@ -35,7 +37,20 @@
 #define CY_CAPSENSE_RC_AVG_SIZE                                 (3u)
 
 /* IIR filter constant */
-#define CY_CAPSENSE_IIR_COEFFICIENT_K                   (256u)
+#define CY_CAPSENSE_IIR_COEFFICIENT_K                           (256u)
+
+/******************************************************************************/
+/** \cond SECTION_CAPSENSE_INTERNAL */
+/** \addtogroup group_capsense_internal *//** \{ */
+/******************************************************************************/
+
+static cy_capsense_status_t Cy_CapSense_CheckBaselineInv(
+                cy_stc_capsense_widget_context_t * ptrWdContext,
+                const cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                const uint16_t * ptrSnsBslnInv,
+                const cy_stc_capsense_context_t * context);
+
+/** \} \endcond */
 
 
 /*******************************************************************************
@@ -58,7 +73,7 @@
 * used for custom application implementation.
 * 
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the update baseline operation of all the widgets:
@@ -102,7 +117,7 @@ cy_capsense_status_t Cy_CapSense_UpdateAllBaselines(
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the specified widget update baseline operation:
@@ -153,7 +168,7 @@ cy_capsense_status_t Cy_CapSense_UpdateWidgetBaseline(
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the specified sensor update baseline operation:
@@ -173,6 +188,71 @@ cy_capsense_status_t Cy_CapSense_UpdateSensorBaseline(
     result = Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, ptrSnsCxt, &ptrWdCfg->ptrBslnInv[sensorId], context);
 
     return (result);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_CheckBaselineInv
+****************************************************************************//**
+*
+* Check a matching of present baseline and its inverse duplication.
+*
+* \param ptrWdContext
+* The pointer to the widget context structure where all the widget parameters
+* are stored.
+*
+* \param ptrSnsContext
+* The pointer to the sensor context structure where the sensor data
+* is stored.
+*
+* \param ptrSnsBslnInv
+* The pointer to the sensor baseline inversion used for BIST if enabled.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns a status indicating check result:
+* - CY_CAPSENSE_STATUS_SUCCESS -  if the BIST baseline integrity test is enabled and
+*                                 baseline and its inverse duplication match or BIST
+*                                 baseline integrity test is disabled.
+* - CY_CAPSENSE_STATUS_BAD_DATA - if the BIST baseline integrity test is enabled and
+*                                 the sensor's baseline and its inversion doesn't
+*                                 match. In this case the function as well clears
+*                                 the bit[2] (Widget Working) of the .status field
+*                                 in the widget context structure preventing corrupted
+*                                 data usage and set the CY_CAPSENSE_BIST_BSLN_INTEGRITY_MASK
+*                                 bit of the .testResultMask field
+*                                 in the /ref cy_stc_capsense_bist_context_t structure.
+*
+*******************************************************************************/
+static cy_capsense_status_t Cy_CapSense_CheckBaselineInv(
+                cy_stc_capsense_widget_context_t * ptrWdContext,
+                const cy_stc_capsense_sensor_context_t * ptrSnsContext,
+                const uint16_t * ptrSnsBslnInv,
+                const cy_stc_capsense_context_t * context)
+{
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
+
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN))
+        uint16_t bslnInv = (uint16_t)(~ptrSnsContext->bsln);
+
+        if (*ptrSnsBslnInv != bslnInv)
+        {
+            result = CY_CAPSENSE_STATUS_BAD_DATA;
+            ptrWdContext->status &= (uint8_t)~CY_CAPSENSE_WD_WORKING_MASK;
+            context->ptrBistContext->testResultMask |= CY_CAPSENSE_BIST_BSLN_INTEGRITY_MASK;
+        }
+    #else
+        (void) ptrWdContext;
+        (void) ptrSnsContext;
+        (void) ptrSnsBslnInv;
+        (void) context;
+    #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+               (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN)) */
+
+    return result;
 }
 
 /*******************************************************************************
@@ -198,29 +278,32 @@ cy_capsense_status_t Cy_CapSense_UpdateSensorBaseline(
 * The pointer to the sensor baseline inversion used for BIST if enabled.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns a status indicating whether the baseline has been updated:
 * - CY_CAPSENSE_STATUS_SUCCESS - if baseline updating was successful.
-* - CY_CAPSENSE_STATUS_BAD_DATA - if present sensor's any channel baseline and its inversion
-* doesn't match.
+* - CY_CAPSENSE_STATUS_BAD_DATA - if the BIST baseline integrity test is enabled and
+*                                 the sensor's baseline and its inversion doesn't
+*                                 match. In this case the function as well clears
+*                                 the bit[2] (Widget Working) of the .status field
+*                                 in the widget context structure preventing corrupted
+*                                 data usage and set the CY_CAPSENSE_BIST_BSLN_INTEGRITY_MASK
+*                                 bit of the .testResultMask field
+*                                 in the /ref cy_stc_capsense_bist_context_t structure.
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
-                const cy_stc_capsense_widget_context_t * ptrWdContext,
+                cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
                 uint16_t * ptrSnsBslnInv,
                 const cy_stc_capsense_context_t * context)
 {
-    cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
+    cy_capsense_status_t result;
     uint32_t bslnHistory;
-    uint16_t bslnInv = (uint16_t)(~ptrSnsContext->bsln);
 
-    if ((CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn) && (*ptrSnsBslnInv != bslnInv))
-    {
-        result = CY_CAPSENSE_STATUS_BAD_DATA;
-    }
+    result = Cy_CapSense_CheckBaselineInv(ptrWdContext, ptrSnsContext, ptrSnsBslnInv, context);
+
     if (CY_CAPSENSE_STATUS_SUCCESS == result)
     {
         /* Reset negative baseline counter */
@@ -230,7 +313,7 @@ cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
         }
 
         /* Reset baseline */
-        if (ptrSnsContext->bsln > (ptrWdContext->nNoiseTh + ptrSnsContext->raw))
+        if ((uint32_t)ptrSnsContext->bsln > ((uint32_t)ptrWdContext->nNoiseTh + ptrSnsContext->raw))
         {
             if (ptrSnsContext->negBslnRstCnt >= ptrWdContext->lowBslnRst)
             {
@@ -250,22 +333,23 @@ cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
             * - sensor Auto-reset is enabled
             */
             if ((0u != context->ptrCommonConfig->swSensorAutoResetEn) ||
-                (ptrSnsContext->raw <= (ptrWdContext->noiseTh + ptrSnsContext->bsln)))
+                ((uint32_t)ptrSnsContext->raw <= ((uint32_t)ptrWdContext->noiseTh + ptrSnsContext->bsln)))
             {
                 /* Get real baseline */
                 bslnHistory = ((uint32_t)ptrSnsContext->bsln << CY_CAPSENSE_IIR_BL_SHIFT) | ptrSnsContext->bslnExt;
                 /* Calculate baseline value */
                 bslnHistory = Cy_CapSense_FtIIR1stOrder((uint32_t)ptrSnsContext->raw << CY_CAPSENSE_IIR_BL_SHIFT, bslnHistory, (uint32_t)ptrWdContext->bslnCoeff);
                 /* Split baseline */
-                ptrSnsContext->bsln = CY_LO16(bslnHistory >> CY_CAPSENSE_IIR_BL_SHIFT);
-                ptrSnsContext->bslnExt = CY_LO8(bslnHistory);
+                ptrSnsContext->bsln = (uint16_t)(bslnHistory >> CY_CAPSENSE_IIR_BL_SHIFT);
+                ptrSnsContext->bslnExt = (uint8_t)(bslnHistory);
             }
         }
         /* If BIST enabled, update the baseline inverse duplication */
-        if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
-        {
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN))
             *ptrSnsBslnInv = ~ptrSnsContext->bsln;
-        }
+        #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+                   (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN)) */
     }
     return result;
 }
@@ -284,7 +368,7 @@ cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
 * 
 * Following functions to initialize sensor and widgets and filter history 
 * should be called after initializing baseline for proper operation of 
-* the CapSense middleware:
+* the CAPSENSE&trade; middleware:
 * * Cy_CapSense_InitializeAllStatuses()
 * * Cy_CapSense_InitializeAllFilters()
 * 
@@ -292,7 +376,7 @@ cy_capsense_status_t Cy_CapSense_FtUpdateBaseline(
 * not required to use this function if above function is used.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context)
@@ -331,7 +415,7 @@ void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context)
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeWidgetBaseline(
@@ -364,7 +448,7 @@ void Cy_CapSense_InitializeWidgetBaseline(
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeSensorBaseline(
@@ -372,21 +456,23 @@ void Cy_CapSense_InitializeSensorBaseline(
                 uint32_t sensorId, 
                 cy_stc_capsense_context_t * context)
 {
-    uint32_t freqChIndex;
-    uint32_t freqChNumber;
     uint32_t cxtOffset;
-
-    freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
-    for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
+    uint32_t freqChIndex;
+    for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
-        cxtOffset = sensorId + (freqChIndex * context->ptrCommonConfig->numSns);
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+            cxtOffset = sensorId + (freqChIndex * context->ptrCommonConfig->numSns);
+        #else
+            cxtOffset = sensorId;
+        #endif
         Cy_CapSense_FtInitializeBaseline(&context->ptrWdConfig[widgetId].ptrSnsContext[cxtOffset]);
         /* If BIST enabled, create a baseline inverse duplication */
-        if (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->bistEn)
-        {
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+                (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN))
             context->ptrWdConfig[widgetId].ptrBslnInv[cxtOffset] =
-                                             ~context->ptrWdConfig[widgetId].ptrSnsContext[cxtOffset].bsln;
-        }
+                                            ~context->ptrWdConfig[widgetId].ptrSnsContext[cxtOffset].bsln;
+        #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+                    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN)) */
     }
 }
 
@@ -409,7 +495,7 @@ void Cy_CapSense_FtInitializeBaseline(cy_stc_capsense_sensor_context_t * ptrSnsC
     ptrSnsContext->negBslnRstCnt = 0u;
 }
 
-
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeAllFilters
 ****************************************************************************//**
@@ -422,7 +508,7 @@ void Cy_CapSense_FtInitializeBaseline(cy_stc_capsense_sensor_context_t * ptrSnsC
 * * Cy_CapSense_InitializeAllBaselines()
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context)
@@ -452,7 +538,7 @@ void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context)
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
 void Cy_CapSense_InitializeWidgetFilter(
@@ -461,159 +547,81 @@ void Cy_CapSense_InitializeWidgetFilter(
 {
     uint32_t snsIndex;
     uint32_t freqChIndex;
-    uint32_t freqChNumber;
     uint32_t snsHistorySize;
-    uint32_t cxtOffset;
     uint32_t historyOffset;
-        
+
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
-    
+
     uint32_t rawFilterCfg = ptrWdCfg->rawFilterConfig;
-    uint8_t * ptrHistoryLow = NULL;
     uint16_t * ptrHistory;
-    cy_stc_capsense_sensor_context_t * ptrSnsCtx ;
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
+    const cy_stc_capsense_sensor_context_t * ptrSnsCtx ;
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
         cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory;
     #endif
+    #if (CY_CAPSENSE_REGULAR_RC_IIR_FILTER_EN || CY_CAPSENSE_PROX_RC_IIR_FILTER_EN)
+        uint8_t * ptrHistoryLow = NULL;
+    #endif
 
-    freqChNumber = (CY_CAPSENSE_ENABLE == context->ptrCommonConfig->mfsEn) ? 3u : 1u;
     snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-    for(freqChIndex = 0u; freqChIndex < freqChNumber; freqChIndex++)
+    for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
         for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
         {
-            cxtOffset = snsIndex + (freqChIndex * context->ptrCommonConfig->numSns);
-            historyOffset = snsHistorySize * (snsIndex + (freqChIndex * context->ptrCommonConfig->numSns));
-            ptrSnsCtx = &ptrWdCfg->ptrSnsContext[cxtOffset];
+            ptrSnsCtx = &ptrWdCfg->ptrSnsContext[snsIndex + (freqChIndex * context->ptrCommonConfig->numSns)];
+            historyOffset = (freqChIndex * (CY_CAPSENSE_RAW_HISTORY_SIZE / CY_CAPSENSE_CONFIGURED_FREQ_NUM)) + (snsHistorySize * snsIndex);
             ptrHistory = &ptrWdCfg->ptrRawFilterHistory[historyOffset];
 
-            if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
-            {
-                ptrHistoryLow = &ptrWdCfg->ptrRawFilterHistoryLow[cxtOffset];
-            }
+            #if (CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN)
+                if(0u != (CY_CAPSENSE_RC_FILTER_MEDIAN_EN_MASK & rawFilterCfg))
+                {
+                    Cy_CapSense_InitializeMedianInternal(ptrWdCfg, ptrSnsCtx, ptrHistory);
+                    ptrHistory += CY_CAPSENSE_RC_MEDIAN_SIZE;
+                }
+            #endif
 
-            if(0u != (CY_CAPSENSE_RC_FILTER_MEDIAN_EN_MASK & rawFilterCfg))
-            {
-                Cy_CapSense_InitializeMedianInternal(ptrWdCfg, ptrSnsCtx, ptrHistory);
-                ptrHistory += CY_CAPSENSE_RC_MEDIAN_SIZE;
-            }
-
+            #if (CY_CAPSENSE_REGULAR_RC_IIR_FILTER_EN || CY_CAPSENSE_PROX_RC_IIR_FILTER_EN)
             if(0u != (CY_CAPSENSE_RC_FILTER_IIR_EN_MASK & rawFilterCfg))
             {
+                if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
+                {
+                    ptrHistoryLow = &ptrWdCfg->ptrRawFilterHistoryLow[snsIndex +
+                            (freqChIndex * (CY_CAPSENSE_IIR_HISTORY_LOW_SIZE / CY_CAPSENSE_CONFIGURED_FREQ_NUM))];
+                }
                 Cy_CapSense_InitializeIIRInternal(ptrWdCfg, ptrSnsCtx, ptrHistory, ptrHistoryLow);
                 ptrHistory += CY_CAPSENSE_RC_IIR_SIZE;
             }
-                
+            #endif
+
+            #if (CY_CAPSENSE_REGULAR_RC_AVERAGE_FILTER_EN || CY_CAPSENSE_PROX_RC_AVERAGE_FILTER_EN)
             if(0u != (CY_CAPSENSE_RC_FILTER_AVERAGE_EN_MASK & rawFilterCfg))
             {
                 Cy_CapSense_InitializeAverageInternal(ptrWdCfg, ptrSnsCtx, ptrHistory);
             }
+            #endif
         }
     }
-    
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_CSDV2)
-        if (CY_CAPSENSE_CSD_SS_HWTH_EN == context->ptrCommonConfig->csdAutotuneEn)
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+        /* Noise envelope is available for CSD widgets only */
+        if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
         {
-            /* Noise envelope is available for CSD widgets only */
-            if ((uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E == ptrWdCfg->senseMethod)
+            ptrSnsCtx = ptrWdCfg->ptrSnsContext;
+            ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
+            for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
             {
-                ptrSnsCtx = ptrWdCfg->ptrSnsContext;
-                ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
-                for(snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
-                {
-                    Cy_CapSense_InitializeNoiseEnvelope_Lib_Call(ptrSnsCtx->raw,
-                                                                 ptrWdCfg->ptrWdContext->sigPFC,
-                                                                 ptrNEHistory,
-                                                                 context);
-                    ptrSnsCtx++;
-                    ptrNEHistory++;
-                }
+                Cy_CapSense_InitializeNoiseEnvelope_Lib(ptrSnsCtx->raw,
+                        ptrWdCfg->ptrWdContext->sigPFC, ptrNEHistory);
+                ptrSnsCtx++;
+                ptrNEHistory++;
             }
         }
+    #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
     #endif
 }
+#endif /*(CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)*/
 
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_InitializeIIR
-****************************************************************************//**
-*
-* Initializes the IIR filter history.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId 
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_InitializeIIR(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg;
-    const cy_stc_capsense_sensor_context_t * ptrSnsCtx;
-    
-    ptrWdCfg = &context->ptrWdConfig[widgetId];
-    ptrSnsCtx = &ptrWdCfg->ptrSnsContext[sensorId];
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-    
-    Cy_CapSense_InitializeIIRInternal(ptrWdCfg,
-                                      ptrSnsCtx, 
-                                      &ptrWdCfg->ptrRawFilterHistory[(sensorId * snsHistorySize) + 2uL],
-                                      &ptrWdCfg->ptrRawFilterHistoryLow[sensorId]);
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_RunIIR
-****************************************************************************//**
-*
-* Executes the IIR filter algorithm on a sensor indicated by an input
-* parameter.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId 
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_RunIIR(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg;
-    cy_stc_capsense_sensor_context_t * ptrSnsCtx;
-    
-    ptrWdCfg = &context->ptrWdConfig[widgetId];
-    ptrSnsCtx = &ptrWdCfg->ptrSnsContext[sensorId];
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-
-    
-    Cy_CapSense_RunIIRInternal(ptrWdCfg,
-                               ptrSnsCtx, 
-                               &ptrWdCfg->ptrRawFilterHistory[(sensorId * snsHistorySize) + 2uL],
-                               &ptrWdCfg->ptrRawFilterHistoryLow[sensorId]);
-
-}
-
+#if (CY_CAPSENSE_REGULAR_RC_IIR_FILTER_EN || CY_CAPSENSE_PROX_RC_IIR_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeIIRInternal
 ****************************************************************************//**
@@ -623,13 +631,13 @@ void Cy_CapSense_RunIIR(
 * \param ptrWdConfig 
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
-* \param ptrSnsRawHistoryLow           
+* \param ptrSnsRawHistoryLow
 * The pointer to the extended filter history of the sensor.
 *
 *******************************************************************************/
@@ -639,12 +647,10 @@ void Cy_CapSense_InitializeIIRInternal(
                 uint16_t * ptrSnsRawHistory,
                 uint8_t * ptrSnsRawHistoryLow)
 {
-    CY_ASSERT(NULL != ptrSnsRawHistory);
-    CY_ASSERT(NULL != ptrSnsRawHistoryLow);
-
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
-    
-    if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
+
+    if ((NULL != ptrSnsRawHistoryLow) &&
+       (CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK)))
     {
         ptrSnsRawHistoryLow[0u] = 0u;
     }
@@ -657,16 +663,16 @@ void Cy_CapSense_InitializeIIRInternal(
 *
 * Runs the IIR filter.
 *
-* \param ptrWdConfig 
+* \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
-* \param ptrSnsRawHistoryLow           
+* \param ptrSnsRawHistoryLow
 * The pointer to the extended filter history of the sensor.
 *
 *******************************************************************************/
@@ -678,113 +684,40 @@ void Cy_CapSense_RunIIRInternal(
 {
     uint32_t tempHistory;
     uint32_t tempRaw;
-    
+
     if(CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
     {
         tempRaw = ((uint32_t)ptrSnsContext->raw) << CY_CAPSENSE_IIR_SHIFT_PERFORMANCE;
         tempHistory  = ((uint32_t)(*ptrSnsRawHistory)) << CY_CAPSENSE_IIR_SHIFT_PERFORMANCE;
         tempHistory |= (uint32_t)(*ptrSnsRawHistoryLow);
         tempRaw = Cy_CapSense_FtIIR1stOrder(tempRaw, tempHistory, ptrWdConfig->iirCoeff);
-        *ptrSnsRawHistory = CY_LO16(tempRaw >> CY_CAPSENSE_IIR_SHIFT_PERFORMANCE);
-        *ptrSnsRawHistoryLow = CY_LO8(tempRaw);
-        ptrSnsContext->raw = CY_LO16(tempRaw >> CY_CAPSENSE_IIR_SHIFT_PERFORMANCE);
+        *ptrSnsRawHistory = (uint16_t)(tempRaw >> CY_CAPSENSE_IIR_SHIFT_PERFORMANCE);
+        *ptrSnsRawHistoryLow = (uint8_t)(tempRaw);
+        ptrSnsContext->raw = (uint16_t)(tempRaw >> CY_CAPSENSE_IIR_SHIFT_PERFORMANCE);
     }
     else
     {
         tempRaw = Cy_CapSense_FtIIR1stOrder((uint32_t)ptrSnsContext->raw, (uint32_t)(*ptrSnsRawHistory), ptrWdConfig->iirCoeff);
-        *ptrSnsRawHistory = CY_LO16(tempRaw);
+        *ptrSnsRawHistory = (uint16_t)(tempRaw);
         ptrSnsContext->raw = *ptrSnsRawHistory;
     }
 }
+#endif /* (CY_CAPSENSE_REGULAR_RC_IIR_FILTER_EN || CY_CAPSENSE_PROX_RC_IIR_FILTER_EN) */
 
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_InitializeMedian
-****************************************************************************//**
-*
-* Initializes the median filter history.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId 
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_InitializeMedian(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
-    cy_stc_capsense_sensor_context_t * ptrSnsCtx = &ptrWdCfg->ptrSnsContext[sensorId];
-
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-    
-    Cy_CapSense_InitializeMedianInternal(ptrWdCfg,
-                                         ptrSnsCtx,
-                                         &ptrWdCfg->ptrRawFilterHistory[sensorId * snsHistorySize]);
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_RunMedian
-****************************************************************************//**
-*
-* Executes the median filter algorithm on a sensor raw count indicated by 
-* the input parameters.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_RunMedian(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
-    cy_stc_capsense_sensor_context_t * ptrSnsCtx = &ptrWdCfg->ptrSnsContext[sensorId];
-
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-    
-    Cy_CapSense_RunMedianInternal(ptrWdCfg,
-                                  ptrSnsCtx,
-
-                                  &ptrWdCfg->ptrRawFilterHistory[sensorId * snsHistorySize]);
-}
-
-
+#if (CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeMedianInternal
 ****************************************************************************//**
 *
 * Initializes the median filter.
 *
-* \param ptrWdConfig 
+* \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
 *******************************************************************************/
@@ -794,7 +727,7 @@ void Cy_CapSense_InitializeMedianInternal(
                 uint16_t * ptrSnsRawHistory)
 {
     (void)ptrWdConfig;
-    
+
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
     ptrSnsRawHistory[1u] = ptrSnsContext->raw;
 }
@@ -806,13 +739,13 @@ void Cy_CapSense_InitializeMedianInternal(
 *
 * Runs the median filter.
 *
-* \param ptrWdConfig 
+* \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
 *******************************************************************************/
@@ -825,108 +758,29 @@ void Cy_CapSense_RunMedianInternal(
                     (uint32_t)ptrSnsContext->raw, 
                     (uint32_t)ptrSnsRawHistory[0u], 
                     (uint32_t)ptrSnsRawHistory[1u]);
-    
+
     (void)ptrWdConfig;
-    
+
     ptrSnsRawHistory[1u] = ptrSnsRawHistory[0u];
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
-    ptrSnsContext->raw = CY_LO16(temp);
+    ptrSnsContext->raw = (uint16_t)(temp);
 }
+#endif /* (CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN) */
 
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_InitializeAverage
-****************************************************************************//**
-*
-* Initializes the average filter history.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId 
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_InitializeAverage(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t  * ptrWdCfg;
-    const cy_stc_capsense_sensor_context_t * ptrSnsCtx;
-    
-    ptrWdCfg   = &context->ptrWdConfig[widgetId];
-    ptrSnsCtx  = &ptrWdCfg->ptrSnsContext[sensorId];
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-
-    Cy_CapSense_InitializeAverageInternal(
-                    ptrWdCfg,
-                    ptrSnsCtx,
-                    &ptrWdCfg->ptrRawFilterHistory[(sensorId * snsHistorySize) + 2u + 1u]);
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_RunAverage
-****************************************************************************//**
-*
-* Executes the average filter algorithm on a sensor indicated by an input
-* parameter.
-*
-* \param widgetId 
-* Specifies the ID number of the widget. A macro for the widget ID can be found 
-* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
-*
-* \param sensorId 
-* Specifies the ID number of the sensor within the widget. A macro for the 
-* sensor ID within a specified widget can be found in the cycfg_capsense.h 
-* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
-*
-* \param context
-* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
-*
-*******************************************************************************/
-void Cy_CapSense_RunAverage(
-                uint32_t widgetId, 
-                uint32_t sensorId, 
-                const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsHistorySize;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg;
-    cy_stc_capsense_sensor_context_t * ptrSnsCtx;
-    
-    ptrWdCfg   = &context->ptrWdConfig[widgetId];
-    ptrSnsCtx  = &ptrWdCfg->ptrSnsContext[sensorId];
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
-
-    Cy_CapSense_RunAverageInternal(
-                    ptrWdCfg,
-                    ptrSnsCtx,
-                    &ptrWdCfg->ptrRawFilterHistory[(sensorId * snsHistorySize) + 2u + 1u]);
-
-}
-
-
+#if (CY_CAPSENSE_REGULAR_RC_AVERAGE_FILTER_EN || CY_CAPSENSE_PROX_RC_AVERAGE_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeAverageInternal
 ****************************************************************************//**
 *
 * Initializes the average filter.
 *
-* \param ptrWdConfig 
+* \param ptrWdConfig
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
 *******************************************************************************/
@@ -937,7 +791,7 @@ void Cy_CapSense_InitializeAverageInternal(
 {
     (void)ptrWdConfig;
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
-    ptrSnsRawHistory[1u] = ptrSnsContext->raw;    
+    ptrSnsRawHistory[1u] = ptrSnsContext->raw;
     ptrSnsRawHistory[2u] = ptrSnsContext->raw;
 }
 
@@ -951,10 +805,10 @@ void Cy_CapSense_InitializeAverageInternal(
 * \param ptrWdConfig 
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
 *******************************************************************************/
@@ -976,10 +830,11 @@ void Cy_CapSense_RunAverageInternal(
         temp = ((uint32_t)ptrSnsContext->raw + ptrSnsRawHistory[0u]) >> 1u;
     }
     ptrSnsRawHistory[0u] = ptrSnsContext->raw;
-    ptrSnsContext->raw = CY_LO16(temp);
+    ptrSnsContext->raw = (uint16_t)(temp);
 }
+#endif /* (CY_CAPSENSE_REGULAR_RC_AVERAGE_FILTER_EN || CY_CAPSENSE_PROX_RC_AVERAGE_FILTER_EN) */
 
-
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_FtRunEnabledFiltersInternal
 ****************************************************************************//**
@@ -989,13 +844,13 @@ void Cy_CapSense_RunAverageInternal(
 * \param ptrWdConfig 
 * The pointer to the widget configuration structure.
 *
-* \param ptrSnsContext     
+* \param ptrSnsContext
 * The pointer to the sensor context structure.
 *
-* \param ptrSnsRawHistory           
+* \param ptrSnsRawHistory
 * The pointer to the filter history of the sensor.
 *
-* \param ptrSnsRawHistoryLow           
+* \param ptrSnsRawHistoryLow
 * The pointer to the extended filter history of the sensor.
 *
 *******************************************************************************/
@@ -1007,64 +862,78 @@ void Cy_CapSense_FtRunEnabledFiltersInternal(
 {
     uint16_t rawFilterCfg;
     rawFilterCfg = ptrWdConfig->rawFilterConfig;
-    
-    if(0u != (CY_CAPSENSE_RC_FILTER_MEDIAN_EN_MASK & rawFilterCfg))
-    {
-        Cy_CapSense_RunMedianInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistory);
-        ptrSnsRawHistory += CY_CAPSENSE_RC_MEDIAN_SIZE;
-    }
+    uint16_t * ptrSnsRawHistoryLocal = ptrSnsRawHistory;
 
-    if(0u != (CY_CAPSENSE_RC_FILTER_IIR_EN_MASK & rawFilterCfg))
-    {
-        Cy_CapSense_RunIIRInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistory, ptrSnsRawHistoryLow);
-        ptrSnsRawHistory += CY_CAPSENSE_RC_IIR_SIZE;
-    }
-        
-    if(0u != (CY_CAPSENSE_RC_FILTER_AVERAGE_EN_MASK & rawFilterCfg))
-    {
-        Cy_CapSense_RunAverageInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistory);
-    }
+    #if (CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN)
+        if(0u != (CY_CAPSENSE_RC_FILTER_MEDIAN_EN_MASK & rawFilterCfg))
+        {
+            Cy_CapSense_RunMedianInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistoryLocal);
+            ptrSnsRawHistoryLocal += CY_CAPSENSE_RC_MEDIAN_SIZE;
+        }
+    #endif 
+
+    #if (CY_CAPSENSE_REGULAR_RC_IIR_FILTER_EN || CY_CAPSENSE_PROX_RC_IIR_FILTER_EN)
+        if(0u != (CY_CAPSENSE_RC_FILTER_IIR_EN_MASK & rawFilterCfg))
+        {
+            Cy_CapSense_RunIIRInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistoryLocal, ptrSnsRawHistoryLow);
+            ptrSnsRawHistoryLocal += CY_CAPSENSE_RC_IIR_SIZE;
+        }
+    #else
+        (void)ptrSnsRawHistoryLow;
+    #endif
+
+    #if (CY_CAPSENSE_REGULAR_RC_AVERAGE_FILTER_EN || CY_CAPSENSE_PROX_RC_AVERAGE_FILTER_EN)
+        if(0u != (CY_CAPSENSE_RC_FILTER_AVERAGE_EN_MASK & rawFilterCfg))
+        {
+            Cy_CapSense_RunAverageInternal(ptrWdConfig, ptrSnsContext, ptrSnsRawHistoryLocal);
+        }
+    #endif
 }
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN) */
 
-
+#if (CY_CAPSENSE_POS_MEDIAN_FILTER_EN || CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN \
+    || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN || CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_FtMedian
 ****************************************************************************//**
 *
 * Returns the median value from the three passed arguments.
 *
-* \param x1 
+* \param x1
 * The first value to be compared.
 *
-* \param x2 
+* \param x2
 * The second value to be compared.
 *
-* \param x3 
+* \param x3
 * The third value to be compared.
 *
-* \return   
+* \return
 * Returns the median value of input arguments.
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_FtMedian(uint32_t x1, uint32_t x2, uint32_t x3)
 {
     uint32_t tmp;
+    uint32_t x1Local = x1;
+    uint32_t x2Local = x2;
 
-    if (x1 > x2)
+    if (x1Local > x2Local)
     {
-        tmp = x2;
-        x2 = x1;
-        x1 = tmp;
+        tmp = x2Local;
+        x2Local = x1Local;
+        x1Local = tmp;
     }
 
-    if (x2 > x3)
+    if (x2Local > x3)
     {
-        x2 = x3;
+        x2Local = x3;
     }
 
-    return ((x1 > x2) ? x1 : x2);
+    return ((x1Local > x2Local) ? x1Local : x2Local);
 }
-
+#endif /*#if (CY_CAPSENSE_POS_MEDIAN_FILTER_EN || CY_CAPSENSE_REGULAR_RC_MEDIAN_FILTER_EN \
+    || CY_CAPSENSE_PROX_RC_MEDIAN_FILTER_EN || CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)*/
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_FtIIR1stOrder
@@ -1072,16 +941,16 @@ uint32_t Cy_CapSense_FtMedian(uint32_t x1, uint32_t x2, uint32_t x3)
 *
 * Returns the filtered data by the IIR 1-st order algorithm
 *
-* \param input      
+* \param input
 * The data to be filtered.
 *
-* \param prevOutput 
+* \param prevOutput
 * The previous filtered data.
 *
-* \param n          
+* \param n
 * The IIR filter coefficient (n/256).
 *
-* \return   
+* \return
 * Returns the filtered data.
 *
 *******************************************************************************/
@@ -1094,39 +963,42 @@ uint32_t Cy_CapSense_FtIIR1stOrder(uint32_t input, uint32_t prevOutput, uint32_t
     return filteredOutput;
 }
 
-
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_JITTER_FILTER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_FtJitter
 ****************************************************************************//**
 *
 * Returns the filtered data by the jitter algorithm.
 *
-* \param input      
+* \param input
 * The data to be filtered.
 *
-* \param prevOutput 
+* \param prevOutput
 * The previous filtered data.
 *
-* \return   
+* \return
 * Returns the filtered data.
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_FtJitter(uint32_t input, uint32_t prevOutput)
 {
-    if (prevOutput > input)
+    uint32_t inputLocal = input;
+
+    if (prevOutput > inputLocal)
     {
-        input++;
+        inputLocal++;
     }
-    else if (prevOutput < input)
+    else if (prevOutput < inputLocal)
     {
-        input--;
+        inputLocal--;
     }
     else
     {
-        /* Nothing to do - MISRA 14.1 requirement*/
+        /* No action, input equal to prevOutput */
     }
-    return input;
+    return inputLocal;
 }
+#endif /*(CY_CAPSENSE_DISABLE != CY_CAPSENSE_POS_JITTER_FILTER_EN)*/
 
 #endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
 

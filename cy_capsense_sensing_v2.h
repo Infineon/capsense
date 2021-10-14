@@ -7,7 +7,8 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2020, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -22,6 +23,7 @@
 #include "cy_sysclk.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
+#include "cycfg_capsense_defines.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2))
 
@@ -39,13 +41,9 @@ extern "C" {
 /******************************************************************************/
 
 cy_capsense_status_t Cy_CapSense_SetupWidget(
-                uint32_t widgetId, 
+                uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_ScanAllWidgets(cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_IsBusy(const cy_stc_capsense_context_t * context);
-void Cy_CapSense_InterruptHandler(
-                const CSD_Type * base, 
+cy_capsense_status_t Cy_CapSense_Scan(
                 cy_stc_capsense_context_t * context);
 
 /** \} */
@@ -58,18 +56,8 @@ cy_capsense_status_t Cy_CapSense_SetupWidgetExt(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_CalibrateWidget(
-                uint32_t widgetId, 
+cy_capsense_status_t Cy_CapSense_ScanExt(
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_SetPinState(
-                uint32_t widgetId,
-                uint32_t sensorElement,
-                uint32_t state,
-                const cy_stc_capsense_context_t * context);
 
 /** \} */
 
@@ -77,58 +65,142 @@ cy_capsense_status_t Cy_CapSense_SetPinState(
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
+cy_capsense_status_t Cy_CapSense_ScanWidget_V2(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ScanSensor_V2(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ScanAllWidgets_V2(
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_IsBusy_V2(
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_InterruptHandler_V2(
+                const CSD_Type * base,
+                cy_stc_capsense_context_t * context);
 
-void Cy_CapSense_SetBusyFlags(cy_stc_capsense_context_t * context);
-void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context);
-void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context);
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
+    cy_capsense_status_t Cy_CapSense_CalibrateWidget_V2(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets_V2(
+                cy_stc_capsense_context_t * context);
+#endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN)) */
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN)
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsdWidgets(
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN)
+cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets(
+                cy_stc_capsense_context_t * context);
+#endif
+
+cy_capsense_status_t Cy_CapSense_SetPinState_V2(
+                uint32_t widgetId,
+                uint32_t sensorElement,
+                uint32_t state,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_SetBusyFlags(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_ClrBusyFlags(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SsInitialize(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_SsPostAllWidgetsScan(
+                cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetIOsInDesiredState(
                 uint32_t desiredDriveMode,
                 uint32_t desiredPinOutput,
                 en_hsiom_sel_t desiredHsiom,
                 const cy_stc_capsense_context_t * context);
-void Cy_CapSense_SetSpecificIOsInDefaultState(const cy_stc_capsense_context_t * context);
+void Cy_CapSense_SetSpecificIOsInDefaultState(
+                const cy_stc_capsense_context_t * context);
+cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(
+                uint8_t mode,
+                cy_stc_capsense_context_t * context);
 
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+cy_capsense_status_t Cy_CapSense_SsAutoTune(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+#endif
 
-cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(uint8_t mode, cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitializeSourceSenseClk(
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_SsCalcLfsrSize(
+                uint32_t clkDivider,
+                uint32_t conversionsNum);
 
-cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
-
-void Cy_CapSense_InitializeSourceSenseClk(const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_SsCalcLfsrSize(uint32_t clkDivider, uint32_t conversionsNum);
-
-void Cy_CapSense_DischargeExtCapacitors(cy_stc_capsense_context_t * context);
-
-void Cy_CapSense_InitActivePtrSns(uint32_t sensorId, cy_stc_capsense_context_t * context);
-void Cy_CapSense_InitActivePtrWd(uint32_t widgetId, cy_stc_capsense_context_t * context);
-void Cy_CapSense_InitActivePtr(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
-
-void Cy_CapSense_SsConfigPinRegisters(GPIO_PRT_Type * base, uint32_t pinNum, uint32_t dm, en_hsiom_sel_t hsiom);
-void Cy_CapSense_SsReadPinRegisters(GPIO_PRT_Type * base, uint32_t pinNum, uint32_t *dm, en_hsiom_sel_t *hsiom);
-
-void Cy_CapSense_SetClkDivider(uint32_t dividerValue, const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_WatchdogCyclesNum(uint32_t desiredTimeUs, uint32_t cpuFreqMHz, uint32_t cyclesPerLoop);
-
+void Cy_CapSense_DischargeExtCapacitors(
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitActivePtrSns(
+                uint32_t sensorId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitActivePtrWd(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_InitActivePtr(
+                uint32_t widgetId,
+                uint32_t sensorId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_SsConfigPinRegisters(
+                GPIO_PRT_Type * base,
+                uint32_t pinNum,
+                uint32_t dm,
+                en_hsiom_sel_t hsiom);
+void Cy_CapSense_SsReadPinRegisters(
+                GPIO_PRT_Type * base,
+                uint32_t pinNum,
+                uint32_t *dm,
+                en_hsiom_sel_t *hsiom);
+void Cy_CapSense_SetClkDivider(
+                uint32_t dividerValue,
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_WatchdogCyclesNum(
+                uint32_t desiredTimeUs,
+                uint32_t cpuFreqMHz,
+                uint32_t cyclesPerLoop);
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) ||\
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
 cy_capsense_status_t Cy_CapSense_CalibrateCheck(
-                uint32_t widgetId, 
-                uint32_t target, 
+                uint32_t widgetId,
+                uint32_t target,
                 uint32_t senseMethod,
                 const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_GetVrefAutoMv(const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_GetVrefHighGain(uint32_t vrefDesiredMv, const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_GetVrefHighMv(uint32_t vrefGain, const cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_WaitForSeqIdle(uint32_t watchdogCycleNum, const cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_WaitEndOfScan(uint32_t watchdogCycleNum, const cy_stc_capsense_context_t * context);
-
+#endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) ||\
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN)) */
+uint32_t Cy_CapSense_GetVrefAutoMv(
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_GetVrefHighGain(
+                uint32_t vrefDesiredMv,
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_GetVrefHighMv(
+                uint32_t vrefGain,
+                const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InternalPreCalculation(
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_WaitForSeqIdle(
+                uint32_t watchdogCycleNum,
+                const cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_WaitEndOfScan(
+                uint32_t watchdogCycleNum,
+                const cy_stc_capsense_context_t * context);
 /** \} \endcond */
 
+
+#if (CY_CAPSENSE_DISABLE == CY_CAPSENSE_USE_CAPTURE)
 
 /*******************************************************************************
 * Local definition
 *******************************************************************************/
-
 /*
  *  Definition of the default configuration of the CSD HW registers that is
  *  intended to be used on the CSD HW block capturing stage.
@@ -141,7 +213,7 @@ uint32_t Cy_CapSense_WaitEndOfScan(uint32_t watchdogCycleNum, const cy_stc_capse
  *  3. Sets into default state the rest of the CSD HW block registers which are not related
  *     to actions #1 and #2.
 */
-#define CY_CAPSENSE_CSD_CONFIG_DEFAULT  {\
+    #define CY_CAPSENSE_CSD_CONFIG_DEFAULT  {\
     .config         = 0x84001000uL, /* ENABLE = "1", SENSE_EN = "1". Set other fields into default state. */\
     .spare          = 0x00000000uL, /* Set all fields into default state. */                                \
     .status         = 0x00000000uL, /* Set all fields into default state. */                                \
@@ -183,7 +255,8 @@ uint32_t Cy_CapSense_WaitEndOfScan(uint32_t watchdogCycleNum, const cy_stc_capse
     .idacB          = 0x00000000uL, /* Set all fields into default state. */                                \
     }
 
-extern const cy_stc_csd_config_t cy_capsense_csdCfg;
+    extern const cy_stc_csd_config_t cy_capsense_csdCfg;
+#endif
 
 
 /*******************************************************************************
@@ -212,7 +285,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 *******************************************************************************/
 
 /* CSD_CONFIG register masks */
-#if (CY_CAPSENSE_PSOC6_CSDV2)
+#if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     #define CY_CAPSENSE_CSD_CONFIG_IREF_SEL_MSK                 (CSD_CONFIG_IREF_SEL_Msk)
 #endif
 
@@ -309,7 +382,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 #define CY_CAPSENSE_CSD_SENSE_DUTY_OVERLAP_PHI1_MSK             (CSD_SENSE_DUTY_OVERLAP_PHI1_Msk)
 #define CY_CAPSENSE_CSD_SENSE_DUTY_OVERLAP_PHI2_MSK             (CSD_SENSE_DUTY_OVERLAP_PHI2_Msk)
 
-#if (CY_CAPSENSE_PSOC4_CSDV2)
+#if (CY_CAPSENSE_PSOC4_FOURTH_GEN)
     #define CY_CAPSENSE_CSD_SENSE_DUTY_CFG                      (CSD_SENSE_DUTY_OVERLAP_PHI1_Msk | CSD_SENSE_DUTY_OVERLAP_PHI2_Msk)
 #else
     #define CY_CAPSENSE_CSD_SENSE_DUTY_CFG                      (CY_CAPSENSE_CSD_SENSE_DUTY_SENSE_POL_PHI_HIGH)
@@ -428,7 +501,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 #define CY_CAPSENSE_CSD_SW_FW_TANK_SEL_SW_C2CD_STATIC_OPEN      (CY_CAPSENSE_CSD_WAVEFORM_STATIC_CLOSED << CSD_SW_FW_TANK_SEL_SW_C2CD_Pos)
 #define CY_CAPSENSE_CSD_SW_FW_TANK_SEL_SW_C2CD_STATIC_CLOSE     (CY_CAPSENSE_CSD_WAVEFORM_STATIC_CLOSED << CSD_SW_FW_TANK_SEL_SW_C2CD_Pos)
 
-#if (CY_CAPSENSE_PSOC4_CSDV2)
+#if (CY_CAPSENSE_PSOC4_FOURTH_GEN)
     #define CY_CAPSENSE_CSD_TX_OUT_MSK                          (0u)
     #define CY_CAPSENSE_CSD_TX_OUT_EN_PHI1_DELAY                (0u)
     #define CY_CAPSENSE_CSD_TX_AMUXB_EN_PHI2_DELAY              (0u)
@@ -573,12 +646,15 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 /*******************************************************************************
 * HSIOM and PC Macros redefinition platform dependent and for readability
 *******************************************************************************/
-#if (CY_CAPSENSE_PSOC4_CSDV2)
+#define CY_CAPSENSE_DM_GPIO_ANALOG                          (CY_GPIO_DM_ANALOG)
+#define CY_CAPSENSE_DM_GPIO_STRONG_IN_OFF                   (CY_GPIO_DM_STRONG_IN_OFF)
+#if (CY_CAPSENSE_PSOC4_FOURTH_GEN)
     #define CY_CAPSENSE_HSIOM_SEL_GPIO                          (HSIOM_SEL_GPIO)
     #define CY_CAPSENSE_HSIOM_SEL_CSD_SENSE                     (HSIOM_SEL_CSD_SENSE)
     #define CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD                    (HSIOM_SEL_CSD_SHIELD)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXA                         (HSIOM_SEL_AMUXA)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXB                         (HSIOM_SEL_AMUXB)
+    #define CY_CAPSENSE_DM_SHIELD                                (CY_GPIO_DM_ANALOG)
     #define CY_CAPSENSE_CSD_SCAN_PIN_DM                         (CY_GPIO_DM_ANALOG)
     #define CY_CAPSENSE_CSX_TX_SCAN_PIN_HSIOM                   (HSIOM_SEL_CSD_SENSE)
     #define CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM                 (HSIOM_SEL_AMUXA)
@@ -588,6 +664,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
     #define CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD                    (HSIOM_SEL_ACT_2)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXA                         (HSIOM_SEL_AMUXA)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXB                         (HSIOM_SEL_AMUXB)
+    #define CY_CAPSENSE_DM_SHIELD                                (CY_GPIO_DM_STRONG_IN_OFF)
     #define CY_CAPSENSE_CSD_SCAN_PIN_DM                         (CY_GPIO_DM_STRONG_IN_OFF)
     #define CY_CAPSENSE_CSX_TX_SCAN_PIN_HSIOM                   (HSIOM_SEL_ACT_2)
     #define CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM                 (HSIOM_SEL_GPIO)

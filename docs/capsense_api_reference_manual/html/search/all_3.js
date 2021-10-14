@@ -25,5 +25,6 @@ var searchData=
   ['dmachainrdchindex',['dmaChainRdChIndex',['../structcy__stc__msc__channel__config__t.html#a033754c3c8cbe3ef754684056f7f7154',1,'cy_stc_msc_channel_config_t']]],
   ['dmachainwrchindex',['dmaChainWrChIndex',['../structcy__stc__msc__channel__config__t.html#a88bf57540e88d8a4fdf81e8ae19d952d',1,'cy_stc_msc_channel_config_t']]],
   ['dmardchindex',['dmaRdChIndex',['../structcy__stc__msc__channel__config__t.html#ac8026a90b58820b2e621496847d83591',1,'cy_stc_msc_channel_config_t']]],
-  ['dmawrchindex',['dmaWrChIndex',['../structcy__stc__msc__channel__config__t.html#ac86892509bd5574480a67d459cdb9f8b',1,'cy_stc_msc_channel_config_t']]]
+  ['dmawrchindex',['dmaWrChIndex',['../structcy__stc__msc__channel__config__t.html#ac86892509bd5574480a67d459cdb9f8b',1,'cy_stc_msc_channel_config_t']]],
+  ['data_20structure',['Data Structure',['../group__group__capsense__data__structure.html',1,'']]]
 ];

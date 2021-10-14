@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CapSense Middleware Library 3.0 (Alpha): cy_stc_active_scan_sns_t Struct Reference</title>
+<title>CAPSENSE&trade; Middleware Library 3.0: cy_stc_active_scan_sns_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CapSense Middleware Library 3.0 (Alpha)</div>
+   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0</div>
   </td>
  </tr>
  </tbody>
@@ -83,7 +83,7 @@ $(document).ready(function(){initNavTree('structcy__stc__active__scan__sns__t.ht
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">cy_stc_active_scan_sns_t Struct Reference<div class="ingroups"><a class="el" href="group__group__capsense__data__structure.html">CapSense Data Structure</a> &raquo; <a class="el" href="group__group__capsense__structures.html">CapSense Structures</a></div></div>  </div>
+<div class="title">cy_stc_active_scan_sns_t Struct Reference<div class="ingroups"><a class="el" href="group__group__capsense__data__structure.html">Data Structure</a> &raquo; <a class="el" href="group__group__capsense__structures.html">Structures</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Description</h2>
@@ -99,6 +99,20 @@ const <a class="el" href="structcy__stc__capsense__widget__config__t.html">cy_st
 <a class="el" href="structcy__stc__capsense__widget__context__t.html">cy_stc_capsense_widget_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a81beffc93033c90901da1f8debfbd59c">ptrWdContext</a></td></tr>
 <tr class="memdesc:a81beffc93033c90901da1f8debfbd59c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the widget context structure of the active sensor. <br /></td></tr>
 <tr class="separator:a81beffc93033c90901da1f8debfbd59c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ad0b697f5e856d2436d402f085fbd86"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a6ad0b697f5e856d2436d402f085fbd86">scanScope</a></td></tr>
+<tr class="memdesc:a6ad0b697f5e856d2436d402f085fbd86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keeps request of scanning either:  <a href="#a6ad0b697f5e856d2436d402f085fbd86">More...</a><br /></td></tr>
+<tr class="separator:a6ad0b697f5e856d2436d402f085fbd86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb24deb10dc9b5f7e654cdcd0916938b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#abb24deb10dc9b5f7e654cdcd0916938b">mfsChannelIndex</a></td></tr>
+<tr class="memdesc:abb24deb10dc9b5f7e654cdcd0916938b"><td class="mdescLeft">&#160;</td><td class="mdescRight">MFS channel index.  <a href="#abb24deb10dc9b5f7e654cdcd0916938b">More...</a><br /></td></tr>
+<tr class="separator:abb24deb10dc9b5f7e654cdcd0916938b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35dbb63147b6c493bed49f7bdfc7819d"><td class="memItemLeft" align="right" valign="top"><a id="a35dbb63147b6c493bed49f7bdfc7819d"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a35dbb63147b6c493bed49f7bdfc7819d">rxIndex</a></td></tr>
+<tr class="memdesc:a35dbb63147b6c493bed49f7bdfc7819d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current Rx ID. <br /></td></tr>
+<tr class="separator:a35dbb63147b6c493bed49f7bdfc7819d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef1caed388c9d1fb076e710ab7db49a4"><td class="memItemLeft" align="right" valign="top"><a id="aef1caed388c9d1fb076e710ab7db49a4"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#aef1caed388c9d1fb076e710ab7db49a4">txIndex</a></td></tr>
+<tr class="memdesc:aef1caed388c9d1fb076e710ab7db49a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current Tx ID. <br /></td></tr>
+<tr class="separator:aef1caed388c9d1fb076e710ab7db49a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc6f5af6f05f765faaca0aa5f4d9da40"><td class="memItemLeft" align="right" valign="top"><a id="abc6f5af6f05f765faaca0aa5f4d9da40"></a>
 const <a class="el" href="structcy__stc__capsense__electrode__config__t.html">cy_stc_capsense_electrode_config_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#abc6f5af6f05f765faaca0aa5f4d9da40">ptrEltdConfig</a></td></tr>
 <tr class="memdesc:abc6f5af6f05f765faaca0aa5f4d9da40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the electrode configuration structure of the active sensor. <br /></td></tr>
@@ -127,50 +141,61 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a3976b21c01b88709fb4c641d147a95ba">widgetIndex</a></td></tr>
 <tr class="memdesc:a3976b21c01b88709fb4c641d147a95ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current widget ID. <br /></td></tr>
 <tr class="separator:a3976b21c01b88709fb4c641d147a95ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35dbb63147b6c493bed49f7bdfc7819d"><td class="memItemLeft" align="right" valign="top"><a id="a35dbb63147b6c493bed49f7bdfc7819d"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a35dbb63147b6c493bed49f7bdfc7819d">rxIndex</a></td></tr>
-<tr class="memdesc:a35dbb63147b6c493bed49f7bdfc7819d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current Rx ID. <br /></td></tr>
-<tr class="separator:a35dbb63147b6c493bed49f7bdfc7819d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef1caed388c9d1fb076e710ab7db49a4"><td class="memItemLeft" align="right" valign="top"><a id="aef1caed388c9d1fb076e710ab7db49a4"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#aef1caed388c9d1fb076e710ab7db49a4">txIndex</a></td></tr>
-<tr class="memdesc:aef1caed388c9d1fb076e710ab7db49a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current Tx ID. <br /></td></tr>
-<tr class="separator:aef1caed388c9d1fb076e710ab7db49a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="memItemLeft" align="right" valign="top"><a id="a2bdf357c40aa4a699ed2c3dc929a32d3"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a2bdf357c40aa4a699ed2c3dc929a32d3">connectedSnsState</a></td></tr>
-<tr class="memdesc:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows if the current sensor is connected to analog bus. <br /></td></tr>
-<tr class="separator:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2afc0b2553f1d967a0d8da996c6e527c"><td class="memItemLeft" align="right" valign="top"><a id="a2afc0b2553f1d967a0d8da996c6e527c"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a2afc0b2553f1d967a0d8da996c6e527c">scanScopeAll</a></td></tr>
-<tr class="memdesc:a2afc0b2553f1d967a0d8da996c6e527c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request of scanning all widgets. <br /></td></tr>
-<tr class="separator:a2afc0b2553f1d967a0d8da996c6e527c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e14625ae7b326c80fedb252cc748ea6"><td class="memItemLeft" align="right" valign="top"><a id="a8e14625ae7b326c80fedb252cc748ea6"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a8e14625ae7b326c80fedb252cc748ea6">scanScopeSns</a></td></tr>
-<tr class="memdesc:a8e14625ae7b326c80fedb252cc748ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request of scanning a single sensor. <br /></td></tr>
-<tr class="separator:a8e14625ae7b326c80fedb252cc748ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb24deb10dc9b5f7e654cdcd0916938b"><td class="memItemLeft" align="right" valign="top"><a id="abb24deb10dc9b5f7e654cdcd0916938b"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#abb24deb10dc9b5f7e654cdcd0916938b">mfsChannelIndex</a></td></tr>
-<tr class="memdesc:abb24deb10dc9b5f7e654cdcd0916938b"><td class="mdescLeft">&#160;</td><td class="mdescRight">MFS channel index. <br /></td></tr>
-<tr class="separator:abb24deb10dc9b5f7e654cdcd0916938b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a623c26b8d6deb2025f4a4ae186bdb8b5"><td class="memItemLeft" align="right" valign="top"><a id="a623c26b8d6deb2025f4a4ae186bdb8b5"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a623c26b8d6deb2025f4a4ae186bdb8b5">currentSenseMethod</a></td></tr>
 <tr class="memdesc:a623c26b8d6deb2025f4a4ae186bdb8b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current sensing method. <br /></td></tr>
 <tr class="separator:a623c26b8d6deb2025f4a4ae186bdb8b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99c299c4344a25320f411aee5c37007e"><td class="memItemLeft" align="right" valign="top"><a id="a99c299c4344a25320f411aee5c37007e"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a99c299c4344a25320f411aee5c37007e">currentSenseGroup</a></td></tr>
-<tr class="memdesc:a99c299c4344a25320f411aee5c37007e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current sensing group. <br /></td></tr>
-<tr class="separator:a99c299c4344a25320f411aee5c37007e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0eb623f6af761076b24d2fe7d5de59c3"><td class="memItemLeft" align="right" valign="top"><a id="a0eb623f6af761076b24d2fe7d5de59c3"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a0eb623f6af761076b24d2fe7d5de59c3">currentHwMode</a></td></tr>
-<tr class="memdesc:a0eb623f6af761076b24d2fe7d5de59c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current hw mode. <br /></td></tr>
-<tr class="separator:a0eb623f6af761076b24d2fe7d5de59c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="memItemLeft" align="right" valign="top"><a id="a2bdf357c40aa4a699ed2c3dc929a32d3"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__active__scan__sns__t.html#a2bdf357c40aa4a699ed2c3dc929a32d3">connectedSnsState</a></td></tr>
+<tr class="memdesc:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows if the current sensor is connected to analog bus. <br /></td></tr>
+<tr class="separator:a2bdf357c40aa4a699ed2c3dc929a32d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Field Documentation</h2>
+<a id="a6ad0b697f5e856d2436d402f085fbd86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ad0b697f5e856d2436d402f085fbd86">&#9670;&nbsp;</a></span>scanScope</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t cy_stc_active_scan_sns_t::scanScope</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Keeps request of scanning either: </p>
+<ul>
+<li>CY_CAPSENSE_SCAN_SCOPE_SNGL_SNS - Single sensor</li>
+<li>CY_CAPSENSE_SCAN_SCOPE_ALL_SNS_MASK - All sensors of one widget</li>
+<li>CY_CAPSENSE_SCAN_SCOPE_ALL_WD_MASK - All widgets </li>
+</ul>
+
+</div>
+</div>
+<a id="abb24deb10dc9b5f7e654cdcd0916938b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb24deb10dc9b5f7e654cdcd0916938b">&#9670;&nbsp;</a></span>mfsChannelIndex</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t cy_stc_active_scan_sns_t::mfsChannelIndex</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>MFS channel index. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CapSense Middleware Library 3.0 (Alpha)</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE&trade; Middleware Library 3.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

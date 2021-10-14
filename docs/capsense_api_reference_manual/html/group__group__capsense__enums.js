@@ -1,5 +1,11 @@
 var group__group__capsense__enums =
 [
+    [ "cy_en_capsense_bist_external_cap_id_t", "group__group__capsense__enums.html#ga07f6f8cbe8fa1cebb08e2bd44e9de29b", [
+      [ "CY_CAPSENSE_BIST_CMOD_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29baf3745617d4c520ecd77a4b87a8fe8172", null ],
+      [ "CY_CAPSENSE_BIST_CINTA_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29bacfe90ee851fdb0c5990cf9c255c2142d", null ],
+      [ "CY_CAPSENSE_BIST_CINTB_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29ba8d03343ec314140673d8b7034caeacc8", null ],
+      [ "CY_CAPSENSE_BIST_CSH_ID_E", "group__group__capsense__enums.html#gga07f6f8cbe8fa1cebb08e2bd44e9de29ba86cb63cafed2d806f3a916f9ab51890f", null ]
+    ] ],
     [ "cy_en_capsense_tuner_state_t", "group__group__capsense__enums.html#gaadb1f5ee70c7d52a5375cdae765093dc", [
       [ "CY_CAPSENSE_TU_FSM_RUNNING", "group__group__capsense__enums.html#ggaadb1f5ee70c7d52a5375cdae765093dca90d0945b863d6c568c124179622abcb8", null ],
       [ "CY_CAPSENSE_TU_FSM_SUSPENDED", "group__group__capsense__enums.html#ggaadb1f5ee70c7d52a5375cdae765093dcabd652b762757d2927ff7efc5b61d58ea", null ],
@@ -22,12 +28,6 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_WD_MATRIX_BUTTON_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a49a619428a7d70767032000b70d3c5d5", null ],
       [ "CY_CAPSENSE_WD_TOUCHPAD_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a71ed340a3d5c1ec96169c5a7d4ee91df", null ],
       [ "CY_CAPSENSE_WD_PROXIMITY_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c", null ]
-    ] ],
-    [ "cy_en_capsense_sensing_method_t", "group__group__capsense__enums.html#gacf2944091a3125fba10a168982a1008b", [
-      [ "CY_CAPSENSE_UNDEFINED_E", "group__group__capsense__enums.html#ggacf2944091a3125fba10a168982a1008ba1dc9940367de4b895eca63d20b5e2a63", null ],
-      [ "CY_CAPSENSE_SENSE_METHOD_CSD_E", "group__group__capsense__enums.html#ggacf2944091a3125fba10a168982a1008ba2ca9ef54ef708b81fcf6677a51a14c77", null ],
-      [ "CY_CAPSENSE_SENSE_METHOD_CSX_E", "group__group__capsense__enums.html#ggacf2944091a3125fba10a168982a1008ba9e09b42fcf71877ce700a3c1454ff4b1", null ],
-      [ "CY_CAPSENSE_SENSE_METHOD_BIST_E", "group__group__capsense__enums.html#ggacf2944091a3125fba10a168982a1008ba9ce0cae7f0d3e53838d58749ae9e8724", null ]
     ] ],
     [ "cy_en_capsense_return_status_t", "group__group__capsense__enums.html#gaa96ebe173a9a3ec24f7461f696482b11", [
       [ "CY_CAPSENSE_SUCCESS_E", "group__group__capsense__enums.html#ggaa96ebe173a9a3ec24f7461f696482b11a3ddd2a0c59c25f817f852c4d899784c3", null ],
@@ -76,6 +76,7 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_BIST_ERROR_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857ca8454fc9f2934cdb63ed2a9962b318749", null ],
       [ "CY_CAPSENSE_BIST_FEATURE_DISABLED_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857caaaa05668fc0be7bfb934a228b0d9410c", null ],
       [ "CY_CAPSENSE_BIST_TIMEOUT_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857ca7c3531ff81e35c5a17b9bb6326027710", null ],
+      [ "CY_CAPSENSE_BIST_BAD_CONFIG_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857cae73550f4b25fe2bb7f8a6504c85dd93c", null ],
       [ "CY_CAPSENSE_BIST_FAIL_E", "group__group__capsense__enums.html#ggafbe67572b1e6a637676b0a6e1040857ca561a9faf24c500cc9990b46117fdcace", null ]
     ] ],
     [ "cy_en_capsense_msc_raw_mode_t", "group__group__capsense__enums.html#ga2f401fe83daac81512b02b33fc967f57", [
