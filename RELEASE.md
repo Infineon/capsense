@@ -25,7 +25,7 @@ This version of the CAPSENSE™ Middleware was validated for compatibility with 
 | - ModusToolbox™ CAPSENSE™ Configurator / Tuner tools                                              | 4.0     |
 | CAT1 Peripheral Driver Library (PDL)                                                              | 2.3.0   |
 | CAT2 Peripheral Driver Library (PDL)                                                              | 1.4.0   |
-| GCC Compiler                                                                                      | 9.3.1   |
+| GCC Compiler                                                                                      | 10.3.1  |
 | IAR Compiler                                                                                      | 8.42.1  |
 | ARM Compiler 6                                                                                    | 6.13    |
 | MBED OS                                                                                           | 5.15.8  |
