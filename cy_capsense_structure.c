@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -27,12 +27,14 @@
 #include "cy_capsense_selftest.h"
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
     #include "cy_csd.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_msclp.h"
 #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
     #include "cy_msc.h"
 #endif
 #include "cycfg_capsense_defines.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 /*******************************************************************************
 * Local definition
@@ -61,6 +63,10 @@
 * not process widget data but extracts previously processed results
 * from the \ref group_capsense_structures.
 *
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed,
+* its status is not taken into account.
+*
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
@@ -75,13 +81,55 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
     uint32_t capStatus = 0u;
     uint32_t wdIndex;
 
-    for (wdIndex = context->ptrCommonConfig->numWd; wdIndex-- > 0u;)
+    for (wdIndex = CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex-- > 0u;)
     {
-        capStatus |= (uint32_t)context->ptrWdContext[wdIndex].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[wdIndex].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+        {
+            capStatus |= (uint32_t)context->ptrWdContext[wdIndex].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
     }
 
     return capStatus;
 }
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsAnyLpWidgetActive
+****************************************************************************//**
+*
+* Reports whether any low power widget has detected a touch at the previous
+* low power scan.
+*
+* This function reports whether any low power widget has detected a touch
+* by extracting information from the common status register. The function does
+* not process the widget data but extracts the result obtained at the previous
+* low power widget scan. The result remains set up to the next low power widget
+* scan and is reset with the low power scan start.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the touch detection status of all the widgets:
+* - Zero - No touch is detected in any of the low power widgets or sensors
+* - CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK - At least one low power widget or sensor
+*                                         has detected a touch at the previous scan
+*
+* \funcusage
+* \snippet capsense/snippet/main.c snippet_LowPowerStateMachine
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_IsAnyLpWidgetActive(const cy_stc_capsense_context_t * context)
+{
+    return ((uint32_t)context->ptrCommonContext->status & CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK);
+}
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
 
 
 /*******************************************************************************
@@ -98,6 +146,9 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed and a zero is returned.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -116,9 +167,14 @@ uint32_t Cy_CapSense_IsWidgetActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
-        capStatus = (uint32_t)context->ptrWdContext[widgetId].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+        {
+            capStatus = (uint32_t)context->ptrWdContext[widgetId].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
     }
     return capStatus;
 }
@@ -142,6 +198,9 @@ uint32_t Cy_CapSense_IsWidgetActive(
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed and a zero is returned.
 *
 * \param sensorId
 * Specifies the ID number of the sensor within the widget. A macro for the
@@ -167,9 +226,12 @@ uint32_t Cy_CapSense_IsSensorActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if ((widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT) &&
+        (sensorId < context->ptrWdConfig[widgetId].numSns))
     {
-        if (sensorId < context->ptrWdConfig[widgetId].numSns)
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
         {
             capStatus = context->ptrWdConfig[widgetId].ptrSnsContext[sensorId].status;
         }
@@ -178,7 +240,7 @@ uint32_t Cy_CapSense_IsSensorActive(
 }
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_IsProximitySensorActive
 ****************************************************************************//**
@@ -219,7 +281,7 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
         if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == context->ptrWdConfig[widgetId].wdType)
         {
@@ -235,9 +297,9 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN) */
 
 
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetTouchInfo
 ****************************************************************************//**
@@ -269,7 +331,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
         switch (ptrWdCfg->wdType)
@@ -319,7 +381,7 @@ cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_cont
     const cy_stc_capsense_widget_config_t * ptrWdCfg = context->ptrWdConfig;
     const cy_stc_capsense_widget_context_t * ptrWdCxt = context->ptrWdContext;
     const cy_stc_capsense_pin_config_t * ptrPinCfg = context->ptrPinConfig;
-    const cy_stc_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
 
     if (ptrCommonCfg == NULL)       {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
     if (ptrCommonCxt == NULL)       {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
@@ -329,7 +391,7 @@ cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_cont
     if (ptrPinCfg == NULL)          {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
     if (ptrActScanSns == NULL)      {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
 
-    return (capStatus);
+    return capStatus;
 }
 
 
@@ -441,8 +503,8 @@ uint16_t Cy_CapSense_GetCrcWidget(
     crcDataVal.onDebounceVal     = ptrWdCxt->onDebounce;
     crcDataVal.snsClkSourceVal   = ptrWdCxt->snsClkSource;
 
-    if((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
-       (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
+    if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
+        (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
     {
         crcDataVal.fingerThVal       = ptrWdCxt->fingerTh;
         crcDataVal.proxThVal         = ptrWdCxt->proxTh;
@@ -473,7 +535,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 
     crcValue = Cy_CapSense_GetCRC((uint8_t *)(&crcDataVal), sizeof(crcDataVal));
 
-    return (crcValue);
+    return crcValue;
 }
 
 
@@ -661,8 +723,7 @@ cy_capsense_status_t Cy_CapSense_SetParam(
              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN))
             paramCrc = (paramId & CY_CAPSENSE_PARAM_CRC_MASK) >> CY_CAPSENSE_PARAM_CRC_OFFSET;
             paramWidget = (paramId & CY_CAPSENSE_PARAM_WIDGET_MASK) >> CY_CAPSENSE_PARAM_WIDGET_OFFSET;
-            if ((paramWidget > context->ptrCommonConfig->numWd) &&
-                (0u != paramCrc))
+            if ((paramWidget > context->ptrCommonConfig->numWd) && (0u != paramCrc))
             {
                 capStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
             }
@@ -716,7 +777,7 @@ cy_capsense_status_t Cy_CapSense_SetParam(
 }
 
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 
 /* [] END OF FILE */

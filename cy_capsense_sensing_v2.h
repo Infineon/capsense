@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v2.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the function prototypes specific to the sensing module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -74,8 +74,6 @@ cy_capsense_status_t Cy_CapSense_ScanSensor_V2(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ScanAllWidgets_V2(
                 cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_IsBusy_V2(
-                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InterruptHandler_V2(
                 const CSD_Type * base,
                 cy_stc_capsense_context_t * context);

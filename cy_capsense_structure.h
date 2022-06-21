@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -27,11 +27,13 @@
 #include "cy_capsense_common.h"
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
     #include "cy_csd.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_msclp.h"
 #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
     #include "cy_msc.h"
 #endif
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -61,11 +63,18 @@ typedef enum
     CY_CAPSENSE_TU_CMD_NONE_E           = 0u,                   /**< No command */
     CY_CAPSENSE_TU_CMD_SUSPEND_E        = 1u,                   /**< Suspend command */
     CY_CAPSENSE_TU_CMD_RESUME_E         = 2u,                   /**< Resume command switches state from suspend to running */
-    CY_CAPSENSE_TU_CMD_RESTART_E        = 3u,                   /**< Restart command requests to perform CAPSENSE&trade; re-initialization */
+    CY_CAPSENSE_TU_CMD_RESTART_E        = 3u,                   /**< Restart command requests to perform CAPSENSE&trade; re-initialization and switches state to running */
     CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E   = 4u,                   /**< Reserved */
     CY_CAPSENSE_TU_CMD_PING_E           = 5u,                   /**< Ping command to check whether application program calls Cy_CapSense_RunTuner() */
     CY_CAPSENSE_TU_CMD_ONE_SCAN_E       = 6u,                   /**< Execute one scan cycle and then switch to suspend state */
     CY_CAPSENSE_TU_CMD_WRITE_E          = 7u,                   /**< Writes specified data with offset into cy_capsense_tuner */
+    CY_CAPSENSE_TU_CMD_COMM_DIS_E       = 8u,                   /**< Disables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
+                                                                 * * Low power sensors rawcounts does not copied to communication structure
+                                                                 * * Communication of CapSense data structure to Tuner does not happen (in case of UART or protocol-agnostic method) */
+    CY_CAPSENSE_TU_CMD_COMM_EN_E        = 9u,                   /**< Enables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
+                                                                 * * Low power sensors rawcounts are copied to communication structure
+                                                                 * * Data is transferred to Tuner (in case of UART or protocol-agnostic method) */
+    CY_CAPSENSE_TU_CMD_RESTART_ONLY_E   = 10u,                  /**< Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged */
 } cy_en_capsense_tuner_cmd_t;
 
 /** Defines widget types */
@@ -77,6 +86,9 @@ typedef enum
     CY_CAPSENSE_WD_MATRIX_BUTTON_E      = 0x04u,                /**< Matrix Buttons widget */
     CY_CAPSENSE_WD_TOUCHPAD_E           = 0x05u,                /**< Touchpad widget */
     CY_CAPSENSE_WD_PROXIMITY_E          = 0x06u,                /**< Proximity widget */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        CY_CAPSENSE_WD_LOW_POWER_E      = 0x07u,                /**< Low Power widget, used in the fifth-generation low power CAPSENSE&trade; only */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 } cy_en_capsense_widget_type_t;
 
 /** Defines CAPSENSE&trade; return statuses types */
@@ -234,11 +246,11 @@ typedef struct
                                                                   */
     #endif
     uint8_t bslnExt;                                            /**< Sensor baseline fractional */
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
         uint8_t cdacComp;                                       /**< Compensation CDAC
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-    #endif
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 } cy_stc_capsense_sensor_context_t;
 
 /** CSX Touchpad touch tracking history */
@@ -307,7 +319,8 @@ typedef struct
                                                                    * * 1 - touch reported immediately as soon as detected
                                                                    * * 2 - touch reported on the second consecutive detection
                                                                    * * 3 - touch reported on the third consecutive detection */
-    uint8_t snsClkSource;                                       /**< Widget clock source:
+    uint8_t snsClkSource;                                       /**< Widget clock source.
+                                                                   * For fourth-generation CAPSENSE&trade;:
                                                                    * * bit[7] - Indicates auto mode of clock source selection
                                                                    * * bit[0:6] - Clock source:
                                                                    *   * 0 - Direct (CY_CAPSENSE_CLK_SOURCE_DIRECT)
@@ -316,7 +329,16 @@ typedef struct
                                                                    *   * 3 - SSC9 (CY_CAPSENSE_CLK_SOURCE_SSC9)
                                                                    *   * 4 - SSC10 (CY_CAPSENSE_CLK_SOURCE_SSC10)
                                                                    *   * 5 - PRS8 (CY_CAPSENSE_CLK_SOURCE_PRS8)
-                                                                   *   * 6 - PRS12 (CY_CAPSENSE_CLK_SOURCE_PRS12) */
+                                                                   *   * 6 - PRS12 (CY_CAPSENSE_CLK_SOURCE_PRS12)
+                                                                   *
+                                                                   * For fifth-generation and fifth-generation low power CAPSENSE&trade;:
+                                                                   * bit[3] - Indicates auto mode of PRS clock source
+                                                                   * bit[2] - Indicates auto mode of SSC clock source
+                                                                   * * bit[0:1] - Clock source:
+                                                                   *   * 0 - Direct (CY_CAPSENSE_CLK_SOURCE_DIRECT)
+                                                                   *   * 1 - SSC (CY_CAPSENSE_CLK_SOURCE_SSC)
+                                                                   *   * 2 - PRS (CY_CAPSENSE_CLK_SOURCE_PRS)
+                                                                   */
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t idacMod[CY_CAPSENSE_MAX_SUPPORTED_FREQ_NUM];         /**< Sets the current of the modulation IDAC for the CSD widgets.
                                                                 * For the CSD Touchpad and Matrix Button widgets sets the current of the
@@ -333,40 +355,45 @@ typedef struct
     uint8_t status;                                             /**< Contains masks:
                                                                    * * bit[0] - Widget Active (CY_CAPSENSE_WD_ACTIVE_MASK)
                                                                    * * bit[1] - Widget Disabled (CY_CAPSENSE_WD_DISABLE_MASK)
-                                                                   * * bit[2] - Widget Working (CY_CAPSENSE_WD_WORKING_MASK) */
+                                                                   * * bit[2] - Widget Working (CY_CAPSENSE_WD_WORKING_MASK)
+                                                                   * * bit[3] - Widget maximum raw count calculation enabled (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK)
+                                                                   * * bit[4] - Widget row maximum raw count calculation enable (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK) */
     cy_stc_capsense_touch_t wdTouch;                            /**< Widget touch structure used for Matrix Buttons, Sliders, and Touchpads */
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         uint16_t numSubConversions;                             /**< Number of sub-conversions in a scan
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t cdacRef;                                        /**< Sets the capacitance of the reference CDAC
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t rowCdacRef;                                     /**< Sets the capacitance of the reference CDAC for CSD
                                                                  * Touchpad and CSD Matrix buttons widgets
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t cicRate;                                        /**< Sets decimation rate when CIC2 is enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-        uint8_t cdacDitherEn;                                   /**< Enabled CDAC dithering
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+            uint8_t cdacDitherEn;                                   /**< Enabled CDAC dithering
+                                                                     * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                     */
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
         uint8_t cdacDitherValue;                                /**< CDAC dither value in percentage
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t coarseInitBypassEn;                             /**< Skip Cmod coarse initialization sensors scan within widget
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t cdacCompDivider;                               /**< Number of time DAC switched in sense clock period
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t lfsrBits;                                       /**< Defines the number of LSB bits to use by the LSFR unit to achieve
                                                                  *   the desired clock dithering variation.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-    #endif
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
 } cy_stc_capsense_widget_context_t;
 
@@ -376,10 +403,13 @@ typedef struct
     GPIO_PRT_Type * pcPtr;                                      /**< Pointer to the base port register of the IO */
     uint8_t pinNumber;                                          /**< Position of the IO in the port */
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         uint8_t padNumber;                                      /**< Control Mux pad number
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+    #endif
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
         uint8_t chId;                                           /**< Channel Id the pin belongs to
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
@@ -393,6 +423,7 @@ typedef struct
     const cy_stc_capsense_pin_config_t * ptrPin;                /**< Pointer to pin configuration structure */
     uint8_t type;                                               /**< Electrode type \ref cy_en_capsense_eltd_t */
     uint8_t numPins;                                            /**< Total number of pins in this sensor */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
         uint8_t chId;                                           /**< Channel Id the electrode belongs to
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
@@ -426,9 +457,9 @@ typedef struct
 } cy_stc_capsense_advanced_touchpad_config_t;
 
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
 /** Multi-phase TX table for de-convolution structure
- * \note This structure is available only for the fifth-generation CAPSENSE&trade;.
+ * \note This structure is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
  */
 typedef struct
 {
@@ -445,11 +476,13 @@ typedef struct
     cy_stc_capsense_sensor_context_t * ptrSnsContext;           /**< Pointer to the first object of sensor context structure that belongs to this widget */
     const cy_stc_capsense_electrode_config_t * ptrEltdConfig;   /**< Pointer to the first object of electrode configuration structure that belongs to this widget */
     uint32_t * ptrEltdCapacitance;                              /**< Pointer to the first object in the electrode capacitance array that belongs to this widget */
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-    uint32_t * ptrSnsCapacitance;                               /**< Pointer to the first object in the sensor capacitance array that belongs to this widget.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        uint32_t * ptrSnsCapacitance;                           /**< Pointer to the first object in the sensor capacitance array that belongs to this widget.
+                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-#endif
+    #endif
+
     uint16_t * ptrBslnInv;                                      /**< Pointer to the first object in the sensor baseline inversion array that belongs to this widget */
 
     cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope;
@@ -466,14 +499,17 @@ typedef struct
     uint16_t yResolution;                                       /**< For Touchpads Y-Axis maximum position */
     uint16_t numSns;                                            /**< The total number of sensors:
                                                                    * For CSD widgets: WD_NUM_ROWS + WD_NUM_COLS.
-                                                                   * For CSX widgets: WD_NUM_ROWS * WD_NUM_COLS. */
+                                                                   * For CSX widgets: WD_NUM_ROWS * WD_NUM_COLS.
+                                                                   * For ISX widgets: (WD_NUM_ROWS + WD_NUM_COLS) / 2 */
     uint8_t numCols;                                            /**< For CSD Button and Proximity Widgets, the number of sensors.
                                                                    * For CSD Slider Widget, the number of segments.
                                                                    * For CSD Touchpad and Matrix Button, the number of the column sensors.
-                                                                   * For CSX Button, Slider, Touchpad, and Matrix Button, the number of the Rx electrodes. */
+                                                                   * For CSX Button, Slider, Touchpad, and Matrix Button, the number of the Rx electrodes.
+                                                                   * For ISX Button and Linear Slider, the number of the Rx electrodes. */
     uint8_t numRows;                                            /**< For CSD Touchpad and Matrix Buttons, the number of the row sensors.
                                                                    * For the CSX Button and Slider, the number of the Tx electrodes (constant 1u).
-                                                                   * For CSX Touchpad and Matrix Button, the number of the Tx electrodes. */
+                                                                   * For CSX Touchpad and Matrix Button, the number of the Tx electrodes.
+                                                                   * For ISX Button and Linear Slider, the number of the Lx electrodes. */
     cy_stc_capsense_touch_t * ptrPosFilterHistory;              /**< Pointer to the position filter history */
     cy_stc_capsense_csx_touch_history_t * ptrCsxTouchHistory;   /**< Pointer to the CSX touchpad history */
     cy_stc_capsense_csx_touch_buffer_t * ptrCsxTouchBuffer;     /**< Pointer to the single CSX buffer needed for CSX touchpad processing */
@@ -494,30 +530,31 @@ typedef struct
     uint8_t senseMethod;                                        /**< Specifies the widget sensing method:
                                                                     * * 0 - UNDEFINED   (CY_CAPSENSE_UNDEFINED_GROUP)
                                                                     * * 1 - CSD         (CY_CAPSENSE_CSD_GROUP)
-                                                                    * * 2 - CSX         (CY_CAPSENSE_CSX_GROUP) */
+                                                                    * * 2 - CSX         (CY_CAPSENSE_CSX_GROUP)
+                                                                    * * 3 - ISX         (CY_CAPSENSE_ISX_GROUP) */
     uint8_t wdType;                                             /**< Specifies the widget type */
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         cy_stc_capsense_mptx_table_t * ptrMptxTable;            /**< Pointer to the multi-phase TX vector and de-convolution coefficients
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t firstSlotId;                                   /**< The slot ID in the widget to start scan from
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t numSlots;                                      /**< The number of slots in the widget
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t numChopCycles;                                  /**< Defines number of chopping cycles. One cycle means the feature is disabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t mptxOrder;                                      /**< Multi-phase TX order
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t lfsrDitherLimit;                                /**< Max dither in percentage. The input parameter for the LFSR range auto-selection algorithm
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade;and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t snsClkSourceAutoSelMode;                        /**< Defines set of rules that are used by clock source auto-selection algorithm
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t mfsConfig;                                      /**< Multi-frequency Scan (MFS) widget configuration.
                                                                  **  Contains masks:
@@ -529,7 +566,7 @@ typedef struct
                                                                  *   * 0 - Base widget
                                                                  *   * 1 - Frequency channel 1 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_1_MASK)
                                                                  *   * 2 - Frequency channel 2 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_2_MASK)
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
     #endif
 } cy_stc_capsense_widget_config_t;
@@ -545,9 +582,9 @@ typedef struct
 } cy_stc_capsense_idac_gain_table_t;
 #endif
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
 /** Declares the scan order of widget and sensor
- * \note This structure is available only for the fifth-generation CAPSENSE&trade;.
+ * \note This structure is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
  */
 typedef struct
 {
@@ -556,14 +593,29 @@ typedef struct
 } cy_stc_capsense_scan_slot_t;
 #endif
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
 /** Declares MSC channel (HW block) configuration
- * \note This structure is available only for the fifth-generation CAPSENSE&trade;.
+ * \note This structure is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
  */
 typedef struct
 {
-    MSC_Type * ptrMscBase;                                  /**< Pointer to the MSC HW block register */
-    cy_stc_msc_context_t * ptrMscContext;                   /**< Pointer to the MSC driver context */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        MSC_Type * ptrHwBase;                              /**< Pointer to the MSC HW block register
+                                                            * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                            */
+        cy_stc_msc_context_t * ptrHwContext;               /**< Pointer to the MSC driver context
+                                                            * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                            */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        MSCLP_Type * ptrHwBase;                            /**< Pointer to the MSCLP HW block register
+                                                            * \note This structure is available only for the fifth-generation low power CAPSENSE&trade;
+                                                            */
+        cy_stc_msclp_context_t * ptrHwContext;             /**< Pointer to the MSCLP driver context
+                                                            * \note This structure is available only for the fifth-generation low power CAPSENSE&trade;
+                                                            */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
     GPIO_PRT_Type * portCmod1;                              /**< The pointer to the Cmod1 pin base port register */
     uint8_t pinCmod1;                                       /**< The Cmod1 pin position (bit number) in the port */
@@ -571,12 +623,22 @@ typedef struct
     GPIO_PRT_Type * portCmod2;                              /**< The pointer to the Cmod2 pin base port register */
     uint8_t pinCmod2;                                       /**< The Cmod2 pin position (bit number) in the port */
 
-    uint8_t dmaWrChIndex;                                   /**< Specifies the DMA Write channel index */
-    uint8_t dmaChainWrChIndex;                              /**< Specifies the DMA Chain Write channel index */
-    uint8_t dmaRdChIndex;                                   /**< Specifies the DMA Read channel index */
-    uint8_t dmaChainRdChIndex;                              /**< Specifies the DMA Chain Read channel index */
-} cy_stc_msc_channel_config_t;
-#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        uint8_t dmaWrChIndex;                               /**< Specifies the DMA Write channel index
+                                                             * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                             */
+        uint8_t dmaChainWrChIndex;                          /**< Specifies the DMA Chain Write channel index
+                                                             * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                             */
+        uint8_t dmaRdChIndex;                               /**< Specifies the DMA Read channel index
+                                                             * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                             */
+        uint8_t dmaChainRdChIndex;                          /**< Specifies the DMA Chain Read channel index
+                                                             * \note This structure is available only for the fifth-generation CAPSENSE&trade;
+                                                             */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+} cy_stc_capsense_channel_config_t;
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
 
 /** Common configuration structure */
@@ -599,6 +661,7 @@ typedef struct
     uint8_t periDividerType;                                    /**< Peripheral clock type (8- or 16-bit type) */
     uint8_t periDividerIndex;                                   /**< Peripheral divider index */
     uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of the CSD HW block after power up or System Deep Sleep. */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t ssIrefSource;                                   /**< Iref source
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -607,8 +670,10 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint16_t proxTouchCoeff;                                    /**< Proximity touch coefficient in percentage used in smart sensing algorithm */
     uint8_t swSensorAutoResetEn;                                /**< Sensor auto reset enabled */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t portCmodPadNum;                                 /**< Number of port of dedicated Cmod pad
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -678,13 +743,24 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint8_t csdInactiveSnsConnection;                           /**< Inactive sensor connection for CSD scan:
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_SHIELD
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
-    uint8_t csxInactiveSnsConnection;                           /**< Inactive sensor connection for CSD scan:
+    uint8_t csxInactiveSnsConnection;                           /**< Inactive sensor connection for CSX scan:
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
-                                                                   * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
+                                                                   * * CY_CAPSENSE_SNS_CONNECTION_GROUND
+                                                                   * * CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2
+                                                                   *
+                                                                   * CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2 is only available for fifth-generation
+                                                                   * and fifth-generation low power CAPSENSE&trade;.
+                                                                   */
+    uint8_t isxInactiveSnsConnection;                           /**< Inactive sensor connection for ISX scan:
+                                                                   * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
+                                                                   *
+                                                                   * Applicable only for fifth-generation low power CAPSENSE&trade;.
+                                                                   */
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csdShieldDelay;                                 /**< Shield signal delay
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -693,13 +769,17 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint16_t csdRConst;                                         /**< Sensor resistance in series used by smart sensing algorithm */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csdCTankShieldEn;                               /**< Csh enabled
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint8_t csdShieldNumPin;                                    /**< Number of shield IOs */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csdShieldSwRes;                                 /**< Shield switch resistance
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -711,8 +791,10 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint8_t csdRawTarget;                                       /**< Raw count target in percentage for CSD calibration */
     uint8_t csdAutotuneEn;                                      /**< smart sensing algorithm enabled */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csdIdacAutocalEn;                               /**< CSD IDAC calibration enabled
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -724,7 +806,9 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
         uint8_t csdCalibrationError;                            /**< Acceptable calibration error */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csdIdacMin;                                     /**< Min acceptable IDAC value in CSD calibration
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -748,7 +832,9 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint8_t csxRawTarget;                                       /**< Raw count target in percentage for CSX calibration */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csxIdacGainInitIndex;                           /**< IDAC gain for CSX method
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -760,7 +846,9 @@ typedef struct
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
     #endif
+
     uint8_t csxCalibrationError;                                /**< Acceptable calibration error */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t csxFineInitTime;                                /**< Number of dummy TX periods at fine initialization
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
@@ -787,11 +875,19 @@ typedef struct
                                                                   */
     #endif
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        cy_stc_msc_channel_config_t * ptrMscChConfig;           /**< The pointer to the CAPSENSE&trade; enabled MSC channel (HW block) configuration
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        uint8_t isxRawTarget;                                   /**< Raw count target in percentage for ISX calibration
+                                                                  * \note This structure is available only for the fifth-generation low power CAPSENSE&trade;
+                                                                  */
+        uint8_t isxCalibrationError;                            /**< Acceptable calibration error
+                                                                  * \note This structure is available only for the fifth-generation low power CAPSENSE&trade;
+                                                                  */
+        cy_stc_capsense_channel_config_t * ptrChConfig;         /**< The pointer to the CAPSENSE&trade; enabled channel (HW block) configuration
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
         DMAC_Type * ptrDmacBase;                                /**< Pointer to the DMAC HW block base register
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
@@ -803,102 +899,145 @@ typedef struct
                                                                  * used as a source for the DMA Chain Read channel
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
 
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         uint16_t numEpiCycles;                                  /**< Number of clk_mod cycles to be run during EPILOGUE
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint16_t numProWaitKrefDelayPrs;                        /**< Number of Kref/4 ProDummy Wait Cycles if PRS is enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t numProWaitKrefDelay;                           /**< Number of Kref/4 ProDummy Wait Cycles if PRS is disabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t numEpiKrefDelayPrs;                            /**< Number of Kref/4 cycles to be run during EPILOGUE if PRS is enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t numEpiKrefDelay;                               /**< Number of Kref/4 cycles to be run during EPILOGUE if PRS is disabled
+                                                                 * \note This field is available only for the fifth-generation pow power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
         uint16_t numCoarseInitChargeCycles;                     /**< Configure duration of Cmod initialization, phase 1
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t numCoarseInitSettleCycles;                     /**< Configure duration of Cmod initialization, phase 2
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t numSlots;                                      /**< Total number of slots
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-
         uint8_t csdShieldMode;                                  /**< Shield mode
                                                                  * * CY_CAPSENSE_SHIELD_DISABLED
                                                                  * * CY_CAPSENSE_SHIELD_ACTIVE
                                                                  * * CY_CAPSENSE_SHIELD_PASSIVE
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+            uint8_t sensorConnection;                           /**< Sensor Connection. In CS-DMA mode, sensor connection always set to CTRLMUX.
+                                                                 * * 0 - CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD:
+                                                                 *       All AMUX capable GPIOs available as sensor.
+                                                                 * * 1 - CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD:
+                                                                 *       Only dedicated GPIO available as sensor.
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
-        uint8_t sensorConnection;                                  /**< Sensor Connection. In CS-DMA mode, sensor connection always set to CTRLMUX.
-                                                                    * * 0 - CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD:
-                                                                    *       All AMUX capable GPIOs available as sensor.
-                                                                    * * 1 - CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD:
-                                                                    *       Only dedicated GPIO available as sensor.
-                                                                    * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                    */
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
         uint8_t csdCdacAutocalEn;                               /**< CSD CDAC calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csdRefCdacAutoEn;                               /**< CSD Reference CDAC auto-calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csdCdacCompEn;                                  /**< CSD Compensation CDAC enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csdCdacCompDivAutoEn;                           /**< CSD Compensation CDAC divider auto-calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csdCdacAutoCalibMin;                            /**< Min acceptable CDAC value in CSD auto-calibration
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csdRefCdacRowColumnAlignEn;                     /**< Row-Column alignment enabled. It adjusts reference CDAC for rows
                                                                  * and for columns in two-dimension CSD widgets to achieve
                                                                  * the similar sensitivity
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxCdacAutocalEn;                               /**< CSX CDAC calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxRefCdacAutoEn;                               /**< CSX Reference CDAC auto-calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxCdacCompEn;                                  /**< CSX Compensation CDAC enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxCdacCompDivAutoEn;                           /**< CSX Compensation CDAC divider auto-calibration enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxCdacAutoCalibMin;                            /**< Min acceptable CDAC value in CSX auto-calibration
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t csxAutotuneEn;                                  /**< CSX smart sensing algorithm enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxCdacAutocalEn;                               /**< ISX CDAC calibration enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxRefCdacAutoEn;                               /**< ISX Reference CDAC auto-calibration enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxCdacCompEn;                                  /**< ISX Compensation CDAC enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxCdacCompDivAutoEn;                           /**< ISX Compensation CDAC divider auto-calibration enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxCdacAutoCalibMin;                            /**< Min acceptable CDAC value in ISX auto-calibration
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxAutotuneEn;                                  /**< ISX smart sensing algorithm enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t numProOffsetCycles;                             /**< Maximum number of clk_mod cycles for the PRO_OFFSET state.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-        uint8_t proOffsetCdacComp;                                /**< Compensation CAPDAC size during PRO_OFFSET.
+        uint8_t proOffsetCdacComp;                              /**< Compensation CAPDAC size during PRO_OFFSET.
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
         uint8_t scanningMode;                                   /**< Scanning Mode:
                                                                  * * 0 - CY_CAPSENSE_SCAN_MODE_INT_DRIVEN
                                                                  * * 1 - CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade;.
                                                                  */
         uint8_t mptxEn;                                         /**< Multi-phase TX enabled
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t chopPolarity;                                   /**< Select polarity for system level chopping
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t cicFilterMode;                                  /**< CIC filter mode
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t numBadScans;                                    /**< 1 to 7, repeat scan upon "bad" scan. Disabled = 0.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t counterMode;                                    /**< Select overflow or saturate mode for raw count:
                                                                  * * 0 - CY_CAPSENSE_COUNTER_MODE_SATURATE
                                                                  * * 1 - CY_CAPSENSE_COUNTER_MODE_OVERFLOW
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t syncFrameStartEn;                               /**< Enable external synchronization signals
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
         uint8_t syncClockEn;                                    /**< Enable external synchronization signals
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
@@ -922,8 +1061,7 @@ typedef struct
         uint8_t channelOffset;                                  /**< The ID of the first channel that belongs to the current chip
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
-    #endif
-
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN  */
 } cy_stc_capsense_common_config_t;
 
 
@@ -1177,23 +1315,23 @@ typedef struct
     uint8_t widgetIndex;                                        /**< Current widget ID */
     uint8_t currentSenseMethod;                                 /**< Current sensing method */
     uint8_t connectedSnsState;                                  /**< Shows if the current sensor is connected to analog bus */
-} cy_stc_active_scan_sns_t;
+} cy_stc_capsense_active_scan_sns_t;
 
 
 /**
 * Provides the typedef for the callback function that is intended to be called when
 * the \ref cy_en_capsense_callback_event_t events occurs.
 */
-typedef void (*cy_capsense_callback_t)(cy_stc_active_scan_sns_t * ptrActiveScan);
+typedef void (*cy_capsense_callback_t)(cy_stc_capsense_active_scan_sns_t * ptrActiveScan);
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
     /**
     * Provides the typedef for the callback function that is called by the
     * Cy_CapSense_Enable() function to change the CAPSENSE&trade; configuration from
     * the default configuration to the user's specific use cases.
     * Refer to \ref group_capsense_callbacks section.
     *
-    * \note This callback function is available only for the fifth-generation CAPSENSE&trade;.
+    * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
     */
     typedef void (*cy_capsense_ds_init_callback_t)(void * context);
 #endif
@@ -1202,6 +1340,8 @@ typedef void (*cy_capsense_callback_t)(cy_stc_active_scan_sns_t * ptrActiveScan)
 * Provides the typedef for the callback function that is called by the
 * Cy_CapSense_RunTuner() function to establish communication with
 * the CAPSENSE&trade; Tuner tool to monitor CAPSENSE&trade; operation.
+* For the fifth-generation low power CAPSENSE&trade; the callback is called only once for each new scan.
+* For the previous CAPSENSE&trade; generations the callback is called once per scan cycle or periodically if device is in suspended mode.
 * Refer to \ref group_capsense_callbacks section.
 */
 typedef void (*cy_capsense_tuner_send_callback_t)(void * context);
@@ -1224,12 +1364,22 @@ typedef struct
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
     uint8_t intrCsxInactSnsConn;                                /**< Internal inactive electrode connection for CSX scan:
                                                                    * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
-                                                                   * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
-    uint32_t csdInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
-    en_hsiom_sel_t csdInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
+                                                                   * * CY_CAPSENSE_SNS_CONNECTION_GROUND
+                                                                   * * CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2 */
 
-    uint32_t csxInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
-    en_hsiom_sel_t csxInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        uint8_t intrIsxInactSnsConn;                                /**< Internal inactive electrode connection for ISX scan:
+                                                                       * * CY_CAPSENSE_SNS_CONNECTION_HIGHZ
+                                                                       * * CY_CAPSENSE_SNS_CONNECTION_GROUND */
+    #endif
+
+    #if (!CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint32_t csdInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
+        en_hsiom_sel_t csdInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
+
+        uint32_t csxInactiveSnsDm;                                  /**< Internal pre-calculated data for faster operation */
+        en_hsiom_sel_t csxInactiveSnsHsiom;                         /**< Internal pre-calculated data for faster operation */
+    #endif
 
     cy_capsense_callback_t ptrSSCallback;                           /**< Pointer to a user's Start Sample callback function. Refer to \ref group_capsense_callbacks section */
     cy_capsense_callback_t ptrEOSCallback;                          /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
@@ -1343,71 +1493,121 @@ typedef struct
         uint16_t csdVrefVoltageMv;                              /**< Internal pre-calculated data for faster operation
                                                                   * \note This field is available only for the fourth-generation CAPSENSE&trade;.
                                                                   */
-    #endif
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN */
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         cy_capsense_ds_init_callback_t ptrEODsInitCallback;     /**< Pointer to a user's End Of Data Structure Initialization callback function. Refer to \ref group_capsense_callbacks section
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+            uint32_t snsCtlReg[CY_CAPSENSE_TOTAL_CH_NUMBER];    /**< Keeps value of non-retention SNS_CTL register for LFT mode */
+            uint16_t numFineInitWaitCycles;                     /**< Number of ProDummy Wait Cycles
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
-        uint32_t snsCtlReg[CY_CAPSENSE_TOTAL_CH_NUMBER];        /**< Keeps value of non-retention SNS_CTL register for LFT mode */
-        uint16_t numEpiCycles;                                  /**< Number of clk_mod cycles to be run during EPILOGUE
+            uint16_t numEpiCycles;                              /**< Number of clk_mod cycles to be run during EPILOGUE
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+            uint32_t snsCtlReg;                                 /**< Keeps value of non-retention SNS_CTL register for LFT mode */
+            uint16_t numProWaitKrefDelayPrs;                    /**< Number of Kref/4 ProDummy Wait Cycles if PRS is enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+            uint16_t numProWaitKrefDelay;                       /**< Number of Kref/4 ProDummy Wait Cycles if PRS is disabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+            uint16_t numEpiKrefDelayPrs;                        /**< Number of Kref/4 cycles to be run during EPILOGUE if PRS is enabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+            uint16_t numEpiKrefDelay;                           /**< Number of Kref/4 cycles to be run during EPILOGUE if PRS is disabled
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+            uint16_t numSlots;                                  /**< The number of slots in the current frame
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+            uint16_t activeWakeupTimer;                         /**< The wakeup timer value for the ACTIVE scan mode in CLK_LF periods
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
         uint16_t numCoarseInitChargeCycles;                     /**< Configure duration of Cmod initialization, phase 1
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t numCoarseInitSettleCycles;                     /**< Configure duration of Cmod initialization, phase 2
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint16_t numFineInitWaitCycles;                         /**< Number of ProDummy Wait Cycles
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t currentSlotIndex;                              /**< Current slot ID
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint16_t endSlotIndex;                                  /**< The last slot ID for the current frame
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t scanSingleSlot;                                 /**< Request of scanning just one slot with keeping HW configuration after scan:
                                                                  * * CY_CAPSENSE_SCAN_SNGL_SLOT - Single slot scanning
                                                                  * * CY_CAPSENSE_SCAN_MULTIPLE_SLOT - Multiple slot scanning
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
-        uint8_t numSenseMethod;                                 /**< The number of sense methods, used in the project
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+            uint8_t numSenseMethod;                                 /**< The number of sense methods, used in the project
+                                                                     * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                     */
+            uint8_t mapSenseMethod[CY_CAPSENSE_REG_MODE_NUMBER];    /**< The map array of sense methods, used in the project
+                                                                     * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                     */
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+            uint8_t firstActSubFrame;                           /**< The flag for a first Active sub-frame. It is used for Active Low Refresh-rate scans
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
-        uint8_t mapSenseMethod[CY_CAPSENSE_REG_MODE_NUMBER];    /**< The map array of sense methods, used in the project
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+            uint8_t numFunc;                                    /**< The number of pin functions, used in the project
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
+            uint8_t mapPinState[CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER]; /**< The map array of CTRLMUX pin functions, used in the project
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+            uint8_t operatingMode;                              /**< The internal fifth-generation low power CAPSENSE&trade; HW block operating mode
+                                                                  * * 0 - CY_CAPSENSE_CTL_OPERATING_MODE_CPU
+                                                                  * * 2 - CY_CAPSENSE_CTL_OPERATING_MODE_AS_MS
+                                                                  * * 3 - CY_CAPSENSE_CTL_OPERATING_MODE_LP_AOS
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+            uint8_t mrssStateAfterScan;                         /**< Defines the MRSS state after scan frame is complete. By default MRSS is left enabled */
+
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
         uint8_t numProOffsetCycles;                             /**< Maximum number of clk_mod cycles for the PRO_OFFSET state.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t proOffsetCdacComp;                              /**< Compensation CAPDAC size during PRO_OFFSET.
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t hwConfigState;                                  /**< Contains the current hw state, it is configured or not and if yes then to what operation
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t slotAutoCalibrMode;                             /**< The slot auto-calibration mode:
                                                                  * * 0 - CY_CAPSENSE_CAL_MODE_REF_CDAC_SUC_APPR
                                                                  * * 2 - CY_CAPSENSE_CAL_MODE_COMP_CDAC_SUC_APPR
                                                                  * * 3 - CY_CAPSENSE_CAL_MODE_COMP_CDAC_MAX_CODE
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t intrCsdRawTarget;                               /**< Internal auto-calibration target in percentage for CSD widgets
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t intrCsxRawTarget;                               /**< Internal auto-calibration target in percentage for CSX widgets
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
-    #endif
-
+        uint8_t intrIsxRawTarget;                               /**< Internal auto-calibration target in percentage for ISX widgets
+                                                                 * \note This field is available only for the fifth-generation and for the fifth-generation low power CAPSENSE&trade;
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 }cy_stc_capsense_internal_context_t;
 
 
 /** Declares the structure that is intended to store the \ref cy_stc_capsense_widget_context_t
  *  data structure fields, the CRC checking should be applied for.
- * \note This structure is available only for the fourth-generation CAPSENSE&trade;.
  */
 typedef struct
 {
@@ -1469,7 +1669,7 @@ typedef struct
                                                                    * Used by the CAPSENSE&trade; Tuner tool to identify if the FW corresponds to the specific user configuration. */
     uint16_t tunerCmd;                                          /**< Tuner Command Register \ref cy_en_capsense_tuner_cmd_t.
                                                                    * Used for the communication between the CAPSENSE&trade; Tuner tool and the middleware */
-    uint16_t scanCounter;                                       /**< This counter increments after each scan. */
+    uint16_t scanCounter;                                       /**< This counter increments after each scan of active widgets. */
     uint8_t tunerSt;                                            /**< State of CAPSENSE&trade; middleware tuner module. \ref cy_en_capsense_tuner_state_t */
     uint8_t initDone;                                           /**< Keep information whether initialization was done or not */
     volatile uint32_t status;                                   /**< Middleware status information, scan in progress (1) or not (0).
@@ -1488,30 +1688,99 @@ typedef struct
 
     uint8_t tunerCnt;                                           /**< Command counter of CAPSENSE&trade; middleware tuner module */
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         uint8_t numFineInitCycles;                              /**< Number of ProDummy SubConversions
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
+    #endif
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
         uint16_t numFineInitWaitCycles;                         /**< Number of ProDummy Wait Cycles
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint16_t lfsrPoly;                                      /**< LFSR Polynomial
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint8_t lfsrScale;                                      /**< LFSR Scale value
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint8_t cdacDitherSeed;                                 /**< Dither CDAC Seed
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint8_t cdacDitherPoly;                                 /**< Dither CDAC Polynomial
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
-                                                                 */
-        uint8_t modClk;                                         /**< The modulator clock divider
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade;.
                                                                  */
     #endif
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint16_t lpDataSt;                                       /**< State of Low Power data processing:
+                                                                  * * Bit[0] = 0 (Default) - data is not copied and cannot be transmitted to Tuner
+                                                                  * * Bit[0] = 1 - data copied by CAPSENSE&trade; and transmitted to Tuner.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        uint8_t lpFirstSnsId;                                    /**< The first scanned low power sensor within LP frame.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        uint8_t lpSnsNumber;                                     /**< The number of consecutive scanned low power sensors from the .lpFirstSnsID.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        uint8_t lpNumFrame;                                      /**< The number of fully scanned low power frames available in the packet.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        uint8_t lpScanCounter;                                   /**< This counter increments after each scan of low power widgets.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+        uint8_t lpScanSt;                                            /**< The state / status of low power sensor baselines:
+                                                                  * * Bit[0] = 0 - baseline reset: does not happen
+                                                                  * * Bit[0] = 1 - baseline reset: happen
+                                                                  * * Bit[1] = 0 - baseline is not valid due to FIFO overflow
+                                                                  * * Bit[1] = 1 - baseline is valid.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        uint16_t lfsrPoly;                                      /**< LFSR Polynomial
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t lfsrScale;                                      /**< LFSR Scale value
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t cdacDitherSeed;                                 /**< Dither CDAC Seed
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t cdacDitherPoly;                                 /**< Dither CDAC Polynomial
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t modClk;                                         /**< The modulator clock divider
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint8_t csdCdacDitherEn;                                /**< Enabled CDAC dithering for CSD sensing method
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t csxCdacDitherEn;                                /**< Enabled CDAC dithering for CSX sensing method
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t isxCdacDitherEn;                                /**< Enabled CDAC dithering for ISX sensing method
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t bslnCoefSlow;                                   /**< Baseline IIR filter coefficient (slow) for Low power widget.
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t bslnCoefFast;                                   /**< Baseline IIR filter coefficient (fast) for Low power widget.
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t bslnUpdateDelay;                                /**< Specifies the value from which timer is decremented from on consecutive scans where the baseline update IIR produces a zero.
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t iirCoeffLp;                                     /**< Rawcount IIR filter coefficient for Low power widget
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t wotScanInterval;                               /**< Scan refresh interval (ms) while in Wake-on-Touch mode.
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint8_t wotTimeout;                                     /**< Maximum number of frames to be scanned in Wake-on-Touch mode when there is no touch.
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 } cy_stc_capsense_common_context_t;
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    /** Declares historic rawcount low power sensors */
+    typedef uint16_t cy_stc_capsense_lp_historic_context_t;
+#endif
 
 
 /** Declares top-level CAPSENSE&trade; context data structure */
@@ -1524,19 +1793,51 @@ typedef struct
     cy_stc_capsense_widget_context_t * ptrWdContext;            /**< Pointer to the widget context structure */
     const cy_stc_capsense_pin_config_t * ptrPinConfig;          /**< Pointer to the pin configuration structure */
     const cy_stc_capsense_pin_config_t * ptrShieldPinConfig;    /**< Pointer to the shield pin configuration structure */
-    cy_stc_active_scan_sns_t * ptrActiveScanSns;                /**< Pointer to the current active sensor structure */
+    cy_stc_capsense_active_scan_sns_t * ptrActiveScanSns;       /**< Pointer to the current active sensor structure */
     cy_stc_capsense_bist_context_t * ptrBistContext;            /**< Pointer to the BIST context structure */
+
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
         cy_stc_msc_base_config_t * ptrBaseFrameContext;         /**< Pointer to the first member of the context structure of base configuration array
                                                                  * \note This field is available only for the fifth-generation CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        cy_stc_msclp_base_config_t * ptrBaseFrameContext;       /**< Pointer to the first member of the context structure of base configuration array
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         uint32_t * ptrSensorFrameContext;                       /**< Pointer to the context structure of sensor configuration
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint32_t * ptrSensorFrameLpContext;                     /**< Pointer to the context structure of low power sensor configuration
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         const cy_stc_capsense_scan_slot_t * ptrScanSlots;       /**< Pointer to the scan order slot structure
-                                                                 * \note This field is available only for the fifth-generation CAPSENSE&trade;.
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-    #endif
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        const cy_stc_capsense_scan_slot_t * ptrLpScanSlots;     /**< Pointer to the low power scan order slot structure
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        cy_stc_capsense_lp_historic_context_t * ptrLpHistoricContext;
+                                                                /**< Pointer to the low power historic data
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 } cy_stc_capsense_context_t;
 
 /** \} */
@@ -1551,6 +1852,11 @@ typedef struct
 /******************************************************************************/
 
 uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context);
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    uint32_t Cy_CapSense_IsAnyLpWidgetActive(const cy_stc_capsense_context_t * context);
+#endif
+
 uint32_t Cy_CapSense_IsWidgetActive(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
@@ -1558,13 +1864,13 @@ uint32_t Cy_CapSense_IsSensorActive(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 const cy_stc_capsense_context_t * context);
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
     uint32_t Cy_CapSense_IsProximitySensorActive(
                     uint32_t widgetId,
                     uint32_t sensorId,
                     const cy_stc_capsense_context_t * context);
 #endif
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
     cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
@@ -1620,6 +1926,11 @@ typedef enum
 } cy_en_capsense_sensing_method_t;
 
 
+/** This structure is obsolete and should not be used further.
+ * Instead cy_stc_capsense_active_scan_sns_t should be used.
+ */
+#define cy_stc_active_scan_sns_t        cy_stc_capsense_active_scan_sns_t
+
 /** \} \endcond */
 
 
@@ -1627,7 +1938,7 @@ typedef enum
 }
 #endif
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_STRUCTURE_H */
 

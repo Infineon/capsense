@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -22,7 +22,8 @@
 #include "cy_sysint.h"
 #include "cycfg_capsense_defines.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -39,10 +40,12 @@ extern "C" {
 
     #define CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN       (1u)
     #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN        (0u)
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP     (0u)
 
     #define CY_CAPSENSE_PSOC4_FOURTH_GEN                (1u)
     #define CY_CAPSENSE_PSOC6_FOURTH_GEN                (0u)
     #define CY_CAPSENSE_PSOC4_FIFTH_GEN                 (0u)
+    #define CY_CAPSENSE_PSOC4_FIFTH_GEN_LP              (0u)
 
 #elif (defined(CY_IP_MXCSDV2))
 
@@ -51,10 +54,12 @@ extern "C" {
 
     #define CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN       (1u)
     #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN        (0u)
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP     (0u)
 
     #define CY_CAPSENSE_PSOC4_FOURTH_GEN                (0u)
     #define CY_CAPSENSE_PSOC6_FOURTH_GEN                (1u)
     #define CY_CAPSENSE_PSOC4_FIFTH_GEN                 (0u)
+    #define CY_CAPSENSE_PSOC4_FIFTH_GEN_LP              (0u)
 
 #elif (defined(CY_IP_M0S8MSCV3))
 
@@ -63,10 +68,26 @@ extern "C" {
 
     #define CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN       (0u)
     #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN        (1u)
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP     (0u)
 
     #define CY_CAPSENSE_PSOC4_FOURTH_GEN                (0u)
     #define CY_CAPSENSE_PSOC6_FOURTH_GEN                (0u)
     #define CY_CAPSENSE_PSOC4_FIFTH_GEN                 (1u)
+    #define CY_CAPSENSE_PSOC4_FIFTH_GEN_LP              (0u)
+
+#elif (defined(CY_IP_M0S8MSCV3LP))
+
+    #define CY_CAPSENSE_PLATFORM_DEVICE_PSOC4           (1u)
+    #define CY_CAPSENSE_PLATFORM_DEVICE_PSOC6           (0u)
+
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN       (0u)
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN        (0u)
+    #define CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP     (1u)
+
+    #define CY_CAPSENSE_PSOC4_FOURTH_GEN                (0u)
+    #define CY_CAPSENSE_PSOC6_FOURTH_GEN                (0u)
+    #define CY_CAPSENSE_PSOC4_FIFTH_GEN                 (0u)
+    #define CY_CAPSENSE_PSOC4_FIFTH_GEN_LP              (1u)
 
 #endif
 
@@ -75,6 +96,8 @@ extern "C" {
 
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
     #include "cy_csd.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_msclp.h"
 #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
     #include "cy_msc.h"
 #endif
@@ -83,11 +106,11 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MW_VERSION_MAJOR                    (3)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                    (4)
 /** Middleware minor version */
 #define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (300)
+#define CY_CAPSENSE_MW_VERSION                          (400)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */
@@ -146,6 +169,10 @@ extern "C" {
 
 #endif
 
+#if (CY_CAPSENSE_PSOC4_FIFTH_GEN_LP)
+    #define CY_CAPSENSE_USE_CAPTURE                     (1u)
+#endif
+
 #if !defined (CY_CAPSENSE_USE_CAPTURE)
     /** Use CSD/MSC Init function */
     #define CY_CAPSENSE_USE_CAPTURE                     (0u)
@@ -161,7 +188,7 @@ extern "C" {
 /** The CAPSENSE&trade; middleware is not busy */
 #define CY_CAPSENSE_NOT_BUSY                            (0x00u)
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
     /** The CAPSENSE&trade; middleware busy mask */
     #define CY_CAPSENSE_BUSY_MASK                       (0xFFu)
     /** The MSCv3 channel busy mask */
@@ -193,11 +220,17 @@ extern "C" {
 #define CY_CAPSENSE_WD_DISABLE_MASK                     (0x02u)
 /** Widget working status mask */
 #define CY_CAPSENSE_WD_WORKING_MASK                     (0x04u)
+/** Widget maximum raw count calculation enable mask */
+#define CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK               (0x08u)
+/** Widget row maximum raw count calculation enable mask */
+#define CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK           (0x10u)
 /** \} */
 
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_mw_state *//** \{ */
 /******************************************************************************/
+/** There was any sensor touch detected at the previous low power widget scan */
+#define CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK             (0x400u)
 /** The BIST is currently in progress */
 #define CY_CAPSENSE_MW_STATE_BIST_MASK                  (0x800u)
 /** The auto-calibration in Single CDAC mode */
@@ -212,7 +245,23 @@ extern "C" {
 #define CY_CAPSENSE_MW_STATE_SCAN_SLOT_MASK             (0xFFFF0000u)
 /** Current scan slot position in status */
 #define CY_CAPSENSE_MW_STATE_SCAN_SLOT_POS              (16u)
+
+#if (CY_CAPSENSE_PSOC4_FIFTH_GEN_LP)
+    /** The last or currently scanned widget type is Active widget
+     *  * \note This macro is available only for the fifth-generation low power CAPSENSE&trade;.
+     */
+    #define CY_CAPSENSE_MW_STATE_ACTIVE_WD_SCAN_MASK       (0x10u)
+    /** The last or currently scanned widget type is Low Power widget
+     *  * \note This macro is available only for the fifth-generation low power CAPSENSE&trade;.
+     */
+    #define CY_CAPSENSE_MW_STATE_LP_WD_SCAN_MASK           (0x20u)
+    /** The mask for the last or currently scanned widget type
+     *  * \note This macro is available only for the fifth-generation low power CAPSENSE&trade;.
+     */
+    #define CY_CAPSENSE_MW_STATE_WD_SCAN_MASK              (0x30u)
+#endif
 /** \} */
+
 
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_settings *//** \{ */
@@ -259,27 +308,17 @@ extern "C" {
 #define CY_CAPSENSE_BIST_CSX_GROUP                      (5u)
 /** BIST shield capacitance measurement group */
 #define CY_CAPSENSE_BIST_SHIELD_GROUP                   (6u)
+/** ISX sensing group */
+#define CY_CAPSENSE_ISX_GROUP                           (10u)
 
-/** Sensing mode undefined */
-#define CY_CAPSENSE_REG_MODE_UNDEFINED                  (255u)
-/** CSD sense mode configuration index */
-#define CY_CAPSENSE_REG_MODE_CSD                        (0u)
-/** CSX sense mode configuration index */
-#define CY_CAPSENSE_REG_MODE_CSX                        (1u)
-/** CSD sense mode configuration index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_CSD_DITHERING              (2u)
-/** CSX sense mode configuration index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_CSX_DITHERING              (3u)
-
-/** First mode index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_DITHERING                  (CY_CAPSENSE_REG_MODE_CSD_DITHERING)
-
-/** Total number of modes */
-#define CY_CAPSENSE_REG_MODE_NUMBER                     (4u)
+/** Total number of mode templates */
+#define CY_CAPSENSE_REG_MODE_NUMBER                     (6u)
 
 /* The values of these macros should be not changed due to CY_ID374670 */
 
 /* Initialization Group */
+/** Pin function undefined */
+#define CY_CAPSENSE_SCW_FUNC_PIN_STATE_IDX_UNDEFINED    (255u)
 /** Control mux switch state is ground */
 #define CY_CAPSENSE_CTRLMUX_PIN_STATE_GND               (0u)
 /** Control mux switch state is High-Z */
@@ -299,8 +338,40 @@ extern "C" {
 /** Control mux switch state defined as CSDBUSC connected electrode */
 #define CY_CAPSENSE_CTRLMUX_PIN_STATE_VDDA2             (7u)
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/** Pin function undefined */
+#define CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED             (255u)
+/** Pin function is ground */
+#define CY_CAPSENSE_PIN_STATE_IDX_GND                   (0u)
+/** Pin function is High-Z */
+#define CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z                (1u)
+/** Pin function is CSX Rx electrode */
+#define CY_CAPSENSE_PIN_STATE_IDX_CSX_RX                (2u)
+/** Pin function is CSX Tx electrode */
+#define CY_CAPSENSE_PIN_STATE_IDX_CSX_TX                (3u)
+/** Pin function is CSX Negative Tx electrode */
+#define CY_CAPSENSE_PIN_STATE_IDX_CSX_NEG_TX            (4u)
+/** Pin function is CSD sensor */
+#define CY_CAPSENSE_PIN_STATE_IDX_CSD_SNS               (5u)
+/** Pin function is ISX Lx electrode */
+#define CY_CAPSENSE_PIN_STATE_IDX_ISX_LX                (6u)
+/** Pin function is ISX Rx electrode */
+#define CY_CAPSENSE_PIN_STATE_IDX_ISX_RX                (7u)
+/** Pin function is Active shield */
+#define CY_CAPSENSE_PIN_STATE_IDX_ACT_SHIELD            (8u)
+/** Pin function is Passive shield */
+#define CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD            (9u)
+/** Pin function is CSX VDDA/2 connection */
+#define CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2             (10u)
+/** Number of CTRLMUX Pin States for LP */
+#define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (11u)
+
+#else /* All the rest platforms */
+
 /** Number of CTRLMUX Pin State */
 #define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (8u)
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
 /** Number of CTRLMUX Pin State MASK registers */
 #define CY_CAPSENSE_CTRLMUX_PIN_STATE_MASK_NUMBER       (3u)
 
@@ -565,11 +636,11 @@ extern "C" {
 /** \} */
 
 /* Slot configuration */
-/** Shield only slot */
+/** Shield only slot, can be assigned to the \ref cy_stc_capsense_scan_slot_t::wdId */
 #define CY_CAPSENSE_SLOT_SHIELD_ONLY                    (0xFFFDu)
-/** TX only slot */
+/** TX only slot, can be assigned to the \ref cy_stc_capsense_scan_slot_t::wdId */
 #define CY_CAPSENSE_SLOT_TX_ONLY                        (0xFFFEu)
-/** Empty slot */
+/** Empty slot, can be assigned to the \ref cy_stc_capsense_scan_slot_t::wdId */
 #define CY_CAPSENSE_SLOT_EMPTY                          (0xFFFFu)
 
 /* Centroid configuration */
@@ -675,16 +746,18 @@ extern "C" {
 #define CY_CAPSENSE_SHIELD                              (2u)
 /** Configuring of pin as a CSD sensor */
 #define CY_CAPSENSE_SENSOR                              (3u)
-/** Configuring of pin as a Tx */
+/** Configuring of pin as a CSX Tx electrode */
 #define CY_CAPSENSE_TX_PIN                              (4u)
-/** Configuring of pin as a Rx */
+/** Configuring of pin as a CSX Rx electrode */
 #define CY_CAPSENSE_RX_PIN                              (5u)
+
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
 /** Configuring of pin as a negative Tx
  * \note This macro is available only for the fifth-generation CAPSENSE&trade;.
  */
 #define CY_CAPSENSE_NEGATIVE_TX_PIN                     (6u)
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+
 /** Pin is not connected to scanning bus */
 #define CY_CAPSENSE_SNS_DISCONNECTED                    (0u)
 /** Pin is connected to scanning bus */
@@ -832,16 +905,43 @@ extern "C" {
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unable to perform calibration */
 #define CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL       (0x400u)
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Sense Clock Divider
-*   is out of the valid range for the specified Clock source configuration 
+*   is out of the valid range for the specified Clock source configuration
 */
 #define CY_CAPSENSE_STATUS_BAD_CLOCK_CONFIG             (0x800u)
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Used scan configuration
+*   is not sufficient to accumulate at least one valid CIC2 sample.
+*/
+#define CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW           (0x1000u)
+
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Used scan configuration
+*   leads to the overflow in the CIC2 accumulation register.
+*/
+#define CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW            (0x2000u)
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unknown */
 #define CY_CAPSENSE_STATUS_UNKNOWN                      (0x80000000u)
 
+/** State of Low Power sensor processing mask */
+#define CY_CAPSENSE_LP_PROCESS_ENABLED_MASK             (0x1uL)
+
 /** \} */
 
+/* The time interval is required for settling analog part of the HW block. */
+#define CY_CAPSENSE_ANALOG_SETTLING_TIME_US             (25u)
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/* The time interval in us is required for settling analog part of the MSCLP HW block. */
+#define CY_CAPSENSE_MSCLP_HW_SETTLING_TIME_US           (10u)
+
+/*  The Sequencer FSM Operating Mode,
+*   to be used with cy_stc_capsense_internal_context_t::operatingMode
+*/
+#define CY_CAPSENSE_MODE_CPU                            (0x0u) /* The regular (interrupt-driven) CPU mode */
+#define CY_CAPSENSE_MODE_AS_MS                          (0x2u) /* The Autonomous-Scan Multi-Sensor Mode */
+#define CY_CAPSENSE_MODE_LP_AOS                         (0x3u) /* The Low Power Always-On-Scanning Mode */
+#endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
 #define CY_CAPSENSE_BYTES_IN_16_BITS                    (2u)
-#define CY_CAPSENSE_BYTE_IN_32_BIT                      (4u)
+#define CY_CAPSENSE_BYTE_IN_32_BIT                      (4uL)
 #define CY_CAPSENSE_CONVERSION_MEGA                     (1000000u)
 #define CY_CAPSENSE_CONVERSION_KILO                     (1000u)
 #define CY_CAPSENSE_DIVIDER_TWO                         (2u)
@@ -861,7 +961,7 @@ extern "C" {
 }
 #endif
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_COMMON_H */
 

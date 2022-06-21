@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0: cy_stc_capsense_widget_context_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 4.0 (Preliminary): cy_stc_capsense_widget_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0 (Preliminary)</div>
   </td>
  </tr>
  </tbody>
@@ -160,7 +160,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memdesc:a594bf2fb432dbeaa9b23545a9ff3d55a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widget Debounce for the signal above the finger threshold 1 to 255.  <a href="#a594bf2fb432dbeaa9b23545a9ff3d55a">More...</a><br /></td></tr>
 <tr class="separator:a594bf2fb432dbeaa9b23545a9ff3d55a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9a639859b9bb45518c041e37bfca15a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#ab9a639859b9bb45518c041e37bfca15a">snsClkSource</a></td></tr>
-<tr class="memdesc:ab9a639859b9bb45518c041e37bfca15a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widget clock source:  <a href="#ab9a639859b9bb45518c041e37bfca15a">More...</a><br /></td></tr>
+<tr class="memdesc:ab9a639859b9bb45518c041e37bfca15a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widget clock source.  <a href="#ab9a639859b9bb45518c041e37bfca15a">More...</a><br /></td></tr>
 <tr class="separator:ab9a639859b9bb45518c041e37bfca15a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0af701de0ec391286d2df0ba67299b9d"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a0af701de0ec391286d2df0ba67299b9d">idacMod</a> [<a class="el" href="group__group__capsense__macros__settings.html#ga2e3c548e409ca07aa1376632bbcd6670">CY_CAPSENSE_MAX_SUPPORTED_FREQ_NUM</a>]</td></tr>
 <tr class="memdesc:a0af701de0ec391286d2df0ba67299b9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the current of the modulation IDAC for the CSD widgets.  <a href="#a0af701de0ec391286d2df0ba67299b9d">More...</a><br /></td></tr>
@@ -294,8 +294,8 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
       </table>
 </div><div class="memdoc">
 
-<p>Widget clock source: </p>
-<ul>
+<p>Widget clock source. </p>
+<p>For fourth-generation CAPSENSE&trade;:</p><ul>
 <li>bit[7] - Indicates auto mode of clock source selection</li>
 <li>bit[0:6] - Clock source:<ul>
 <li>0 - Direct (CY_CAPSENSE_CLK_SOURCE_DIRECT)</li>
@@ -304,7 +304,15 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>3 - SSC9 (CY_CAPSENSE_CLK_SOURCE_SSC9)</li>
 <li>4 - SSC10 (CY_CAPSENSE_CLK_SOURCE_SSC10)</li>
 <li>5 - PRS8 (CY_CAPSENSE_CLK_SOURCE_PRS8)</li>
-<li>6 - PRS12 (CY_CAPSENSE_CLK_SOURCE_PRS12) </li>
+<li>6 - PRS12 (CY_CAPSENSE_CLK_SOURCE_PRS12)</li>
+</ul>
+</li>
+</ul>
+<p>For fifth-generation and fifth-generation low power CAPSENSE&trade;: bit[3] - Indicates auto mode of PRS clock source bit[2] - Indicates auto mode of SSC clock source</p><ul>
+<li>bit[0:1] - Clock source:<ul>
+<li>0 - Direct (CY_CAPSENSE_CLK_SOURCE_DIRECT)</li>
+<li>1 - SSC (CY_CAPSENSE_CLK_SOURCE_SSC)</li>
+<li>2 - PRS (CY_CAPSENSE_CLK_SOURCE_PRS) </li>
 </ul>
 </li>
 </ul>
@@ -395,7 +403,9 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <ul>
 <li>bit[0] - Widget Active (CY_CAPSENSE_WD_ACTIVE_MASK)</li>
 <li>bit[1] - Widget Disabled (CY_CAPSENSE_WD_DISABLE_MASK)</li>
-<li>bit[2] - Widget Working (CY_CAPSENSE_WD_WORKING_MASK) </li>
+<li>bit[2] - Widget Working (CY_CAPSENSE_WD_WORKING_MASK)</li>
+<li>bit[3] - Widget maximum raw count calculation enabled (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK)</li>
+<li>bit[4] - Widget row maximum raw count calculation enable (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK) </li>
 </ul>
 
 </div>
@@ -413,7 +423,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Number of sub-conversions in a scan. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -430,7 +440,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Sets the capacitance of the reference CDAC. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -447,7 +457,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Sets the capacitance of the reference CDAC for CSD Touchpad and CSD Matrix buttons widgets. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -464,7 +474,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Sets decimation rate when CIC2 is enabled. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -498,7 +508,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>CDAC dither value in percentage. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -515,7 +525,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Skip Cmod coarse initialization sensors scan within widget. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -532,7 +542,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Number of time DAC switched in sense clock period. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -549,7 +559,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Defines the number of LSB bits to use by the LSFR unit to achieve the desired clock dithering variation. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -559,7 +569,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0 (Preliminary)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

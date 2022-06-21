@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file contains the definitions for all the filters implementation.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -24,16 +24,16 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_common.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
-/***************************************
+/*******************************************************************************
 * Function Prototypes
-***************************************/
+*******************************************************************************/
 
 /*******************************************************************************
 * LOW LEVEL FUNCTIONS
@@ -135,7 +135,7 @@ uint32_t Cy_CapSense_FtIIR1stOrder(uint32_t input, uint32_t prevOutput, uint32_t
 }
 #endif
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_FILTER_H */
 

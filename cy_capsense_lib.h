@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * The file contains application programming interface to the CAPSENSE&trade; library.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -106,7 +106,8 @@ typedef struct
 *     <td>Reserved</td>
 *     <td>Reserved</td>
 *     <td>Reserved</td>
-*     <td>MSB = Age of touch; LSB = Z-value</td>
+*     <td>MSB = Age of touch; LSB = Z-value represents a touch strength (summ of sensor diff counts divided by 16
+*        that form 3x3 matrix with a local maximum in the center)</td>
 *   </tr>
 *   <tr>
 *     <td>id</td>

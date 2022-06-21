@@ -1,5 +1,6 @@
 var group__group__capsense__macros__mw__state =
 [
+    [ "CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK", "group__group__capsense__macros__mw__state.html#gafa92a91e1bbb0f0dcafeeee76241559b", null ],
     [ "CY_CAPSENSE_MW_STATE_BIST_MASK", "group__group__capsense__macros__mw__state.html#ga77644fbd95cb2c428d72941891a90e9f", null ],
     [ "CY_CAPSENSE_MW_STATE_CALIBRATION_SINGLE_MASK", "group__group__capsense__macros__mw__state.html#ga6300d3c18f5ba220c0fb30d7ebdd32ae", null ],
     [ "CY_CAPSENSE_MW_STATE_CALIBRATION_MASK", "group__group__capsense__macros__mw__state.html#ga812bfd422afd4cd3112299e51d6e3c5e", null ],

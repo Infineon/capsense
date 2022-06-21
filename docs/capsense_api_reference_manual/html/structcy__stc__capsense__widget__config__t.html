@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0: cy_stc_capsense_widget_config_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 4.0 (Preliminary): cy_stc_capsense_widget_config_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0 (Preliminary)</div>
   </td>
  </tr>
  </tbody>
@@ -249,7 +249,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Pointer to the first object in the sensor capacitance array that belongs to this widget. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -300,7 +300,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>The total number of sensors: For CSD widgets: WD_NUM_ROWS + WD_NUM_COLS. </p>
-<p>For CSX widgets: WD_NUM_ROWS * WD_NUM_COLS. </p>
+<p>For CSX widgets: WD_NUM_ROWS * WD_NUM_COLS. For ISX widgets: (WD_NUM_ROWS + WD_NUM_COLS) / 2 </p>
 
 </div>
 </div>
@@ -317,7 +317,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>For CSD Button and Proximity Widgets, the number of sensors. </p>
-<p>For CSD Slider Widget, the number of segments. For CSD Touchpad and Matrix Button, the number of the column sensors. For CSX Button, Slider, Touchpad, and Matrix Button, the number of the Rx electrodes. </p>
+<p>For CSD Slider Widget, the number of segments. For CSD Touchpad and Matrix Button, the number of the column sensors. For CSX Button, Slider, Touchpad, and Matrix Button, the number of the Rx electrodes. For ISX Button and Linear Slider, the number of the Rx electrodes. </p>
 
 </div>
 </div>
@@ -334,7 +334,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>For CSD Touchpad and Matrix Buttons, the number of the row sensors. </p>
-<p>For the CSX Button and Slider, the number of the Tx electrodes (constant 1u). For CSX Touchpad and Matrix Button, the number of the Tx electrodes. </p>
+<p>For the CSX Button and Slider, the number of the Tx electrodes (constant 1u). For CSX Touchpad and Matrix Button, the number of the Tx electrodes. For ISX Button and Linear Slider, the number of the Lx electrodes. </p>
 
 </div>
 </div>
@@ -386,7 +386,8 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <ul>
 <li>0 - UNDEFINED (CY_CAPSENSE_UNDEFINED_GROUP)</li>
 <li>1 - CSD (CY_CAPSENSE_CSD_GROUP)</li>
-<li>2 - CSX (CY_CAPSENSE_CSX_GROUP) </li>
+<li>2 - CSX (CY_CAPSENSE_CSX_GROUP)</li>
+<li>3 - ISX (CY_CAPSENSE_ISX_GROUP) </li>
 </ul>
 
 </div>
@@ -404,7 +405,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Pointer to the multi-phase TX vector and de-convolution coefficients. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -421,7 +422,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>The slot ID in the widget to start scan from. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -438,7 +439,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>The number of slots in the widget. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -455,7 +456,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Defines number of chopping cycles. </p>
-<p>One cycle means the feature is disabled </p><dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>One cycle means the feature is disabled </p><dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -472,7 +473,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Multi-phase TX order. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -489,7 +490,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Max dither in percentage. </p>
-<p>The input parameter for the LFSR range auto-selection algorithm </p><dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>The input parameter for the LFSR range auto-selection algorithm </p><dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade;and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -506,7 +507,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 </div><div class="memdoc">
 
 <p>Defines set of rules that are used by clock source auto-selection algorithm. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -533,7 +534,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <li>bit[5:6] - Widget attribute (CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK):<ul>
 <li>0 - Base widget</li>
 <li>1 - Frequency channel 1 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_1_MASK)</li>
-<li>2 - Frequency channel 2 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_2_MASK) <dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<li>2 - Frequency channel 2 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_2_MASK) <dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 </li>
 </ul>
 </li>
@@ -547,7 +548,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0 (Preliminary)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

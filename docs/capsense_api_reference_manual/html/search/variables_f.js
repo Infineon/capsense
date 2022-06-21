@@ -40,5 +40,5 @@ var searchData=
   ['rowmap',['rowMap',['../structcy__stc__capsense__csx__touch__buffer__t.html#a2235820c150af3e6594730e9031066de',1,'cy_stc_capsense_csx_touch_buffer_t']]],
   ['rowsnsclk',['rowSnsClk',['../structcy__stc__capsense__widget__context__t.html#a2dd4e90d01407e1c2a0ed33f637e3b4f',1,'cy_stc_capsense_widget_context_t']]],
   ['rowsnsclkval',['rowSnsClkVal',['../structcy__stc__capsense__widget__crc__data__t.html#af9f145585e1986461ae4ba26927bbe3c',1,'cy_stc_capsense_widget_crc_data_t']]],
-  ['rxindex',['rxIndex',['../structcy__stc__active__scan__sns__t.html#a35dbb63147b6c493bed49f7bdfc7819d',1,'cy_stc_active_scan_sns_t']]]
+  ['rxindex',['rxIndex',['../structcy__stc__capsense__active__scan__sns__t.html#abc72adb11dbe72c7ba58289f605b2e35',1,'cy_stc_capsense_active_scan_sns_t']]]
 ];

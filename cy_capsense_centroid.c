@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -27,8 +27,8 @@
 #include "cy_capsense_filter.h"
 #include "cycfg_capsense_defines.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
 
 
 /*******************************************************************************
@@ -57,48 +57,47 @@
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     static void Cy_CapSense_TransferTouch(
                     uint32_t newIndex,
                     uint32_t oldIndex,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     static void Cy_CapSense_NewTouch(
                     uint32_t newIndex,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     static uint32_t Cy_CapSense_CalcDistance(
                     uint32_t newIndex,
                     uint32_t oldIndex,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     static void Cy_CapSense_Hungarian(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     static void Cy_CapSense_CopyTouchRecord(
                     cy_stc_capsense_position_t * destination,
                     const cy_stc_capsense_position_t * source);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     __STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     __STATIC_INLINE void Cy_CapSense_SortByAge(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask);
 #endif
 /** \} \endcond */
 
 
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_DIPLEX_SLIDER_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_DIPLEX_SLIDER_EN))
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_DIPLEX_SLIDER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidDiplex
 ****************************************************************************//**
@@ -211,12 +210,10 @@ void Cy_CapSense_DpCentroidDiplex(
         newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
     }
 }
-#endif /*((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_DIPLEX_SLIDER_EN) ||\
-          (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_DIPLEX_SLIDER_EN)) */
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_DIPLEX_SLIDER_EN) */
 
 
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_LINEAR_SLIDER_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_LINEAR_SLIDER_EN))
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LINEAR_SLIDER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidLinear
 ****************************************************************************//**
@@ -256,7 +253,7 @@ void Cy_CapSense_DpCentroidLinear(
     uint32_t multiplier;
     uint32_t offset;
 
-    if(snsCount < CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT)
+    if (snsCount < CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT)
     {
         snsCount = CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT;
     }
@@ -328,11 +325,10 @@ void Cy_CapSense_DpCentroidLinear(
         /* This is a place holder for local maximum searching when number of centroids could be more than one */
     }
 }
-#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_LINEAR_SLIDER_EN) ||\
-           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_LINEAR_SLIDER_EN)) */
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LINEAR_SLIDER_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidRadial
 ****************************************************************************//**
@@ -435,7 +431,7 @@ void Cy_CapSense_DpCentroidRadial(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCentroidTouchpad
 ****************************************************************************//**
@@ -477,12 +473,12 @@ void Cy_CapSense_DpCentroidTouchpad(
     uint32_t multiplier;
     uint32_t offset;
 
-    if(CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT > colCount)
+    if (CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT > colCount)
     {
         colCount = CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT;
     }
 
-    if(CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT > rowCount)
+    if (CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT > rowCount)
     {
         rowCount = CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT;
     }
@@ -556,7 +552,7 @@ void Cy_CapSense_DpCentroidTouchpad(
             newTouch->numPosition = CY_CAPSENSE_POSITION_NONE;
         }
 
-        if(newTouch->numPosition != CY_CAPSENSE_POSITION_NONE)
+        if (newTouch->numPosition != CY_CAPSENSE_POSITION_NONE)
         {
             /***********************************************************************
             * Y Axis (Rows)
@@ -692,7 +688,7 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADVANCED_CENTROID_5X5_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpFindLocalMaxDd
 ****************************************************************************//**
@@ -856,7 +852,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /* CY_ID633 */
 #if defined(__ICCARM__)
     #pragma optimize=none
@@ -896,7 +892,7 @@ void Cy_CapSense_DpCalcTouchPadCentroid(
     uint32_t touchNum = ptrWdConfig->ptrCsxTouchBuffer->newPeakNumber;
     cy_stc_capsense_position_t * ptrNewPeak = &ptrWdConfig->ptrCsxTouchBuffer->newPeak[0];
 
-    for(number = 0u; number < touchNum; number++)
+    for (number = 0u; number < touchNum; number++)
     {
         /* Set the sensor pointer to the local maximum sensor */
         ptrSnsCxt =  ptrWdConfig->ptrSnsContext;
@@ -1000,15 +996,24 @@ void Cy_CapSense_DpCalcTouchPadCentroid(
         /* The Y position is rounded to the nearest integer value and normalized to the resolution range */
         ptrNewPeak->y = (uint16_t)(((uint32_t)weightedSumY + CY_CAPSENSE_CENTROID_ROUND_VALUE) >> 8u);
 
-        /* The z value is a sum of raw counts of sensors that form 3x3 matrix with a local maximum in the center */
-        ptrNewPeak->z = (uint8_t)(totalSum >> CY_CAPSENSE_CSX_TOUCHPAD_Z_SHIFT);
+        /* The z value is a summ of sensor difference counts divided by 16 that form 3x3 matrix with a local maximum in the center */
+        totalSum >>= CY_CAPSENSE_CSX_TOUCHPAD_Z_SHIFT;
+        if (totalSum > 0xFFu)
+        {
+            ptrNewPeak->z = 0xFFu;
+        }
+        else
+        {
+            ptrNewPeak->z = (uint8_t)totalSum;
+        }
+
         ptrNewPeak++;
     }
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpTouchTracking
 ****************************************************************************//**
@@ -1153,7 +1158,7 @@ void Cy_CapSense_DpTouchTracking(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_TransferTouch
 ****************************************************************************//**
@@ -1208,7 +1213,7 @@ static void Cy_CapSense_TransferTouch(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_NewTouch
 ****************************************************************************//**
@@ -1256,7 +1261,7 @@ static void Cy_CapSense_NewTouch(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetLowestId
 ****************************************************************************//**
@@ -1296,7 +1301,7 @@ __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask)
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_TouchDownDebounce
 ****************************************************************************//**
@@ -1333,7 +1338,7 @@ __STATIC_INLINE void Cy_CapSense_TouchDownDebounce(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_CalcDistance
 ****************************************************************************//**
@@ -1374,7 +1379,7 @@ static uint32_t Cy_CapSense_CalcDistance(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_Hungarian
 ****************************************************************************//**
@@ -1508,7 +1513,7 @@ static void Cy_CapSense_Hungarian(
                 }
             }
 
-            if(j == -1)
+            if (j == -1)
             {
                 j = 0;
             }
@@ -1557,7 +1562,7 @@ static void Cy_CapSense_Hungarian(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_SortByAge
 ****************************************************************************//**
@@ -1647,7 +1652,7 @@ __STATIC_INLINE void Cy_CapSense_SortByAge(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_CopyTouchRecord
 ****************************************************************************//**
@@ -1670,7 +1675,7 @@ static void Cy_CapSense_CopyTouchRecord(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpFilterTouchRecord
 ****************************************************************************//**
@@ -1817,7 +1822,7 @@ void Cy_CapSense_DpFilterTouchRecord(
     }
     else
     {
-        ptrWdConfig->ptrWdContext->status = CY_CAPSENSE_WD_ACTIVE_MASK;
+        ptrWdConfig->ptrWdContext->status |= CY_CAPSENSE_WD_ACTIVE_MASK;
     }
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
@@ -2120,7 +2125,7 @@ void Cy_CapSense_RunPositionFiltersRadial(
             * between the new position and IIR filter history is bigger than 
             * half of resolution, then all enabled position filters are reset.
             */
-            if(temp >= halfResolution)
+            if (temp >= halfResolution)
             {
                 /* Perform Initialization */
                 Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
@@ -2167,7 +2172,7 @@ void Cy_CapSense_RunPositionFiltersRadial(
             * between the new position and IIR filter history is bigger than 
             * half of resolution, then all enabled position filters are reset.
             */
-            if(temp >= halfResolution)
+            if (temp >= halfResolution)
             {
                 /* Perform Initialization */
                 Cy_CapSense_InitPositionFilters(filterCfg, ptrInput, ptrHistory);
@@ -2287,9 +2292,9 @@ void Cy_CapSense_ProcessPositionFilters(
         }
 
         /* Process touches that exists from previous processing */
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN) &&\
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN) &&\
             (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_POSITION_FILTER_EN))
-            if((uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
+            if ((uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
             {
                 for (posIndex = 0u; posIndex < numPosMin; posIndex++)
                 {
@@ -2328,6 +2333,6 @@ void Cy_CapSense_ProcessPositionFilters(
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN) */
 #endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN)) */
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 /* [] END OF FILE */

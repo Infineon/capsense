@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.c
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -108,7 +108,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest(
         result = Cy_CapSense_RunSelfTest_V2(testEnMask, context);
     #endif
 
-    return (result);
+    return result;
 }
 
 
@@ -187,7 +187,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
         result = Cy_CapSense_CheckCRCWidget_V2(widgetId, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN) */
 
@@ -280,7 +280,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
                                                             context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN) */
 
@@ -362,7 +362,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
                                                             context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_RAW_INTEGRITY_EN) */
 
@@ -498,7 +498,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins(
         result = Cy_CapSense_CheckIntegritySensorPins_V2(widgetId, sensorId, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN) */
 
@@ -642,7 +642,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
                                                      maxCapacitance,
                                                      context);
 
-    return (bistStatus);
+    return bistStatus;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_EXTERNAL_CAP_EN) */
 
@@ -694,7 +694,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
     cy_en_capsense_bist_status_t result = CY_CAPSENSE_BIST_BAD_PARAM_E;
     result = Cy_CapSense_MeasureVdda_V2(ptrValue, context);
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_VDDA_EN) */
 

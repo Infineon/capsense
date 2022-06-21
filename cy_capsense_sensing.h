@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the common function prototypes for different supported
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -22,7 +22,7 @@
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -35,6 +35,16 @@ extern "C" {
 /******************************************************************************/
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)|| (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+cy_capsense_status_t Cy_CapSense_ScanAllSlots(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ScanSlots(
+                uint32_t startSlotId,
+                uint32_t numberSlots,
+                cy_stc_capsense_context_t * context);
+cy_capsense_mw_state_t Cy_CapSense_MwState(
+                const cy_stc_capsense_context_t * context);
+#endif
 cy_capsense_status_t Cy_CapSense_ScanAllWidgets(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ScanWidget(
@@ -52,24 +62,49 @@ void Cy_CapSense_InterruptHandler(
 /******************************************************************************/
 cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
                 cy_stc_capsense_context_t * context);
-#if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && (1u == CY_CAPSENSE_TOTAL_CH_NUMBER)) || (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN))
+
+#if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) && \
+     ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN)))
+cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SetCalibrationTarget(
+                uint32_t calibrTarget,
+                uint32_t snsMethod,
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && (1u == CY_CAPSENSE_TOTAL_CH_NUMBER)) ||\
+     (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
 cy_capsense_status_t Cy_CapSense_CalibrateWidget(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
 #endif
+
 cy_capsense_status_t Cy_CapSense_ScanSensor(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_SetPinState(
-                uint32_t widgetId,
-                uint32_t sensorElement,
-                uint32_t state,
-                const cy_stc_capsense_context_t * context);
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN || \
+ ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)))
+    cy_capsense_status_t Cy_CapSense_SetPinState(
+                    uint32_t widgetId,
+                    uint32_t sensorElement,
+                    uint32_t state,
+                    const cy_stc_capsense_context_t * context);
+#endif
+
 cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
                 uint32_t inactiveState,
                 uint32_t sensingGroup,
                 cy_stc_capsense_context_t * context);
+
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)|| (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+cy_capsense_status_t Cy_CapSense_ScanAbort(
+                cy_stc_capsense_context_t * context);
+#endif
 /** \} */
 
 
@@ -86,13 +121,25 @@ cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
     void Cy_CapSense_SetCsxInactiveState(
                     cy_stc_capsense_context_t * context);
 #endif
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+cy_capsense_status_t Cy_CapSense_InitializeMaxRaw(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_GetMaxRaw(
+                            uint16_t * ptrMaxRawVal,
+                            uint32_t snsClkDivider,
+                            const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                            const cy_stc_capsense_context_t * context);
+#endif
+
 /** \} \endcond */
 
 #if defined(__cplusplus)
 }
 #endif
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif/* CY_CAPSENSE_SENSING_H */
 

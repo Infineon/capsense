@@ -21,5 +21,7 @@ var group__group__capsense__macros__general =
     [ "CY_CAPSENSE_SNS_OVERFLOW_MASK", "group__group__capsense__macros__general.html#gaa37105aadfbfd2c37b34b939c6fcf016", null ],
     [ "CY_CAPSENSE_WD_ACTIVE_MASK", "group__group__capsense__macros__general.html#gad47321d5011cc28ee15d2148c62af66f", null ],
     [ "CY_CAPSENSE_WD_DISABLE_MASK", "group__group__capsense__macros__general.html#ga0a84bc1036114a86ad2806f69110709d", null ],
-    [ "CY_CAPSENSE_WD_WORKING_MASK", "group__group__capsense__macros__general.html#ga00a019887f9b20124c916b3a2f431fdd", null ]
+    [ "CY_CAPSENSE_WD_WORKING_MASK", "group__group__capsense__macros__general.html#ga00a019887f9b20124c916b3a2f431fdd", null ],
+    [ "CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK", "group__group__capsense__macros__general.html#ga354fa288854b26370ddf907d481a93e2", null ],
+    [ "CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK", "group__group__capsense__macros__general.html#ga9789be8ab6ab96597c236b923cbbabbb", null ]
 ];

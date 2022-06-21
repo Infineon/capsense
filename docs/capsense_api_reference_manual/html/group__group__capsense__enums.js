@@ -19,7 +19,10 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a87282482662ce591d86c7767bae8217a", null ],
       [ "CY_CAPSENSE_TU_CMD_PING_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a133f8c8b5cdf8f35e298d8cd203d17c5", null ],
       [ "CY_CAPSENSE_TU_CMD_ONE_SCAN_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a4878ec99a8b651b4a1812af156b4df6d", null ],
-      [ "CY_CAPSENSE_TU_CMD_WRITE_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a0598ab56c52f94b05400c1c4b52243b9", null ]
+      [ "CY_CAPSENSE_TU_CMD_WRITE_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a0598ab56c52f94b05400c1c4b52243b9", null ],
+      [ "CY_CAPSENSE_TU_CMD_COMM_DIS_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a7ff8efe140ca009c31270a5073c3bfeb", null ],
+      [ "CY_CAPSENSE_TU_CMD_COMM_EN_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79ad8519bacd62326f448283dacbf43ac5e", null ],
+      [ "CY_CAPSENSE_TU_CMD_RESTART_ONLY_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c", null ]
     ] ],
     [ "cy_en_capsense_widget_type_t", "group__group__capsense__enums.html#ga855d894b24929f0d7d2774dfc4266d60", [
       [ "CY_CAPSENSE_WD_BUTTON_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a12b429b17049aec3da05bba98d86d704", null ],
@@ -27,7 +30,8 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_WD_RADIAL_SLIDER_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a50cac3d4ee616bbc7e0c9ed9dced309e", null ],
       [ "CY_CAPSENSE_WD_MATRIX_BUTTON_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a49a619428a7d70767032000b70d3c5d5", null ],
       [ "CY_CAPSENSE_WD_TOUCHPAD_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a71ed340a3d5c1ec96169c5a7d4ee91df", null ],
-      [ "CY_CAPSENSE_WD_PROXIMITY_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c", null ]
+      [ "CY_CAPSENSE_WD_PROXIMITY_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c", null ],
+      [ "CY_CAPSENSE_WD_LOW_POWER_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aef4c95b7c358505b7e5b110dfc26a97e", null ]
     ] ],
     [ "cy_en_capsense_return_status_t", "group__group__capsense__enums.html#gaa96ebe173a9a3ec24f7461f696482b11", [
       [ "CY_CAPSENSE_SUCCESS_E", "group__group__capsense__enums.html#ggaa96ebe173a9a3ec24f7461f696482b11a3ddd2a0c59c25f817f852c4d899784c3", null ],

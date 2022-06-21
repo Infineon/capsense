@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0: cy_stc_capsense_context_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 4.0 (Preliminary): cy_stc_capsense_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0 (Preliminary)</div>
   </td>
  </tr>
  </tbody>
@@ -119,10 +119,10 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_capsense_pin_config_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a2a2bab67c44107594f5c43c785b0cb2e">ptrShieldPinConfig</a></td></tr>
 <tr class="memdesc:a2a2bab67c44107594f5c43c785b0cb2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the shield pin configuration structure. <br /></td></tr>
 <tr class="separator:a2a2bab67c44107594f5c43c785b0cb2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2719dc3e059d012106c5f4476faec66d"><td class="memItemLeft" align="right" valign="top"><a id="a2719dc3e059d012106c5f4476faec66d"></a>
-<a class="el" href="structcy__stc__active__scan__sns__t.html">cy_stc_active_scan_sns_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a2719dc3e059d012106c5f4476faec66d">ptrActiveScanSns</a></td></tr>
-<tr class="memdesc:a2719dc3e059d012106c5f4476faec66d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the current active sensor structure. <br /></td></tr>
-<tr class="separator:a2719dc3e059d012106c5f4476faec66d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a781a75f37f0349ef3a6a83a03a8ead46"><td class="memItemLeft" align="right" valign="top"><a id="a781a75f37f0349ef3a6a83a03a8ead46"></a>
+<a class="el" href="structcy__stc__capsense__active__scan__sns__t.html">cy_stc_capsense_active_scan_sns_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a781a75f37f0349ef3a6a83a03a8ead46">ptrActiveScanSns</a></td></tr>
+<tr class="memdesc:a781a75f37f0349ef3a6a83a03a8ead46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the current active sensor structure. <br /></td></tr>
+<tr class="separator:a781a75f37f0349ef3a6a83a03a8ead46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92125bdfe35272f254fcc58d857670ce"><td class="memItemLeft" align="right" valign="top"><a id="a92125bdfe35272f254fcc58d857670ce"></a>
 <a class="el" href="structcy__stc__capsense__bist__context__t.html">cy_stc_capsense_bist_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a92125bdfe35272f254fcc58d857670ce">ptrBistContext</a></td></tr>
 <tr class="memdesc:a92125bdfe35272f254fcc58d857670ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the BIST context structure. <br /></td></tr>
@@ -130,16 +130,28 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 <tr class="memitem:a638028282143ad3653b80671da17da72"><td class="memItemLeft" align="right" valign="top">cy_stc_msc_base_config_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a638028282143ad3653b80671da17da72">ptrBaseFrameContext</a></td></tr>
 <tr class="memdesc:a638028282143ad3653b80671da17da72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the first member of the context structure of base configuration array.  <a href="#a638028282143ad3653b80671da17da72">More...</a><br /></td></tr>
 <tr class="separator:a638028282143ad3653b80671da17da72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40aeb6d7923f1ef641e2a5f1cfcc59f4"><td class="memItemLeft" align="right" valign="top">cy_stc_msclp_base_config_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a40aeb6d7923f1ef641e2a5f1cfcc59f4">ptrBaseFrameContext</a></td></tr>
+<tr class="memdesc:a40aeb6d7923f1ef641e2a5f1cfcc59f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the first member of the context structure of base configuration array.  <a href="#a40aeb6d7923f1ef641e2a5f1cfcc59f4">More...</a><br /></td></tr>
+<tr class="separator:a40aeb6d7923f1ef641e2a5f1cfcc59f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac6608bbe9e738a5de77a047ecace2f1"><td class="memItemLeft" align="right" valign="top">uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#aac6608bbe9e738a5de77a047ecace2f1">ptrSensorFrameContext</a></td></tr>
 <tr class="memdesc:aac6608bbe9e738a5de77a047ecace2f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the context structure of sensor configuration.  <a href="#aac6608bbe9e738a5de77a047ecace2f1">More...</a><br /></td></tr>
 <tr class="separator:aac6608bbe9e738a5de77a047ecace2f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad94af415ec2c2d768f786d46545b4180"><td class="memItemLeft" align="right" valign="top">uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#ad94af415ec2c2d768f786d46545b4180">ptrSensorFrameLpContext</a></td></tr>
+<tr class="memdesc:ad94af415ec2c2d768f786d46545b4180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the context structure of low power sensor configuration.  <a href="#ad94af415ec2c2d768f786d46545b4180">More...</a><br /></td></tr>
+<tr class="separator:ad94af415ec2c2d768f786d46545b4180"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a701dc256c0227c806b5907061625ab43"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structcy__stc__capsense__scan__slot__t.html">cy_stc_capsense_scan_slot_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a701dc256c0227c806b5907061625ab43">ptrScanSlots</a></td></tr>
 <tr class="memdesc:a701dc256c0227c806b5907061625ab43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the scan order slot structure.  <a href="#a701dc256c0227c806b5907061625ab43">More...</a><br /></td></tr>
 <tr class="separator:a701dc256c0227c806b5907061625ab43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2814ae3085de3e2143895e0d359f84cd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structcy__stc__capsense__scan__slot__t.html">cy_stc_capsense_scan_slot_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a2814ae3085de3e2143895e0d359f84cd">ptrLpScanSlots</a></td></tr>
+<tr class="memdesc:a2814ae3085de3e2143895e0d359f84cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the low power scan order slot structure.  <a href="#a2814ae3085de3e2143895e0d359f84cd">More...</a><br /></td></tr>
+<tr class="separator:a2814ae3085de3e2143895e0d359f84cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3391f04a75be6576c5f6ec9ed5602b70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__capsense__structures.html#ga9596ae7da8c600a654b62bd08ba365eb">cy_stc_capsense_lp_historic_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__context__t.html#a3391f04a75be6576c5f6ec9ed5602b70">ptrLpHistoricContext</a></td></tr>
+<tr class="memdesc:a3391f04a75be6576c5f6ec9ed5602b70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the low power historic data.  <a href="#a3391f04a75be6576c5f6ec9ed5602b70">More...</a><br /></td></tr>
+<tr class="separator:a3391f04a75be6576c5f6ec9ed5602b70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a id="a638028282143ad3653b80671da17da72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a638028282143ad3653b80671da17da72">&#9670;&nbsp;</a></span>ptrBaseFrameContext</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a638028282143ad3653b80671da17da72">&#9670;&nbsp;</a></span>ptrBaseFrameContext <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -152,6 +164,23 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 
 <p>Pointer to the first member of the context structure of base configuration array. </p>
 <dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a40aeb6d7923f1ef641e2a5f1cfcc59f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40aeb6d7923f1ef641e2a5f1cfcc59f4">&#9670;&nbsp;</a></span>ptrBaseFrameContext <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_stc_msclp_base_config_t* cy_stc_capsense_context_t::ptrBaseFrameContext</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pointer to the first member of the context structure of base configuration array. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -168,7 +197,24 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 </div><div class="memdoc">
 
 <p>Pointer to the context structure of sensor configuration. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="ad94af415ec2c2d768f786d46545b4180"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad94af415ec2c2d768f786d46545b4180">&#9670;&nbsp;</a></span>ptrSensorFrameLpContext</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t* cy_stc_capsense_context_t::ptrSensorFrameLpContext</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pointer to the context structure of low power sensor configuration. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -185,7 +231,41 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 </div><div class="memdoc">
 
 <p>Pointer to the scan order slot structure. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a2814ae3085de3e2143895e0d359f84cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2814ae3085de3e2143895e0d359f84cd">&#9670;&nbsp;</a></span>ptrLpScanSlots</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structcy__stc__capsense__scan__slot__t.html">cy_stc_capsense_scan_slot_t</a>* cy_stc_capsense_context_t::ptrLpScanSlots</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pointer to the low power scan order slot structure. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a3391f04a75be6576c5f6ec9ed5602b70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3391f04a75be6576c5f6ec9ed5602b70">&#9670;&nbsp;</a></span>ptrLpHistoricContext</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__group__capsense__structures.html#ga9596ae7da8c600a654b62bd08ba365eb">cy_stc_capsense_lp_historic_context_t</a>* cy_stc_capsense_context_t::ptrLpHistoricContext</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pointer to the low power historic data. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -195,7 +275,7 @@ const <a class="el" href="structcy__stc__capsense__pin__config__t.html">cy_stc_c
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0 (Preliminary)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

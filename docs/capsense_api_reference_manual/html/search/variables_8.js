@@ -9,6 +9,7 @@ var searchData=
   ['idacmod',['iDacMod',['../structcy__stc__capsense__auto__tune__config__t.html#adbec8688c917a7a25a7cc4b14b1e49ed',1,'cy_stc_capsense_auto_tune_config_t::iDacMod()'],['../structcy__stc__capsense__widget__context__t.html#a0af701de0ec391286d2df0ba67299b9d',1,'cy_stc_capsense_widget_context_t::idacMod()'],['../structcy__stc__capsense__bist__custom__parameters__t.html#ada4f2a1109cc40af7ad1455e67252153',1,'cy_stc_capsense_bist_custom_parameters_t::idacMod()']]],
   ['idacmodval',['idacModVal',['../structcy__stc__capsense__widget__crc__data__t.html#a7377454579441d2f33c2d96b458e5bba',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['iircoeff',['iirCoeff',['../structcy__stc__capsense__widget__config__t.html#a3837d9686917c0fdfc96cadb261dbc03',1,'cy_stc_capsense_widget_config_t']]],
+  ['iircoefflp',['iirCoeffLp',['../structcy__stc__capsense__common__context__t.html#a9af87f8e91cd4eb25fabd9cba10053f5',1,'cy_stc_capsense_common_context_t']]],
   ['initdone',['initDone',['../structcy__stc__capsense__common__context__t.html#a0181ebd06d8e03e3b18ac5c08ca14742',1,'cy_stc_capsense_common_context_t']]],
   ['intrcsdinactsnsconn',['intrCsdInactSnsConn',['../structcy__stc__capsense__internal__context__t.html#ac5af80cd4336ff0a3ca1e4b3a94c2343',1,'cy_stc_capsense_internal_context_t']]],
   ['intrcsdrawtarget',['intrCsdRawTarget',['../structcy__stc__capsense__internal__context__t.html#a3e4d3c24280c56169f481c91db5928e7',1,'cy_stc_capsense_internal_context_t']]],
@@ -16,5 +17,17 @@ var searchData=
   ['intrcsxrawtarget',['intrCsxRawTarget',['../structcy__stc__capsense__internal__context__t.html#aa567c9166072174f081d982b47246c47',1,'cy_stc_capsense_internal_context_t']]],
   ['intreltdcapcsdisc',['intrEltdCapCsdISC',['../structcy__stc__capsense__bist__context__t.html#ac61c103d20cb691984135ab15b7c7a24',1,'cy_stc_capsense_bist_context_t']]],
   ['intreltdcapcsxisc',['intrEltdCapCsxISC',['../structcy__stc__capsense__bist__context__t.html#a5f7f79777ce7fb2bcd270d1001a7f932',1,'cy_stc_capsense_bist_context_t']]],
-  ['intreltdcapshieldisc',['intrEltdCapShieldISC',['../structcy__stc__capsense__bist__context__t.html#af75d6d1eea62a6f89d6d812cd6488252',1,'cy_stc_capsense_bist_context_t']]]
+  ['intreltdcapshieldisc',['intrEltdCapShieldISC',['../structcy__stc__capsense__bist__context__t.html#af75d6d1eea62a6f89d6d812cd6488252',1,'cy_stc_capsense_bist_context_t']]],
+  ['intrisxinactsnsconn',['intrIsxInactSnsConn',['../structcy__stc__capsense__internal__context__t.html#a697bbc45d7428255dcf5c3d4a8652939',1,'cy_stc_capsense_internal_context_t']]],
+  ['intrisxrawtarget',['intrIsxRawTarget',['../structcy__stc__capsense__internal__context__t.html#a76b775ea247ac23160c1286fa965adb3',1,'cy_stc_capsense_internal_context_t']]],
+  ['isxautotuneen',['isxAutotuneEn',['../structcy__stc__capsense__common__config__t.html#a4d52ca0525d3caf8f0c9003b84eff51a',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcalibrationerror',['isxCalibrationError',['../structcy__stc__capsense__common__config__t.html#a51d97e88c598f8f2f9caf844d652b2cc',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdacautocalen',['isxCdacAutocalEn',['../structcy__stc__capsense__common__config__t.html#af29c446ef8746ac3f825fed6650d5cd9',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdacautocalibmin',['isxCdacAutoCalibMin',['../structcy__stc__capsense__common__config__t.html#abadb1707f41cf18f24451ebfde47327d',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdaccompdivautoen',['isxCdacCompDivAutoEn',['../structcy__stc__capsense__common__config__t.html#a81cc54914d8e501b9e78c7c1614c54cc',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdaccompen',['isxCdacCompEn',['../structcy__stc__capsense__common__config__t.html#a71d126c71d3f58203acf8dbe4b84a994',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdacditheren',['isxCdacDitherEn',['../structcy__stc__capsense__common__context__t.html#a53e744b1b69ade031e79ec7f8adab92c',1,'cy_stc_capsense_common_context_t']]],
+  ['isxinactivesnsconnection',['isxInactiveSnsConnection',['../structcy__stc__capsense__common__config__t.html#ae11d43954cd2a5bd2d2be0dc3ef349c6',1,'cy_stc_capsense_common_config_t']]],
+  ['isxrawtarget',['isxRawTarget',['../structcy__stc__capsense__common__config__t.html#a12e0de779c3a1f759e349210dbd3d2a4',1,'cy_stc_capsense_common_config_t']]],
+  ['isxrefcdacautoen',['isxRefCdacAutoEn',['../structcy__stc__capsense__common__config__t.html#aebaa1b720fdf141b0bedbe38f3795969',1,'cy_stc_capsense_common_config_t']]]
 ];

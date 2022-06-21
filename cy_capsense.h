@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -16,15 +16,19 @@
 
 /**
 ********************************************************************************
-* \mainpage CAPSENSE&trade; Middleware Library 3.0
+* \mainpage
 ********************************************************************************
+* The support for the PSoC 4000T family on ModusToolbox is currently 
+* at the Preliminary level. Features may change without notice.
+* Contact <a href="https:/\/www.infineon.com/cms/en/about-infineon/company/contacts/support/">
+* <b>Infineon Product Support</b></a> for additional details.
 *
 * CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon.
 * Capacitive sensing can be used in a variety of applications and products where
 * conventional mechanical buttons can be replaced with sleek human interfaces to
 * transform the way users interact with electronic systems. These include home
 * appliances, and automotive, IoT, and industrial applications. CAPSENSE&trade;
-* supports multiple interfaces (widgets) using both CSX and CSD sensing methods
+* supports multiple interfaces (widgets) using CSD, CSX, and ISX sensing methods
 * with robust performance.
 *
 * CAPSENSE&trade; has become a popular technology to replace conventional
@@ -36,7 +40,7 @@
 *
 * Use CAPSENSE&trade; for:
 * * Touch and gesture detection for various interfaces
-* * Proximity detection for innovative user experiences and low-power
+* * Proximity detection for innovative user experiences and low power
 *   optimization
 * * Contactless liquid-level sensing in a variety of applications
 * * Touch-free operations in hazardous materials
@@ -45,10 +49,11 @@
 * \section section_capsense_general General Description
 ********************************************************************************
 *
-* The CAPSENSE&trade; middleware Library supports operation with fourth-generation and
-* fifth-generation of CAPSENSE&trade; HW. CAPSENSE&trade; HW enables multiple sensing
-* capabilities on PSoC&trade; devices including the self-cap (CSD) and mutual-cap (CSX)
-* capacitive touch sensing solutions, inductive sensing, impedance measurement, and
+* The CAPSENSE&trade; middleware Library supports operation with fourth-generation,
+* fifth-generation and fifth-generation LP of CAPSENSE&trade; HW.
+* CAPSENSE&trade; HW enables the multiple sensing
+* capabilities on PSoC&trade; devices including the Self-Capacitance (CSD) and Mutual-Capacitance (CSX)
+* capacitive touch sensing solutions, inductive sensing (ISX), impedance measurement, and
 * other features.
 *
 * Middleware access available the CAPSENSE&trade; HW block through the corresponding
@@ -56,6 +61,8 @@
 *  - CSD (CAPSENSE&trade; Sigma-Delta) driver for the forth-generation of the
 *    CAPSENSE&trade; HW;
 *  - MSC (Multi-Sensor Converter) driver for the fifth-generation of the
+*    CAPSENSE&trade; HW;
+*  - MSCLP (Multi-Sensor Converter Low Power) driver for the fifth-generation of the
 *    CAPSENSE&trade; HW;
 *
 * The CAPSENSE&trade; peripheral driver does not provide any system-level functions.
@@ -69,8 +76,8 @@
 * For details and code examples, refer to the description of the
 * Cy_CapSense_Save() and Cy_CapSense_Restore() functions.
 *
-* \image html capsense_solution.png "CAPSENSE&trade; Solution" width=800px
-* \image latex capsense_solution.png
+* \image html CAPSENSE_SOLUTION_MSCLP.png "CAPSENSE&trade; Solution" width=800px
+* \image latex CAPSENSE_SOLUTION_MSCLP.png
 *
 * This section describes only the CAPSENSE&trade; middleware. Refer to the corresponding
 * sections of documentation for other middleware supported by the CAPSENSE&trade; HW.
@@ -99,11 +106,13 @@
 * \subsection subsection_capsense_features Features
 *
 * * Offers best-in-class signal-to-noise ratio (SNR)
-* * Supports Self-Capacitance (CSD) and Mutual-Capacitance (CSX)
-*   sensing methods
+* * Supports Self-Capacitance (CSD) and Mutual-Capacitance (CSX) sensing methods
+* * Inductive sensing method (ISX) available for fifth-generation low power CAPSENSE&trade;
+* * Fifth-generation low power CAPSENSE&trade; supports autonomous scanning in Deep Sleep
+*   power mode
 * * Supports various Widgets, such as Buttons, Matrix Buttons, Sliders,
 *   Touchpads, and Proximity Sensors
-* * Provides ultra-low power consumption and liquid-tolerant capacitive
+* * Provides ultra-low power consumption capacitive
 *   sensing technology
 * * Contains the integrated graphical CAPSENSE&trade; Tuner tool for real-time tuning,
 *   testing, and debugging
@@ -111,6 +120,16 @@
 *   emission
 * * Offers best-in-class liquid tolerance
 * * Supports one-finger and two-finger gestures
+*
+* \note
+* This Beta release adds support of the fifth-generation low-power CAPSENSE&trade;.
+* The following features are not supported yet and will be added in next releases.
+* * Built-in Self-Test library (BIST)
+* * Self-capacitance SmartSense auto-tuning
+* * Multi-frequency scan (MFS)
+* * Multi-phase TX (MPTX)
+* * Inductive sensing (ISX) on fifth-generation CAPSENSE&trade;
+* * Protocol agnostic full duplex communication
 *
 ********************************************************************************
 * \section group_capsense_quick_start Quick Start Guide
@@ -142,7 +161,7 @@
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csx-button-tuning">
 *   <b>CSX Button Manual Tuning</b></a>
 *
-* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense--csd-slider-tuning">
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-slider-tuning">
 *   <b>CSD Slider Manual Tuning</b></a>
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-touchpad-tuning">
@@ -157,7 +176,7 @@
 *   <b>Two Buttons and Slider with CAPSENSE&trade; Tuner</b></a>
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-low-power-capsense-freertos">
-*   <b>Low-Power Slider and Ganged Sensors with FreeRTOS</b></a>
+*   <b>low power Slider and Ganged Sensors with FreeRTOS</b></a>
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-custom-scan">
 *   <b>Custom Scan</b></a>
@@ -246,11 +265,11 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>2.4</td>
+*     <td>3.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator</td>
-*     <td>3.10.0</td>
+*     <td>4.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; MSC Superblock Personality for for PSoC&trade; 4 devices in the Device Configurator</td>
@@ -261,8 +280,12 @@
 *     <td>1.1</td>
 *   </tr>
 *   <tr>
+*     <td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator</td>
+*     <td>1.0</td>
+*   </tr>
+*   <tr>
 *     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator</td>
-*     <td>1.1</td>
+*     <td>1.2</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator</td>
@@ -270,23 +293,23 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>4.0.0</td>
+*     <td>5.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>4.0.0</td>
+*     <td>5.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
-*     <td>2.3.0</td>
+*     <td>2.4.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>1.4.0</td>
+*     <td>2.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
-*     <td>9.3.1</td>
+*     <td>10.3.1</td>
 *   </tr>
 *   <tr>
 *     <td>IAR Compiler</td>
@@ -371,6 +394,9 @@
 *  <tr align="center"><td>SRAM:</td><td colspan=9>SRAM memory consumption is the same as in CTRL_MUX - DMA</td></tr>
 *  <tr align="center"><td rowspan=2>DMA</td><td rowspan=2>CTRL_MUX</td><td>Flash:</td><td>&lt; 7.7 kB</td><td>&lt; 11.0 kB</td><td>&lt; 11.1 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.6 kB</td><td>&lt; 10.2 kB</td><td>&lt; 11.4 kB</td><td>&lt; 11.7 kB</td><td>&lt; 15.4 kB</td></tr>
 *  <tr align="center"><td>SRAM:</td><td>&lt; 1.3 kB</td><td>&lt; 1.5 kB</td><td>&lt; 1.4 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB</td></tr>
+*  <tr align="center"><td rowspan=2>5th Gen low power</td><td rowspan=2>IntDrv</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 12.9 kB</td><td> NA </td><td> NA </td><td>&lt; 12.8 kB</td>
+*   <td>&lt; 15.3 kB</td><td>&lt; 17.5 kB</td><td>&lt; 18.5 kB</td><td>&lt; 9.4 kB</td><td>&lt; 14 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 1.3 kB</td><td> NA </td><td> NA </td><td>&lt; 2 kB</td><td>&lt; 2.5 kB</td><td>&lt; 2.5 kB</td><td>&lt; 3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 5.3 kB</td></tr>
 *  <tr><th colspan=13>Widgets</th></tr>
 *  <tr><td colspan=4>CSD Button</td><td>3(10 sensors)</td><td>3(10 sensors)</td><td>3(10 sensors)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>1(1 sensor)</td><td>1(1 sensor)</td></tr>
 *  <tr><td colspan=4>CSD Matrix Buttons</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -403,8 +429,8 @@
 * </table>
 *
 * \note
-* * To select values for the Scan mode and Sensor connection method parameters (for the fifth-generation of the CAPSENSE&trade; HW) 
-* navigate to the Advanced tab in the CAPSENSE&trade; Configurator tool, and then select the General settings sub-tab. 
+* * To select values for the Scan mode and Sensor connection method parameters (for the fifth-generation of the CAPSENSE&trade; HW)
+* navigate to the Advanced tab in the CAPSENSE&trade; Configurator tool, and then select the General settings sub-tab.
 *
 * * For the forth-generation of the CAPSENSE&trade; HW, the IntDrv mode with the AMUX sensor connection type is available only.
 *
@@ -551,6 +577,14 @@
 *     </td>
 *   </tr>
 *    <tr>
+*     <td>Rule 11.8</td>
+*     <td>A cast shall not remove any const or volatile qualification from the type pointed to by a pointer.
+*     </td>
+*     <td>There is an issue with a DMAC driver (IFXID-9039), due to which volatile qualifier is removed.
+*          Code is manually checked and reviewed to be safe.
+*     </td>
+*   </tr>
+*    <tr>
 *     <td>Rule 14.2</td>
 *     <td>A for loop shall be well-formed.
 *     </td>
@@ -584,7 +618,7 @@
 *   <tr>
 *     <td>Rule 8.4</td>
 *     <td>A compatible declaration shall be visible when an object or function with external linkage is defined.</td>
-*     <td>The CAPSENSE&trade; middleware library consists of several modules. One of them is CapSense Built-in Self Test (BIST).
+*     <td>The CAPSENSE&trade; middleware library consists of several modules. One of them is CAPSENSE&trade; Built-in Self Test (BIST).
 *         All the BIST variables are used in other data structures and accessed using pointers.</td>
 *   </tr>
 *   <tr>
@@ -647,6 +681,40 @@
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="4" >4.0</td>
+*     <td>
+*         Added CAPSENSE&trade; fifth-generation LP device support
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Added the Inductive sensing method support (ISX)
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Updated the CIC2 functionality for the fifth-generation devices
+*         to be consistent with the fifth-generation LP devices.
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Renamed cy_stc_active_scan_sns_t to cy_stc_capsense_active_scan_sns_t.
+*     </td>
+*     <td>
+*         Following naming convention. Fixing defect.
+*     </td>
+*   </tr>
 *   <tr>
 *     <td rowspan="12">3.0</td>
 *     <td colspan="2"><i><b>
@@ -892,7 +960,7 @@
 *
 * * ModusToolbox&trade; Overview:
 *
-*   * <a href="https:/\/www.cypress.com/products/modustoolbox-software-environment">
+*   * <a href="https:/\/www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software">
 *   <b>ModusToolbox&trade; Software Environment, Quick Start Guide, Documentation,
 *   and Videos</b></a>
 *
@@ -901,45 +969,39 @@
 *
 * * Infineon Technologies Kits and Code Examples:
 *
-*   * <a href="https:/\/github.com/cypresssemiconductorco/mbed-os-example-capsense">
+*   * <a href="https:/\/github.com/Infineon/mbed-os-example-capsense">
 *   <b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/code-examples/ce218136-psoc-6-mcu-e-ink-display-capsense-rtos">
+*   * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider-freertos">
 *   <b>CAPSENSE&trade; Middleware Code Example for FreeRTOS</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-145-40xx-psoc-4000s-capsense-prototyping-kit">
+*   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx">
 *   <b>CY8CKIT-145-40XX PSoC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-149-psoc-4100s-plus-prototyping-kit">
+*   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149">
 *   <b>CY8CKIT-149 PSoC&trade; 4100S Plus Prototyping Kit</b></a>
-*
-*   * <a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-041-psoc-4-s-series-pioneer-kit">
-*   <b>CY8CKIT-041-40XX PSoC&trade; 4 S-Series Pioneer Kit</b></a>
-*
-*   * <a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-041-41xx-psoc-4100s-capsense-pioneer-kit">
-*   <b>CY8CKIT-041-41XX PSoC&trade; 4100S CAPSENSE&trade; Pioneer Kit</b></a>
 *
 * * General Information:
 *
-*   * <a href="https:/\/cypresssemiconductorco.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html">
+*   * <a href="https:/\/infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html">
 *   <b>CAT1 PDL API Reference</b></a>
 *
-*   * <a href="https:/\/cypresssemiconductorco.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html">
+*   * <a href="https:/\/infineon.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html">
 *   <b>CAT2 PDL API Reference</b></a>
 *
-*   * <a href="http:/\/www.cypress.com/an210781"><b>AN210781 Getting Started with
+*   * <a href="http:/\/edit.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
 *   PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-6-mcu-psoc-63-ble-architecture-technical-reference">
+*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">
 *   <b>PSoC&trade; 6 Technical Reference Manual</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-4000s-family-psoc-4-architecture-technical-reference">
+*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&view=downloads">
 *   <b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-4100s-and-psoc-4100s-plus-psoc-4-architecture">
+*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&view=downloads">
 *   <b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
-*   * <a href="http:/\/www.cypress.com/ds218787">
+*   * <a href="http:/\/edit.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&view=downloads">
 *   <b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a>
 *
 *   * <a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a>
@@ -1106,6 +1168,10 @@
 * program to ensure register map rule are not violated while
 * modifying the value of data field in CAPSENSE&trade; Data Structure.
 *
+* Note: If the middleware configuration from the application program is changed
+* by writing registers to the data structure, call the Cy_CapSense_Enable() function
+* to repeat the initialization process.
+*
 * \} */
 
 /******************************************************************************/
@@ -1131,7 +1197,14 @@
 *     <td>This is called before each sensor scan triggering. Such a callback
 *         can be used to implement user-specific use cases like changing scan
 *         parameters depending on whether a sensor is going to be scanned.
-*         For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
+*       \par
+*       * For fifth-generation low power CAPSENSE&trade; this callback is called
+*         by CapSense MW before scan triggering. If a timeout to postpone a scan
+*         is configured (using Cy_CapSense_ConfigureMsclpTimer() function) then callback
+*         will be called before this timeout. The StartSample callback is called
+*         only once before entire frame scan in Cy_CapSense_ScanSlots() function.
+*       \par
+*       * For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
 *         only once in Cy_CapSense_ScanSlots() function with NULL passed as a parameter.
 *         In INT driven mode it is called in Cy_CapSense_ScanSlots() and
 *         in Cy_CapSense_ScanISR() function before HW starting the scan. </td>
@@ -1143,7 +1216,8 @@
 *     <td>\ref cy_capsense_callback_t</td>
 *     <td>This is called after sensor scan completion and there is no other
 *         sensor in the queue to be scanned.
-*         For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
+*       \par
+*       * For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
 *         with NULL passed as a parameter.</td>
 *   </tr>
 *   <tr>
@@ -1152,7 +1226,11 @@
 *     <td>ptrTunerSendCallback</td>
 *     <td>\ref cy_capsense_tuner_send_callback_t</td>
 *     <td>This is called by the Cy_CapSense_RunTuner() function to establish
-*         synchronous communication with the Tuner tool.</td>
+*         synchronous communication with the Tuner tool.
+*       \par
+*       * For the fifth-generation low power CAPSENSE&trade; the callback is called only once for each new scan.
+*       \par
+*       * For the previous CAPSENSE&trade; generations the callback is called once per scan cycle or periodically if device is in suspended mode.</td>
 *   </tr>
 *   <tr>
 *     <td>4</td>
@@ -1160,7 +1238,11 @@
 *     <td>ptrTunerReceiveCallback</td>
 *     <td>\ref cy_capsense_tuner_receive_callback_t</td>
 *     <td>This is called by the Cy_CapSense_RunTuner() function to establish
-*         synchronous communication with the Tuner tool.</td>
+*         synchronous communication with the Tuner tool.
+*         \warning
+*         This Beta release does not support the Tuner Receive Callback for
+*         the fifth-generation low power CAPSENSE&trade;. The feature will be implemented in next releases.
+*         </td>
 *   </tr>
 *   <tr>
 *     <td>5</td>
@@ -1172,8 +1254,10 @@
 *         the first initialization scan. Using this callback is not
 *         recommended. It is used only to implement only user's
 *         specific use cases (while changing the CAPSENSE&trade;
-*         default configuration). The callback is available for Fifth
-*         Generation CAPSENSE&trade; devices.</td>
+*         default configuration).
+*       \par
+*       * The callback is available for Fifth Generation CAPSENSE&trade; and
+*         Fifth Generation low power CAPSENSE&trade; devices.</td>
 *   </tr>
 * </table>
 *
@@ -1216,11 +1300,15 @@
     #include "cy_capsense_csx_v2.h"
     #include "cy_capsense_sensing_v2.h"
     #include "cy_capsense_selftest_v2.h"
-#else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
     #include "cy_capsense_generator_v3.h"
     #include "cy_capsense_sensing_v3.h"
     #include "cy_capsense_selftest_v3.h"
     #include "cy_capsense_sm_base_full_wave_v3.h"
+#else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+    #include "cy_capsense_generator_lp.h"
+    #include "cy_capsense_sensing_lp.h"
+    #include "cy_capsense_sm_base_full_wave_lp.h"
 #endif
 
 #endif /* CY_CAPSENSE_H */

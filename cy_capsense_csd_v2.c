@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csd_v2.c
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -80,11 +80,11 @@ static void Cy_CapSense_CSDCalibrate(
                 uint32_t widgetId, uint32_t target,
                 cy_stc_capsense_context_t * context);
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
     static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * context);
     #endif
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
     static void Cy_CapSense_CSDNormalizeIdac(
                     cy_stc_capsense_widget_config_t const * ptrWdConfig,
                     uint32_t target,
@@ -323,7 +323,7 @@ void Cy_CapSense_CSDSnsStateCheck(cy_stc_capsense_context_t * context)
 *
 * Modulator IDAC is taken from widget context structure and Compensation
 * IDAC is taken from sensor context structure.
-* The cy_stc_active_scan_sns_t structure must be updated to the current
+* The cy_stc_capsense_active_scan_sns_t structure must be updated to the current
 * widget/sensor by Cy_CapSense_InitActivePtr() before calling this function.
 *
 * \param context
@@ -334,14 +334,14 @@ void Cy_CapSense_CSDSetUpIdacs(cy_stc_capsense_context_t * context)
 {
     uint32_t regValue;
 
-    const cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
 
     const uint32_t idacaBitsToWrite = CSD_IDACA_VAL_Msk |
                                       CSD_IDACA_RANGE_Msk |
                                       CSD_IDACA_LEG1_EN_Msk |
                                       CSD_IDACA_LEG2_EN_Msk;
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
         const uint32_t idacbBitsToWrite = CSD_IDACB_VAL_Msk     |
                                           CSD_IDACB_RANGE_Msk   |
                                           CSD_IDACB_LEG1_EN_Msk |
@@ -365,7 +365,7 @@ void Cy_CapSense_CSDSetUpIdacs(cy_stc_capsense_context_t * context)
             (context->ptrCommonConfig->ptrCsdBase->IDACA & ~idacaBitsToWrite) |
             (regValue & idacaBitsToWrite);
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
         /* IDAC B Code */
         regValue = ptrActive->ptrSnsContext->idacComp;
         regValue |= context->ptrCommonConfig->idacGainTable[ptrActive->ptrWdContext->idacGainIndex].gainReg;
@@ -413,7 +413,7 @@ uint32_t Cy_CapSense_CSDGetNumberOfConversions(uint32_t snsClkDivider, uint32_t 
         snsClkDividerLocal <<= 1u;
     }
 
-    if(CY_CAPSENSE_16_BIT_RESOLUTION <= resolution)
+    if (CY_CAPSENSE_16_BIT_RESOLUTION <= resolution)
     {
         /* CY_ID285392 */
         extraCounts = CY_CAPSENSE_EXTRA_COUNTS_MAX;
@@ -545,7 +545,7 @@ void Cy_CapSense_CSDCalculateScanDuration(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
 {
-    #if((CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) &&\
+    #if ((CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) &&\
         ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
          (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)))
         const cy_stc_capsense_widget_config_t * ptrWdCfg;
@@ -567,11 +567,11 @@ void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
      * the Sense Clock and the Scan Duration will be configured for each call
      * of the Cy_CapSense_CSDScan() function.
      */
-    #if(CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
+    #if (CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
             (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
             ptrWdCfg = context->ptrActiveScanSns->ptrWdConfig;
-            if(((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E != ptrWdCfg->wdType) &&
+            if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E != ptrWdCfg->wdType) &&
                ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E != ptrWdCfg->wdType))
             {
                 Cy_CapSense_CSDCalculateScanDuration(context);
@@ -668,7 +668,7 @@ void Cy_CapSense_CSDSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_
 *******************************************************************************/
 void Cy_CapSense_CSDStartSample(cy_stc_capsense_context_t * context)
 {
-    if(NULL != context->ptrInternalContext->ptrSSCallback)
+    if (NULL != context->ptrInternalContext->ptrSSCallback)
     {
         context->ptrInternalContext->ptrSSCallback(context->ptrActiveScanSns);
     }
@@ -716,7 +716,7 @@ void Cy_CapSense_CSDStartSample(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 void Cy_CapSense_CSDScanExt(cy_stc_capsense_context_t * context)
 {
-    cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
 
     /* Set MFS channel index to 0 */
     ptrActive->mfsChannelIndex = 0u;
@@ -782,7 +782,7 @@ void Cy_CapSense_CSDScanExt(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context)
 {
-    #if((CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) &&\
+    #if ((CY_CAPSENSE_DISABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) &&\
         ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
          (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)))
         const cy_stc_capsense_widget_config_t * ptrWdCfg;
@@ -800,13 +800,13 @@ void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context)
     * the Sense Clock and the Scan Duration will be configured only once in the scope
     * of the Cy_CapSense_CSDSetupWidget() function.
     */
-    #if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
         Cy_CapSense_CSDCalculateScanDuration(context);
         Cy_CapSense_CSDConfigClock(context);
-    #elif((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
+    #elif ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
         ptrWdCfg = context->ptrActiveScanSns->ptrWdConfig;
-        if(((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType) ||
+        if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType) ||
            ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
         {
             Cy_CapSense_CSDCalculateScanDuration(context);
@@ -841,13 +841,13 @@ void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 void Cy_CapSense_CSDConnectSnsExt(cy_stc_capsense_context_t * context)
 {
-    cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
     const cy_stc_capsense_electrode_config_t * ptrActiveSns = ptrActive->ptrEltdConfig;
     const cy_stc_capsense_pin_config_t * ptrActivePin = ptrActiveSns->ptrPin;
     uint32_t i;
 
     /* Connect all pins of current sensors */
-    for(i = 0u; i < ptrActiveSns->numPins; i++)
+    for (i = 0u; i < ptrActiveSns->numPins; i++)
     {
         Cy_CapSense_CSDConnectSns(ptrActivePin, context);
         ptrActivePin++;
@@ -875,14 +875,14 @@ void Cy_CapSense_CSDConnectSnsExt(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 {
-    cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
     const cy_stc_capsense_electrode_config_t * ptrActiveSns = ptrActive->ptrEltdConfig;
     const cy_stc_capsense_pin_config_t * ptrActivePin = ptrActiveSns->ptrPin;
 
     uint32_t i;
 
     /* Disconnect all pins of current sensors */
-    for(i = 0u; i < ptrActiveSns->numPins; i++)
+    for (i = 0u; i < ptrActiveSns->numPins; i++)
     {
         Cy_CapSense_CSDDisconnectSns(ptrActivePin, context);
         ptrActivePin++;
@@ -926,17 +926,12 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
-* \funcusage
-*
-* An example of using the function to perform port pin re-connection:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSDConnect
-*
 *******************************************************************************/
 void Cy_CapSense_CSDConnectSns(
                 const cy_stc_capsense_pin_config_t * snsAddrPtr,
                 const cy_stc_capsense_context_t * context)
 {
-    (void) context;
+    (void)context;
     Cy_CapSense_SsConfigPinRegisters(snsAddrPtr->pcPtr, (uint32_t)snsAddrPtr->pinNumber, CY_CAPSENSE_CSD_SCAN_PIN_DM, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE);
 }
 
@@ -967,11 +962,6 @@ void Cy_CapSense_CSDConnectSns(
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
-*
-* \funcusage
-*
-* An example of using the function to perform port pin re-connection:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_CSDConnect
 *
 *******************************************************************************/
 void Cy_CapSense_CSDDisconnectSns(
@@ -1023,7 +1013,7 @@ void Cy_CapSense_CSDClearSensors(const cy_stc_capsense_context_t * context)
             {
                 ptrPin = ptrSnsCfg->ptrPin;
                 /* Go through all pins in sensor */
-                for(pinIndex = 0u; pinIndex < ptrSnsCfg->numPins; pinIndex++)
+                for (pinIndex = 0u; pinIndex < ptrSnsCfg->numPins; pinIndex++)
                 {
                     /* Set CSD pin default state */
                     Cy_CapSense_CSDDisconnectSns(ptrSnsCfg->ptrPin, context);
@@ -1051,7 +1041,7 @@ void Cy_CapSense_CSDSetWidgetSenseClkSrc(const cy_stc_capsense_widget_config_t *
     uint32_t lfsrSize;
     uint32_t conversionsNum;
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
-    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+    #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
         uint32_t rowLfsrSize;
         uint8_t widgetType = ptrWdConfig->wdType;
     #endif
@@ -1065,7 +1055,7 @@ void Cy_CapSense_CSDSetWidgetSenseClkSrc(const cy_stc_capsense_widget_config_t *
             lfsrSize = Cy_CapSense_CSDCalcPrsSize((uint32_t)ptrWdCxt->snsClk << 1uL, (uint32_t)ptrWdCxt->resolution);
         }
 
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
             if (((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == widgetType) || ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == widgetType))
             {
                 if (ptrWdCxt->rowSnsClk != ptrWdCxt->snsClk)
@@ -1174,7 +1164,7 @@ void Cy_CapSense_CSDDischargeCmod(cy_stc_capsense_context_t * context)
 }
 
 
-#if((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) && \
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) && \
     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_CSDNormalizeIdac
@@ -1209,14 +1199,14 @@ static void Cy_CapSense_CSDNormalizeIdac(
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
     uint32_t maxRawLevel = ptrWdCxt->maxRawCount;
     cy_stc_capsense_sensor_context_t * ptrSnsCxt;
-    for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+    for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
         /* Find maximum and minimum IDACs */
         maxIdac = ptrWdConfig->ptrWdContext->idacMod[freqChIndex];
         minIdac = maxIdac;
         ptrSnsCxt = &ptrWdConfig->ptrSnsContext[freqChIndex * context->ptrCommonConfig->numSns];
         minRaw = ptrSnsCxt->raw;
-        for(snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
+        for (snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
         {
             if (minIdac > ptrSnsCxt->idacComp)
             {
@@ -1238,7 +1228,7 @@ static void Cy_CapSense_CSDNormalizeIdac(
 
         /* Re-calculate compensation IDAC */
         ptrSnsCxt = &ptrWdConfig->ptrSnsContext[freqChIndex * context->ptrCommonConfig->numSns];
-        for(snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
+        for (snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
         {
             rawLevel = ((((uint32_t)ptrSnsCxt->raw * CY_CAPSENSE_PERCENTAGE_100) / maxRawLevel) +
                 CY_CAPSENSE_PERCENTAGE_100) * ptrSnsCxt->idacComp;
@@ -1254,7 +1244,7 @@ static void Cy_CapSense_CSDNormalizeIdac(
             ptrSnsCxt++;
         }
         /* IDAC Normalization is performed separately for row and column  */
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
             if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdConfig->wdType) ||
                 ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdConfig->wdType))
             {
@@ -1263,7 +1253,7 @@ static void Cy_CapSense_CSDNormalizeIdac(
                 minIdac = ptrWdCxt->rowIdacMod[freqChIndex];
                 ptrSnsCxt = &(ptrWdConfig->ptrSnsContext[(freqChIndex * context->ptrCommonConfig->numSns) + ptrWdConfig->numCols]);
                 minRaw = ptrSnsCxt->raw;
-                for(snsIndex = ptrWdConfig->numCols; snsIndex < ptrWdConfig->numSns; snsIndex++)
+                for (snsIndex = ptrWdConfig->numCols; snsIndex < ptrWdConfig->numSns; snsIndex++)
                 {
                     if (minIdac > ptrSnsCxt->idacComp)
                     {
@@ -1285,7 +1275,7 @@ static void Cy_CapSense_CSDNormalizeIdac(
 
                 /* Re-calculate compensation IDAC */
                 ptrSnsCxt = &(ptrWdConfig->ptrSnsContext[(freqChIndex * context->ptrCommonConfig->numSns) + ptrWdConfig->numCols]);
-                for(snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
+                for (snsIndex = 0u; snsIndex < ptrWdConfig->numCols; snsIndex++)
                 {
                     rawLevel = ((((uint32_t)ptrSnsCxt->raw * CY_CAPSENSE_PERCENTAGE_100) / maxRawLevel) +
                         CY_CAPSENSE_PERCENTAGE_100) * ptrSnsCxt->idacComp;
@@ -1334,7 +1324,7 @@ static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * contex
     uint32_t maxIdac;
     uint32_t minIdac;
     uint32_t swStatus = 0u;
-    const cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
     uint32_t gainIndex = ptrActive->ptrWdContext->idacGainIndex;
     uint32_t idacVal;
     uint32_t freqChIndex;
@@ -1342,12 +1332,12 @@ static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * contex
     maxIdac = 0u;
     minIdac = CY_CAPSENSE_CAL_IDAC_MAX_VALUE;
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
         const cy_stc_capsense_sensor_context_t * ptrSnsCxt;
         uint32_t snsIndex;
     #endif
 
-    for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+    for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
         /* Find maximum and minimum IDACs */
         idacVal = ptrActive->ptrWdContext->idacMod[freqChIndex];
@@ -1360,7 +1350,7 @@ static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * contex
             minIdac = idacVal;
         }
         /* Check for sensorIndex >= numCols added and choose rowIdac if needed */
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
             if ((((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrActive->ptrWdConfig->wdType) ||
                  ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrActive->ptrWdConfig->wdType)) &&
                  (ptrActive->ptrWdConfig->numCols <= ptrActive->sensorIndex))
@@ -1378,8 +1368,8 @@ static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * contex
         #endif
 
         /* Set value for iDac comp */
-        #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
-            for(snsIndex = 0u; snsIndex < ptrActive->ptrWdConfig->numSns; snsIndex++)
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+            for (snsIndex = 0u; snsIndex < ptrActive->ptrWdConfig->numSns; snsIndex++)
             {
                 ptrSnsCxt = &ptrActive->ptrWdConfig->ptrSnsContext[snsIndex];
                 idacVal = ptrSnsCxt[freqChIndex * context->ptrCommonConfig->numSns].idacComp;
@@ -1406,7 +1396,7 @@ static uint32_t Cy_CapSense_CSDSwitchIdacGain(cy_stc_capsense_context_t * contex
             }
         }
     }
-    return (swStatus);
+    return swStatus;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN) */
 
@@ -1481,7 +1471,7 @@ static void Cy_CapSense_CSDCalibrate(
 
     rawTarget = ((uint32_t)ptrWdCxt->maxRawCount * target) / CY_CAPSENSE_PERCENTAGE_100;
 
-    for(snsIndex = 0u; snsIndex < (uint32_t)ptrWdCfg->numSns; snsIndex++)
+    for (snsIndex = 0u; snsIndex < (uint32_t)ptrWdCfg->numSns; snsIndex++)
     {
         /* Set default IDAC code */
         calMask = (uint8_t)CY_CAPSENSE_CAL_MIDDLE_VALUE;
@@ -1499,16 +1489,16 @@ static void Cy_CapSense_CSDCalibrate(
             ptrIdacMax = maxRowIdac;
         }
 
-        for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+        for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
         {
             ptrIdacMod[freqChIndex] = calMask;
-            #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
                 ptrSnsCxt[freqChIndex * context->ptrCommonConfig->numSns].idacComp = calMask;
             #endif
         }
 
         modClkDivider = context->ptrCommonContext->modCsdClk;
-        if(0u == modClkDivider)
+        if (0u == modClkDivider)
         {
             modClkDivider = 1u;
         }
@@ -1517,7 +1507,7 @@ static void Cy_CapSense_CSDCalibrate(
         isBusyWatchdogTimeUs *= (uint64_t)modClkDivider * CY_CAPSENSE_CONVERSION_MEGA;
         isBusyWatchdogTimeUs /= context->ptrCommonConfig->periClkHz;
 
-        if(0u == isBusyWatchdogTimeUs)
+        if (0u == isBusyWatchdogTimeUs)
         {
             isBusyWatchdogTimeUs = 1u;
         }
@@ -1539,7 +1529,7 @@ static void Cy_CapSense_CSDCalibrate(
             /* Wait for EOS */
             while (CY_CAPSENSE_BUSY == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
             {
-                if(0uL == watchdogCounter)
+                if (0uL == watchdogCounter)
                 {
                     break;
                 }
@@ -1547,7 +1537,7 @@ static void Cy_CapSense_CSDCalibrate(
             }
 
             /* Switch to the lower IDAC mask */
-            for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+            for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
             {
                 /* Update IDAC based on scan result */
                 if (ptrSnsCxt[freqChIndex * context->ptrCommonConfig->numSns].raw < rawTarget)
@@ -1557,19 +1547,19 @@ static void Cy_CapSense_CSDCalibrate(
 
                 ptrIdacMod[freqChIndex] |= (uint8_t)(calMask >> 1u);
 
-                if(0u == ptrIdacMod[freqChIndex])
+                if (0u == ptrIdacMod[freqChIndex])
                 {
                     ptrIdacMod[freqChIndex] = 1u;
                 }
-                #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
                     ptrSnsCxt[freqChIndex * context->ptrCommonConfig->numSns].idacComp = ptrIdacMod[freqChIndex];
                 #endif
             }
             calMask >>= 1u;
         }
-        while(calMask != 0u);
+        while (calMask != 0u);
 
-        for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+        for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
         {
             /* Set the max Idac value */
             if (ptrIdacMax[freqChIndex] < ptrIdacMod[freqChIndex])
@@ -1588,7 +1578,7 @@ static void Cy_CapSense_CSDCalibrate(
         /* Wait for EOS */
         while (CY_CAPSENSE_BUSY == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
-            if(0uL == watchdogCounter)
+            if (0uL == watchdogCounter)
             {
                 break;
             }
@@ -1596,11 +1586,11 @@ static void Cy_CapSense_CSDCalibrate(
         }
     }
 
-    for(freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
+    for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
         ptrWdCxt->idacMod[freqChIndex] = maxColIdac[freqChIndex];
 
-        #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
             if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType) ||
                 ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
             {
@@ -1687,7 +1677,7 @@ cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(
     uint32_t modClkDivider;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
 
-    #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
         uint32_t gainSwitch;
     #endif
 
@@ -1697,39 +1687,39 @@ cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(
     /* Wait For Init watchdog timeout in microseconds */
     uint64_t isBusyWatchdogTimeUs;
 
-    if(context->ptrCommonConfig->numWd <= widgetId)
+    if (context->ptrCommonConfig->numWd <= widgetId)
     {
         calibrateStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
-    if(CY_CAPSENSE_CSD_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+    if (CY_CAPSENSE_CSD_GROUP != context->ptrWdConfig[widgetId].senseMethod)
     {
         calibrateStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
     }
 
-    if(CY_CAPSENSE_BUSY == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
+    if (CY_CAPSENSE_BUSY == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
     {
         /* Previous widget is being scanned, return error */
         calibrateStatus = CY_CAPSENSE_STATUS_INVALID_STATE;
     }
 
-    if(CY_CAPSENSE_STATUS_SUCCESS == calibrateStatus)
+    if (CY_CAPSENSE_STATUS_SUCCESS == calibrateStatus)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
         ptrWdCfg->ptrWdContext->idacGainIndex = context->ptrCommonConfig->csdIdacGainInitIndex;
 
         /* Perform calibration */
-        #if(CY_CAPSENSE_DISABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
+        #if (CY_CAPSENSE_DISABLE == CY_CAPSENSE_CSD_IDAC_AUTO_GAIN_EN)
             Cy_CapSense_CSDCalibrate(widgetId, target, context);
         #else
             do
             {
                 Cy_CapSense_CSDCalibrate(widgetId, target, context);
                 gainSwitch = Cy_CapSense_CSDSwitchIdacGain(context);
-            } while(0u != gainSwitch);
+            } while (0u != gainSwitch);
         #endif
 
-        #if(CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
             /* IDAC Normalization in Dual IDAC mode */
             Cy_CapSense_CSDNormalizeIdac(ptrWdCfg, target, context);
         #endif
@@ -1739,7 +1729,7 @@ cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(
         Cy_CapSense_CSDScan(context);
 
         modClkDivider = context->ptrCommonContext->modCsdClk;
-        if(0u == modClkDivider)
+        if (0u == modClkDivider)
         {
             modClkDivider = 1u;
         }
@@ -1752,7 +1742,7 @@ cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(
         isBusyWatchdogTimeUs *= (uint64_t)modClkDivider * CY_CAPSENSE_CONVERSION_MEGA;
         isBusyWatchdogTimeUs /= context->ptrCommonConfig->periClkHz;
 
-        if(0u == isBusyWatchdogTimeUs)
+        if (0u == isBusyWatchdogTimeUs)
         {
             isBusyWatchdogTimeUs = 1u;
         }
@@ -1763,7 +1753,7 @@ cy_capsense_status_t Cy_CapSense_CSDCalibrateWidget(
 
         while (CY_CAPSENSE_BUSY == (context->ptrCommonContext->status & CY_CAPSENSE_BUSY))
         {
-            if(0uL == watchdogCounter)
+            if (0uL == watchdogCounter)
             {
                 break;
             }
@@ -1934,7 +1924,7 @@ void Cy_CapSense_CSDScanISR(void * capsenseContext)
     uint32_t rawData;
     uint32_t maxCount;
     cy_stc_capsense_context_t * cxt = (cy_stc_capsense_context_t *)capsenseContext;
-    const cy_stc_active_scan_sns_t * ptrActive = cxt->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActive = cxt->ptrActiveScanSns;
 
     /* Clear pending interrupt */
     cxt->ptrCommonConfig->ptrCsdBase->INTR = CY_CAPSENSE_CSD_INTR_ALL_MSK;
@@ -1947,7 +1937,7 @@ void Cy_CapSense_CSDScanISR(void * capsenseContext)
     maxCount = (1uL << ptrActive->ptrWdContext->resolution) - 1uL;
     rawData = cxt->ptrCommonConfig->ptrCsdBase->RESULT_VAL1 & CY_CAPSENSE_CSD_RESULT_VAL1_VALUE_MSK;
 
-    if(rawData > maxCount)
+    if (rawData > maxCount)
     {
         rawData = maxCount;
     }
@@ -2002,7 +1992,7 @@ void Cy_CapSense_CSDScanISR(void * capsenseContext)
 *******************************************************************************/
 static void Cy_CapSense_CSDInitNextSnsScan(cy_stc_capsense_context_t * context)
 {
-    const cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
     uint32_t sensorId = ptrActive->sensorIndex + 1uL;
 
     /* Check if all the sensors are scanned in widget */
@@ -2047,7 +2037,7 @@ static void Cy_CapSense_CSDInitNextSnsScan(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 static void Cy_CapSense_CSDInitNextChScan(cy_stc_capsense_context_t * context)
 {
-    cy_stc_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
+    cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
 
     ptrActive->mfsChannelIndex++;
     ptrActive->ptrSnsContext += context->ptrCommonConfig->numSns;

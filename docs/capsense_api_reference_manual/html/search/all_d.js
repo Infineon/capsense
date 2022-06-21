@@ -13,5 +13,6 @@ var searchData=
   ['oldtimestamp',['oldTimestamp',['../structcy__stc__capsense__ballistic__context__t.html#a38d8589f93a3bc5fa8fb53e5076d6da6',1,'cy_stc_capsense_ballistic_context_t']]],
   ['oldtouchnumber',['oldTouchNumber',['../structcy__stc__capsense__ballistic__context__t.html#a74a898f524e561622e4fb8d5b302fa77',1,'cy_stc_capsense_ballistic_context_t']]],
   ['ondebounce',['onDebounce',['../structcy__stc__capsense__widget__context__t.html#a594bf2fb432dbeaa9b23545a9ff3d55a',1,'cy_stc_capsense_widget_context_t']]],
-  ['ondebounceval',['onDebounceVal',['../structcy__stc__capsense__widget__crc__data__t.html#a656e5777ec25c6e3a3b5b64ba54fc4dc',1,'cy_stc_capsense_widget_crc_data_t']]]
+  ['ondebounceval',['onDebounceVal',['../structcy__stc__capsense__widget__crc__data__t.html#a656e5777ec25c6e3a3b5b64ba54fc4dc',1,'cy_stc_capsense_widget_crc_data_t']]],
+  ['operatingmode',['operatingMode',['../structcy__stc__capsense__internal__context__t.html#a4cbe96829047f4df48ec8fbb8bfed9a2',1,'cy_stc_capsense_internal_context_t']]]
 ];

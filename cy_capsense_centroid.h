@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.h
-* \version 3.0
+* \version 4.0
 *
 * \brief
 * This file provides the function prototypes for the centroid calculation
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -24,8 +24,8 @@
 #include "cy_capsense_structure.h"
 #include "cycfg_capsense_defines.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -45,24 +45,22 @@ extern "C" {
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
 
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_LINEAR_SLIDER_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_LINEAR_SLIDER_EN))
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LINEAR_SLIDER_EN)
     void Cy_CapSense_DpCentroidLinear(
                     cy_stc_capsense_touch_t * newTouch,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_RADIAL_SLIDER_EN)
     void Cy_CapSense_DpCentroidRadial(
                     cy_stc_capsense_touch_t * newTouch,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_DIPLEX_SLIDER_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_DIPLEX_SLIDER_EN))
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_DIPLEX_SLIDER_EN)
     void Cy_CapSense_DpCentroidDiplex(
                     cy_stc_capsense_touch_t * newTouch,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
     void Cy_CapSense_DpCentroidTouchpad(
                     cy_stc_capsense_touch_t * newTouch,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
@@ -72,19 +70,19 @@ extern "C" {
                     cy_stc_capsense_touch_t * newTouch,
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     void Cy_CapSense_DpFindLocalMaxDd(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     void Cy_CapSense_DpCalcTouchPadCentroid(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     void Cy_CapSense_DpTouchTracking(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN)
     void Cy_CapSense_DpFilterTouchRecord(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
@@ -115,7 +113,7 @@ extern "C" {
 #endif
 
 #endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN)) */
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_CENTROID_H */
 

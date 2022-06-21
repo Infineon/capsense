@@ -16,6 +16,6 @@ var searchData=
   ['tunercnt',['tunerCnt',['../structcy__stc__capsense__common__context__t.html#ac6502f0565b37d6ba97cce1c81a773b3',1,'cy_stc_capsense_common_context_t']]],
   ['tunerst',['tunerSt',['../structcy__stc__capsense__common__context__t.html#a26f741c17c454d43f6a07dbf87d8154e',1,'cy_stc_capsense_common_context_t']]],
   ['twofingersen',['twoFingersEn',['../structcy__stc__capsense__advanced__centroid__config__t.html#a541c1a949ee1bb818933bbb95f153ada',1,'cy_stc_capsense_advanced_centroid_config_t']]],
-  ['txindex',['txIndex',['../structcy__stc__active__scan__sns__t.html#aef1caed388c9d1fb076e710ab7db49a4',1,'cy_stc_active_scan_sns_t']]],
+  ['txindex',['txIndex',['../structcy__stc__capsense__active__scan__sns__t.html#a0a96bd932ed14ac0fc770797721dd5f7',1,'cy_stc_capsense_active_scan_sns_t']]],
   ['type',['type',['../structcy__stc__capsense__electrode__config__t.html#a3f987328f5df9cd9fe4f6b4daf80ec8e',1,'cy_stc_capsense_electrode_config_t']]]
 ];

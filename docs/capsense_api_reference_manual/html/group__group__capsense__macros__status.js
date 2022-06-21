@@ -13,5 +13,8 @@ var group__group__capsense__macros__status =
     [ "CY_CAPSENSE_STATUS_CALIBRATION_OVERFLOW", "group__group__capsense__macros__status.html#ga0efb73a86bce0609b8d1a0046ed01abe", null ],
     [ "CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL", "group__group__capsense__macros__status.html#ga9f3803d22196b2817b13876dc40235e7", null ],
     [ "CY_CAPSENSE_STATUS_BAD_CLOCK_CONFIG", "group__group__capsense__macros__status.html#ga481480b9c9d3b3ac244342cc3b6a3fb3", null ],
-    [ "CY_CAPSENSE_STATUS_UNKNOWN", "group__group__capsense__macros__status.html#ga6af4b561b0252573ec898b34624db5be", null ]
+    [ "CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW", "group__group__capsense__macros__status.html#ga731203578f532b6e1a51fa1b241495a1", null ],
+    [ "CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW", "group__group__capsense__macros__status.html#gab4a9d4aade70ac7bdd458387c1106f2e", null ],
+    [ "CY_CAPSENSE_STATUS_UNKNOWN", "group__group__capsense__macros__status.html#ga6af4b561b0252573ec898b34624db5be", null ],
+    [ "CY_CAPSENSE_LP_PROCESS_ENABLED_MASK", "group__group__capsense__macros__status.html#ga29d486b109c34d98893311dafad45388", null ]
 ];
