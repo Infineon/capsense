@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 3.0
+* \version 3.0.1
 *
 * \brief
 * This file provides the function prototypes of the Control module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying

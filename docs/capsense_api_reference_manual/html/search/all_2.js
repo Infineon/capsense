@@ -607,5 +607,5 @@ var searchData=
   ['cy_5fstc_5fcapsense_5fwidget_5fcrc_5fdata_5ft',['cy_stc_capsense_widget_crc_data_t',['../structcy__stc__capsense__widget__crc__data__t.html',1,'']]],
   ['cy_5fstc_5fmsc_5fchannel_5fconfig_5ft',['cy_stc_msc_channel_config_t',['../structcy__stc__msc__channel__config__t.html',1,'']]],
   ['callbacks',['Callbacks',['../group__group__capsense__callbacks.html',1,'']]],
-  ['capsense_26trade_3b_20middleware_20library_203_2e0',['CAPSENSE&amp;trade; Middleware Library 3.0',['../index.html',1,'']]]
+  ['capsense_26trade_3b_20middleware_20library_203_2e0_2e1',['CAPSENSE&amp;trade; Middleware Library 3.0.1',['../index.html',1,'']]]
 ];

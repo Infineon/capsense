@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.c
-* \version 3.0
+* \version 3.0.1
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -3070,7 +3070,7 @@ cy_capsense_status_t Cy_CapSense_InitializeDmaResource(
             Cy_DMAC_Channel_SetPriority(dmacBase, wrIdx, 3u);
             Cy_DMAC_Descriptor_SetPreemptable(dmacBase, wrIdx, CY_DMAC_DESCRIPTOR_PING, false);
             Cy_DMAC_Channel_SetCurrentDescriptor(dmacBase, wrIdx, CY_DMAC_DESCRIPTOR_PING);
-            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, wrIdx, CY_DMAC_DESCRIPTOR_PING, (const uint32_t*)&mscBase->SNS_SW_SEL_CSW_MASK2);
+            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, wrIdx, CY_DMAC_DESCRIPTOR_PING, (void volatile *)&mscBase->SNS_SW_SEL_CSW_MASK2);
             Cy_DMAC_Descriptor_SetDataCount(dmacBase, wrIdx, CY_DMAC_DESCRIPTOR_PING,  CY_MSC_6_SNS_REGS);
             Cy_DMAC_Channel_Enable(dmacBase, wrIdx);
 
@@ -3089,7 +3089,7 @@ cy_capsense_status_t Cy_CapSense_InitializeDmaResource(
             Cy_DMAC_Channel_SetPriority(dmacBase, wrChIdx, 3u);
             Cy_DMAC_Descriptor_SetPreemptable(dmacBase, wrChIdx, CY_DMAC_DESCRIPTOR_PING, false);
             Cy_DMAC_Channel_SetCurrentDescriptor(dmacBase, wrChIdx, CY_DMAC_DESCRIPTOR_PING);
-            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, wrChIdx, CY_DMAC_DESCRIPTOR_PING, (void *) &(DMAC_DESCR_PING_SRC(dmacBase, wrIdx)));
+            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, wrChIdx, CY_DMAC_DESCRIPTOR_PING, (void volatile *)&dmacBase->DESCR[wrIdx].PING_SRC);
             Cy_DMAC_Channel_Enable(dmacBase, wrChIdx);
 
             /* Perform the initial configuration of the RD channel of DMAC */
@@ -3107,7 +3107,7 @@ cy_capsense_status_t Cy_CapSense_InitializeDmaResource(
             Cy_DMAC_Channel_SetPriority(dmacBase, rdIdx, 3u);
             Cy_DMAC_Descriptor_SetPreemptable(dmacBase, rdIdx, CY_DMAC_DESCRIPTOR_PING, false);
             Cy_DMAC_Channel_SetCurrentDescriptor(dmacBase, rdIdx, CY_DMAC_DESCRIPTOR_PING);
-            Cy_DMAC_Descriptor_SetSrcAddress(dmacBase, rdIdx, CY_DMAC_DESCRIPTOR_PING, (uint32_t *)&(mscBase->RESULT_FIFO_RD));
+            Cy_DMAC_Descriptor_SetSrcAddress(dmacBase, rdIdx, CY_DMAC_DESCRIPTOR_PING, (void volatile const *)&(mscBase->RESULT_FIFO_RD));
             Cy_DMAC_Descriptor_SetDataCount(dmacBase, rdIdx, CY_DMAC_DESCRIPTOR_PING, 1u);
             Cy_DMAC_Channel_Enable(dmacBase, rdIdx);
 
@@ -3126,7 +3126,7 @@ cy_capsense_status_t Cy_CapSense_InitializeDmaResource(
             Cy_DMAC_Channel_SetPriority(dmacBase, rdChIdx, 3u);
             Cy_DMAC_Descriptor_SetPreemptable(dmacBase, rdChIdx, CY_DMAC_DESCRIPTOR_PING, false);
             Cy_DMAC_Channel_SetCurrentDescriptor(dmacBase, rdChIdx, CY_DMAC_DESCRIPTOR_PING);
-            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, rdChIdx, CY_DMAC_DESCRIPTOR_PING, (void *) &(DMAC_DESCR_PING_DST(dmacBase, rdIdx)));
+            Cy_DMAC_Descriptor_SetDstAddress(dmacBase, rdChIdx, CY_DMAC_DESCRIPTOR_PING, (void volatile *) &dmacBase->DESCR[rdIdx].PING_DST);
             Cy_DMAC_Enable(dmacBase);
         }
 

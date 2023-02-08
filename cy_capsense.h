@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 3.0
+* \version 3.0.1
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -16,7 +16,7 @@
 
 /**
 ********************************************************************************
-* \mainpage CAPSENSE&trade; Middleware Library 3.0
+* \mainpage CAPSENSE&trade; Middleware Library 3.0.1
 ********************************************************************************
 *
 * CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon.
@@ -246,11 +246,11 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>2.4</td>
+*     <td>3.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator</td>
-*     <td>3.10.0</td>
+*     <td>4.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; MSC Superblock Personality for for PSoC&trade; 4 devices in the Device Configurator</td>
@@ -262,31 +262,31 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator</td>
-*     <td>1.1</td>
-*   </tr>
-*   <tr>
-*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator</td>
 *     <td>2.0</td>
 *   </tr>
 *   <tr>
+*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator</td>
+*     <td>3.0</td>
+*   </tr>
+*   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>4.0.0</td>
+*     <td>5.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>4.0.0</td>
+*     <td>5.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
-*     <td>2.3.0</td>
+*     <td>3.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>1.4.0</td>
+*     <td>2.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
-*     <td>9.3.1</td>
+*     <td>10.3.1</td>
 *   </tr>
 *   <tr>
 *     <td>IAR Compiler</td>
@@ -647,6 +647,12 @@
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="1">3.0.1</td>
+*     <td>Fixed call of Cy_DMAC_Descriptor_SetDstAddress() accordingly to changes
+*         in DMAC v1.20 mtb-pdl-cat2 driver.</td>
+*     <td>mtb-pdl-cat2 v2.0.0 support</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="12">3.0</td>
 *     <td colspan="2"><i><b>
