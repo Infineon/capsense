@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -120,9 +120,6 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 * - Zero - No touch is detected in any of the low power widgets or sensors
 * - CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK - At least one low power widget or sensor
 *                                         has detected a touch at the previous scan
-*
-* \funcusage
-* \snippet capsense/snippet/main.c snippet_LowPowerStateMachine
 *
 *******************************************************************************/
 uint32_t Cy_CapSense_IsAnyLpWidgetActive(const cy_stc_capsense_context_t * context)
@@ -495,43 +492,66 @@ uint16_t Cy_CapSense_GetCrcWidget(
 
     (void)memset((void*)&crcDataVal, 0, sizeof(crcDataVal));
 
-    crcDataVal.fingerCapVal      = ptrWdCxt->fingerCap;
-    crcDataVal.sigPFCVal         = ptrWdCxt->sigPFC;
-    crcDataVal.lowBslnRstVal     = ptrWdCxt->lowBslnRst;
-    crcDataVal.snsClkVal         = ptrWdCxt->snsClk;
-    crcDataVal.rowSnsClkVal      = ptrWdCxt->rowSnsClk;
-    crcDataVal.onDebounceVal     = ptrWdCxt->onDebounce;
-    crcDataVal.snsClkSourceVal   = ptrWdCxt->snsClkSource;
+    crcDataVal.fingerCapVal = ptrWdCxt->fingerCap;
+    crcDataVal.sigPFCVal = ptrWdCxt->sigPFC;
+    crcDataVal.lowBslnRstVal = ptrWdCxt->lowBslnRst;
+    crcDataVal.snsClkVal = ptrWdCxt->snsClk;
+    crcDataVal.rowSnsClkVal = ptrWdCxt->rowSnsClk;
+    crcDataVal.onDebounceVal = ptrWdCxt->onDebounce;
+    crcDataVal.snsClkSourceVal = ptrWdCxt->snsClkSource;
+    crcDataVal.maxRawCountVal = ptrWdCxt->maxRawCount;
+    crcDataVal.maxRawCountRowVal = ptrWdCxt->maxRawCountRow;
+    crcDataVal.bslnCoeffVal = ptrWdCxt->bslnCoeff;
 
-    if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
-        (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
+    if ((CY_CAPSENSE_CSD_GROUP != ptrWdCfg->senseMethod) ||
+        ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
+        (0u == (context->ptrCommonConfig->csdAutotuneEn & CY_CAPSENSE_CSD_SS_TH_EN)))
     {
-        crcDataVal.fingerThVal       = ptrWdCxt->fingerTh;
-        crcDataVal.proxThVal         = ptrWdCxt->proxTh;
-        crcDataVal.noiseThVal        = ptrWdCxt->noiseTh;
-        crcDataVal.nNoiseThVal       = ptrWdCxt->nNoiseTh;
-        crcDataVal.hysteresisVal     = ptrWdCxt->hysteresis;
+        crcDataVal.fingerThVal = ptrWdCxt->fingerTh;
+        crcDataVal.proxThVal = ptrWdCxt->proxTh;
+        crcDataVal.noiseThVal = ptrWdCxt->noiseTh;
+        crcDataVal.nNoiseThVal = ptrWdCxt->nNoiseTh;
+        crcDataVal.hysteresisVal = ptrWdCxt->hysteresis;
     }
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
-        crcDataVal.resolutionVal     = ptrWdCxt->resolution;
-        crcDataVal.idacModVal[0u]    = ptrWdCxt->idacMod[0u];
-        crcDataVal.idacModVal[1u]    = ptrWdCxt->idacMod[1u];
-        crcDataVal.idacModVal[2u]    = ptrWdCxt->idacMod[2u];
-        crcDataVal.idacGainIndexVal  = ptrWdCxt->idacGainIndex;
+        crcDataVal.resolutionVal = ptrWdCxt->resolution;
+        crcDataVal.idacModVal[0u] = ptrWdCxt->idacMod[0u];
+        crcDataVal.idacModVal[1u] = ptrWdCxt->idacMod[1u];
+        crcDataVal.idacModVal[2u] = ptrWdCxt->idacMod[2u];
+        crcDataVal.idacGainIndexVal = ptrWdCxt->idacGainIndex;
         crcDataVal.rowIdacModVal[0u] = ptrWdCxt->rowIdacMod[0u];
         crcDataVal.rowIdacModVal[1u] = ptrWdCxt->rowIdacMod[1u];
         crcDataVal.rowIdacModVal[2u] = ptrWdCxt->rowIdacMod[2u];
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        crcDataVal.resolutionVal   = ptrWdCxt->numSubConversions;
-        crcDataVal.cdacRef         = ptrWdCxt->cdacRef;
-        crcDataVal.rowCdacRef      = ptrWdCxt->rowCdacRef;
-        crcDataVal.cdacCompDivider = ptrWdCxt->cdacCompDivider;
-        crcDataVal.cicRate         = ptrWdCxt->cicRate;
-        crcDataVal.lfsrBits        = ptrWdCxt->lfsrBits;
+        crcDataVal.cdacDitherEnVal = ptrWdCxt->cdacDitherEn;
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        crcDataVal.cicShiftVal = ptrWdCxt->cicShift;
+        crcDataVal.rowCicShiftVal = ptrWdCxt->rowCicShift;
+    #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        crcDataVal.resolutionVal = ptrWdCxt->numSubConversions;
+        crcDataVal.cdacRefVal = ptrWdCxt->cdacRef;
+        crcDataVal.rowCdacRefVal = ptrWdCxt->rowCdacRef;
+        crcDataVal.cdacCompDividerVal = ptrWdCxt->cdacCompDivider;
+        crcDataVal.cicRateVal = ptrWdCxt->cicRate;
+        crcDataVal.lfsrBitsVal = ptrWdCxt->lfsrBits;
+        crcDataVal.cdacDitherValueVal = ptrWdCxt->cdacDitherValue;
+        crcDataVal.coarseInitBypassEnVal = ptrWdCxt->coarseInitBypassEn;
+    #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
+         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN)))
+        crcDataVal.cdacFineVal = ptrWdCxt->cdacFine;
+        crcDataVal.rowCdacFineVal = ptrWdCxt->rowCdacFine;
+    #endif
 
     crcValue = Cy_CapSense_GetCRC((uint8_t *)(&crcDataVal), sizeof(crcDataVal));
 
@@ -549,7 +569,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 * argument. The paramId for each register of cy_capsense_tuner is available
 * in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
 * The paramId is a special enumerated value generated by the CAPSENSE&trade;
-* Configurator. The format of paramId is as follows:
+* Configurator tool. The format of paramId is as follows:
 * 1. [ byte 3 byte 2 byte 1 byte 0 ]
 * 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
 * 3. U - indicates if the parameter affects the RAM Widget Object CRC.
@@ -571,7 +591,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 *
 * \param ptrTuner
 * The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
-* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator generated files:
+* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator tool generated files:
 * * cycfg_capsense.c/h
 *
 * \param context
@@ -646,7 +666,7 @@ cy_capsense_status_t Cy_CapSense_GetParam(
 * argument. The paramId for each register of cy_capsense_tuner is available
 * in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
 * The paramId is a special enumerated value generated by the CAPSENSE&trade;
-* Configurator. The format of paramId is as follows:
+* Configurator tool. The format of paramId is as follows:
 * 1. [ byte 3 byte 2 byte 1 byte 0 ]
 * 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
 * 3. U - indicates if the parameter affects the RAM Widget Object CRC.
@@ -676,7 +696,7 @@ cy_capsense_status_t Cy_CapSense_GetParam(
 *
 * \param ptrTuner
 * The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
-* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator generated files:
+* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator tool generated files:
 * * cycfg_capsense.c/h
 *
 * \param context

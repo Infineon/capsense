@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -39,6 +39,12 @@
 #endif
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #if !defined(CY_CAPSENSE_SMARTSENSE_LP_HW_EN)
+        #define CY_CAPSENSE_SMARTSENSE_LP_HW_EN     (0u)
+    #endif
+#endif
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_Init
@@ -122,10 +128,6 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
         uint32_t wdIndex;
         cy_stc_capsense_widget_context_t * ptrWdCxt;
         const cy_stc_capsense_common_config_t * ptrCommonCfg;
-        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
-            const cy_stc_capsense_widget_config_t * ptrWdCfg;
-        #endif
     #endif
 
     if (NULL != context)
@@ -142,6 +144,8 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
             /* Set the maximum refresh rate (default value) for ACTIVE scan mode */
             ptrInternalCxt->activeWakeupTimer = 0u;
+            /* Set default compensation factor for nominal ILO frequency (40KHz) */
+            ptrInternalCxt->iloCompensationFactor = CY_CAPSENSE_DEFAULT_ILO_FACTOR;
         #endif
 
         #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
@@ -155,6 +159,12 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
             ptrInternalCxt->numCoarseInitSettleCycles = ptrCommonCfg->numCoarseInitSettleCycles;
             ptrInternalCxt->numProOffsetCycles = ptrCommonCfg->numProOffsetCycles;
             ptrInternalCxt->proOffsetCdacComp = ptrCommonCfg->proOffsetCdacComp;
+
+            ptrInternalCxt->lfsrPoly = CY_CAPSENSE_LFSR_POLY;
+            ptrInternalCxt->lfsrScale = CY_CAPSENSE_LFSR_SCALE;
+            ptrInternalCxt->cdacDitherSeed = CY_CAPSENSE_CDAC_DITHER_SEED;
+            ptrInternalCxt->cdacDitherPoly = CY_CAPSENSE_CDAC_DITHER_POLY;
+            ptrInternalCxt->modClk = CY_CAPSENSE_MODCLK_DIV;
 
             ptrWdCxt = context->ptrWdConfig->ptrWdContext;
             for (wdIndex = 0u; wdIndex < CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex++)
@@ -170,24 +180,9 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
                 ptrWdCxt++;
             }
 
-            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
-                ptrWdCfg = context->ptrWdConfig;
-                for (wdIndex = 0u; wdIndex < CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex++)
-                {
-                    ptrWdCxt = ptrWdCfg->ptrWdContext;
-                    if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
-                    {
-                        ptrWdCxt->snsClk = CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK;
-                        ptrWdCxt->rowSnsClk = CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK;
-                    }
-                    ptrWdCfg++;
-                }
-            #endif
-
             #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
                 ptrInternalCxt->numEpiCycles = ptrCommonCfg->numEpiCycles;
-                ptrInternalCxt->numFineInitWaitCycles = context->ptrCommonContext->numFineInitWaitCycles;
+                ptrInternalCxt->numFineInitWaitCycles = CY_CAPSENSE_NUM_FINE_INIT_WAIT_CYCLES;
 
                 #if (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == CY_CAPSENSE_SCAN_MODE)
                     /* Set undefined value to initiate DMA configuration in Cy_CapSense_ScanSlots() function */
@@ -200,7 +195,18 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
                 ptrInternalCxt->numProWaitKrefDelayPrs = ptrCommonCfg->numProWaitKrefDelayPrs;
                 ptrInternalCxt->numEpiKrefDelay = ptrCommonCfg->numEpiKrefDelay;
                 ptrInternalCxt->numEpiKrefDelayPrs = ptrCommonCfg->numEpiKrefDelayPrs;
-                ptrInternalCxt->mrssStateAfterScan = CY_CAPSENSE_MRSS_TURN_ON;
+                ptrInternalCxt->mrssStateAfterScan = CY_CAPSENSE_MRSS_TURN_OFF;
+
+                ptrInternalCxt->numFineInitCycles = CY_CAPSENSE_NUM_FINE_INIT_CYCLES;
+                ptrInternalCxt->csdCdacDitherEn = CY_CAPSENSE_CSD_CDAC_DITHER_EN;
+                ptrInternalCxt->csxCdacDitherEn = CY_CAPSENSE_CSX_CDAC_DITHER_EN;
+                ptrInternalCxt->isxCdacDitherEn = CY_CAPSENSE_ISX_CDAC_DITHER_EN;
+                ptrInternalCxt->bslnCoefSlow = CY_CAPSENSE_BSLN_COEFF_SLOW;
+                ptrInternalCxt->bslnCoefFast = CY_CAPSENSE_BSLN_COEFF_FAST;
+                ptrInternalCxt->bslnUpdateDelay = CY_CAPSENSE_BSLN_UPDATE_DELAY;
+                ptrInternalCxt->iirCoeffLp = CY_CAPSENSE_IIR_COEFF_LP;
+                ptrInternalCxt->wotScanInterval = CY_CAPSENSE_WOT_SCAN_INTERVAL;
+                ptrInternalCxt->wotTimeout = CY_CAPSENSE_WOT_TIMEOUT;
             #endif
 
             result = Cy_CapSense_SwitchHwConfiguration(CY_CAPSENSE_HW_CONFIG_UNDEFINED, context);
@@ -250,6 +256,9 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 *
 * The repeated call of this function is also done inside the
 * Cy_CapSense_RunTuner() function when a restart command is received.
+*
+* The function calls the Cy_CapSense_ScanAllWidgets() function to proper
+* baseline setup.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -332,7 +341,8 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
             #endif
         #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN) || \
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_LP_HW_EN))
                 result |= Cy_CapSense_SsAutoTune(context);
             #endif
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
@@ -347,7 +357,30 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
             #endif
         #endif
 
-        result |= Cy_CapSense_ScanAllWidgets(context);
+        /* Scan each widget separately if the MPSC is enabled */
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
+                {
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
+                        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
+                        {
+                            result |= Cy_CapSense_ScanSlots(context->ptrWdConfig[widgetId].firstSlotId,
+                                                            context->ptrWdConfig[widgetId].numSlots, context);
+                        }
+                    #else
+                        result |= Cy_CapSense_ScanSlots(context->ptrWdConfig[widgetId].firstSlotId,
+                                                        context->ptrWdConfig[widgetId].numSlots, context);
+                    #endif
+
+                    result |= Cy_CapSense_WaitEndScan(1000000uL, context);  /* 1sec timeout */
+                }
+            #else
+                result |= Cy_CapSense_ScanAllSlots(context);
+            #endif /* CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED */
+        #else
+            result |= Cy_CapSense_ScanAllWidgets(context);
+        #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
         /* Init Watchdog Counter to prevent a hang */
         cpuFreqMHz = context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA;
@@ -357,7 +390,7 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
         {
             if (0uL == watchdogCounter)
             {
-                result = CY_CAPSENSE_STATUS_INVALID_STATE;
+                result = CY_CAPSENSE_STATUS_TIMEOUT;
                 break;
             }
 
@@ -368,11 +401,22 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
             for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
             {
                 Cy_CapSense_PreProcessWidget(widgetId, context);
-                #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-                    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
-                        if (CY_CAPSENSE_MPTX_MIN_ORDER <= context->ptrWdConfig[widgetId].mptxOrder)
+                #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                        if (((CY_CAPSENSE_MPSC_MIN_ORDER <= context->ptrWdConfig[widgetId].mpOrder) ||
+                             (CY_CAPSENSE_MPSC_MIN_ORDER <= context->ptrWdConfig[widgetId].mpOrderRows)) &&
+                             (CY_CAPSENSE_CSD_GROUP == context->ptrWdConfig[widgetId].senseMethod))
                         {
-                            result |= Cy_CapSense_ProcessWidgetMptxDeconvolution(widgetId, context);
+                            result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId, context);
+                        }
+                    #endif
+                #endif
+                #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
+                        if ((CY_CAPSENSE_MPTX_MIN_ORDER <= context->ptrWdConfig[widgetId].mpOrder) &&
+                            (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod))
+                        {
+                            result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId, context);
                         }
                     #endif
                 #endif
@@ -569,7 +613,7 @@ cy_capsense_status_t Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * c
 * increase the refresh rate, and decrease the average power consumption.
 * See the function usage example below for details on usage.
 *
-* For the Fifth generation CapSense if the specified widget has the enabled
+* For the Fifth generation CAPSENSE&trade; if the specified widget has the enabled
 * multi-frequency scan feature then the function does the following:
 * - If the specified widget ID refers to main (base) frequency then the function
 * processes raw count processing of all three widgets (main and two sub-widgets)
@@ -635,7 +679,8 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
             #if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) &&\
                  (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN))
                 /* Check for sub-widget */
-                if (0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK))
+                if ((0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK)) &&
+                    (0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)))
                 {
                     result |= CY_CAPSENSE_STATUS_BAD_PARAM;
                 }
@@ -652,30 +697,55 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
                     Cy_CapSense_PreProcessWidget(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
                     Cy_CapSense_PreProcessWidget(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
 
-                    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
-                        if ((CY_CAPSENSE_MPTX_MIN_ORDER <= ptrWdCfg->mptxOrder) &&
+                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                            if (((CY_CAPSENSE_MPSC_MIN_ORDER <= ptrWdCfg->mpOrder) ||
+                                 (CY_CAPSENSE_MPSC_MIN_ORDER <= ptrWdCfg->mpOrderRows)) &&
+                                 (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod))
+                            {
+                                result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
+                                result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
+                            }
+                        #endif
+                    #endif
+
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
+                        if ((CY_CAPSENSE_MPTX_MIN_ORDER <= ptrWdCfg->mpOrder) &&
                             (CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod))
                         {
-                            result |= Cy_CapSense_ProcessWidgetMptxDeconvolution(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
-                            result |= Cy_CapSense_ProcessWidgetMptxDeconvolution(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
+                            result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
+                            result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
                         }
                     #endif
                 }
             #endif
 
             Cy_CapSense_PreProcessWidget(widgetId, context);
-            #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
-                if ((CY_CAPSENSE_MPTX_MIN_ORDER <= ptrWdCfg->mptxOrder) &&
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                    if (((CY_CAPSENSE_MPSC_MIN_ORDER <= ptrWdCfg->mpOrder) ||
+                         (CY_CAPSENSE_MPSC_MIN_ORDER <= ptrWdCfg->mpOrderRows)) &&
+                         (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod))
+                    {
+                        result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId, context);
+                    }
+                #endif
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
+                if ((CY_CAPSENSE_MPTX_MIN_ORDER <= ptrWdCfg->mpOrder) &&
                     (CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod))
                 {
-                    result |= Cy_CapSense_ProcessWidgetMptxDeconvolution(widgetId, context);
+                    result |= Cy_CapSense_ProcessWidgetMpDeconvolution(widgetId, context);
                 }
             #endif
         #endif
 
         #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
-            result |= Cy_CapSense_DpProcessWidgetRawCounts(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
-            result |= Cy_CapSense_DpProcessWidgetRawCounts(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
+            if (0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK))
+            {
+                result |= Cy_CapSense_DpProcessWidgetRawCounts(widgetId + CY_CAPSENSE_MFS_CH2_INDEX, context);
+                result |= Cy_CapSense_DpProcessWidgetRawCounts(widgetId + CY_CAPSENSE_MFS_CH1_INDEX, context);
+            }
         #endif
         result |= Cy_CapSense_DpProcessWidgetRawCounts(widgetId, context);
 
@@ -739,12 +809,23 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
 * this function:
 * * A raw count pre-processing calling either the Cy_CapSense_PreProcessWidget()
 *   or Cy_CapSense_PreProcessSensor() functions.
-* * A deconvolution for widgets with multi-phase Tx calling the
-*   Cy_CapSense_ProcessWidgetMptxDeconvolution() function.
+* * A deconvolution for widgets with multi-phase Tx or Self calling the
+*   Cy_CapSense_ProcessWidgetMpDeconvolution() function
+*   (multi-phase Self is available only for the fifth-generation low power CAPSENSE&trade;)
 * In this case a full processing flow consists of the following:
 * * Cy_CapSense_PreProcessWidget()
-* * Cy_CapSense_ProcessWidgetMptxDeconvolution()
+* * Cy_CapSense_ProcessWidgetMpDeconvolution()
 * * Cy_CapSense_ProcessWidgetExt()
+*
+* \note
+* For the fifth generation and fifth-generation low power CAPSENSE&trade;
+* if the specified widget has the enabled multi-frequency scan feature
+* then the processing must follow the following order:
+* * Sub-widget channel 2
+* * Sub-widget channel 1
+* * Main widget channel 0
+* The CY_CAPSENSE_PROCESS_MFS_FILTER option is skipped for sub-widgets,
+* however CY_CAPSENSE_PROCESS_STATUS option is available.
 *
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
@@ -760,12 +841,12 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
 * specified widget:
 * 1. Bits [31..7] - Reserved.
 * 2. Bits [6..0]  - CY_CAPSENSE_PROCESS_ALL - Execute all of the below tasks.
-* 3. Bit [6]      - CY_CAPSENSE_PROCESS_MFS_FILTER - Run the firmware filters
+* 3. Bit [6]      - CY_CAPSENSE_PROCESS_STATUS - Update the status
+*                   (on/off, centroid position).
+* 4. Bit [5]      - CY_CAPSENSE_PROCESS_MFS_FILTER - Run the firmware filters
 *                   for MFS on sensor rawcounts
 *                   (applicable only for fifth-generation CAPSENSE&trade;
 *                   and fifth-generation low power CAPSENSE&trade;).
-* 4. Bit [5]      - CY_CAPSENSE_PROCESS_STATUS - Update the status
-*                   (on/off, centroid position).
 * 5. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Update the thresholds
 *                   (only in CSD auto-tuning mode).
 * 6. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculate the noise
@@ -846,8 +927,8 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                 }
             }
 
-            #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN) && \
-                (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN))
+            #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
+                (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
                 ptrSnsCxtSns = ptrWdCfg->ptrSnsContext;
                 for (snsIndex = ptrWdCfg->numSns; snsIndex-- > 0u;)
                 {
@@ -856,11 +937,15 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                 }
             #endif
 
-            #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN) && \
+            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN) && \
                  ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)))
-                if (0u != (mode & CY_CAPSENSE_PROCESS_MFS_FILTER))
+                if ((0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK)) &&
+                    (0u == (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)))
                 {
-                    (void)Cy_CapSense_RunMfsMedian(widgetId, context);
+                    if (0u != (mode & CY_CAPSENSE_PROCESS_MFS_FILTER))
+                    {
+                        (void)Cy_CapSense_RunMfsMedian(widgetId, context);
+                    }
                 }
             #endif
 
@@ -916,16 +1001,17 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
 * function usage example below.
 *
 * \note
-* For the the fifth-generation CAPSENSE&trade; and fifth-generation low power
+* For the fifth-generation CAPSENSE&trade; and fifth-generation low power
 * CAPSENSE&trade; HW generation an extra processing should be  performed prior
 * a call of this function:
 * * A raw count pre-processing calling either the Cy_CapSense_PreProcessWidget()
 *   or Cy_CapSense_PreProcessSensor() functions.
-* * A deconvolution for widgets with multi-phase Tx calling the
-*   Cy_CapSense_ProcessWidgetMptxDeconvolution() function.
+* * A deconvolution for widgets with multi-phase Tx or Self calling the
+*   Cy_CapSense_ProcessWidgetMpDeconvolution() function
+*   (multi-phase Self is available only for the fifth-generation low power CAPSENSE&trade;)
 * In this case a full processing flow consists of the following:
 * * Cy_CapSense_PreProcessWidget()
-* * Cy_CapSense_ProcessWidgetMptxDeconvolution()
+* * Cy_CapSense_ProcessWidgetMpDeconvolution()
 * * Cy_CapSense_ProcessSensorExt() - each sensor
 * * Cy_CapSense_ProcessWidgetExt()
 *
@@ -1015,7 +1101,8 @@ cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                     capStatus |= Cy_CapSense_DpProcessSensorRawCountsExt(ptrWdCfg, ptrSnsCxt, ptrHistory,
                                                                          ptrHistoryLow, mode, ptrSnsBslnInv, context);
                 }
-                #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+                #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
+                    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
                     ptrSnsCxt = ptrWdCfg->ptrSnsContext;
                     Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
                 #endif

@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -652,7 +652,7 @@ uint32_t Cy_CapSense_WaitEndOfScan(
     #define CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD                    (HSIOM_SEL_CSD_SHIELD)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXA                         (HSIOM_SEL_AMUXA)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXB                         (HSIOM_SEL_AMUXB)
-    #define CY_CAPSENSE_DM_SHIELD                                (CY_GPIO_DM_ANALOG)
+    #define CY_CAPSENSE_DM_SHIELD                               (CY_GPIO_DM_ANALOG)
     #define CY_CAPSENSE_CSD_SCAN_PIN_DM                         (CY_GPIO_DM_ANALOG)
     #define CY_CAPSENSE_CSX_TX_SCAN_PIN_HSIOM                   (HSIOM_SEL_CSD_SENSE)
     #define CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM                 (HSIOM_SEL_AMUXA)
@@ -662,7 +662,7 @@ uint32_t Cy_CapSense_WaitEndOfScan(
     #define CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD                    (HSIOM_SEL_ACT_2)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXA                         (HSIOM_SEL_AMUXA)
     #define CY_CAPSENSE_HSIOM_SEL_AMUXB                         (HSIOM_SEL_AMUXB)
-    #define CY_CAPSENSE_DM_SHIELD                                (CY_GPIO_DM_STRONG_IN_OFF)
+    #define CY_CAPSENSE_DM_SHIELD                               (CY_GPIO_DM_STRONG_IN_OFF)
     #define CY_CAPSENSE_CSD_SCAN_PIN_DM                         (CY_GPIO_DM_STRONG_IN_OFF)
     #define CY_CAPSENSE_CSX_TX_SCAN_PIN_HSIOM                   (HSIOM_SEL_ACT_2)
     #define CY_CAPSENSE_CSX_CINT_SCAN_PIN_HSIOM                 (HSIOM_SEL_GPIO)

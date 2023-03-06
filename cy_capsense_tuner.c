@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -70,11 +70,6 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * * Initialize the UART driver and interface
 * * Use a callback function to facilitate data transmission and reception 
 *   using the UART driver.
-*
-* \warning
-* This Beta release does not support protocol agnostic full duplex communication for
-* the fifth-generation low power CAPSENSE&trade;. The feature will be implemented
-* in next releases.
 * 
 * The application program must: 
 * * Form a transmission data packet
@@ -128,28 +123,45 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 *
 * \funcusage
 * 
-* An example of synchronization with the Tuner tool using EzI2C:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_EzI2C
+* An example of synchronization with the Tuner tool using EzI2C interface:
+*
+* -# In the Device Configurator, enable the SCB resource in the EzI2C mode
+*    with the "EZI2C" name. Configure interface parameters, assign required
+*    clock source and pins. Note that in the CapSense Tuner tool, I2C
+*    interface settings should match device EzI2C configuration.
+*
+* -# Declare EzI2C interface context:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_EZI2C_Context
+*
+* -# Setup EzI2C interrupt handler:
+*    \snippet capsense/snippet/main.c snippet_Tuner_EzI2C_Isr
+*
+* -# Configure EzI2C buffer and use EzI2C as the tuner interface:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_EzI2C
 * 
-* An example of synchronization with the Tuner tool using UART.<br>
-* Tuner Send callback implementation: Transmitting data through UART interface:
-* \snippet capsense/snippet/main.c snippet_TunerSend
 *
-* \warning
-* This Beta release does not support the Tuner Receive Callback for
-* the fifth-generation low power CAPSENSE&trade;. The feature will be implemented
-* in next releases.
+* An example of synchronization with the Tuner tool using UART interface:
 *
-* Tuner Receive callback implementation: Receiving data from UART interface:
-* \snippet capsense/snippet/main.c snippet_TunerReceive
+* -# In the Device Configurator, enable the SCB resource in the UART mode
+*    with the "UART" name. Configure interface parameters, assign required
+*    clock source and pins. Note that in the CapSense Tuner tool, UART
+*    interface settings should match device UART configuration.
 *
-* \warning
-* This Beta release does not support the Tuner Receive Callback for
-* the fifth-generation low power CAPSENSE&trade;. The feature will be implemented
-* in next releases.
+* -# Declare UART interface context:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_UART_Context
 *
-* A part of the main.c FW flow with registering callbacks:
-* \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_UART
+* -# Setup UART interrupt handler:
+*    \snippet capsense/snippet/main.c snippet_Tuner_Uart_Isr
+*
+* -# Add Send callback implementation:
+*    \snippet capsense/snippet/main.c snippet_TunerSend
+*
+* -# Add Receive callback implementation:
+*    \snippet capsense/snippet/main.c snippet_TunerReceive
+*
+* -# Configure UART RX ring buffer and register Send and Receive callbacks
+*    as a part of the main.c FW flow:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_Tuner_UART
 * 
 * Refer to the \ref group_capsense_callbacks section for details.
 * 
@@ -157,7 +169,7 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 {
     uint32_t interruptState;
-    uint32_t updateFlag = 0uL;
+    uint32_t updateFlag = 0u;
     uint32_t tunerStatus = CY_CAPSENSE_STATUS_RESTART_NONE;
     uint16_t tunerCommand;
     uint32_t cmdOffset;
@@ -225,95 +237,95 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
         /* Check command register */
         switch (tunerCommand)
         {
-        case (uint16_t)CY_CAPSENSE_TU_CMD_SUSPEND_E:
-            tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_SUSPENDED;
-            updateFlag = 1u;
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_RESUME_E:
-            tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
-            updateFlag = 1u;
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_RESTART_E:
-            (void)Cy_CapSense_Enable(context);
-            tunerStatus = CY_CAPSENSE_STATUS_RESTART_DONE;
-            tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
-            updateFlag = 1u;
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_RESTART_ONLY_E:
-            (void)Cy_CapSense_Enable(context);
-            tunerStatus = CY_CAPSENSE_STATUS_RESTART_DONE;
-            updateFlag = 1u;
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_PING_E:
-            #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN))
-                tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
-            #endif
-            updateFlag = 1u;
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_ONE_SCAN_E:
-            tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_ONE_SCAN;
-            updateFlag = 0u;
-            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-                sendDataFlag = 0u;
-            #endif
-            break;
-
-        case (uint16_t)CY_CAPSENSE_TU_CMD_WRITE_E:
-            if ((NULL != receiveCallback) && (NULL != commandPacket) && (NULL != tunerStructure))
-            {
-                /* Tuner state is not changed */
-                cmdOffset = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
-                                       (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
-                cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
-
-                if (1u == cmdSize)
-                {
-                    tunerStructure[cmdOffset] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-                }
-                else if (2u == cmdSize)
-                {
-                    tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
-                    tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-                }
-                else
-                {
-                    tunerStructure[cmdOffset + 3u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 0u];
-                    tunerStructure[cmdOffset + 2u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 1u];
-                    tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
-                    tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
-                }
-
-                updateFlag = 1u;
-            }
-            break;
-
-        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-            case (uint16_t)CY_CAPSENSE_TU_CMD_COMM_DIS_E:
-                context->ptrCommonContext->lpDataSt &= (uint16_t)(~CY_CAPSENSE_LP_PROCESS_ENABLED_MASK);
-                updateFlag = 1u;
-                break;
-
-            case (uint16_t)CY_CAPSENSE_TU_CMD_COMM_EN_E:
-                context->ptrCommonContext->lpDataSt |= (uint16_t)CY_CAPSENSE_LP_PROCESS_ENABLED_MASK;
+            case (uint16_t)CY_CAPSENSE_TU_CMD_SUSPEND_E:
                 tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_SUSPENDED;
                 updateFlag = 1u;
                 break;
-        #endif
 
-        default:
-            /* No action on other commands */
-            break;
+            case (uint16_t)CY_CAPSENSE_TU_CMD_RESUME_E:
+                tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
+                updateFlag = 1u;
+                break;
+
+            case (uint16_t)CY_CAPSENSE_TU_CMD_RESTART_E:
+                (void)Cy_CapSense_Enable(context);
+                tunerStatus = CY_CAPSENSE_STATUS_RESTART_DONE;
+                tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
+                updateFlag = 1u;
+                break;
+
+            case (uint16_t)CY_CAPSENSE_TU_CMD_RESTART_ONLY_E:
+                (void)Cy_CapSense_Enable(context);
+                tunerStatus = CY_CAPSENSE_STATUS_RESTART_DONE;
+                updateFlag = 1u;
+                break;
+
+            case (uint16_t)CY_CAPSENSE_TU_CMD_PING_E:
+                #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN))
+                    tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
+                #endif
+                updateFlag = 1u;
+                break;
+
+            case (uint16_t)CY_CAPSENSE_TU_CMD_ONE_SCAN_E:
+                tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_ONE_SCAN;
+                updateFlag = 0u;
+                #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                    sendDataFlag = 0u;
+                #endif
+                break;
+
+            case (uint16_t)CY_CAPSENSE_TU_CMD_WRITE_E:
+                if ((NULL != receiveCallback) && (NULL != commandPacket) && (NULL != tunerStructure))
+                {
+                    /* Tuner state is not changed */
+                    cmdOffset = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
+                                           (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
+                    cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
+
+                    if (1u == cmdSize)
+                    {
+                        tunerStructure[cmdOffset] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                    }
+                    else if (2u == cmdSize)
+                    {
+                        tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
+                        tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                    }
+                    else
+                    {
+                        tunerStructure[cmdOffset + 3u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 0u];
+                        tunerStructure[cmdOffset + 2u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 1u];
+                        tunerStructure[cmdOffset + 1u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u];
+                        tunerStructure[cmdOffset + 0u] = commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u];
+                    }
+
+                    updateFlag = 1u;
+                }
+                break;
+
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                case (uint16_t)CY_CAPSENSE_TU_CMD_COMM_DIS_E:
+                    context->ptrCommonContext->lpDataSt &= (uint16_t)(~CY_CAPSENSE_LP_PROCESS_ENABLED_MASK);
+                    updateFlag = 1u;
+                    break;
+
+                case (uint16_t)CY_CAPSENSE_TU_CMD_COMM_EN_E:
+                    context->ptrCommonContext->lpDataSt |= (uint16_t)CY_CAPSENSE_LP_PROCESS_ENABLED_MASK;
+                    tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_SUSPENDED;
+                    updateFlag = 1u;
+                    break;
+            #endif
+
+            default:
+                /* No action on other commands */
+                break;
         }
 
         ptrCommonCxt->tunerSt = tunerState;
 
         /* Set Complete flag in command register if needed */
-        if (0uL != updateFlag)
+        if (0u != updateFlag)
         {
             interruptState = Cy_SysLib_EnterCriticalSection();
             /* Check that command wasn't overwritten with new command */
@@ -323,17 +335,19 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
                 ptrCommonCxt->tunerCnt = cmdCounter;
             }
             Cy_SysLib_ExitCriticalSection(interruptState);
-            updateFlag = 0uL;
         }
 
         /* Send Data to the CAPSENSE&trade; Tuner tool */
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-            if ((NULL != sendCallback) && (0u != sendDataFlag))
+            if ((NULL != sendCallback) &&
+                ((0u != updateFlag) || (0u != sendDataFlag)))
             {
                 sendCallback((void *)context);
                 sendDataFlag = 0u;
             }
         #endif
+
+        updateFlag = 0u;
 
     } while ((uint8_t)CY_CAPSENSE_TU_FSM_SUSPENDED == tunerState);
 

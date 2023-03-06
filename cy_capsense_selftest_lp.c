@@ -1,5 +1,5 @@
 /***************************************************************************//**
-* \file cy_capsense_selftest_v3.c
+* \file cy_capsense_selftest_lp.c
 * \version 4.0
 *
 * \brief
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -23,17 +23,17 @@
 #include "cycfg_capsense_defines.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_sensing.h"
-#include "cy_capsense_sensing_v3.h"
-#include "cy_capsense_generator_v3.h"
-#include "cy_capsense_selftest_v3.h"
+#include "cy_capsense_sensing_lp.h"
+#include "cy_capsense_generator_lp.h"
+#include "cy_capsense_selftest_lp.h"
 #include "cy_gpio.h"
 
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-    #include "cy_msc.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_msclp.h"
 #endif
 
-#if (defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_M0S8MSCV3LP))
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN)
 
@@ -408,7 +408,13 @@
     static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllSensors(
                 cy_stc_capsense_context_t * context);
 #endif
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN)
+    static cy_capsense_status_t Cy_CapSense_BistMeasureCapacitanceSensorEnable(
+                    cy_stc_capsense_context_t * context);
+#endif
 
+#if (1u) /* Copied from MSCv3 */
+#else
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN)
     static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
                     uint32_t * cpPtr,
@@ -424,8 +430,6 @@
 #endif
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN)
-    static cy_capsense_status_t Cy_CapSense_BistMeasureCapacitanceSensorEnable(
-                    cy_stc_capsense_context_t * context);
     static void Cy_CapSense_BistMeasureCapacitanceSensorRun(
                     cy_stc_capsense_context_t * context);
     static void Cy_CapSense_BistGenerateBaseConfig(
@@ -435,13 +439,6 @@
                     uint32_t chIndex,
                     uint32_t * ptrSensorCfg,
                     cy_stc_capsense_context_t * context);
-
-    #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
-        static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
-                        const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
-                        uint32_t * ptrSensorCfg,
-                        uint32_t cswFuncNum);
-    #endif
 
     #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) && \
          (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD))
@@ -456,6 +453,14 @@
 
     static uint32_t Cy_CapSense_BistWatchdogPeriodCalc(
                     const cy_stc_capsense_context_t * context);
+#endif
+    #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
+        static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
+                        const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
+                        uint32_t * ptrSensorCfg,
+                        uint32_t cswFuncNum);
+    #endif
+
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN) */
 
 
@@ -463,7 +468,7 @@
 
 
 /*******************************************************************************
-* Function Name: Cy_CapSense_RunSelfTest_V3
+* Function Name: Cy_CapSense_RunSelfTest_V3Lp
 ****************************************************************************//**
 *
 * Runs built-in self-tests for specified by the test enable mask.
@@ -522,7 +527,7 @@
 *                                     parameters has faulted.
 *
 *******************************************************************************/
-cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest_V3(
+cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest_V3Lp(
                 uint32_t testEnMask,
                 cy_stc_capsense_context_t * context)
 {
@@ -618,7 +623,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest_V3(
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN)
 /*******************************************************************************
-* Function Name: Cy_CapSense_CheckCRCWidget_V3
+* Function Name: Cy_CapSense_CheckCRCWidget_V3Lp
 ****************************************************************************//**
 *
 * Checks the stored CRC of the \ref cy_stc_capsense_widget_context_t data
@@ -682,7 +687,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest_V3(
 *                                         The test was not executed.
 *
 *******************************************************************************/
-cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget_V3(
+cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget_V3Lp(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
@@ -750,7 +755,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_CheckAllWidgetCRC(
 
     for (widgetId = 0u; widgetId < context->ptrCommonConfig->numWd; widgetId++)
     {
-        if (CY_CAPSENSE_BIST_SUCCESS_E != (Cy_CapSense_CheckCRCWidget_V3(widgetId, context)))
+        if (CY_CAPSENSE_BIST_SUCCESS_E != (Cy_CapSense_CheckCRCWidget_V3Lp(widgetId, context)))
         {
             result = CY_CAPSENSE_BIST_FAIL_E;
             break;
@@ -828,7 +833,7 @@ void Cy_CapSense_UpdateAllWidgetCrc(cy_stc_capsense_context_t * context)
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN)
 /*******************************************************************************
-* Function Name: Cy_CapSense_CheckIntegritySensorBaseline_V3
+* Function Name: Cy_CapSense_CheckIntegritySensorBaseline_V3Lp
 ****************************************************************************//**
 *
 * Checks if the baseline of the specified sensor is not corrupted
@@ -894,7 +899,7 @@ void Cy_CapSense_UpdateAllWidgetCrc(cy_stc_capsense_context_t * context)
 *                                         The test was not executed.
 *
 *******************************************************************************/
-cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3(
+cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 uint16_t baselineHighLimit,
@@ -943,7 +948,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3(
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_RAW_INTEGRITY_EN)
 /*******************************************************************************
-* Function Name: Cy_CapSense_CheckIntegritySensorRawcount_V3
+* Function Name: Cy_CapSense_CheckIntegritySensorRawcount_V3Lp
 ****************************************************************************//**
 *
 * Checks the raw count of the specified widget/sensor is within the specified
@@ -998,7 +1003,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3(
 *                                         The test was not executed.
 *
 *******************************************************************************/
-cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3(
+cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 uint16_t rawcountHighLimit,
@@ -1040,7 +1045,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3(
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN)
 /*******************************************************************************
-* Function Name: Cy_CapSense_CheckIntegritySensorPins_V3
+* Function Name: Cy_CapSense_CheckIntegritySensorPins_V3Lp
 ****************************************************************************//**
 *
 * Checks the specified widget/sensor for shorts to GND, VDD or other sensors.
@@ -1159,7 +1164,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3(
 *                                         was not executed.
 *
 *******************************************************************************/
-cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins_V3(
+cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins_V3Lp(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context)
@@ -1653,7 +1658,7 @@ void Cy_CapSense_BistSetAllSnsPinsState(
     for (loopIndex = 0u; loopIndex < context->ptrCommonConfig->numPin; loopIndex++)
     {
         Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr,
-            (uint32_t)ptrPinCfg->pinNumber, desiredDriveMode, desiredHsiom);
+            (uint32_t)ptrPinCfg->pinNumber, desiredDriveMode, desiredHsiom, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
 
         if (0u != desiredPinOutput)
         {
@@ -1705,7 +1710,7 @@ void Cy_CapSense_BistSetAllShieldPinsState(
     for (loopIndex = 0u; loopIndex < context->ptrCommonConfig->csdShieldNumPin; loopIndex++)
     {
         Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr,
-            (uint32_t)ptrPinCfg->pinNumber, desiredDriveMode, desiredHsiom);
+            (uint32_t)ptrPinCfg->pinNumber, desiredDriveMode, desiredHsiom, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
 
         if (0u != desiredPinOutput)
         {
@@ -1769,8 +1774,8 @@ void Cy_CapSense_BistSetAllCmodPinsState(
         cmod2Port = ptrCommonCfg->ptrChConfig[curChIndex].portCmod2;
         cmod2Pin = ptrCommonCfg->ptrChConfig[curChIndex].pinCmod2;
 
-        Cy_CapSense_SsConfigPinRegisters(cmod1Port, (uint32_t)cmod1Pin, desiredDriveMode, desiredHsiom);
-        Cy_CapSense_SsConfigPinRegisters(cmod2Port, (uint32_t)cmod2Pin, desiredDriveMode, desiredHsiom);
+        Cy_CapSense_SsConfigPinRegisters(cmod1Port, (uint32_t)cmod1Pin, desiredDriveMode, desiredHsiom, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
+        Cy_CapSense_SsConfigPinRegisters(cmod2Port, (uint32_t)cmod2Pin, desiredDriveMode, desiredHsiom, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
 
         if (0u != desiredPinOutput)
         {
@@ -1911,6 +1916,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
                 uint32_t eltdId,
                 cy_stc_capsense_context_t * context)
 {
+#if (1u) /* Copied from MSCv3 */
+    (void)widgetId;
+    (void)eltdId;
+    (void)context;
+    return CY_CAPSENSE_BIST_BAD_PARAM_E;
+#else
     cy_en_capsense_bist_status_t result = CY_CAPSENSE_BIST_BAD_PARAM_E;
     uint32_t numWdgtElectrodes;
     const cy_stc_capsense_electrode_config_t * ptrEltdCfg;
@@ -1971,6 +1982,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
     }
 
     return result;
+#endif
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) */
 
@@ -2197,6 +2209,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
                 uint32_t skipChMask,
                 cy_stc_capsense_context_t * context)
 {
+#if (1u) /* Copied from MSCv3 */
+    (void)slotId;
+    (void)skipChMask;
+    (void)context;
+    return CY_CAPSENSE_BIST_BAD_PARAM_E;
+#else
     #if (CY_CAPSENSE_TOTAL_CH_NUMBER > 1u)
         uint32_t i;
     #endif
@@ -2363,6 +2381,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
     }
 
     return result;
+#endif
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN) */
 
@@ -2385,6 +2404,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
 static cy_capsense_status_t Cy_CapSense_BistMeasureCapacitanceSensorEnable(
                 cy_stc_capsense_context_t * context)
 {
+#if (1u) /* Copied from MSCv3 */
+    (void)context;
+    return CY_CAPSENSE_STATUS_SUCCESS;
+#else
     cy_en_msc_status_t mscStatus;
     cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t curChIndex;
@@ -2420,11 +2443,14 @@ static cy_capsense_status_t Cy_CapSense_BistMeasureCapacitanceSensorEnable(
     }
 
     return capStatus;
+#endif
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN) */
 
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN)
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistMeasureCapacitanceSensor
 ****************************************************************************//**
@@ -2526,12 +2552,15 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
 
     return result;
 }
+#endif
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN_EN) */
 
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN) || \
     ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) && \
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN)))
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistMeasureCapacitanceSlot
 ****************************************************************************//**
@@ -2700,12 +2729,15 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSlot(
 
     return result;
 }
+#endif
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN) || \
           ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) && \
            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN))) */
 
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN)
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistMeasureCapacitanceSensorRun
 ****************************************************************************//**
@@ -2739,12 +2771,12 @@ static void Cy_CapSense_BistMeasureCapacitanceSensorRun(
             Cy_CapSense_SsConfigPinRegisters(
             context->ptrCommonConfig->ptrChConfig[chIndex].portCmod1,
             (uint32_t)context->ptrCommonConfig->ptrChConfig[chIndex].pinCmod1,
-            CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA);
+            CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
 
             Cy_CapSense_SsConfigPinRegisters(
             context->ptrCommonConfig->ptrChConfig[chIndex].portCmod2,
             (uint32_t)context->ptrCommonConfig->ptrChConfig[chIndex].pinCmod2,
-            CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA);
+            CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_AMUXA, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
         }
     #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) */
 
@@ -2766,8 +2798,11 @@ static void Cy_CapSense_BistMeasureCapacitanceSensorRun(
         Cy_MSC_ConfigureScan(ptrMscHwBase, CY_MSC_6_SNS_REGS, &sensorFrame[0u]);
     }
 }
+#endif
 
 
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistGenerateBaseConfig
 ****************************************************************************//**
@@ -2791,8 +2826,8 @@ static void Cy_CapSense_BistGenerateBaseConfig(
                 cy_stc_capsense_context_t * context)
 {
     uint32_t i;
-    MSC_Type * ptrBaseCfg = context->ptrCommonConfig->ptrChConfig[chIndex].ptrHwBase;
-    MSC_MODE_Type * ptrBaseCfgMode;
+    MSCLP_Type * ptrBaseCfg = context->ptrCommonConfig->ptrChConfig[chIndex].ptrHwBase;
+    MSCLP_MODE_Type * ptrBaseCfgMode;
     const cy_stc_capsense_channel_config_t * ptrChConfig = &context->ptrCommonConfig->ptrChConfig[chIndex];
 
     #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
@@ -3189,6 +3224,8 @@ static void Cy_CapSense_BistGenerateSensorConfig(
         }
     #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) */
 }
+#endif
+
 
 #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
 /*******************************************************************************
@@ -3309,6 +3346,11 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
                 uint32_t skipChMask,
                 cy_stc_capsense_context_t * context)
 {
+#if (1u) /* Copied from MSCv3 */
+    (void)skipChMask;
+    (void)context;
+    return CY_CAPSENSE_BIST_BAD_PARAM_E;
+#else
     cy_en_capsense_bist_status_t result = CY_CAPSENSE_BIST_BAD_PARAM_E;
 
     #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
@@ -3347,7 +3389,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
                             if (((0x01uL << ptrPinCfg->chId) & skipChMask) == 0u)
                             {
                                 Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr, (uint32_t)ptrPinCfg->pinNumber,
-                                                                 CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE);
+                                                                 CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
                             }
                             ptrPinCfg++;
                         }
@@ -3361,7 +3403,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
                             if (((0x01uL << ptrPinCfg->chId) & skipChMask) == 0u)
                             {
                                 Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr, (uint32_t)ptrPinCfg->pinNumber,
-                                                                 CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE);
+                                                                 CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
                             }
                             ptrPinCfg++;
                         }
@@ -3378,10 +3420,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
                         {
                             if (((0x01uL << ptrPinCfg->chId) & skipChMask) == 0u)
                             {
-                                Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr,
-                                                                 (uint32_t)ptrPinCfg->pinNumber,
-                                                                 context->ptrBistContext->eltdInactiveDm,
-                                                                 context->ptrBistContext->eltdInactiveHsiom);
+                                Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr, (uint32_t)ptrPinCfg->pinNumber,
+                                        context->ptrBistContext->eltdInactiveDm, context->ptrBistContext->eltdInactiveHsiom,
+                                        CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
                             }
                             ptrPinCfg++;
                         }
@@ -3394,10 +3435,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
                         {
                             if (((0x01uL << ptrPinCfg->chId) & skipChMask) == 0u)
                             {
-                                Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr,
-                                                                 (uint32_t)ptrPinCfg->pinNumber,
-                                                                 context->ptrBistContext->eltdInactiveDm,
-                                                                 context->ptrBistContext->eltdInactiveHsiom);
+                                Cy_CapSense_SsConfigPinRegisters(ptrPinCfg->pcPtr, (uint32_t)ptrPinCfg->pinNumber,
+                                        context->ptrBistContext->eltdInactiveDm, context->ptrBistContext->eltdInactiveHsiom,
+                                        CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
                             }
                             ptrPinCfg++;
                         }
@@ -3416,6 +3456,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
     }
 
     return result;
+#endif
 }
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) &&\
            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN)) */
@@ -3423,6 +3464,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) && \
      (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD))
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistConnectEltd
 ****************************************************************************//**
@@ -3454,7 +3497,7 @@ static void Cy_CapSense_BistConnectEltd(
         for (i = 0u; i < ptrEltdConfig->numPins; i++)
         {
             Cy_CapSense_SsConfigPinRegisters(ptrActivePin->pcPtr, (uint32_t)ptrActivePin->pinNumber,
-                    CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE);
+                    CY_CAPSENSE_DM_GPIO_ANALOG, CY_CAPSENSE_HSIOM_SEL_CSD_SENSE, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
             ptrActivePin++;
         }
     }
@@ -3516,12 +3559,13 @@ static void Cy_CapSense_BistDisconnectEltd(
         for (i = 0u; i < ptrEltdConfig->numPins; i++)
         {
             Cy_CapSense_SsConfigPinRegisters(ptrActivePin->pcPtr, (uint32_t)ptrActivePin->pinNumber,
-                                             desiredDriveMode, desiredHsiom);
+                                             desiredDriveMode, desiredHsiom, CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN);
             Cy_GPIO_Clr(ptrActivePin->pcPtr, (uint32_t)ptrActivePin->pinNumber);
             ptrActivePin++;
         }
     }
 }
+#endif
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) && \
            (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)) */
 
@@ -3555,7 +3599,7 @@ void Cy_CapSense_BistInitialize(cy_stc_capsense_context_t * context)
 
 
 /*******************************************************************************
-* Function Name: Cy_CapSense_BistDsInitialize_V3
+* Function Name: Cy_CapSense_BistDsInitialize_V3Lp
 ****************************************************************************//**
 *
 * This internal function initializes the BIST cy_stc_capsense_bist_context_t
@@ -3576,7 +3620,7 @@ void Cy_CapSense_BistInitialize(cy_stc_capsense_context_t * context)
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 *******************************************************************************/
-void Cy_CapSense_BistDsInitialize_V3(cy_stc_capsense_context_t * context)
+void Cy_CapSense_BistDsInitialize_V3Lp(cy_stc_capsense_context_t * context)
 {
     uint32_t wdIndex;
     uint32_t wdNum = (uint32_t)context->ptrCommonConfig->numWd;
@@ -3685,11 +3729,15 @@ static void Cy_CapSense_BistSwitchHwConfig(
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN)
                 case CY_CAPSENSE_BIST_HW_SHORT_E:
                 {
+#if (1u) /* Copied from MSCv3 */
+    (void)curChIndex;
+#else /* Should be just removed, should be replaced with ANA_CTL */
                     /* Configure all the MSC channels to perform pin integrity tests */
                     for (curChIndex = 0u; curChIndex < CY_CAPSENSE_TOTAL_CH_NUMBER; curChIndex++)
                     {
                         context->ptrCommonConfig->ptrChConfig[curChIndex].ptrHwBase->CSW_CTL = 0x00u;
                     }
+#endif
                     break;
                 }
             #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN) */
@@ -3994,6 +4042,8 @@ static void Cy_CapSense_BistSwitchAllExternalCapPinState(
 
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN)
+#if (1u) /* Copied from MSCv3 */
+#else
 /*******************************************************************************
 * Function Name: Cy_CapSense_BistWatchdogPeriodCalc
 ****************************************************************************//**
@@ -4035,11 +4085,12 @@ static uint32_t Cy_CapSense_BistWatchdogPeriodCalc(
                                                    CY_CAPSENSE_BIST_CAP_MEAS_WDT_CYCLES_PER_LOOP);
     return watchdogPeriod;
 }
+#endif
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN) */
 
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) */
 
-#endif /* (defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_M0S8MSCV3LP)) */
 
 
 /* [] END OF FILE */

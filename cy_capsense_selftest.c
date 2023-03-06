@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -18,9 +18,10 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "cy_capsense_common.h"
 #include "cy_capsense_selftest.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN)
 
@@ -38,21 +39,30 @@
 * all the self-tests or any combination of the masks
 * (defined in testEnMask parameter) to specify the desired test list.
 *
+* This function does not execute two tests: sensor raw count and
+* baseline integrity.
+*
 * To execute a single-element test (i.e. for one widget or one sensor),
 * the following low-level functions are available:
-* for the fourth-generation CAPSENSE&trade;:
-* - Cy_CapSense_CheckCRCWidget()
-* - Cy_CapSense_CheckIntegritySensorPins()
-* - Cy_CapSense_MeasureCapacitanceSensor()
-* - Cy_CapSense_MeasureCapacitanceShield()
-* - Cy_CapSense_MeasureCapacitanceCap()
-* - Cy_CapSense_MeasureVdda()
-* for the fifth-generation CAPSENSE&trade;:
-* - Cy_CapSense_CheckCRCWidget()
-* - Cy_CapSense_CheckIntegritySensorPins()
-* - Cy_CapSense_MeasureCapacitanceSensorElectrode()
-* - Cy_CapSense_MeasureCapacitanceSlotSensors()
-* - Cy_CapSense_MeasureCapacitanceShieldElectrode()
+*
+* For the fourth-generation CAPSENSE&trade;:
+* * Cy_CapSense_CheckCRCWidget()
+* * Cy_CapSense_CheckIntegritySensorRawcount()
+* * Cy_CapSense_CheckIntegritySensorBaseline()
+* * Cy_CapSense_CheckIntegritySensorPins()
+* * Cy_CapSense_MeasureCapacitanceSensor()
+* * Cy_CapSense_MeasureCapacitanceShield()
+* * Cy_CapSense_MeasureCapacitanceCap()
+* * Cy_CapSense_MeasureVdda()
+*
+* For the fifth-generation CAPSENSE&trade;:
+* * Cy_CapSense_CheckCRCWidget()
+* * Cy_CapSense_CheckIntegritySensorRawcount()
+* * Cy_CapSense_CheckIntegritySensorBaseline()
+* * Cy_CapSense_CheckIntegritySensorPins()
+* * Cy_CapSense_MeasureCapacitanceSensorElectrode()
+* * Cy_CapSense_MeasureCapacitanceSlotSensors()
+* * Cy_CapSense_MeasureCapacitanceShieldElectrode()
 *
 * Refer to these functions descriptions for detail information
 * on the corresponding test.
@@ -102,10 +112,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_RunSelfTest_V3(testEnMask, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_RunSelfTest_V2(testEnMask, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_RunSelfTest_V3(testEnMask, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_RunSelfTest_V3Lp(testEnMask, context);
     #endif
 
     return result;
@@ -181,10 +193,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckCRCWidget_V3(widgetId, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_CheckCRCWidget_V2(widgetId, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckCRCWidget_V3(widgetId, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckCRCWidget_V3Lp(widgetId, context);
     #endif
 
     return result;
@@ -224,6 +238,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 * Use this function to verify the uniformity of sensors, for example, at
 * mass-production or during an operation phase together with the
 * Cy_CapSense_CheckIntegritySensorRawcount() function.
+*
+* The function should be called after sensors scanning and processing. Do not
+* call the function before processing since processing changes sensor
+* baselines.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -266,18 +284,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorBaseline_V3(widgetId,
-                                                            sensorId,
-                                                            baselineHighLimit,
-                                                            baselineLowLimit,
-                                                            context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-        result = Cy_CapSense_CheckIntegritySensorBaseline_V2(widgetId,
-                                                            sensorId,
-                                                            baselineHighLimit,
-                                                            baselineLowLimit,
-                                                            context);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V2(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V3(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
     #endif
 
     return result;
@@ -307,6 +322,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 * Use this function to verify the uniformity of sensors, for example, at
 * mass-production or during an operation phase together with the
 * Cy_CapSense_CheckIntegritySensorBaseline() function.
+*
+* The function should be called after sensors scanning and processing. Do not
+* call the function before processing since processing changes sensor
+* raw counts.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -348,18 +367,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorRawcount_V3(widgetId,
-                                                            sensorId,
-                                                            rawcountHighLimit,
-                                                            rawcountLowLimit,
-                                                            context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-        result = Cy_CapSense_CheckIntegritySensorRawcount_V2(widgetId,
-                                                            sensorId,
-                                                            rawcountHighLimit,
-                                                            rawcountLowLimit,
-                                                            context);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V2(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V3(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
     #endif
 
     return result;
@@ -492,10 +508,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorPins_V3(widgetId, sensorId, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_CheckIntegritySensorPins_V2(widgetId, sensorId, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorPins_V3(widgetId, sensorId, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorPins_V3Lp(widgetId, sensorId, context);
     #endif
 
     return result;
@@ -532,11 +550,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins(
 *******************************************************************************/
 void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context)
 {
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-    Cy_CapSense_BistDsInitialize_V3(context);
-#else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-    Cy_CapSense_BistDsInitialize_V2(context);
-#endif
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        Cy_CapSense_BistDsInitialize_V2(context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        Cy_CapSense_BistDsInitialize_V3(context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        Cy_CapSense_BistDsInitialize_V3Lp(context);
+    #else
+        /* Supported platform not found */
+    #endif
 }
 
 

@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -126,7 +126,7 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
 
     /* Copies template of a base config */
     ptrBaseCfg->ctl = ptrTemplateCfg->ctl;
-    if (context->ptrCommonContext->modClk > 1u)
+    if (context->ptrInternalContext->modClk > 1u)
     {
         ptrBaseCfg->ctl &= (~MSC_CTL_CLK_MSC_RATIO_Msk);
     }
@@ -350,8 +350,8 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) */
 
     /* Generating the common configuration for the dithering CapDAC */
-    ptrBaseCfg->ditherCdacCtl = (uint32_t)context->ptrCommonContext->cdacDitherSeed |
-                                ((uint32_t)context->ptrCommonContext->cdacDitherPoly << MSC_DITHER_CDAC_CTL_LFSR_POLY_FL_Pos);
+    ptrBaseCfg->ditherCdacCtl = (uint32_t)context->ptrInternalContext->cdacDitherSeed |
+                                ((uint32_t)context->ptrInternalContext->cdacDitherPoly << MSC_DITHER_CDAC_CTL_LFSR_POLY_FL_Pos);
 
     /* Configures synchronization signals */
 
@@ -382,8 +382,8 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     }
 
     /* Generating the common configuration for the clock dithering */
-    ptrBaseCfg->sensePeriodCtl = ((uint32_t)context->ptrCommonContext->lfsrPoly << MSC_SENSE_PERIOD_CTL_LFSR_POLY_Pos) |
-                                 ((uint32_t)context->ptrCommonContext->lfsrScale << MSC_SENSE_PERIOD_CTL_LFSR_SCALE_Pos);
+    ptrBaseCfg->sensePeriodCtl = ((uint32_t)context->ptrInternalContext->lfsrPoly << MSC_SENSE_PERIOD_CTL_LFSR_POLY_Pos) |
+                                 ((uint32_t)context->ptrInternalContext->lfsrScale << MSC_SENSE_PERIOD_CTL_LFSR_SCALE_Pos);
 
     /* Generating the common configuration for the number of the auto-resampling cycles and the counter behaviour when the
      * RAW_COUNT exceeds 0xFFFF
@@ -433,7 +433,7 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     /* Generating the common configuration for the number of sub-conversions to be run during PRO_DUMMY and PRO_WAIT phases. */
     ptrBaseCfg->initCtl4 &= ~MSC_INIT_CTL4_NUM_PRO_DUMMY_SUB_CONVS_Msk;
     ptrBaseCfg->initCtl4 &= ~MSC_INIT_CTL4_NUM_PRO_WAIT_CYCLES_Msk;
-    ptrBaseCfg->initCtl4 |= (uint32_t)context->ptrCommonContext->numFineInitCycles << MSC_INIT_CTL4_NUM_PRO_DUMMY_SUB_CONVS_Pos;
+    ptrBaseCfg->initCtl4 |= (uint32_t)context->ptrInternalContext->numFineInitCycles << MSC_INIT_CTL4_NUM_PRO_DUMMY_SUB_CONVS_Pos;
     ptrBaseCfg->initCtl4 |= (uint32_t)context->ptrInternalContext->numFineInitWaitCycles << MSC_INIT_CTL4_NUM_PRO_WAIT_CYCLES_Pos;
 
     return capStatus;
@@ -769,7 +769,7 @@ void Cy_CapSense_GenerateAllSensorConfig(
 
                         /* Handles multi-phase TX feature */
                         #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
-                            if (context->ptrWdConfig[wdIndex].mptxOrder >= CY_CAPSENSE_MPTX_MIN_ORDER)
+                            if (context->ptrWdConfig[wdIndex].mpOrder >= CY_CAPSENSE_MPTX_MIN_ORDER)
                             {
                                 /* Multiple TX ELECTRODES */
                                 snsMask = 0u;
@@ -777,23 +777,23 @@ void Cy_CapSense_GenerateAllSensorConfig(
                                 snsFuncState = CY_CAPSENSE_CTRLMUX_PIN_STATE_TX;
                                 snsFuncStateNegative = CY_CAPSENSE_CTRLMUX_PIN_STATE_TX_NEGATIVE;
                                 /* Finds the first sensor number in mptx group */
-                                i = snsIndex - (snsIndex % context->ptrWdConfig[wdIndex].mptxOrder);
+                                i = snsIndex - (snsIndex % context->ptrWdConfig[wdIndex].mpOrder);
                                 /* Finds TX electrode of the first group sensor */
                                 i = context->ptrWdConfig[wdIndex].numCols + (i % context->ptrWdConfig[wdIndex].numRows);
                                 eltdPinCfg = &context->ptrWdConfig[wdIndex].ptrEltdConfig[i];
                                 /* Finding the right vector / pattern for mptx operation */
-                                pattern = context->ptrWdConfig[wdIndex].ptrMptxTable->vector;
-                                i = (snsIndex % context->ptrWdConfig[wdIndex].mptxOrder);
+                                pattern = context->ptrWdConfig[wdIndex].ptrMpTable->vector;
+                                i = (snsIndex % context->ptrWdConfig[wdIndex].mpOrder);
                                 if (0u != i)
                                 {
-                                    pattern = (pattern >> i) | (pattern << (context->ptrWdConfig[wdIndex].mptxOrder - i));
+                                    pattern = (pattern >> i) | (pattern << (context->ptrWdConfig[wdIndex].mpOrder - i));
                                 }
-                                if (CY_CAPSENSE_MPTX_MAX_ORDER > context->ptrWdConfig[wdIndex].mptxOrder)
+                                if (CY_CAPSENSE_MPTX_MAX_ORDER > context->ptrWdConfig[wdIndex].mpOrder)
                                 {
-                                    pattern &= (0x01uL << context->ptrWdConfig[wdIndex].mptxOrder) - 1u;
+                                    pattern &= (0x01uL << context->ptrWdConfig[wdIndex].mpOrder) - 1u;
                                 }
                                 /* Loop through all involved mptx TX electrodes, positive and negative */
-                                for (j = 0u; j < context->ptrWdConfig[wdIndex].mptxOrder; j++)
+                                for (j = 0u; j < context->ptrWdConfig[wdIndex].mpOrder; j++)
                                 {
                                     if ((chId + context->ptrCommonConfig->channelOffset) == eltdPinCfg->chId)
                                     {

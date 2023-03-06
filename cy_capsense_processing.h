@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -64,8 +64,8 @@ void Cy_CapSense_InitializeWidgetStatus(
                 const cy_stc_capsense_context_t * context);
 
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
-        cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED))
+        cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
     #endif
@@ -77,7 +77,7 @@ void Cy_CapSense_InitializeWidgetStatus(
     void Cy_CapSense_PreProcessWidget(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
-    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
         cy_capsense_status_t Cy_CapSense_RunMfsMedian(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
@@ -160,7 +160,8 @@ void Cy_CapSense_DpUpdateThresholds(
                 const cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope,
                 uint32_t startFlag);
 
-#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
+    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
     void Cy_CapSense_RunMfsFiltering(
                     cy_stc_capsense_sensor_context_t * ptrSnsContext,
                     const cy_stc_capsense_context_t * context);

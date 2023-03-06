@@ -19,6 +19,7 @@
 #define CY_CAPSENSE_SENSING_LP_H
 
 #include "cy_syslib.h"
+#include "cy_sysclk.h"
 #include "cy_capsense_common.h"
 #include "cy_capsense_structure.h"
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
@@ -39,32 +40,31 @@ extern "C" {
 /******************************************************************************/
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
+    cy_capsense_status_t Cy_CapSense_ScanLpSlots(
+                    uint32_t startLpSlotId,
+                    uint32_t numberLpSlots,
+                    cy_stc_capsense_context_t * context);
+    cy_capsense_status_t Cy_CapSense_ScanAllLpSlots(
+                    cy_stc_capsense_context_t * context);
+    cy_capsense_status_t Cy_CapSense_ScanAllLpWidgets(
+                    cy_stc_capsense_context_t * context);
+    cy_capsense_status_t Cy_CapSense_ConfigureMsclpWotTimer(
+                    uint32_t wakeupTimer,
+                    cy_stc_capsense_context_t * context);
+#endif /* CY_CAPSENSE_LP_EN */
+
 cy_capsense_status_t Cy_CapSense_ConfigureMsclpTimer(
                 uint32_t wakeupTimer,
                 cy_stc_capsense_context_t * context);
-
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
-cy_capsense_status_t Cy_CapSense_ScanLpSlots(
-                uint32_t startLpSlotId,
-                uint32_t numberLpSlots,
+cy_capsense_status_t Cy_CapSense_IloCompensate(
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_ScanAllLpSlots(
-                cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_ScanAllLpWidgets(
-                cy_stc_capsense_context_t * context);
-#endif /* CY_CAPSENSE_LP_EN */
 /** \} */
 
 
 /******************************************************************************/
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
-cy_capsense_status_t Cy_CapSense_SlotPinState(
-                uint32_t slotId,
-                const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
-                uint32_t pinState,
-                cy_stc_capsense_context_t * context);
-
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
     cy_capsense_status_t Cy_CapSense_LpSlotPinState(
                     uint32_t lpSlotId,
@@ -109,7 +109,8 @@ cy_capsense_status_t Cy_CapSense_ScanAllWidgets_V3Lp(
 void Cy_CapSense_InterruptHandler_V3Lp(
                 const MSCLP_Type * base,
                 cy_stc_capsense_context_t * context);
-
+cy_capsense_status_t Cy_CapSense_RepeatScan(
+                cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetBusyFlags(cy_stc_capsense_context_t * context);
 void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_SsInitialize(
@@ -146,6 +147,11 @@ void Cy_CapSense_SsConfigPinRegisters(
                 uint32_t dm,
                 en_hsiom_sel_t hsiom,
                 uint32_t mscCtrl);
+cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
+                uint32_t slotId,
+                const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
+                uint32_t pinState,
+                cy_stc_capsense_context_t * context);
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
@@ -198,10 +204,15 @@ cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(
                 const cy_stc_capsense_context_t * context);
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
-cy_capsense_status_t Cy_CapSense_SsAutoTune(
-                cy_stc_capsense_context_t * context);
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_LP_HW_EN))
+    cy_capsense_status_t Cy_CapSense_SsAutoTune(
+                    cy_stc_capsense_context_t * context);
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN)
+        uint32_t Cy_CapSense_SsSquareRoot16(uint16_t value);
+    #endif
 #endif
+
 cy_capsense_mw_state_t Cy_CapSense_MwState_V3Lp(
                 const cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
@@ -210,14 +221,37 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN)
     uint32_t Cy_CapSense_GetCIC2SamplesMax(uint32_t cic2Rate);
     uint32_t Cy_CapSense_GetCIC2HwDivider(uint32_t cic2Samples);
+    uint32_t Cy_CapSense_GetCIC2HwShift(uint32_t cic2Samples);
+    #if ((CY_CAPSENSE_ARCHES_SI_B0) && (CY_CAPSENSE_CIC2_FILTER_AUTO_EN))
+        cy_capsense_status_t Cy_CapSense_InitializeCic2Shift(
+                        cy_stc_capsense_context_t * context);
+    #endif
 #endif /* #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN) */
+
+void Cy_CapSense_SetupCpuOperatingMode(cy_stc_capsense_context_t * context);
+void Cy_CapSense_StartCpuScan(const uint32_t * scanConfig, cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_WaitEndOfCpuScan(uint32_t watchdogTime, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
+                uint16_t * ptrMaxRaw,
+                uint32_t widgetId,
+                uint32_t scanSlotId,
+                uint32_t mode,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_ConfigureSaturationMode(
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_GetScanWatchdogTime(
+                uint32_t widgetId,
+                uint32_t scanSlotId,
+                cy_stc_capsense_context_t * context);
+
+
 /** \} \endcond */
 
 
 /*******************************************************************************
 * Local definition
 *******************************************************************************/
-
+#if (CY_CAPSENSE_ARCHES_SI_A0)
 #define CY_CAPSENSE_MSCLP_INTR_ALL_MSK                          (MSCLP_INTR_MASK_SUB_SAMPLE_Msk |\
                                                                  MSCLP_INTR_MASK_SAMPLE_Msk |\
                                                                  MSCLP_INTR_MASK_SCAN_Msk |\
@@ -227,6 +261,16 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
                                                                  MSCLP_INTR_MASK_CONFIG_REQ_Msk |\
                                                                  MSCLP_INTR_MASK_FIFO_UNDERFLOW_Msk |\
                                                                  MSCLP_INTR_MASK_FIFO_OVERFLOW_Msk)
+#else
+#define CY_CAPSENSE_MSCLP_INTR_ALL_MSK                          (MSCLP_INTR_MASK_SUB_SAMPLE_Msk |\
+                                                                 MSCLP_INTR_MASK_SAMPLE_Msk |\
+                                                                 MSCLP_INTR_MASK_SCAN_Msk |\
+                                                                 MSCLP_INTR_MASK_INIT_Msk |\
+                                                                 MSCLP_INTR_MASK_FRAME_Msk |\
+                                                                 MSCLP_INTR_MASK_CONFIG_REQ_Msk |\
+                                                                 MSCLP_INTR_MASK_FIFO_UNDERFLOW_Msk |\
+                                                                 MSCLP_INTR_MASK_FIFO_OVERFLOW_Msk)
+#endif
 
 #define CY_CAPSENSE_MSCLP_INTR_LP_ALL_MSK                       (MSCLP_INTR_LP_SIG_DET_Msk |\
                                                                  MSCLP_INTR_LP_FR_TIMEOUT_Msk |\
@@ -238,15 +282,21 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 #define CY_CAPSENSE_FW_SHIELD_PASSIVE_AMUX_REG_SW_CSD_SHIELD_VALUE   (0x00000050uL)
 #define CY_CAPSENSE_FW_NEGATIVE_TX_AMUX_REG_SW_CSD_SHIELD_VALUE      (0x00000060uL)
 
-#define CY_CAPSENSE_CALIBRATION_TIMEOUT                         (1000000uL)
+#define CY_CAPSENSE_MULTIPLIER_CALIBR_WDT_FACTOR                (5u)
 #define CY_CAPSENSE_MAX_CH_NUM                                  (4u)
 #define CY_CAPSENSE_CDAC_MAX_CODE                               (0xFFu)
+#define CY_CAPSENSE_CAL_REF_CDAC_MIN_CODE                       (0x7u)
 #define CY_CAPSENSE_CAL_MIDDLE_VALUE                            (0x80u)
+#define CY_CAPSENSE_CAL_FINE_MIDDLE_VALUE                       (0x10u)
+#define CY_CAPSENSE_REF_CDAC_LSB_X100                           (0x886u)
+#define CY_CAPSENSE_FINE_CDAC_LSB_X100                          (0x270u)
 
 #define CY_CAPSENSE_CAL_MODE_REF_CDAC_SUC_APPR                  (0u)
 #define CY_CAPSENSE_CAL_MODE_COMP_CDAC_SUC_APPR                 (2u)
-#define CY_CAPSENSE_CAL_MODE_COMP_CDAC_MAX_CODE                 (3u)
+#define CY_CAPSENSE_CAL_MODE_FINE_CDAC_SUC_APPR                 (3u)
 
+#if (1u) /* Copied from MSCv3 */
+#else
 #define CY_CAPSENSE_CMOD_AMUX_MSK                               (MSC_SW_SEL_GPIO_SW_CSD_SENSE_Msk |\
                                                                  MSC_SW_SEL_GPIO_SW_CSD_MUTUAL_Msk |\
                                                                  MSC_SW_SEL_GPIO_SW_CSD_POLARITY_Msk |\
@@ -260,9 +310,11 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 
 #define CY_CAPSENSE_FW_CMOD_AMUX_CSX_REG_SW_SEL_GPIO_VALUE      ((2uL << MSC_SW_SEL_GPIO_SW_CSD_SENSE_Pos) |\
                                                                  (1uL << MSC_SW_SEL_GPIO_SW_CSD_MUTUAL_Pos))
-
+#endif
 #define CY_CAPSENSE_MRSS_TURN_ON                                (0u)
 #define CY_CAPSENSE_MRSS_TURN_OFF                               (1u)
+#define CY_CAPSENSE_MRSS_IMO_TURN_ON                            (2u)
+#define CY_CAPSENSE_MRSS_IMO_TURN_OFF                           (3u)
 
 #define CY_CAPSENSE_LFSR_RANGE_0_DITHER_MAX                     (2u)
 #define CY_CAPSENSE_LFSR_RANGE_1_DITHER_MAX                     (4u)
@@ -276,17 +328,11 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 #define CY_CAPSENSE_2PH_DIRECT_SNS_CLOCK_DIVIDER_MIN            (4u)
 #define CY_CAPSENSE_4PH_DIRECT_SNS_CLOCK_DIVIDER_MIN            (8u)
 
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB            (8u)
+#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB            (64u)
 #define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK         (256u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB_RANGE2     (64u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK_RANGE2  (32u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_REF_CDAC        (10u)
+#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_REF_CDAC        (100u)
+#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_WDT             (1000000u)
 #define CY_CAPSENSE_SMARTSENSE_WD_MAX_NUMBER                    (64u)
-#define CY_CAPSENSE_SMARTSENSE_PRO_EPI_CYCLE_NUMBER             (119u)
-#define CY_CAPSENSE_SMARTSENSE_ROUND_UP_2_BITS_MASK             (0x03u)
-#define CY_CAPSENSE_SMARTSENSE_MAX_KREF_VAL                     (2048u)
-#define CY_CAPSENSE_SMARTSENSE_SCALING_DECI_VAL                 (10u)
-#define CY_CAPSENSE_SMARTSENSE_CORRECTION                       (8u)
 
 #define CY_CAPSENSE_MAX_EPI_KREF_DELAY_PRS_NUMBER               (255u)
 #define CY_CAPSENSE_MAX_PRO_WAIT_KREF_DELAY_PRS_NUMBER          (31u)
@@ -303,17 +349,22 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 
 #define CY_CAPSENSE_SLOT_COUNT_MAX_VALUE                        (0xFFFFu)
 
-/* Max number of Low Power sensor raw history to be stored in IP RAM */
+/* Max number of Low Power sensor historical raw counts to be stored in IP RAM */
 #define CY_CAPSENSE_FIFO_SNS_RAW_HISTORY_NUM                    (21uL)
-/* Max number of Active sensor configurations to be stored in IP RAM */
-#define CY_CAPSENSE_FIFO_SNS_NUM                                (MSCLP_SNS_SRAM_WORD_SIZE / (CY_MSCLP_6_SNS_REGS + 1u))
-/* Max number of Low Power sensor configurations to be stored in IP RAM */
+/* Max number of Low Power sensors */
 #define CY_CAPSENSE_FIFO_SNS_LP_MAX_NUM                         (8u)
 /* Max number of Active sensor configurations to be stored in IP RAM */
 #define CY_CAPSENSE_FIFO_SNS_MAX_NUM                            (MSCLP_SNS_SRAM_WORD_SIZE / (CY_MSCLP_6_SNS_REGS + 1u))
 /* The wakeup timer maximum value for ACTIVE scan mode in milliseconds */
 #define CY_CAPSENSE_MAX_WAKEUP_TIMER_MS                         (2000u)
 
+/* CAPSENSE ILO compensation constants */
+#define CY_CAPSENSE_1M_DIVIDER                                  (1000000uL)
+#define CY_CAPSENSE_ILO_COMPENSATE_SHIFT                        (14u)
+
+/* The default compensation factor for nominal ILO frequency (40KHz) */
+#define CY_CAPSENSE_DEFAULT_ILO_FACTOR                          ((CY_SYSCLK_ILO_FREQ << CY_CAPSENSE_ILO_COMPENSATE_SHIFT) /\
+                                                                 CY_CAPSENSE_1M_DIVIDER)
 
 /*******************************************************************************
 * HSIOM and PC Macros redefinition platform dependent and for readability
@@ -432,40 +483,76 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
 
 #define CY_CAPSENSE_CSD_CDAC_COMP_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN))
-#define CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_USAGE) &&\
+#define CY_CAPSENSE_CSD_CDAC_COMP_AUTO_USAGE        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN))
+#define CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_USAGE    (CY_CAPSENSE_CSD_CDAC_COMP_USAGE &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_EN))
-#define CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) &&\
+#define CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN))
+#define CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_CSD_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN))
 
 #define CY_CAPSENSE_CSX_CDAC_COMP_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN))
-#define CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_USAGE) &&\
+#define CY_CAPSENSE_CSX_CDAC_COMP_AUTO_USAGE        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN))
+#define CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_CSX_CDAC_COMP_USAGE) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_EN))
-#define CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) &&\
+#define CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
+#define CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_CSX_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN))
 
 #define CY_CAPSENSE_ISX_CDAC_COMP_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN))
-#define CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_USAGE) &&\
+#define CY_CAPSENSE_ISX_CDAC_COMP_AUTO_USAGE        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN))
+#define CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_ISX_CDAC_COMP_USAGE) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_EN))
-#define CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) &&\
+#define CY_CAPSENSE_ISX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN))
+#define CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_ISX_CDAC_CALIBRATION_USAGE &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_ISX_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN))
 
-#define CY_CAPSENSE_CDAC_COMP_USAGE                 ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_USAGE))
-#define CY_CAPSENSE_CDAC_COMP_DIV_AUTO_USAGE        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_USAGE))
-#define CY_CAPSENSE_CDAC_REF_AUTO_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE) ||\
-                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE))
+#define CY_CAPSENSE_CDAC_COMP_USAGE                 ((CY_CAPSENSE_CSD_CDAC_COMP_USAGE) ||\
+                                                     (CY_CAPSENSE_CSX_CDAC_COMP_USAGE) ||\
+                                                     (CY_CAPSENSE_ISX_CDAC_COMP_USAGE))
+#define CY_CAPSENSE_CDAC_COMP_AUTO_USAGE            ((CY_CAPSENSE_CSD_CDAC_COMP_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_CSX_CDAC_COMP_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_ISX_CDAC_COMP_AUTO_USAGE))
+#define CY_CAPSENSE_CDAC_COMP_DIV_AUTO_USAGE        ((CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_USAGE))
+#define CY_CAPSENSE_CDAC_REF_AUTO_USAGE             ((CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE) ||\
+                                                     (CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE))
+#define CY_CAPSENSE_CDAC_FINE_USAGE                 ((CY_CAPSENSE_CSD_CDAC_FINE_USAGE) ||\
+                                                     (CY_CAPSENSE_CSX_CDAC_FINE_USAGE) ||\
+                                                     (CY_CAPSENSE_ISX_CDAC_FINE_USAGE))
+
+/* CAPSENSE IMO clock values in MHz */
+#define CY_CAPSENSE_IMO_CLK_25_MHZ                  (25u)
+#define CY_CAPSENSE_IMO_CLK_38_MHZ                  (38u)
+#define CY_CAPSENSE_IMO_CLK_46_MHZ                  (46u)
+
+#define CY_CAPSENSE_CPU_CLK_MHZ                     (CY_CAPSENSE_CPU_CLK / CY_CAPSENSE_CONVERSION_MEGA)
+
+/* Used for the Cy_CapSense_ExecuteSaturatedScan() function to obtain the MAX raw count. */
+#define CY_CAPSENSE_SATURATED_MAX_COUNT             (0u)
+/* Used for the Cy_CapSense_ExecuteSaturatedScan() function to obtain the scan duration. */
+#define CY_CAPSENSE_SATURATED_SCAN_TIME             (1u)
 
 
 #if defined(__cplusplus)

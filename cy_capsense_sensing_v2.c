@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -2014,7 +2014,6 @@ cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
     #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
         (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
         uint32_t maxCpSnsId = 0u;
-        uint32_t maxCpRowSnsId = 0u;
     #endif
 
     /* Store sense clock source to be restored at the end of function */
@@ -2067,34 +2066,31 @@ cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
     /* Find raw count and IDAC of a sensor with maximum Cp */
     ptrSnsCtx = ptrWdCfg->ptrSnsContext;
 
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
-        for (snsIndex = 0u; snsIndex < ptrWdCfg->numCols; snsIndex++)
-        {
-            if (maxIdacComp < ptrSnsCtx->idacComp)
+    for (snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+    {
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
+            if ((maxIdacComp < ptrSnsCtx->idacComp) ||
+                ((maxIdacComp == ptrSnsCtx->idacComp) && (maxRaw < ptrSnsCtx->raw)))
             {
-                #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
-                    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
-                    maxCpSnsId = snsIndex;
-                #endif
                 maxIdacComp = ptrSnsCtx->idacComp;
                 maxRaw = ptrSnsCtx->raw;
-            }
-            ptrSnsCtx++;
-        }
-    #else
-        for (snsIndex = 0u; snsIndex < ptrWdCfg->numCols; snsIndex++)
-        {
-            if (maxRaw < ptrSnsCtx->raw)
-            {
                 #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
-                    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+                     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
                     maxCpSnsId = snsIndex;
                 #endif
-                maxRaw = ptrSnsCtx->raw;
             }
-            ptrSnsCtx++;
-        }
-    #endif
+        #else
+            if (maxRaw < ptrSnsCtx->raw)
+            {
+                maxRaw = ptrSnsCtx->raw;
+                #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
+                     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+                    maxCpSnsId = snsIndex;
+                #endif
+            }
+        #endif
+        ptrSnsCtx++;
+    }
 
     /* Update auto-tuning configuration structure */
     autoTuneConfig.iDacMod = ptrWdCxt->idacMod[CY_CAPSENSE_MFS_CH0_INDEX];
@@ -2113,63 +2109,6 @@ cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
     {
         ptrWdCxt->snsClk = (uint16_t)minSnsClkDiv;
     }
-
-    #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
-        (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
-        if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType) ||
-            ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
-        {
-            /* Find a sensor with maximum Cp */
-            maxRaw = 0u;
-            maxIdacComp = 0u;
-
-            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_IDAC_COMP_EN)
-                for (snsIndex = 0u; snsIndex < ptrWdCfg->numCols; snsIndex++)
-                {
-                    if (maxIdacComp < ptrSnsCtx->idacComp)
-                    {
-                        maxCpRowSnsId = snsIndex;
-                        maxIdacComp = ptrSnsCtx->idacComp;
-                        maxRaw = ptrSnsCtx->raw;
-                    }
-                    ptrSnsCtx++;
-                }
-            #else
-                for (snsIndex = 0u; snsIndex < ptrWdCfg->numCols; snsIndex++)
-                {
-                    if (maxRaw < ptrSnsCtx->raw)
-                    {
-                        maxCpRowSnsId = snsIndex;
-                        maxRaw = ptrSnsCtx->raw;
-                    }
-                    ptrSnsCtx++;
-                }
-            #endif
-
-            /* Configure auto-tuning configuration structure */
-            autoTuneConfig.iDacMod = ptrWdCxt->rowIdacMod[CY_CAPSENSE_MFS_CH0_INDEX];
-            autoTuneConfig.iDacComp = (uint8_t)maxIdacComp;
-            autoTuneConfig.ptrSenseClk = &ptrWdCxt->rowSnsClk;
-            autoTuneConfig.calTarget = (uint16_t)((maxRaw * CY_CAPSENSE_CSD_AUTOTUNE_CAL_UNITS) /
-                    ((uint32_t)(0x01uL << CY_CAPSENSE_AUTOTUNE_CALIBRATION_RESOLUTION) - 1u));
-
-            /* Find correct sense clock value */
-            maxCp = Cy_CapSense_TunePrescalers_Lib(&autoTuneConfig);
-            /* Save maximum sensor Cp and corresponding sensor Id */
-            if (autoTuneConfig.sensorCap < maxCp)
-            {
-                autoTuneConfig.sensorCap = maxCp;
-                maxCpSnsId = maxCpRowSnsId;
-            }
-
-            /* Increase sensor clock divider to valid value */
-            if (((uint32_t)ptrWdCxt->rowSnsClk) < minSnsClkDiv)
-            {
-                ptrWdCxt->rowSnsClk = (uint16_t)minSnsClkDiv;
-            }
-        }
-    #endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||
-               (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)) */
 
     /* Check tuning results */
     if (CY_CAPSENSE_AUTOTUNE_CP_MAX < maxCp)
@@ -2190,17 +2129,15 @@ cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
 
     autoTuneConfig.iDacGain = context->ptrCommonConfig->idacGainTable[ptrWdCxt->idacGainIndex].gainValue;
     autoTuneConfig.iDacMod = ptrWdCxt->idacMod[CY_CAPSENSE_MFS_CH0_INDEX];
-    autoTuneConfig.ptrSenseClk = &ptrWdCxt->snsClk;
 
     #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
-        (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+         (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
         if (((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType) ||
             ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
         {
             if (maxCpSnsId >= ptrWdCfg->numCols)
             {
                 autoTuneConfig.iDacMod = ptrWdCxt->rowIdacMod[CY_CAPSENSE_MFS_CH0_INDEX];
-                autoTuneConfig.ptrSenseClk = &ptrWdCxt->rowSnsClk;
             }
         }
     #endif

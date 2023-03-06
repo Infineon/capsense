@@ -4,6 +4,7 @@ var searchData=
   ['ofdccontext',['ofdcContext',['../structcy__stc__capsense__gesture__context__t.html#a41504e9edd68b6aab487492c95b6a059',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofescontext',['ofesContext',['../structcy__stc__capsense__gesture__context__t.html#a34feed1bf649ef82f09da51745d0514e',1,'cy_stc_capsense_gesture_context_t']]],
   ['offlcontext',['offlContext',['../structcy__stc__capsense__gesture__context__t.html#a7a6f0b99bddc8e18cfea0fedb39e00b8',1,'cy_stc_capsense_gesture_context_t']]],
+  ['oflpcontext',['oflpContext',['../structcy__stc__capsense__gesture__context__t.html#ac5433980bc8aff63ef8de3e2c69136f5',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofrtcontext',['ofrtContext',['../structcy__stc__capsense__gesture__context__t.html#a48dfae93de6b33ba60cdd10f8292e590',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofsccontext',['ofscContext',['../structcy__stc__capsense__gesture__context__t.html#a72755d5985247fd60078900d1482ddfc',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofslcontext',['ofslContext',['../structcy__stc__capsense__gesture__context__t.html#a7f7257503a55d3790ab222a6ac280a85',1,'cy_stc_capsense_gesture_context_t']]],

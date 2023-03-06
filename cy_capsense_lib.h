@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -147,7 +147,7 @@ typedef struct
     uint32_t sensorCap;                             /**< Sensor parasitic capacitance in fF 10^-15 */
     uint32_t iDacGain;                              /**< IDAC gain in pA */
     uint16_t * ptrSenseClk;                         /**< Pointer to SnsClk divider */
-    uint16_t * sigPFC;                              /**< Pointer to sigPFC value (Signal Per Finger Capacitance) */
+    uint16_t * sigPFC;                              /**< Pointer to sigPFC value (75% of Signal Per Finger Capacitance) */
     uint16_t snsClkConstantR;                       /**< Resistance in series to a sensor */
     uint16_t vRef;                                  /**< Vref in mVolts  */
     uint16_t fingerCap;                             /**< Finger capacitance in fF 10^-15 (Set in Basic tab in pF 10^-12) */
@@ -169,8 +169,8 @@ typedef struct
     uint16_t kRef0;                                 /**< Base sense frequency */
     uint16_t kRef1;                                 /**< Final sense frequency */
     uint16_t fingerCap;                             /**< Finger capacitance in fF 10^-15 (Set in Basic tab in pF 10^-12) */
-    uint16_t sigPFC;                                /**< sigPFC value (Signal Per Finger Capacitance) */
-    uint8_t refCdac;                                /**< Reference CAP DAC code */
+    uint16_t sigPFC;                                /**< sigPFC value (75% of signal Per Finger Capacitance) */
+    uint8_t refCdac;                                /**< Reference CAP DAC code for getting capacitance and calibration target for getting Nsub */
     uint8_t correctionCoeff;                        /**< Correction coefficient for CTRL_MUX mode */
 } cy_stc_capsense_hw_smartsense_config_t;
 
@@ -290,12 +290,9 @@ void Cy_CapSense_AdaptiveFilterInitialize_Lib(
 *
 * This function runs the Adaptive Filter algorithm for the centroid position.
 *
-* Equation: result = ((k * curPos) + ((divisor-k) * prevPos)) / divisor
-* where k is adaptive coefficient.
-*
 * The function supposes that the filter history is updated at first touch
 * outside of the library. I.e. at the first touchdown the filter history has
-* be initialized by touch positions before calling this function.
+* to be initialized by touch positions before calling this function.
 *
 * \param config
 * The pointer to the configuration structure of the Adaptive Filter.
@@ -443,15 +440,6 @@ uint32_t Cy_CapSense_AlpGetAverage_Lib(
 *
 * This internal function tunes the Sense Clock divider.
 *
-* Found IDAC code in Single IDAC mode is used to calculate the optimal SnsClk.
-* The SnsClk divider is set to meet the requirement that the widget 
-* clock period should be greater than or equal to:
-* Period > 2*5*R*Cp,
-* where:
-* * Cp is the maximum sensor parasitic capacitance within the widget.
-* * R is the user input value in the expression view of the customizer for a 
-*   series resistor.
-*
 * \param config
 * The configuration structure.
 *
@@ -467,17 +455,6 @@ uint32_t Cy_CapSense_TunePrescalers_Lib(
 ****************************************************************************//**
 *
 * Configure scanning resolution to achieve the sufficient sensitivity.
-*
-* The function searches the lowest possible resolution that produces signal 
-* greater than 50 counts (Difference Counts) for user defined finger capacitance.
-* In addition, function calculates 75%-value of the achieved signal, that becomes 
-* candidate to finger threshold.
-*  
-* Used equation to calculate signal at resolution 16-bit:
-* sigPFCmax = (2^16-1) * vRef * snsClk * fingerCap / idacCurrent
-*
-* sigPFCmax contains absolute number of difference counts that user receives as 
-* result of sensor scanning at corresponding resolution.
 *
 * This function requires non-zero Modulator IDAC code (if IDAC is equal to zero it 
 * is considered as non-valid use case).
@@ -498,9 +475,6 @@ uint8_t Cy_CapSense_TuneSensitivity_Lib(
 *
 * Returns capacitance that corresponds to the provided parameters.
 *
-* Calculates sensor capacitance as follows:
-*     Cp = Raw * RefCDAC / Nsub0
-*
 * \param autoTuneConfig
 * The configuration structure.
 *
@@ -517,9 +491,6 @@ uint32_t Cy_CapSense_GetSmartSenseCapacitance(
 *
 * Returns minimum sense clock divider.
 *
-* Calculates minimal sense clock divider as follows:
-*     Kref = 4 * 5tau * Fmod * R * Cp
-*
 * \param autoTuneConfig
 * The configuration structure.
 *
@@ -535,9 +506,6 @@ uint32_t Cy_CapSense_GetSmartSenseFrequencyDivider(
 ****************************************************************************//**
 *
 * Returns optimum number of sub-conversions.
-*
-* Calculates number of sub-conversions as follows:
-*     Nsub = RoundUp(minRaw * RefCDAC * kRef0 /(sigPFC * kRef1)
 *
 * \param autoTuneConfig
 * The configuration structure.

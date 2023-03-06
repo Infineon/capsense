@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -226,6 +226,20 @@ extern "C" {
 #define CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK           (0x10u)
 /** \} */
 
+
+#if !defined(CY_CAPSENSE_ARCHES_SI_A0)
+    /* These macros temporary represents Arches tapeout version.
+     * If decision to support only B0 is made, then everything A0 related
+     * should be removed.
+     * For now, to implement version-dependent stuff these macros should be used.
+     */
+    #define CY_CAPSENSE_ARCHES_SI_A0                    (CY_CAPSENSE_DISABLE)
+    #define CY_CAPSENSE_ARCHES_SI_B0                    (CY_CAPSENSE_ENABLE)
+#else
+    #define CY_CAPSENSE_ARCHES_SI_B0                    (CY_CAPSENSE_DISABLE)
+#endif
+
+
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_mw_state *//** \{ */
 /******************************************************************************/
@@ -310,6 +324,8 @@ extern "C" {
 #define CY_CAPSENSE_BIST_SHIELD_GROUP                   (6u)
 /** ISX sensing group */
 #define CY_CAPSENSE_ISX_GROUP                           (10u)
+/** MPSC-D sensing group */
+#define CY_CAPSENSE_MPSC_GROUP                          (11u)
 
 /** Total number of mode templates */
 #define CY_CAPSENSE_REG_MODE_NUMBER                     (6u)
@@ -363,8 +379,15 @@ extern "C" {
 #define CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD            (9u)
 /** Pin function is CSX VDDA/2 connection */
 #define CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2             (10u)
+/** Pin function is MPSC CSP connection */
+#define CY_CAPSENSE_PIN_STATE_IDX_MPSC_CSP              (11u)
+/** Pin function is MPSC CSN connection */
+#define CY_CAPSENSE_PIN_STATE_IDX_MPSC_CSN              (12u)
+/** Pin function is MPSC CSZ connection */
+#define CY_CAPSENSE_PIN_STATE_IDX_MPSC_CSZ              (13u)
+
 /** Number of CTRLMUX Pin States for LP */
-#define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (11u)
+#define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (14u)
 
 #else /* All the rest platforms */
 
@@ -438,6 +461,12 @@ extern "C" {
 /** Shield tank capacitor pre-charge from IO buffer */
 #define CY_CAPSENSE_CSH_PRECHARGE_IO_BUF                (1u)
 #endif
+
+/** Auto-mode of CIC2 Shift mask */
+#define CY_CAPSENSE_CIC_AUTO_MASK                       (0x80u)
+/** CIC2 Shift field position in register */
+#define CY_CAPSENSE_CIC_FIELD_POSITION                  (28u)
+
 
 /* Sense clock selection options */
 /** Auto-mode of clock source selection mask */
@@ -733,6 +762,14 @@ extern "C" {
 #define CY_CAPSENSE_MPTX_MIN_ORDER                      (4u)
 /** Multi-phase TX max order */
 #define CY_CAPSENSE_MPTX_MAX_ORDER                      (32u)
+
+/** Multi-phase Self-Cap min order */
+#define CY_CAPSENSE_MPSC_MIN_ORDER                      (5u)
+/** Multi-phase Self-Cap max order */
+#define CY_CAPSENSE_MPSC_MAX_ORDER                      (32u)
+
+/** Multi-phase max order */
+#define CY_CAPSENSE_MULTIPHASE_MAX_ORDER                (32u)
 /** \} */
 
 /******************************************************************************/
@@ -751,17 +788,39 @@ extern "C" {
 /** Configuring of pin as a CSX Rx electrode */
 #define CY_CAPSENSE_RX_PIN                              (5u)
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-/** Configuring of pin as a negative Tx
- * \note This macro is available only for the fifth-generation CAPSENSE&trade;.
- */
-#define CY_CAPSENSE_NEGATIVE_TX_PIN                     (6u)
-#endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+    /** Configuring of pin as a negative Tx
+     * \note This macro is available only for the fifth-generation CAPSENSE&trade; and  the fifth-generation low power
+     * CAPSENSE&trade;
+     */
+    #define CY_CAPSENSE_NEGATIVE_TX_PIN                     (6u)
+    /** Configuring of pin as an ISX Lx
+     * \note This macro is available only for the fifth-generation CAPSENSE&trade; and  the fifth-generation low power
+     * CAPSENSE&trade;
+     */
+    #define CY_CAPSENSE_ISX_LX_PIN                          (7u)
+    /** Configuring of pin as an ISX Rx
+     * \note This macro is available only for the fifth-generation CAPSENSE&trade; and  the fifth-generation low power
+     * CAPSENSE&trade;
+     */
+    #define CY_CAPSENSE_ISX_RX_PIN                          (8u)
+    /** Configuring of pin as an ISX Rx
+     * \note This macro is available only for the fifth-generation CAPSENSE&trade; and  the fifth-generation low power
+     * CAPSENSE&trade;
+     */
+    #define CY_CAPSENSE_VDDA2                               (9u)
+#endif /* ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) */
 
 /** Pin is not connected to scanning bus */
 #define CY_CAPSENSE_SNS_DISCONNECTED                    (0u)
 /** Pin is connected to scanning bus */
 #define CY_CAPSENSE_SNS_CONNECTED                       (1u)
+
+/** Defines pin state as not controlled by / disconnected from MSCLP HW block */
+#define CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_DIS              (0u)
+/** Defines pin state as controlled by / connected to MSCLP HW block */
+#define CY_CAPSENSE_MSCLP_GPIO_MSC_ANA_EN               (1u)
+
 /** \} */
 
 /******************************************************************************/
@@ -774,11 +833,25 @@ extern "C" {
 /** Defines the status if restart was done in Cy_CapSense_RunTuner() */
 #define CY_CAPSENSE_STATUS_RESTART_DONE                 (0x01u)
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
-/** Number of supported idac gains */
-#define CY_CAPSENSE_IDAC_GAIN_NUMBER                    (6u)
+    /** The size of the idac gain look-up table */
+    #define CY_CAPSENSE_IDAC_GAIN_TABLE_SIZE            (7u)
+
+    #if (CY_CAPSENSE_PLATFORM_DEVICE_PSOC4)
+        #if (2u <= CY_IP_M0S8CSDV2_VERSION)
+            /** Defines the number of supported idac gains for the CSDv2_ver2-based devices */
+            #define CY_CAPSENSE_IDAC_GAIN_NUMBER        (7u)
+        #else
+            /** Defines the number of supported idac gains for the CSDv2_ver1-based devices */
+            #define CY_CAPSENSE_IDAC_GAIN_NUMBER        (6u)
+        #endif
+    #else
+        #define CY_CAPSENSE_IDAC_GAIN_NUMBER            (6u)
+    #endif
 #endif
 /** 100% value */
 #define CY_CAPSENSE_PERCENTAGE_100                      (100u)
+/** An approximate duration in CPU cycles of the check loop with the software watchdog timer */
+#define CY_CAPSENSE_APPROX_LOOP_DURATION                (5u)
 
 /* Scope of scanning macros */
 /** Widget scanning scope is a single sensor */
@@ -801,7 +874,13 @@ extern "C" {
 #define CY_CAPSENSE_HW_CONFIG_REGULAR_SCANNING          (2u)
 /** CAPSENSE&trade; related HW is configured to execute the BIST functions */
 #define CY_CAPSENSE_HW_CONFIG_BIST_FUNCTIONALITY        (3u)
+/** CAPSENSE&trade; related HW is configured to the MPSC scanning */
+#define CY_CAPSENSE_HW_CONFIG_MPSC_SCANNING             (4u)
+/** CAPSENSE&trade; related HW is configured to execute a scan with the saturated channel */
+#define CY_CAPSENSE_HW_CONFIG_CHANNEL_SATURATION        (5u)
 
+/** Maximum Decimation Rate */
+#define CY_CAPSENSE_MAX_DECIMATION_RATE                 (255u)
 /** \} */
 
 
@@ -917,6 +996,10 @@ extern "C" {
 *   leads to the overflow in the CIC2 accumulation register.
 */
 #define CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW            (0x2000u)
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unable to perform a scan when MPSC sensors and
+*   other sense method sensors are located in the same frame
+*/
+#define CY_CAPSENSE_STATUS_MIXED_SENSORS                (0x4000u)
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unknown */
 #define CY_CAPSENSE_STATUS_UNKNOWN                      (0x80000000u)
 
@@ -938,9 +1021,29 @@ extern "C" {
 #define CY_CAPSENSE_MODE_CPU                            (0x0u) /* The regular (interrupt-driven) CPU mode */
 #define CY_CAPSENSE_MODE_AS_MS                          (0x2u) /* The Autonomous-Scan Multi-Sensor Mode */
 #define CY_CAPSENSE_MODE_LP_AOS                         (0x3u) /* The Low Power Always-On-Scanning Mode */
+
+/* These definitions on CDAC_ FINE below should be removed once Configurator support achieved */
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+    #if !defined(CY_CAPSENSE_CSD_CDAC_FINE_EN)
+        #define CY_CAPSENSE_CSD_CDAC_FINE_EN              (CY_CAPSENSE_ENABLE)
+    #endif
+#endif
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+    #if !defined(CY_CAPSENSE_CSX_CDAC_FINE_EN)
+        #define CY_CAPSENSE_CSX_CDAC_FINE_EN              (CY_CAPSENSE_ENABLE)
+    #endif
+#endif
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+    #if !defined(CY_CAPSENSE_ISX_CDAC_FINE_EN)
+        #define CY_CAPSENSE_ISX_CDAC_FINE_EN              (CY_CAPSENSE_DISABLE)
+    #endif
+#endif
+
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
-#define CY_CAPSENSE_BYTES_IN_16_BITS                    (2u)
+#define CY_CAPSENSE_BYTES_IN_16_BITS                    (2uL)
 #define CY_CAPSENSE_BYTE_IN_32_BIT                      (4uL)
 #define CY_CAPSENSE_CONVERSION_MEGA                     (1000000u)
 #define CY_CAPSENSE_CONVERSION_KILO                     (1000u)

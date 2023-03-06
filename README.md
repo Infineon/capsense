@@ -28,9 +28,9 @@ Use CAPSENSE™ for:
 * Supports one-finger and two-finger gestures
 
 ### Quick start
-The [ModusToolbox™ CAPSENSE™ Configurator User Guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_CAPSENSE_Configurator_Guide_4-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99ab1e6531c8) instructs step-by-step  
+The [ModusToolbox™ CAPSENSE™ Configurator User Guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_CAPSENSE_Configurator_5.0_User_Guide-UserManual-v01_00-EN.pdf?fileId=8ac78c8c8386267f0183a960b36a598c) instructs step-by-step  
 how to configure and launch the CAPSENSE™ Configurator in [ModusToolbox™](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software). 
-The CAPSENSE™ Configurator can be launched in the ModusToolbox™ IDE from the CSD personality and as a stand-alone tool. Refer to [ModusToolbox™ Software Environment, Quick Start Guide, Documentation, and Videos](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/).
+The CAPSENSE™ Configurator can be launched in the ModusToolbox™ IDE from the CSD, MSC or MSCLP personality and as a stand-alone tool. Refer to [ModusToolbox™ Software Environment, Quick Start Guide, Documentation, and Videos](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/).
 
 Use code examples to quickly start the CAPSENSE™ Configurator. Infineon Technologies AG continuously extends their portfolio of code examples at the <a href="http:/\/www.infineon.com"><b>Infineon Technologies</b></a> and at the <a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a>.
 
@@ -39,14 +39,16 @@ For more information, refer to:
 * CAPSENSE™ overview:
   * [CAPSENSE™ Middleware RELEASE.md](./RELEASE.md)
   * [CAPSENSE™ Middleware API Reference Guide](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html)
-  * [ModusToolbox™ CAPSENSE™ Configurator Tool Guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_CAPSENSE_Configurator_Guide_4-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99ab1e6531c8)
-  * [ModusToolbox™ CAPSENSE™ Tuner Tool Guide](https://www.cypress.com/ModusToolboxCapSenseTuner)
+  * [ModusToolbox™ CAPSENSE™ Configurator Tool Guide](www.cypress.com/ModusToolboxCapSenseConfig)
+  * [ModusToolbox™ CAPSENSE™ Tuner Tool Guide](www.cypress.com/ModusToolboxCapSenseTuner)
   * [CAPSENSE™ Design Guide](https://www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v27_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661)
   * [CSDADC Middleware API Reference Guide](https://infineon.github.io/csdadc/csdadc_api_reference_manual/html/index.html)
   * [CSDIDAC Middleware API Reference Guide](https://infineon.github.io/csdidac/csdidac_api_reference_manual/html/index.html)
-* ModusToolbox™ overview:
+
+* ModusToolbox™ Overview:
   * [ModusToolbox™ Software Environment, Quick Start Guide, Documentation, and Videos](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software)
   * [ModusToolbox™ Device Configurator Tool Guide](https://www.cypress.com/ModusToolboxDeviceConfig)
+
 * Infineon Technologies AG Kits and Code Examples:
   * [CAPSENSE™ Middleware Code Example for MBED OS](https://github.com/Infineon/mbed-os-example-capsense)
   * [CAPSENSE™ Middleware Code Example for FreeRTOS](https://github.com/Infineon/mtb-example-psoc6-emwin-eink-freertos)
@@ -54,7 +56,8 @@ For more information, refer to:
   * [CY8CKIT-149 PSoC™ 4100S Plus Prototyping Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149/)
   * [CY8CKIT-041-40XX PSoC™ 4 S-Series Pioneer Kit](https://www.infineon.com/dgdl/Infineon-CY8CKIT-041-40XX_PSoC_4_S-Series_Pioneer_Kit_Quick_Start_Guide-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0efc44781263)
   * [CY8CKIT-041-41XX PSoC™ 4100S CAPSENSE™ Pioneer Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-041-41xx/)
-* General information:
+
+* General Information:
   * [AN210781 Getting Started with PSoC™ 6 MCU with Bluetooth Low Energy (BLE) Connectivity](https://www.infineon.com/dgdl/Infineon-AN210781_Getting_Started_with_PSoC_6_MCU_with_Bluetooth_Low_Energy_(BLE)_Connectivity_on_PSoC_Creator-ApplicationNotes-v05_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d311f536528)
   * [PSoC™ 6 Technical Reference Manual](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Architecture_Technical_Reference_Manual-AdditionalTechnicalInformation-v11_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f946fea01ca)
   * [PSoC™ 63 with BLE Datasheet Programmable System-on-Chip datasheet](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Datasheet_Programmable_System-on-Chip_(PSoC)-DataSheet-v16_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0ee4efe46c37)
@@ -66,4 +69,4 @@ For more information, refer to:
   * [Infineon Technologies](http://www.infineon.com)
 
 ---
-CYPRESS™ Semiconductor Corporation, 2019-2022.
+CYPRESS™ Semiconductor Corporation, 2019-2023.

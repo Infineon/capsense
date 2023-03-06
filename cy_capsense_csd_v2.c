@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -668,6 +668,9 @@ void Cy_CapSense_CSDSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_
 *******************************************************************************/
 void Cy_CapSense_CSDStartSample(cy_stc_capsense_context_t * context)
 {
+    /* Force the LFSR BITS to default before callback, so they can be changed */
+    context->ptrCommonConfig->ptrCsdBase->SENSE_PERIOD |= CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_BITS_MSK;
+
     if (NULL != context->ptrInternalContext->ptrSSCallback)
     {
         context->ptrInternalContext->ptrSSCallback(context->ptrActiveScanSns);
@@ -1885,9 +1888,7 @@ static void Cy_CapSense_CSDTriggerScan(cy_stc_capsense_context_t * context)
     context->ptrCommonConfig->ptrCsdBase->HSCMP = context->ptrInternalContext->csdRegHscmpScan;
 
     /* Force the LFSR to it's initial state (all ones) */
-    context->ptrCommonConfig->ptrCsdBase->SENSE_PERIOD =
-            context->ptrCommonConfig->ptrCsdBase->SENSE_PERIOD |
-            CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_CLEAR_MSK | CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_BITS_MSK;
+    context->ptrCommonConfig->ptrCsdBase->SENSE_PERIOD |= CY_CAPSENSE_CSD_SENSE_PERIOD_LFSR_CLEAR_MSK;
 
     /* Start SEQUENCER for fine initialization scan for Cmod and then for normal scan */
     context->ptrCommonConfig->ptrCsdBase->SEQ_START = CY_CAPSENSE_CSD_SEQ_START_AZ0_SKIP_MSK |

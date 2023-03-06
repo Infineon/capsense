@@ -102,14 +102,14 @@ General Description</h1>
 <li>MSCLP (Multi-Sensor Converter Low Power) driver for the fifth-generation of the CAPSENSE&trade; HW;</li>
 </ul>
 <p>The CAPSENSE&trade; peripheral driver does not provide any system-level functions. It only implements the interface to the CAPSENSE&trade; HW resource.</p>
-<p>The supported CAPSENSE&trade; HW blocks can perform only one function at a time. However, all supported functionality (like CAPSENSE&trade;, CSDADC, etc.) can be time-multiplexed in a design. I.e. you can save the existing state of the CAPSENSE&trade; middleware, restore the state of the the CSDADC middleware, perform CSDADC measurements, and then switch back to the CAPSENSE&trade; functionality. For details and code examples, refer to the description of the <a class="el" href="group__group__capsense__high__level.html#ga899ef1058ead082503771da68e584b82" title="Saves the state of CAPSENSE™ so the functionality can be restored using the Cy_CapSense_Restore() fu...">Cy_CapSense_Save()</a> and <a class="el" href="group__group__capsense__high__level.html#gaf87102783ec511c2e5f2024680112d16" title="Resumes the middleware operation if the Cy_CapSense_Save() function was called previously. ">Cy_CapSense_Restore()</a> functions.</p>
+<p>The supported CAPSENSE&trade; HW blocks can perform only one function at a time. However, all supported functionality (like CAPSENSE&trade;, CSDADC, etc.) can be time-multiplexed in a design. I.e. you can save the existing state of the CAPSENSE&trade; middleware, restore the state of the CSDADC middleware, perform CSDADC measurements, and then switch back to the CAPSENSE&trade; functionality. For details and code examples, refer to the description of the <a class="el" href="group__group__capsense__high__level.html#ga899ef1058ead082503771da68e584b82" title="Saves the state of CAPSENSE™ so the functionality can be restored using the Cy_CapSense_Restore() fu...">Cy_CapSense_Save()</a> and <a class="el" href="group__group__capsense__high__level.html#gaf87102783ec511c2e5f2024680112d16" title="Resumes the middleware operation if the Cy_CapSense_Save() function was called previously. ">Cy_CapSense_Restore()</a> functions.</p>
 <div class="image">
 <img src="CAPSENSE_SOLUTION_MSCLP.png" alt="CAPSENSE_SOLUTION_MSCLP.png" width="800px"/>
 <div class="caption">
 CAPSENSE&trade; Solution</div></div>
  <p>This section describes only the CAPSENSE&trade; middleware. Refer to the corresponding sections of documentation for other middleware supported by the CAPSENSE&trade; HW.</p>
 <p>A CAPSENSE&trade; solution includes:</p><ul>
-<li>The CAPSENSE&trade; Configurator to create and configure CAPSENSE&trade; widgets. It can be launched in ModusToolbox&trade; from the CAPSENSE&trade; superblock personality and in Stand-alone mode. It contains a separate document about how to create and configure widgets, parameters and algorithm descriptions.</li>
+<li>The CAPSENSE&trade; Configurator tool to create and configure CAPSENSE&trade; widgets. It can be launched in ModusToolbox&trade; from the CAPSENSE&trade; superblock personality and in Stand-alone mode. It contains a separate document about how to create and configure widgets, parameters and algorithm descriptions.</li>
 <li>API to control the design from the application program. This documentation describes API with code snippets of how to use them.</li>
 <li>The CAPSENSE&trade; Tuner tool for real-time tuning, testing, and debugging, for easy and smooth designing of human interfaces on customer products. The Tuner tool communicates with a device through a HW bridge and communication drivers (EzI2C, UART, etc.) and allows to monitor widget statuses, sensor signals, detected touch positions, gestures, etc. The application program does not need to interact with the CSD driver and/or other drivers such as GPIO, SysClk directly. All of that is configured and managed by middleware.</li>
 </ul>
@@ -134,7 +134,6 @@ Features</h2>
 <li>Multi-frequency scan (MFS)</li>
 <li>Multi-phase TX (MPTX)</li>
 <li>Inductive sensing (ISX) on fifth-generation CAPSENSE&trade;</li>
-<li>Protocol agnostic full duplex communication</li>
 </ul>
 </dd></dl>
 <h1><a class="anchor" id="group_capsense_quick_start"></a>
@@ -173,15 +172,15 @@ ModusToolbox™ Configuration Considerations</h2>
 <li>The <a href="https:/\/github.com/Infineon/mtb-pdl-cat2"><b>CAT2 Peripheral Driver Library (PDL)</b></a> is included in the project in case if the PSoC&trade; 4 device is used.</li>
 <li><a href="https:/\/www.cypress.com/ModusToolboxDeviceConfig"><b>ModusToolbox&trade; Device Configurator Tool</b></a>, <a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade; CAPSENSE&trade; Configurator Tool</b></a>, and <a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade; CAPSENSE&trade; Tuner Tool</b></a> are installed on the machine.</li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>Ensure to set up the device power voltages correctly to the proper operation of the device power domains. The Setup is on the System Tab of the Device Configurator. Enable the Power check box and set up the voltages as they are red-outlined in the picture below.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Ensure to set up the device power voltages correctly to the proper operation of the device power domains. The Setup is on the System Tab of the Device Configurator tool. Enable the Power check box and set up the voltages as they are red-outlined in the picture below.</dd></dl>
 <div class="image">
 <img src="check_power.png" alt="check_power.png" width="800px"/>
 <div class="caption">
 Power Setup</div></div>
  <h2><a class="anchor" id="group_capsense_quick_start_mbed"></a>
 MBED OS Configuration Considerations</h2>
-<p>You can immediately start with the following MBED OS code example available at the <a href="https:/\/github.com/cypresssemiconductorco"><b> Cypress Semiconductor GitHub</b></a>:</p><ul>
-<li><a href="https:/\/github.com/cypresssemiconductorco/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
+<p>You can immediately start with the following MBED OS code example available at the <a href="https:/\/github.com/Infineon/"><b> Infineon GitHub</b></a>:</p><ul>
+<li><a href="https:/\/github.com/Infineon/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
 </ul>
 <p>If you are doing your own project, remember to include cycfg.h file: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;cycfg.h&quot;</span></div></div><!-- fragment --><p> and call the resource initialization functions in main() at the beginning: </p><div class="fragment"><div class="line">    init_cycfg_all();</div></div><!-- fragment --><h1><a class="anchor" id="section_capsense_configuration"></a>
 Summary of Application Programming Interface (API)</h1>
@@ -203,17 +202,17 @@ Supported Software and Tools</h1>
 <tr>
 <td>ModusToolbox&trade; Software Environment </td><td>3.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; Device Configurator </td><td>4.0  </td></tr>
+<td>- ModusToolbox&trade; Device Configurator tool </td><td>4.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; MSC Superblock Personality for for PSoC&trade; 4 devices in the Device Configurator </td><td>1.0  </td></tr>
+<td>- ModusToolbox&trade; MSC Superblock Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>1.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator </td><td>1.1  </td></tr>
+<td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>1.1  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator </td><td>1.0  </td></tr>
+<td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>3.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator </td><td>1.2  </td></tr>
+<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>1.2  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator </td><td>2.0  </td></tr>
+<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator tool </td><td>2.0  </td></tr>
 <tr>
 <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool </td><td>5.0  </td></tr>
 <tr>
@@ -243,14 +242,14 @@ Supported Software and Tools</h1>
 Update to Newer Versions</h1>
 <p>Refer to the <a class="el" href="index.html#section_capsense_changelog">Changelog</a> to learn about the design impact of the newer version. Set up your environment in accordance with <a class="el" href="index.html#section_capsense_toolchain">Supported Software and Tools</a>.</p>
 <p>Ensure:</p><ul>
-<li>The specified version of the ModusToolbox&trade; Device Configurator and the Personality are used to re-generate the device configuration.</li>
-<li>The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator is used to re-generate the middleware configuration.</li>
+<li>The specified version of the ModusToolbox&trade; Device Configurator tool and the Personality are used to re-generate the device configuration.</li>
+<li>The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator tool is used to re-generate the middleware configuration.</li>
 <li>The toolchains are set up properly for your environment per the settings outlined in the Supported Software and Tools.</li>
 <li>The project is re-built once the toolchains are configured and the configuration is completed.</li>
 </ul>
 <p>You might need to re-generate the configuration structures for either the device initialization code or the middleware initialization code.</p><ul>
-<li>Launch the ModusToolbox&trade; Device Configurator and perform the File-&gt;Save command to re-generate the device initialization code.</li>
-<li>From the ModusToolbox&trade; Device Configurator, launch the ModusToolbox&trade; CAPSENSE&trade; Configurator and perform the File-&gt;Save command to re-generate the middleware initialization code.</li>
+<li>Launch the ModusToolbox&trade; Device Configurator tool and perform the File-&gt;Save command to re-generate the device initialization code.</li>
+<li>From the ModusToolbox&trade; Device Configurator tool, launch the ModusToolbox&trade; CAPSENSE&trade; Configurator tool and perform the File-&gt;Save command to re-generate the middleware initialization code.</li>
 </ul>
 <h1><a class="anchor" id="section_capsense_memory_usage"></a>
 Memory Usage</h1>
@@ -383,16 +382,16 @@ CAPSENSE™ Middleware Deviation</h2>
 <tr>
 <td>Rule 8.13 </td><td>A pointer should point to const-qualified type whenever possible.  </td><td>Advisory. During the code analysis, the same source files are compiled multiple times with device-specific options. A function argument can be const for some specific run.   </td></tr>
 <tr>
-<td>Rule 11.5 </td><td>A conversion should not be performed from pointer to void into pointer to object.  </td><td>Advisory. The cast from void pointer to an object pointer does not have any unintended effect, as it is a consequence of the definition of a structure based on function pointers.   </td></tr>
+<td>Rule 11.4 </td><td>A conversion should not be performed between a pointer to object and an integer type.  </td><td>Advisory. There is an issue with a SYSCLK driver (IFXID-10550), due to which integer type is cast to an object pointer type. Code is manually checked and reviewed to be safe.   </td></tr>
 <tr>
-<td>Rule 11.8 </td><td>A cast shall not remove any const or volatile qualification from the type pointed to by a pointer.  </td><td>There is an issue with a DMAC driver (IFXID-9039), due to which volatile qualifier is removed. Code is manually checked and reviewed to be safe.   </td></tr>
+<td>Rule 11.5 </td><td>A conversion should not be performed from pointer to void into pointer to object.  </td><td>Advisory. The cast from void pointer to an object pointer does not have any unintended effect, as it is a consequence of the definition of a structure based on function pointers.   </td></tr>
 <tr>
 <td>Rule 14.2 </td><td>A for loop shall be well-formed.  </td><td>The third clause of the for loop is empty to improve execution time.   </td></tr>
 <tr>
 <td>Rule 18.4 </td><td>The +, -, += and -= operators should not be applied to an expression of pointer type.  </td><td>Advisory. There are several instances of pointer arithmetic in drivers. They cannot be avoided, so are manually checked and reviewed to be safe.   </td></tr>
 </table>
 <h2><a class="anchor" id="subsection_capsense_misra-cfg"></a>
-CAPSENSE™ Configurator Generated Sources Deviation</h2>
+CAPSENSE™ Configurator Tool Generated Sources Deviation</h2>
 <table class="doxtable">
 <tr>
 <th>Rule ID </th><th>Rule Description </th><th>Description of Deviation(s)  </th></tr>
@@ -564,13 +563,13 @@ Changelog</h1>
 </table>
 <h1><a class="anchor" id="section_capsense_more_information"></a>
 More Information</h1>
-<p>Important information about the CAPSENSE&trade;-technology overview, appropriate CYPRESS&trade; device from Infineon for the design, CAPSENSE&trade; system and sensor design guidelines, different interfaces and tuning guidelines necessary for a successful design of a CAPSENSE&trade; system is available in the Getting Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide. CYPRESS&trade; highly recommends starting with these documents. They can be found on the CYPRESS&trade; web site at www.cypress.com.</p>
+<p>Important information about the CAPSENSE&trade;-technology overview, appropriate CYPRESS&trade; device from Infineon for the design, CAPSENSE&trade; system and sensor design guidelines, different interfaces and tuning guidelines necessary for a successful design of a CAPSENSE&trade; system is available in the Getting Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide. Infineon Technologies highly recommends starting with these documents. They can be found on the Infineon Technologies web site at www.infineon.com.</p>
 <p>For more information, refer to the following documents:</p>
 <ul>
 <li>CAPSENSE&trade; Overview:<ul>
 <li><a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade; CAPSENSE&trade; Configurator Tool Guide</b></a></li>
 <li><a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade; CAPSENSE&trade; Tuner Tool Guide</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/application-notes/an85951-psoc-4-and-psoc-6-mcu-capsense-design-guide"><b>CAPSENSE&trade; Design Guide</b></a></li>
+<li><a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661"><b>CAPSENSE&trade; Design Guide</b></a></li>
 </ul>
 </li>
 <li>ModusToolbox&trade; Overview:<ul>
@@ -588,11 +587,11 @@ More Information</h1>
 <li>General Information:<ul>
 <li><a href="https:/\/infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html"><b>CAT1 PDL API Reference</b></a></li>
 <li><a href="https:/\/infineon.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html"><b>CAT2 PDL API Reference</b></a></li>
-<li><a href="http:/\/edit.infineon.com/cms/en/search.html#!term=AN210781&amp;view=downloads"><b>AN210781 Getting Started with PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a></li>
-<li><a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&amp;view=downloads"><b>PSoC&trade; 6 Technical Reference Manual</b></a></li>
-<li><a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&amp;view=downloads"><b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
-<li><a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&amp;view=downloads"><b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
-<li><a href="http:/\/edit.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&amp;view=downloads"><b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a></li>
+<li><a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&amp;view=downloads"><b>AN210781 Getting Started with PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&amp;view=downloads"><b>PSoC&trade; 6 Technical Reference Manual</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&amp;view=downloads"><b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&amp;view=downloads"><b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
+<li><a href="http:/\/www.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&amp;view=downloads"><b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a></li>
 <li><a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a></li>
 <li><a href="http:/\/www.infineon.com"><b>Infineon Technologies</b></a></li>
 </ul>

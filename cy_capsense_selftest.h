@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -24,12 +24,16 @@
 #include "cy_capsense_structure.h"
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
     #include "cy_capsense_selftest_v2.h"
-#else /* (CY_CAPSENSE_PSOC4_FIFTH_GEN) */
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
     #include "cy_capsense_selftest_v3.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_capsense_selftest_lp.h"
+#else
+    /* Supported platform not found */
 #endif
 
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN)
 
@@ -88,14 +92,19 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest(
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN) */
 
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
-cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
-                cy_en_capsense_bist_external_cap_id_t integrationCapId,
-                uint32_t * ptrValue,
-                uint32_t maxCapacitance,
-                cy_stc_capsense_context_t * context);
-cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
-                uint32_t * ptrValue,
-                cy_stc_capsense_context_t * context);
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_EXTERNAL_CAP_EN)
+        cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
+                        cy_en_capsense_bist_external_cap_id_t integrationCapId,
+                        uint32_t * ptrValue,
+                        uint32_t maxCapacitance,
+                        cy_stc_capsense_context_t * context);
+    #endif
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_VDDA_EN)
+        cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
+                        uint32_t * ptrValue,
+                        cy_stc_capsense_context_t * context);
+    #endif
 #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
 
 /** \} */
@@ -116,7 +125,7 @@ void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context);
 
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) */
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_SELFTEST_H */
 

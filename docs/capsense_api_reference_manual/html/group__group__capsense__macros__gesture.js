@@ -15,6 +15,7 @@ var group__group__capsense__macros__gesture =
     [ "CY_CAPSENSE_GESTURE_ONE_FNGR_FLICK_MASK", "group__group__capsense__macros__gesture.html#ga2ebcf1c878564dc6badc69097041ca9a", null ],
     [ "CY_CAPSENSE_GESTURE_ONE_FNGR_ROTATE_MASK", "group__group__capsense__macros__gesture.html#ga8f2f7a9121b4ada5241dd7a14250a0a2", null ],
     [ "CY_CAPSENSE_GESTURE_TWO_FNGR_ZOOM_MASK", "group__group__capsense__macros__gesture.html#gaa1d831e7dccc101ca4fc6956356cfc09", null ],
+    [ "CY_CAPSENSE_GESTURE_ONE_FNGR_LONG_PRESS_MASK", "group__group__capsense__macros__gesture.html#gae612433594b501cae7794c1513d57360", null ],
     [ "CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_SCROLL", "group__group__capsense__macros__gesture.html#ga577bb1c6645e656fb8a35944559afde8", null ],
     [ "CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_SCROLL", "group__group__capsense__macros__gesture.html#gab65415405b4a5a8e2dcd432aeba8dad5", null ],
     [ "CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_EDGE", "group__group__capsense__macros__gesture.html#ga930273b6f56453073e1ca8ff2abf94c7", null ],

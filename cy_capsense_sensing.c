@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -31,19 +31,6 @@
 #endif
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-
-/*******************************************************************************
-* Local definition
-*******************************************************************************/
-
-/* Defines the KREF_PRS correcting shift, taking into account Sense Clock Divider
- * adjustment in scope of the Cy_CapSense_AdjustSnsClkDivider()
- * routine.
- */
-#define CY_CAPSENSE_PRS_SNS_KREF_SHIFT      (1u)
-
-/* Macro to optimize division operation */
-#define CY_CAPSENSE_DIV4_SHIFT              (2u)
 
 
 /*******************************************************************************
@@ -134,8 +121,9 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * Function Name: Cy_CapSense_ScanAllSlots
 ****************************************************************************//**
 *
-* Initiates the non-blocking scan of all regular slots and then exits. Scanning
-* is initiated only if no scan is in progress.
+* Initiates the non-blocking scan of all Active slots and then exits. Scanning
+* is initiated only if no scan is in progress. To initiate all Low Power slot
+* scan use the Cy_CapSense_ScanAllLpSlots() function.
 * The status of the current scan should be checked using the Cy_CapSense_IsBusy()
 * function and the application program waits until all scans are finished prior
 * to starting a next scan by using this function.
@@ -147,8 +135,40 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * If the scan frame doesn`t fit into the internal buffer it will be processed as
 * the sequence of sub-frames. Next sub-frame will be loaded by the interrupt
 * service routine(part of middleware) once scan of previous sub-frame is complete.
-* The transition into system DEEP SLEEP mode is allowed after the scan is
-* started.
+* The scanning process duration consists of a some
+* pre-configured interval and a frame scan duration. The first slot scan starts
+* after the pre-configured interval. The default duration of the interval is
+* 1 ILO cycle. The interval duration can be changed
+* by the Cy_CapSense_ConfigureMsclpTimer() function.
+* If the "Enable external frame start" option is disabled in the CAPSENSE&trade;
+* Configurator, the scanning process will be triggered immediately.
+* If the "Enable external frame start" option is enabled in the CAPSENSE&trade;
+* Configurator, the scanning process will be triggered by the first external
+* synchronization signal after call of the function.
+* The number of slots in frame in this case should not exceed the maximum
+* possible slot number to fit into the internal buffer of the CAPSENSE&trade;
+* hardware block.
+* The External synchronization signal parameters should meet the following
+* constraints:
+*   * - the interval between the return of the function and the rising edge
+*     of an external synchronization signal must not be less than 2 ILO cycles;
+*   * - the pulse duration of an external synchronization signal
+*     (i.e. signal is in High level) must not be less than 2 ILO cycles and more
+*     than the full scanning process duration. The full scanning process
+*     duration is the time between the rising edge of the external
+*     synchronization pulse and clearing of BUSY flag. The Cy_CapSense_IsBusy()
+*     function can be used to check BUSY flag;
+*   * - the interval between sub-sequent pulses should not be less than full
+*     scanning process duration.
+* Disregarding the "Enable external frame start" option, the transition into
+* system DEEP SLEEP mode is allowed after the scan process is started
+* by the function.
+* To decrease the start scan time when it is intended to scan the same frame,
+* i.e. startSlotId and numberSlots parameters are the same, then the scan
+* is performed without the MSC HW block reconfiguration.
+* The number of slots in frame in this case should not exceed the maximum
+* possible slot number to fit into the internal buffer of the CAPSENSE&trade;
+* hardware block.
 *
 * \par
 * * For fifth-generation CAPSENSE&trade; this function initiates a scan for
@@ -203,21 +223,55 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * Function Name: Cy_CapSense_ScanSlots
 ****************************************************************************//**
 *
-* Initiates the non-blocking scan of specified regular slots and then exits.
+* Initiates the non-blocking scan of a specified regular slots set named "frame"
+* and then exits.
 * Scanning is initiated only if no scan is in progress.
-* The status of the current scan should be checked using the Cy_CapSense_IsBusy()
-* function and the application program waits until specified scans are finished
-* prior to starting a next scan by using this function.
+* Check the status of the current scan using the Cy_CapSense_IsBusy()
+* function. The application program should wait until the current frame scan is
+* finished prior to start a next scan by using the function.
 *
 * \par
 * * For fifth-generation low power CAPSENSE&trade;
-* This function loads slots configurations into the internal buffer of the
-* CAPSENSE&trade; hardware block and triggers scanning.
-* If the scan frame doesn`t fit into the internal buffer it will be processed as
-* the sequence of sub-frames. Next sub-frame will be loaded by the interrupt
-* service routine(part of middleware) once scan of previous sub-frame is complete.
-* The transition into system DEEP SLEEP mode is allowed after the scan is
-* started.
+* The function loads the frame configuration into the internal buffer of the
+* CAPSENSE&trade; hardware block and triggers the scanning process.
+* If the frame configuration does not fit into the internal buffer its scan will
+* be processed as a sequence of sub-frame scans. A next sub-frame will be loaded
+* by the interrupt service routine (part of the middleware)
+* after the previous sub-frame scan is complete.
+* The scanning process duration consists of a some
+* pre-configured interval and a frame scan duration. The first slot scan starts
+* after the pre-configured interval. The default duration of the interval is
+* 1 ILO cycle. The interval duration can be changed
+* by the Cy_CapSense_ConfigureMsclpTimer() function.
+* If the "Enable external frame start" option is disabled in the CAPSENSE&trade;
+* Configurator, the scanning process will be triggered immediately.
+* If the "Enable external frame start" option is enabled in the CAPSENSE&trade;
+* Configurator, the scanning process will be triggered by the first external
+* synchronization signal after call of the function.
+* The number of slots in frame in this case should not exceed the maximum
+* possible slot number to fit into the internal buffer of the CAPSENSE&trade;
+* hardware block.
+* The External synchronization signal parameters should meet the following
+* constraints:
+*   * - the interval between the return of the function and the rising edge
+*     of an external synchronization signal must not be less than 2 ILO cycles;
+*   * - the pulse duration of an external synchronization signal
+*     (i.e. signal is in High level) must not be less than 2 ILO cycles and more
+*     than the full scanning process duration. The full scanning process
+*     duration is the time between the rising edge of the external
+*     synchronization pulse and clearing of BUSY flag. The Cy_CapSense_IsBusy()
+*     function can be used to check BUSY flag;
+*   * - the interval between sub-sequent pulses should not be less than full
+*     scanning process duration.
+* Disregarding the "Enable external frame start" option, the transition into
+* system DEEP SLEEP mode is allowed after the scan process is started
+* by the function.
+* To decrease the start scan time when it is intended to scan the same frame,
+* i.e. startSlotId and numberSlots parameters are the same, then the scan
+* is performed without the MSC HW block reconfiguration.
+* The number of slots in frame in this case should not exceed the maximum
+* possible slot number to fit into the internal buffer of the CAPSENSE&trade;
+* hardware block.
 *
 * \par
 * * For fifth-generation CAPSENSE&trade; this function initiates a scan for
@@ -228,31 +282,32 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * cy_stc_capsense_common_config_t structure is set to CY_CAPSENSE_SYNC_MODE_OFF,
 * then the next slot scan for the channel with the fired interrupt,
 * will start regardless of the another channel readiness for the next scan.
-* If the syncMode field is set to CY_CAPSENSE_SYNC_INTERNAL (for single-chip projects)
-* or to CY_CAPSENSE_SYNC_EXTERNAL (for multi-chip projects),
+* If the syncMode field is set to CY_CAPSENSE_SYNC_INTERNAL (for single-chip
+* projects) or to CY_CAPSENSE_SYNC_EXTERNAL (for multi-chip projects),
 * then the next slot scan for the channel with the fired interrupt,
 * will start in lockstep with another channels after they all are ready
 * for the next scan.
 * The scan for the remaining slots in CS-DMA scan mode are initiated
 * by DMAC triggered at the end
 * of each scan completion for each channel. The channel scan synchronization is
-* performed as in Interrupt-driven scan mode. After all specified slots are scanned,
-* the FRAME interrupt is fired and the interrupt service routine (part of middleware)
-* updates the busy status. The transition into system DEEP SLEEP mode is allowed
-* only when all specified scans are finished.
+* performed as in Interrupt-driven scan mode. After all specified slots are
+* scanned, the FRAME interrupt is fired and the interrupt service routine
+* (part of middleware) updates the busy status. The transition into system
+* DEEP SLEEP mode is allowed only when all specified scans are finished.
 * To decrease the start scan time when it is intended to scan the same slot,
 * i.e. the startSlotId parameter is the same and numberSlots = 1u, then the scan
 * is performed without the MSC HW block reconfiguration. Also, in the legacy
 * AMUX mode sensors are not disconnected.
 *
 * \note
-* This function is available for the fifth-generation and fifth-generation low power CAPSENSE&trade;.
+* This function is available for the fifth-generation and fifth-generation
+* low power CAPSENSE&trade;.
 *
 * \param startSlotId
-* The slot ID scan will be started from.
+* The slot ID the scan of the specified frame will be started from.
 *
 * \param numberSlots
-* The number of slots will be scanned.
+* The number of slots in the specified frame will be scanned.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -283,7 +338,13 @@ cy_capsense_status_t Cy_CapSense_ScanSlots(
 ****************************************************************************//**
 *
 * Initiates scanning of all enabled widgets (and sensors) in the project.
-* Scanning is initiated only if no scan is in progress.
+* For fifth-generation low power CAPSENSE&trade; the function initiates only
+* Active widget scans. To initiate Low Power widget scan use
+* the Cy_CapSense_ScanAllLpWidgets() function. Scanning is initiated only if no
+* current scan is in progress. Check the status of the current scan using
+* the Cy_CapSense_IsBusy() function. The application program should wait until
+* the current frame scan is finished prior to start a next scan by using
+* the function.
 *
 * This function initiates a scan only for the first sensor in the first widget
 * for the fourth-generation CAPSENSE&trade; or a scan for the first slot
@@ -291,10 +352,10 @@ cy_capsense_status_t Cy_CapSense_ScanSlots(
 * CAPSENSE&trade; and then exits the function. The scan
 * for the remaining sensors(slots) are initiated in the interrupt-driven mode
 * in the interrupt service routine (part of middleware) triggered at the end
-* of each scan completion or by DMA controllers in the DMA mode. The status
-* of the current scan should be checked by using the Cy_CapSense_IsBusy() and wait
-* until all scans is finished prior to starting a next scan or initializing
-* another widget.
+* of each scan completion or by DMA controllers in the DMA mode for
+* the fifth-generation CAPSENSE&trade;. For the fifth-generation low power
+* CAPSENSE&trade; the remaining sensor scans depend on the ACTIVE sensor
+* quantity, for details see the Cy_CapSense_ScanAllSlots() function description.
 *
 * \note
 * For the fifth-generation CAPSENSE&trade; and fifth-generation low power
@@ -327,11 +388,15 @@ cy_capsense_status_t Cy_CapSense_ScanAllWidgets(
 * Function Name: Cy_CapSense_MwState
 ****************************************************************************//**
 *
-* This function returns a detailed state of the CAPSENSE&trade; middleware and MSC
-* hardware in Single- or Multi-channel mode. This feature is useful in
+* Returns a detailed state of the CAPSENSE&trade; middleware and MSC and
+* MSCLP HW blocks in Single- or Multi-channel mode. This feature is useful in
 * multi-thread applications or in ISR.
 * Use the Cy_CapSense_IsBusy() function to verify if HW is busy at a particular
 * moment.
+*
+* \note
+* This function is available for the fifth-generation and fifth-generation
+* low power CAPSENSE&trade;.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -389,7 +454,7 @@ cy_capsense_mw_state_t Cy_CapSense_MwState(const cy_stc_capsense_context_t * con
 ****************************************************************************//**
 *
 * This function returns a status of the CAPSENSE&trade; middleware whether
-*  a scan is currently in progress or not.
+* a scan is currently in progress or not.
 *
 * If the middleware is busy, a new scan or setup widgets should not
 * be initiated.
@@ -421,7 +486,7 @@ uint32_t Cy_CapSense_IsBusy(
 * Function Name: Cy_CapSense_InterruptHandler
 ****************************************************************************//**
 *
-* Implements interrupt service routine for CAPSENSE&trade; Middleware.
+* Implements interrupt service routine for CAPSENSE&trade; middleware.
 *
 * The CAPSENSE&trade; middleware uses this interrupt to implement a
 * non-blocking sensor scan method, in which only the first sensor scan is
@@ -430,16 +495,16 @@ uint32_t Cy_CapSense_IsBusy(
 * or current sub-frame is completed.
 *
 * The CAPSENSE&trade; middleware does not initialize or modify the priority
-* of interrupts. For the operation of middleware, the application program
-* must configure MSC interrupt and assign interrupt vector to
-* the Cy_CapSense_InterruptHandler() function. Refer to function
+* of interrupts. For the proper middleware operation, the application program
+* must configure CAPSENSE&trade; block interrupt and assign the interrupt
+* vector to the Cy_CapSense_InterruptHandler() function. Refer to function
 * usage example for details.
 *
 * The calls of the Start Sample and End Of Scan callbacks
-* (see the \ref group_capsense_callbacks section for details) are the part of the
-* Cy_CapSense_InterruptHandler() routine and they lengthen its execution. These
-* callbacks will lengthen the ISR execution in case of a direct call of the
-* Cy_CapSense_InterruptHandler() function from a ISR.
+* (see the \ref group_capsense_callbacks section for details) are the part
+* of the Cy_CapSense_InterruptHandler() routine and they lengthen its execution.
+* These callbacks should not lengthen the ISR execution too much to prevent
+* different interrupt overlaps.
 *
 * \param base
 * The pointer to the base register address of the CAPSENSE&trade; HW block.
@@ -517,17 +582,46 @@ void Cy_CapSense_InterruptHandler(
 * Function Name: Cy_CapSense_CalibrateAllWidgets
 ****************************************************************************//**
 *
-* Executes the CapDAC/IDAC calibration for all the sensors in all widgets in
-* the middleware to default target value.
+* Executes CapDAC/IDAC auto-calibration for all the sensors in all widgets
+* of some sensing groups (CSD, CSX, or ISX) if calibration is enabled
+* for such group of widgets. The auto-calibration finds CapDAC/IDAC values
+* to have raw counts close to configured target values. Use sensing and
+* processing functions after auto-calibration to update all baselines and
+* configured filters.
+*
+* Having enabled the CDAC auto-calibration algorithm is the most common use
+* case. It helps to tune your system considering board-to-board variation,
+* temperature drift, etc. CDAC auto-calibration is enabled by default.
+*
+* The default auto-calibration target values are defined as:
+* * 85% of the maximum raw count for CSD widgets
+* * 40% of the maximum raw count for CSX widgets.
+* * 40% of the maximum raw count for ISX widgets.
+* Use the Cy_CapSense_SetCalibrTarget() function to change calibration targets .
+*
+* For fifth-generation low power CAPSENSE&trade; the function calibrates only
+* Active widgets. For Low Power widgets use
+* the Cy_CapSense_CalibrateAllLpWidgets() function.
 *
 * This function detects the sensing method used by each widget and performs
-* a successive approximation search algorithm to find the appropriate modulator
-* and compensation CapDAC/IDAC (if enabled) values for all sensors in CSD widgets
+* a successive approximation search algorithm to find the appropriate Reference
+* and Compensation CapDAC (if enabled) values for all sensors for
+* the fifth-generation CAPSENSE&trade; and for all Active sensors for
+* the fifth-generation low power CAPSENSE&trade;. For the fifth-generation
+* low power CAPSENSE&trade; if during the calibration process it is reached
+* the Reference CapDAC value lower than /ref CY_CAPSENSE_CAL_REF_CDAC_MIN_CODE
+* and Fine CapDAC usage is enabled in CAPSENSE&trade; Configurator then
+* the FineCDAC calibration is performed with the reference CDAC value set to 0.
+*
+* For the the forth-generation
+* CAPSENSE&trade; the function finds appropriate modulator and compensation
+* IDAC (if enabled) values for all sensors in CSD widgets
 * and/or IDAC values for all sensors in CSX widgets to make sensor raw count
 * to the default value level.
 *
 * This function could be used only if Enable auto-calibration parameter
-* is enabled for CSD and/or CSX widgets.
+* is enabled for CSD and/or CSX (and/or ISX for fifth-generation low power
+* CAPSENSE&trade;) widgets.
 *
 * \note
 * For the fifth-generation CAPSENSE&trade; this function is available in
@@ -579,11 +673,20 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 * Function Name: Cy_CapSense_CalibrateAllSlots
 ****************************************************************************//**
 *
-* Executes CapDAC auto-calibration for all relevant widgets if enabled.
+* Executes CapDAC/IDAC auto-calibration for all the sensors in all widgets
+* of some sensing groups (CSD, CSX, or ISX) if calibration is enabled
+* for such group of widgets. The auto-calibration finds CapDAC/IDAC values
+* to have raw counts close to configured target values. Use sensing and
+* processing functions after auto-calibration to update all baselines and
+* configured filters.
 *
 * Having enabled the CDAC auto-calibration algorithm is the most common use
 * case. It helps to tune your system considering board-to-board variation,
 * temperature drift, etc. CDAC auto-calibration is enabled by default.
+*
+* For fifth-generation low power CAPSENSE&trade; the function calibrates only
+* Active widgets. For Low Power widgets use
+* the Cy_CapSense_CalibrateAllLpWidgets() function.
 *
 * The function performs searching of Reference CDAC code, Compensation CDAC
 * code Compensation Divider (whichever is enabled) by using a successive
@@ -593,8 +696,13 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 * * 85% of the maximum raw count for CSD widgets
 * * 40% of the maximum raw count for CSX widgets.
 * * 40% of the maximum raw count for ISX widgets.
+* Use the Cy_CapSense_SetCalibrTarget() function to change calibration targets .
 *
-* To change calibration targets use the Cy_CapSense_SetCalibrTarget() function.
+* For the fifth-generation
+* low power CAPSENSE&trade; if during the calibration process it is reached
+* the Reference CapDAC value lower than /ref CY_CAPSENSE_CAL_REF_CDAC_MIN_CODE
+* and Fine CapDAC usage is enabled in CAPSENSE&trade; Configurator then
+* the FineCDAC calibration is performed with the reference CDAC value set to 0.
 *
 * \note
 * This function is available for the fifth-generation CAPSENSE&trade; and
@@ -629,13 +737,17 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(cy_stc_capsense_context_t * c
 * Function Name: Cy_CapSense_SetCalibrationTarget
 ****************************************************************************//**
 *
-* Sets the CapDAC auto-calibration raw count targets for CSD, CSX and/or ISX
-* widgets.
+* Sets the CapDAC auto-calibration raw count target for CSD, CSX or ISX
+* widgets. The function only updates the target value, use
+* Cy_CapSense_CalibrateWidget()/Cy_CapSense_CalibrateAllWidgets()/
+* Cy_CapSense_CalibrateAllLpWidgets()/Cy_CapSense_CalibrateAllSlots() to change
+* raw counts according to the updated target.
 *
-* The function sets the specified raw count targets if CSD, CSX and/or ISX widgets
-* are in the project and the auto-calibration is enabled for them. These targets
-* will be used instead the configured ones by Cy_CapSense_CalibrateAllSlots(),
-* Cy_CapSense_CalibrateAllWidgets() and Cy_CapSense_CalibrateWidget() functions.
+* The function sets the specified raw count targets if CSD, CSX and/or ISX
+* widgets are in the project and the auto-calibration is enabled for them. These
+* targets will be used instead the configured ones by
+* Cy_CapSense_CalibrateAllSlots(), Cy_CapSense_CalibrateAllWidgets() and
+* Cy_CapSense_CalibrateWidget() functions.
 *
 * \note
 * This function is available only for the fifth-generation CAPSENSE&trade; and
@@ -643,9 +755,9 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(cy_stc_capsense_context_t * c
 *
 * \param calibrTarget
 * The raw counts target in percentage for the specified sensing method.
-* It should be more than 0u and less than 100u. If the specified target is outside the
-* range, then it will not be updated and the CY_CAPSENSE_STATUS_BAD_PARAM status will be
-* returned.
+* It should be in range [1..99]. If the specified target is
+* outside the range, then it will not be updated and the
+* CY_CAPSENSE_STATUS_BAD_PARAM status will be returned.
 *
 * \param snsMethod
 * Desired sensing method the calibration target should be updated for:
@@ -687,7 +799,9 @@ cy_capsense_status_t Cy_CapSense_SetCalibrationTarget(
 * widget to the default target value.
 *
 * This function performs exactly the same tasks as
-* Cy_CapSense_CalibrateAllWidgets(), but only for a specified widget.
+* Cy_CapSense_CalibrateAllWidgets(), but only for a specified widget. Use
+* sensing and processing functions after auto-calibration to update all
+* baselines and configured filters.
 *
 * \note
 * For the fifth-generation CAPSENSE&trade; this function is available in
@@ -855,6 +969,144 @@ cy_capsense_status_t Cy_CapSense_SetPinState(
 #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN || \
            ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
             (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD))) */
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP || \
+     ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
+      (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)))
+/*******************************************************************************
+* Function Name: Cy_CapSense_SlotPinState
+****************************************************************************//**
+*
+* Configures the specified electrode to the desired state in the specified
+* slot (Active slot for fifth-generation low power
+* CAPSENSE&trade;) by updating the CAPSENSE&trade; configuration.
+*
+* This function changes / overwrites configuration of an electrode (several
+* pins in case the electrode is ganged to more pins) with a state specified
+* by the pinState parameter. The function does this only for the specified slot ID
+* (Active slotID for fifth-generation low power CAPSENSE&trade;).
+* If the electrode should have the desired state during scans in another
+* slots, the function should be called multiple times for each desired slot
+* (Active slot for fifth-generation low power CAPSENSE&trade;).
+*
+* The function call changes the pin states permanently and all further scans of
+* the slot will have the electrode state as specified by the pinState parameter.
+* Call the function again to change the electrode state to a new desired one or
+* reinitialize CAPSENSE&trade; middleware by using the Cy_CapSense_Enable() function.
+*
+* The re-configuration is available only when
+* parameter Sensor connection method = CTRLMUX.
+* If parameter Sensor connection method = AMUXBUS, then the Cy_CapSense_SetPinState()
+* function should be used.
+*
+*
+* The function changes the configuration of an electrode without storing
+* the previous state. A user is responsible to keep the previous state to
+* revert to the default settings if needed. Also, the default settings
+* can be configured again by calling Cy_CapSense_Enable() function that
+* leads to repeating CAPSENSE&trade; Data Structure initialization,
+* DAC auto-calibration, and baseline initialization.
+*
+* Using the function is recommended only for advanced users for specific use cases.
+* For instance, to change the CAPSENSE&trade; default electrode configuration,
+* the function could be called by using a CAPSENSE&trade; Data Structure
+* Initialization callback ptrEODsInitCallback. For details of how to register
+* the callback see the \ref group_capsense_callbacks section. That avoids repeating of
+* DAC auto-calibration and baseline initialization since the callback is called after
+* CAPSENSE&trade; Data Structure initialization but before the first initialization
+* scan.
+*
+* You can also use this function to change the shield electrode state - call the function
+* and pass the pointer to the shield electrode configuration as an input parameter.
+*
+* \note
+* This function is available for the fifth-generation (only
+* for CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) and fifth-generation low power
+* CAPSENSE&trade;. For fourth-generation CAPSENSE&trade and fifth-generation
+* CAPSENSE&trade with for CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD use
+* Cy_CapSense_SetPinState().
+*
+* \param slotId
+* The desired slot ID (Active slot ID for fifth-generation low power
+* CAPSENSE&trade;).
+*
+* \param ptrEltdCfg
+* The pointer to an electrode the all pins states of which will be configured
+* as pinState parameter.
+*
+* \param pinState
+* The desired pins state for CSX widget electrodes could be:
+* * CY_CAPSENSE_RX_PIN - Rx electrode
+* * CY_CAPSENSE_TX_PIN - Tx electrode
+* * CY_CAPSENSE_GROUND - Grounded
+* * CY_CAPSENSE_NEGATIVE_TX_PIN - Negative Tx electrode
+*     (for multi-phase TX method)
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+* The desired pins state for CSD widget electrodes could be:
+* * CY_CAPSENSE_SENSOR - Self-cap sensor
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_GROUND - Grounded
+* * CY_CAPSENSE_SHIELD - Shield is routed to the pin.
+* The desired pins state for ISX widget electrodes could be:
+* * CY_CAPSENSE_ISX_RX_PIN - ISX Rx electrode
+* * CY_CAPSENSE_ISX_LX_PIN - ISX Lx electrode
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS      - Indicates the successful electrode setting.
+* - CY_CAPSENSE_STATUS_BAD_CONFIG   - The function does not suppose to be
+*                                     called with the current CAPSENSE&trade;
+*                                     configuration.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - 1) widgetID, sensorElement or state
+*                                        are not valid;
+*                      2) the CSD sensing method is disabled for desired
+*                         CY_CAPSENSE_SHIELD or CY_CAPSENSE_SENSOR states;
+*                      3) the CSX sensing method is disabled for desired
+*                         CY_CAPSENSE_TX_PIN, CY_CAPSENSE_NEGATIVE_TX_PIN or
+*                         CY_CAPSENSE_RX_PIN states.
+*                      4) the ISX sensing method is disabled for desired
+*                         CY_CAPSENSE_ISX_RX_PIN or CY_CAPSENSE_ISX_LX_PIN
+*                         states (Only for fifth-generation low power CAPSENSE&trade;).
+*
+* \funcusage
+* \snippet capsense/snippet/main.c snippet_Cy_CapSense_SlotPinState
+*
+*******************************************************************************/
+cy_capsense_status_t Cy_CapSense_SlotPinState(
+                uint32_t slotId,
+                const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
+                uint32_t pinState,
+                cy_stc_capsense_context_t * context)
+{
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
+    uint32_t localPinState;
+
+    if ((NULL != context) && (NULL != ptrEltdCfg) && (CY_CAPSENSE_SLOT_COUNT > slotId))
+    {
+        result = Cy_CapSense_ConvertPinState(pinState, &localPinState);
+
+        if ((uint32_t)CY_CAPSENSE_SUCCESS_E == result)
+        {
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+                result = Cy_CapSense_SlotPinState_V3(slotId, ptrEltdCfg, localPinState, context);
+            #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+                result =  Cy_CapSense_SlotPinState_V3Lp(slotId, ptrEltdCfg, localPinState, context);
+            #endif
+        }
+    }
+
+    return result;
+}
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP || \
+           ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
+            (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD))) */
 
 
 /*******************************************************************************
@@ -1276,7 +1528,7 @@ void Cy_CapSense_SetCsxInactiveState(
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) && (!CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) */
 
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeMaxRaw
 ****************************************************************************//**
@@ -1284,199 +1536,294 @@ void Cy_CapSense_SetCsxInactiveState(
 * Initializes the maxRawCount and the maxRawCountRow fields of the
 * cy_stc_capsense_widget_context_t structure for the specified widget.
 *
-* \param ptrWdConfig
-* The pointer to the CAPSENSE&trade; widget configuration structure
-* \ref cy_stc_capsense_context_t.
+* \param widgetId
+* Specifies the ID number of the widget. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the operation:
-* - CY_CAPSENSE_STATUS_SUCCESS             - The operation is performed successfully.
-* - CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW  - Used scan configuration is not sufficient
-*                                            to accumulate at least one valid CIC2 sample.
-* - CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW   - Used scan configuration leads to the overflow
-*                                            in the CIC2 accumulation register.
+* - CY_CAPSENSE_STATUS_SUCCESS      - The operation is performed successfully.
+* - CY_CAPSENSE_STATUS_TIMEOUT      - A timeout reached during the scan time measurement.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - Not valid input parameter.
+* - CY_CAPSENSE_STATUS_HW_BUSY      - The MSCLP HW block is busy and cannot be
+*                                     switched to another mode.
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_InitializeMaxRaw(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context)
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
 {
+    uint32_t scanSlotId;
     cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_SUCCESS;
-    const cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
-
-    if(0u != (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK & ptrWdConfig->ptrWdContext->status))
-    {
-        capStatus |= Cy_CapSense_GetMaxRaw(&ptrWdConfig->ptrWdContext->maxRawCount, ptrWdCxt->snsClk,
-                                                                                    ptrWdConfig, context);
-    }
-    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
-        (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
-        if((CY_CAPSENSE_CSD_GROUP == ptrWdConfig->senseMethod) &&
-           (((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdConfig->wdType) ||
-           ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdConfig->wdType)))
-        {
-            if(0u != (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK & ptrWdConfig->ptrWdContext->status))
-            {
-                capStatus |= Cy_CapSense_GetMaxRaw(&ptrWdConfig->ptrWdContext->maxRawCountRow, ptrWdCxt->rowSnsClk,
-                                                                                               ptrWdConfig, context);
-            }
-
-        }
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
+    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        uint32_t tmpVal;
+        const cy_stc_capsense_scan_slot_t * ptrScanSlots;
     #endif
 
-    return(capStatus);
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_CapSense_GetMaxRaw
-****************************************************************************//**
-*
-* Returns the theoretical MAX raw count for specified parameters of scan.
-*
-* \param ptrMaxRawVal
-* Specifies the pointer to store the resulting MAX raw count value.
-*
-* \param snsClkDivider
-* Specifies the Sense Clock divider value.
-*
-* \param ptrWdConfig
-* The pointer to the CAPSENSE&trade; widget configuration structure
-* \ref cy_stc_capsense_context_t.
-*
-* \param context
-* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
-*
-* \return
-* Returns the status of the operation:
-* - CY_CAPSENSE_STATUS_SUCCESS             - The operation is performed successfully.
-* - CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW  - Used scan configuration is not sufficient
-*                                            to accumulate at least one valid CIC2 sample.
-* - CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW   - Used scan configuration leads to the overflow
-*                                            in the CIC2 accumulation register.
-*
-*******************************************************************************/
-cy_capsense_status_t Cy_CapSense_GetMaxRaw(
-                            uint16_t * ptrMaxRawVal,
-                            uint32_t snsClkDivider,
-                            const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                            const cy_stc_capsense_context_t * context)
-{
-    uint32_t snsClkTmp;
-    uint32_t maxRawTmp = 0u;
-    cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_SUCCESS;
-    const cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
-
-    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN)
-        uint32_t cic2HwDivider;
-        uint32_t cic2SamplesNum;
-        uint32_t cic2SamplesMax;
-    #else
+    if(0u != (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK & ptrWdCfg->ptrWdContext->status))
+    {
+        /* Prepare and execute the measurement to obtain the MAX raw count for the one-dimension widgets
+         * or columns for two-dimension widgets.
+         */
+        scanSlotId = ptrWdCfg->firstSlotId;
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-            uint32_t snsClkDividerLocal;
+            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCount,
+                                                          widgetId, scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
+        #else
+            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCount,
+                                                          scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
         #endif
-    #endif
 
-    (void)context;
-
-    snsClkTmp = snsClkDivider;
-    if (CY_CAPSENSE_CLK_SOURCE_PRS == (ptrWdConfig->ptrWdContext->snsClkSource & CY_CAPSENSE_CLK_SOURCE_MASK))
-    {
-        snsClkTmp <<= CY_CAPSENSE_PRS_SNS_KREF_SHIFT;
+        #if (CY_CAPSENSE_ENABLE != CY_CAPSENSE_CIC2_FILTER_EN)
+            ptrWdCfg->ptrWdContext->maxRawCount *= ptrWdCfg->numChopCycles;
+        #endif
     }
 
-    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN)
-        /* Obtain the MAX number of CIC2 samples for specified decimation rate. */
-        cic2SamplesMax = Cy_CapSense_GetCIC2SamplesMax(ptrWdCxt->cicRate);
-        /* Obtain the number of CIC2 samples for used sensing parameters. */
-        cic2SamplesNum  = (ptrWdCxt->numSubConversions * snsClkTmp) / ptrWdCxt->cicRate;
-
-        /*
-        * Check if obtained number of CIC2 samples is greater than 1, since the 1st sample
-        * after CIC2 reset always gets discarded.
-        */
-        if (cic2SamplesNum > 1u)
+    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        if(CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
         {
-            /* Take into account the discarded sample. */
-            cic2SamplesNum -= 1u;
-            cic2SamplesNum *= ptrWdConfig->numChopCycles;
-        }
-        else
-        {
-            /*
-            * Error is reported if the number of samples to be accumulated
-            * (taking into account discarded 1st sample) is less than 1.
-            */
-            capStatus |= CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW;
-        }
-
-        if (cic2SamplesNum > cic2SamplesMax)
-        {
-            /*
-            * Error is reported if the number of samples to be accumulated
-            * (taking into account discarded 1st sample) is greater than
-            * MAX possible value for specified CIC2 decimation rate that
-            * needs to be complied in order to prevent overflow.
-            */
-            capStatus |= CY_CAPSENSE_STATUS_CIC2_ACC_OVERFLOW;
-        }
-        else
-        {
-            cic2HwDivider = Cy_CapSense_GetCIC2HwDivider(cic2SamplesNum);
-
-            maxRawTmp = (uint32_t)ptrWdCxt->cicRate * ptrWdCxt->cicRate;
-            maxRawTmp = (maxRawTmp * cic2SamplesNum) / cic2HwDivider;
-        }
-    #else
-        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-            maxRawTmp = (((uint32_t)context->ptrInternalContext->numEpiCycles * ptrWdConfig->numChopCycles) - 1u) +
-                        (((uint32_t)ptrWdCxt->numSubConversions * ptrWdConfig->numChopCycles) * snsClkTmp);
-        #else
-            if (CY_CAPSENSE_CLK_SOURCE_PRS == (ptrWdConfig->ptrWdContext->snsClkSource & CY_CAPSENSE_CLK_SOURCE_MASK))
+           if(((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType) || ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType))
             {
-                maxRawTmp = context->ptrInternalContext->numEpiKrefDelayPrs;
+                if(0u != (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK & ptrWdCfg->ptrWdContext->status))
+                {
+                    /* Prepare and execute the measurement to obtain the MAX raw count for rows for two-dimension widgets. */
+                    scanSlotId = (uint32_t)ptrWdCfg->firstSlotId + ptrWdCfg->numSlots - 1u;
+                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCountRow,
+                                                                      widgetId, scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
+                    #else
+                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCountRow,
+                                                                      scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
+                    #endif
+
+                    #if (CY_CAPSENSE_ENABLE != CY_CAPSENSE_CIC2_FILTER_EN)
+                        ptrWdCfg->ptrWdContext->maxRawCountRow *= ptrWdCfg->numChopCycles;
+                    #endif
+
+                    /* For the multi-channel mode, iterate through enabled channels and find the sensing channel that
+                     * drives the sensor (not Shield only, Tx only, or Empty).
+                     */
+                    for (tmpVal = 0u; tmpVal < CY_CAPSENSE_TOTAL_CH_NUMBER; tmpVal++)
+                    {
+                        ptrScanSlots = &context->ptrScanSlots[scanSlotId + (CY_CAPSENSE_SLOT_COUNT * tmpVal)];
+                        if(CY_CAPSENSE_SLOT_SHIELD_ONLY > ptrScanSlots->wdId)
+                        {
+                            break;
+                        }
+                    }
+
+                    if(tmpVal >= CY_CAPSENSE_TOTAL_CH_NUMBER)
+                    {
+                        capStatus |= CY_CAPSENSE_STATUS_BAD_CONFIG;
+                    }
+
+                    /* Swap the row and column MAX raw count values in case if rows are scanned before
+                     * columns (the row's sensor is placed to the first slot of the widget).
+                     */
+                    if (ptrWdCfg->numRows >= ptrScanSlots->snsId)
+                    {
+                        tmpVal = ptrWdCfg->ptrWdContext->maxRawCount;
+                        ptrWdCfg->ptrWdContext->maxRawCount = ptrWdCfg->ptrWdContext->maxRawCountRow;
+                        ptrWdCfg->ptrWdContext->maxRawCountRow = (uint16_t)tmpVal;
+                    }
+                }
             }
-            else
-            {
-                maxRawTmp = context->ptrInternalContext->numEpiKrefDelay;
-            }
-
-            /*
-            * The duration of Epilogue is calculated as T_EPI = NUM_EPI_KREF * Kref / 4, where:
-            *  * T_EPI - the Epilogue duration as number of Mod Clock cycles;
-            *  * NUM_EPI_KREF - the NUM_EPI_KREF_DELAY_PRS value if LFSR_MODE = PRS and the NUM_EPI_KREF_DELAY
-            *    value if LFSR_MODE != PRS;
-            * Divider 4 is required because the value of the NUM_EPI_KREF parameter is interpreted
-            * as Kref/4 increments.
-            */
-            snsClkDividerLocal = Cy_CapSense_AdjustSnsClkDivider(ptrWdConfig->senseMethod, ptrWdCxt->snsClkSource, (uint16_t)snsClkDivider);
-            maxRawTmp = (maxRawTmp * snsClkDividerLocal) >> CY_CAPSENSE_DIV4_SHIFT;
-
-            if(maxRawTmp < 1u)
-            {
-                maxRawTmp = 1u;
-            }
-
-            maxRawTmp = ((maxRawTmp * ptrWdConfig->numChopCycles) - 1u) +
-                        ((snsClkTmp * ptrWdCxt->numSubConversions) * ptrWdConfig->numChopCycles);
-        #endif
-    #endif
-
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        *ptrMaxRawVal = (maxRawTmp > MSC_STATUS1_RAW_COUNT_Msk) ?
-                        ((uint16_t)MSC_STATUS1_RAW_COUNT_Msk) : (uint16_t)maxRawTmp;
-    #else
-        *ptrMaxRawVal = (maxRawTmp > MSCLP_SNS_STATUS1_RAW_COUNT_Msk) ?
-                        ((uint16_t)MSCLP_SNS_STATUS1_RAW_COUNT_Msk) : (uint16_t)maxRawTmp;
+        }
     #endif
 
     return capStatus;
 }
-#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+#endif /* ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)) */
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP || \
+     ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
+      (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)))
+/*******************************************************************************
+* Function Name: Cy_CapSense_ConvertPinState
+****************************************************************************//**
+*
+* The internal function that converts specified electrode state to the
+* internal format, depending on the used CAPSENSE&trade; platform.
+*
+* \note
+* This function is available for the fifth-generation (only
+* for CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) and fifth-generation low power
+* CAPSENSE&trade;.
+*
+* \param pinState
+* The desired pins state for CSX widget electrodes could be:
+* * CY_CAPSENSE_RX_PIN - Rx electrode
+* * CY_CAPSENSE_TX_PIN - Tx electrode
+* * CY_CAPSENSE_GROUND - Grounded
+* * CY_CAPSENSE_NEGATIVE_TX_PIN - Negative Tx electrode
+*     (for multi-phase TX method)
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+* The desired pins state for CSD widget electrodes could be:
+* * CY_CAPSENSE_SENSOR - Self-cap sensor
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_GROUND - Grounded
+* * CY_CAPSENSE_SHIELD - Shield is routed to the pin.
+* The desired pins state for ISX widget electrodes could be:
+* * CY_CAPSENSE_ISX_RX_PIN - ISX Rx electrode
+* * CY_CAPSENSE_ISX_LX_PIN - ISX Lx electrode
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
+* * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+*
+* \param convertedPinState
+* The pointer to the converted pins state value.
+*
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS   - Indicates the successful electrode setting conversion.
+* - CY_CAPSENSE_STATUS_BAD_PARAM - 1) pinState is not valid;
+*                      2) the CSD sensing method is disabled for desired
+*                         CY_CAPSENSE_SHIELD or CY_CAPSENSE_SENSOR states;
+*                      3) the CSX sensing method is disabled for desired
+*                         CY_CAPSENSE_TX_PIN, CY_CAPSENSE_NEGATIVE_TX_PIN or
+*                         CY_CAPSENSE_RX_PIN states;
+*                      4) the ISX sensing method is disabled for desired
+*                         CY_CAPSENSE_ISX_RX_PIN or CY_CAPSENSE_ISX_LX_PIN
+*                         states (Only for fifth-generation low power CAPSENSE&trade;).
+*******************************************************************************/
+cy_capsense_status_t Cy_CapSense_ConvertPinState(
+                uint32_t pinState,
+                uint32_t * convertedPinState)
+{
+    cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_PARAM;
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        switch (pinState)
+        {
+            case CY_CAPSENSE_GROUND:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_GND;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_HIGHZ:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+            case CY_CAPSENSE_SENSOR:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_CSD_SNS;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
+            case CY_CAPSENSE_SHIELD:
+                    #if (CY_CAPSENSE_CSD_SHIELD_MODE == CY_CAPSENSE_SHIELD_ACTIVE)
+                        *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_ACT_SHIELD;
+                    #else
+                        *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD;
+                    #endif
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+            #endif
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
+
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+            case CY_CAPSENSE_TX_PIN:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_CSX_TX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_RX_PIN:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_CSX_RX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_NEGATIVE_TX_PIN:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_CSX_NEG_TX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_VDDA2:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+            case CY_CAPSENSE_ISX_RX_PIN:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_ISX_RX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_ISX_LX_PIN:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_IDX_ISX_LX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
+
+            default:
+                /* No action on other sensor states */
+                break;
+        }
+    #else
+        switch (pinState)
+        {
+            case CY_CAPSENSE_GROUND:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_GND;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_HIGHZ:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_HIGH_Z;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+            case CY_CAPSENSE_SENSOR:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_SNS;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
+            case CY_CAPSENSE_SHIELD:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_SHIELD;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+            #endif
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+            case CY_CAPSENSE_TX_PIN:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_TX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_RX_PIN:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_RX;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_NEGATIVE_TX_PIN:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_TX_NEGATIVE;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_VDDA2:
+                    *convertedPinState = CY_CAPSENSE_CTRLMUX_PIN_STATE_VDDA2;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
+
+            default:
+                /* No action on other sensor states */
+                break;
+        }
+    #endif
+
+    return result;
+}
+#endif
 
 #endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 /* [] END OF FILE */

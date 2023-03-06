@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -352,19 +352,19 @@ extern "C" {
 /* MODE0_SW_SEL_CDAC_FL Register for CSD SM with CapDAC dithering */
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA                (3uL)
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB                 (2uL)
-#define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV                 (2uL)
+#define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV                 (0uL)
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG                 (3uL)
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV                 (6uL)
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG                 (7uL)
 #define CY_CAPSENSE_SM_CSD_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE         (0uL)
 
 /* MODE0_SW_SEL_CDAC_FL Register for CSX SM with CapDAC dithering */
-#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA                (4uL)
-#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB                 (5uL)
+#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTCA                (5uL)
+#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLCB                 (4uL)
 #define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTV                 (0uL)
 #define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLTG                 (0uL)
-#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV                 (2uL)
-#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG                 (3uL)
+#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBV                 (4uL)
+#define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_SW_FLBG                 (5uL)
 #define CY_CAPSENSE_SM_CSX_DITH_FULL_WAVE_CTRL_MUX_REG_MODE0_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE         (0uL)
 
 /* SW_SEL_GPIO Register for CSD SM */

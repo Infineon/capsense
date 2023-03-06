@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -71,7 +71,7 @@
 * The supported CAPSENSE&trade; HW blocks can perform only one function at a time.
 * However, all supported functionality (like CAPSENSE&trade;, CSDADC, etc.) can be
 * time-multiplexed in a design. I.e. you can save the existing state of
-* the CAPSENSE&trade; middleware, restore the state of the the CSDADC middleware, perform
+* the CAPSENSE&trade; middleware, restore the state of the CSDADC middleware, perform
 * CSDADC measurements, and then switch back to the CAPSENSE&trade; functionality.
 * For details and code examples, refer to the description of the
 * Cy_CapSense_Save() and Cy_CapSense_Restore() functions.
@@ -83,7 +83,7 @@
 * sections of documentation for other middleware supported by the CAPSENSE&trade; HW.
 *
 * A CAPSENSE&trade; solution includes:
-* * The CAPSENSE&trade; Configurator to create
+* * The CAPSENSE&trade; Configurator tool to create
 *   and configure CAPSENSE&trade; widgets. It can be launched in ModusToolbox&trade;
 *   from the CAPSENSE&trade; superblock personality and in Stand-alone mode.
 *   It contains a separate document about how to create and
@@ -129,7 +129,6 @@
 * * Multi-frequency scan (MFS)
 * * Multi-phase TX (MPTX)
 * * Inductive sensing (ISX) on fifth-generation CAPSENSE&trade;
-* * Protocol agnostic full duplex communication
 *
 ********************************************************************************
 * \section group_capsense_quick_start Quick Start Guide
@@ -211,7 +210,7 @@
 * \note
 * Ensure to set up the device power voltages correctly
 * to the proper operation of the device power domains. The Setup is
-* on the System Tab of the Device Configurator. Enable the Power check box
+* on the System Tab of the Device Configurator tool. Enable the Power check box
 * and set up the voltages as they are red-outlined in the picture below.
 *
 * \image html check_power.png "Power Setup" width=800px
@@ -220,9 +219,9 @@
 * \subsection group_capsense_quick_start_mbed MBED OS Configuration Considerations
 *
 * You can immediately start with the following MBED OS code example available
-* at the <a href="https:/\/github.com/cypresssemiconductorco">
-* <b> Cypress Semiconductor GitHub</b></a>:
-* * <a href="https:/\/github.com/cypresssemiconductorco/mbed-os-example-capsense">
+* at the <a href="https:/\/github.com/Infineon/">
+* <b> Infineon GitHub</b></a>:
+* * <a href="https:/\/github.com/Infineon/mbed-os-example-capsense">
 *   <b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a>
 *
 * If you are doing your own project, remember to include cycfg.h file:
@@ -268,27 +267,27 @@
 *     <td>3.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; Device Configurator</td>
+*     <td>- ModusToolbox&trade; Device Configurator tool</td>
 *     <td>4.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; MSC Superblock Personality for for PSoC&trade; 4 devices in the Device Configurator</td>
+*     <td>- ModusToolbox&trade; MSC Superblock Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>1.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator</td>
+*     <td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>1.1</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator</td>
-*     <td>1.0</td>
+*     <td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
+*     <td>3.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator</td>
+*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>1.2</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator</td>
+*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator tool</td>
 *     <td>2.0</td>
 *   </tr>
 *   <tr>
@@ -348,9 +347,9 @@
 * \ref section_capsense_toolchain.
 *
 * Ensure:
-* * The specified version of the ModusToolbox&trade; Device Configurator and
+* * The specified version of the ModusToolbox&trade; Device Configurator tool and
 *   the Personality are used to re-generate the device configuration.
-* * The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator is used
+* * The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator tool is used
 *   to re-generate the middleware configuration.
 * * The toolchains are set up properly for your environment per the settings
 *   outlined in the Supported Software and Tools.
@@ -359,10 +358,10 @@
 *
 * You might need to re-generate the configuration structures for either the
 * device initialization code or the middleware initialization code.
-* * Launch the ModusToolbox&trade; Device Configurator and perform the File->Save command
+* * Launch the ModusToolbox&trade; Device Configurator tool and perform the File->Save command
 *   to re-generate the device initialization code.
-* * From the ModusToolbox&trade; Device Configurator, launch the
-*   ModusToolbox&trade; CAPSENSE&trade; Configurator and perform the File->Save command to
+* * From the ModusToolbox&trade; Device Configurator tool, launch the
+*   ModusToolbox&trade; CAPSENSE&trade; Configurator tool and perform the File->Save command to
 *   re-generate the middleware initialization code.
 *
 ********************************************************************************
@@ -569,19 +568,19 @@
 *     </td>
 *   </tr>
 *    <tr>
+*     <td>Rule 11.4</td>
+*     <td>A conversion should not be performed between a pointer to object and an integer type.
+*     </td>
+*     <td>Advisory. There is an issue with a SYSCLK driver (IFXID-10550), due to which integer type
+*          is cast to an object pointer type. Code is manually checked and reviewed to be safe.
+*     </td>
+*   </tr>
+*    <tr>
 *     <td>Rule 11.5</td>
 *     <td>A conversion should not be performed from pointer to void into pointer to object.
 *     </td>
 *     <td>Advisory. The cast from void pointer to an object pointer does not have any unintended effect,
 *         as it is a consequence of the definition of a structure based on function pointers.
-*     </td>
-*   </tr>
-*    <tr>
-*     <td>Rule 11.8</td>
-*     <td>A cast shall not remove any const or volatile qualification from the type pointed to by a pointer.
-*     </td>
-*     <td>There is an issue with a DMAC driver (IFXID-9039), due to which volatile qualifier is removed.
-*          Code is manually checked and reviewed to be safe.
 *     </td>
 *   </tr>
 *    <tr>
@@ -601,7 +600,7 @@
 *   </tr>
 * </table>
 *
-* \subsection subsection_capsense_misra-cfg CAPSENSE&trade; Configurator Generated Sources Deviation
+* \subsection subsection_capsense_misra-cfg CAPSENSE&trade; Configurator Tool Generated Sources Deviation
 *
 * <table class="doxtable">
 *   <tr>
@@ -942,8 +941,8 @@
 * design guidelines, different interfaces and tuning guidelines necessary
 * for a successful design of a CAPSENSE&trade; system is available in the Getting
 * Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide.
-* CYPRESS&trade; highly recommends starting with these documents. They can be
-* found on the CYPRESS&trade; web site at www.cypress.com.
+* Infineon Technologies highly recommends starting with these documents. They can be
+* found on the Infineon Technologies web site at www.infineon.com.
 *
 * For more information, refer to the following documents:
 *
@@ -955,7 +954,7 @@
 *   * <a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade;
 *   CAPSENSE&trade; Tuner Tool Guide</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/documentation/application-notes/an85951-psoc-4-and-psoc-6-mcu-capsense-design-guide">
+*   * <a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661">
 *   <b>CAPSENSE&trade; Design Guide</b></a>
 *
 * * ModusToolbox&trade; Overview:
@@ -989,19 +988,19 @@
 *   * <a href="https:/\/infineon.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html">
 *   <b>CAT2 PDL API Reference</b></a>
 *
-*   * <a href="http:/\/edit.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
+*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
 *   PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
 *
-*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">
+*   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">
 *   <b>PSoC&trade; 6 Technical Reference Manual</b></a>
 *
-*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&view=downloads">
+*   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&view=downloads">
 *   <b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
-*   * <a href="https:/\/edit.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&view=downloads">
+*   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&view=downloads">
 *   <b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
-*   * <a href="http:/\/edit.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&view=downloads">
+*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&view=downloads">
 *   <b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a>
 *
 *   * <a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a>
@@ -1202,7 +1201,8 @@
 *         by CapSense MW before scan triggering. If a timeout to postpone a scan
 *         is configured (using Cy_CapSense_ConfigureMsclpTimer() function) then callback
 *         will be called before this timeout. The StartSample callback is called
-*         only once before entire frame scan in Cy_CapSense_ScanSlots() function.
+*         only once before entire frame scan in Cy_CapSense_ScanSlots()
+*         and Cy_CapSense_ScanLpSlots() functions.
 *       \par
 *       * For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
 *         only once in Cy_CapSense_ScanSlots() function with NULL passed as a parameter.
@@ -1216,6 +1216,9 @@
 *     <td>\ref cy_capsense_callback_t</td>
 *     <td>This is called after sensor scan completion and there is no other
 *         sensor in the queue to be scanned.
+*       \par
+*       * For the fifth-generation low power CAPSENSE&trade; this callback is called
+*         with NULL passed as a parameter.</td>
 *       \par
 *       * For the fifth-generation CAPSENSE&trade; in CS-DMA mode this callback is called
 *         with NULL passed as a parameter.</td>
@@ -1239,9 +1242,6 @@
 *     <td>\ref cy_capsense_tuner_receive_callback_t</td>
 *     <td>This is called by the Cy_CapSense_RunTuner() function to establish
 *         synchronous communication with the Tuner tool.
-*         \warning
-*         This Beta release does not support the Tuner Receive Callback for
-*         the fifth-generation low power CAPSENSE&trade;. The feature will be implemented in next releases.
 *         </td>
 *   </tr>
 *   <tr>
@@ -1305,10 +1305,13 @@
     #include "cy_capsense_sensing_v3.h"
     #include "cy_capsense_selftest_v3.h"
     #include "cy_capsense_sm_base_full_wave_v3.h"
-#else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
     #include "cy_capsense_generator_lp.h"
     #include "cy_capsense_sensing_lp.h"
+    #include "cy_capsense_selftest_lp.h"
     #include "cy_capsense_sm_base_full_wave_lp.h"
+#else
+    /* Supported platform not found */
 #endif
 
 #endif /* CY_CAPSENSE_H */

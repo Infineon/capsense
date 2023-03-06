@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -71,7 +71,11 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 {
     uint32_t widgetId;
 
-    context->ptrCommonContext->status = 0u;
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        context->ptrCommonContext->status = CY_CAPSENSE_MW_STATE_INITIALIZATION_MASK;
+    #else
+        context->ptrCommonContext->status = 0u;
+    #endif
 
     for (widgetId = CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId-- > 0u;)
     {
@@ -309,17 +313,13 @@ void Cy_CapSense_InitializeWidgetGestures(
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdCfg->ptrWdContext;
 
-    if (((uint8_t)CY_CAPSENSE_WD_LINEAR_SLIDER_E == ptrWdCfg->wdType) ||
-        ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType))
+    if (NULL != ptrWdCfg->ptrGestureConfig)
     {
-        if (NULL != ptrWdCfg->ptrGestureConfig)
+        if (0u != (ptrWdCfg->ptrGestureConfig->gestureEnableMask & CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK))
         {
-            if (0u != (ptrWdCfg->ptrGestureConfig->gestureEnableMask & CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK))
-            {
-                ptrWdCxt->gestureDetected = 0u;
-                ptrWdCxt->gestureDirection = 0u;
-                Cy_CapSense_Gesture_ResetState(ptrWdCfg->ptrGestureContext);
-            }
+            ptrWdCxt->gestureDetected = 0u;
+            ptrWdCxt->gestureDirection = 0u;
+            Cy_CapSense_Gesture_ResetState(ptrWdCfg->ptrGestureContext);
         }
     }
 }
@@ -366,6 +366,7 @@ void Cy_CapSense_InitializeWidgetGestures(
 *   * bit[7] - one-finger flick
 *   * bit[8] - one-finger rotate
 *   * bit[9] - two-finger zoom
+*   * bit[10] - one-finger long press
 *   * bit[13] - touchdown event
 *   * bit[14] - liftoff event
 * * bit[16..31] - gesture direction if detected
@@ -396,12 +397,21 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdCfg->ptrWdContext;
     cy_stc_capsense_gesture_position_t position[CY_CAPSENSE_MAX_CENTROIDS];
 
-    if (((uint8_t)CY_CAPSENSE_WD_LINEAR_SLIDER_E == ptrWdCfg->wdType) ||
-        ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType))
+    if (NULL != ptrWdCfg->ptrGestureConfig)
     {
-        if (NULL != ptrWdCfg->ptrGestureConfig)
+        if (0u != (ptrWdCfg->ptrGestureConfig->gestureEnableMask & CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK))
         {
-            if (0u != (ptrWdCfg->ptrGestureConfig->gestureEnableMask & CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK))
+            if (((uint8_t)CY_CAPSENSE_WD_BUTTON_E == ptrWdCfg->wdType) ||
+                ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
+            {
+                positionNum = (uint32_t)ptrWdCxt->status & CY_CAPSENSE_WD_ACTIVE_MASK;
+                for (posIndex = 0u; posIndex < positionNum; posIndex++)
+                {
+                    position[posIndex].x = 0u;
+                    position[posIndex].y = 0u;
+                }
+            }
+            else
             {
                 positionNum = ptrWdCxt->wdTouch.numPosition;
                 if (positionNum > CY_CAPSENSE_MAX_CENTROIDS)
@@ -413,14 +423,15 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
                     position[posIndex].x = ptrWdCxt->wdTouch.ptrPosition[posIndex].x;
                     position[posIndex].y = ptrWdCxt->wdTouch.ptrPosition[posIndex].y;
                 }
-                Cy_CapSense_Gesture_Decode(context->ptrCommonContext->timestamp, (uint32_t)ptrWdCxt->wdTouch.numPosition,
-                        &position[0u], ptrWdCfg->ptrGestureConfig, ptrWdCfg->ptrGestureContext);
-                ptrWdCxt->gestureDetected = ptrWdCfg->ptrGestureContext->detected;
-                ptrWdCxt->gestureDirection = ptrWdCfg->ptrGestureContext->direction;
-                gestureStatus = (uint32_t)ptrWdCxt->gestureDetected | ((uint32_t)ptrWdCxt->gestureDirection << CY_CAPSENSE_GESTURE_DIRECTION_OFFSET);
             }
+            Cy_CapSense_Gesture_Decode(context->ptrCommonContext->timestamp, positionNum,
+                    &position[0u], ptrWdCfg->ptrGestureConfig, ptrWdCfg->ptrGestureContext);
+            ptrWdCxt->gestureDetected = ptrWdCfg->ptrGestureContext->detected;
+            ptrWdCxt->gestureDirection = ptrWdCfg->ptrGestureContext->direction;
+            gestureStatus = (uint32_t)ptrWdCxt->gestureDetected | ((uint32_t)ptrWdCxt->gestureDirection << CY_CAPSENSE_GESTURE_DIRECTION_OFFSET);
         }
     }
+
     return gestureStatus;
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN) */
@@ -523,7 +534,8 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
         }
     }
 
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
+        (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
         ptrSnsCxtSns = ptrWdCfg->ptrSnsContext;
         for (snsIndex = ptrWdCfg->numSns; snsIndex-- > 0u;)
         {
@@ -532,7 +544,8 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
         }
     #endif
 
-    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN) && \
+         ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)))
         (void)Cy_CapSense_RunMfsMedian(widgetId, context);
     #endif
 
@@ -1473,7 +1486,8 @@ void Cy_CapSense_DpProcessCsxTouchpad(
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_TOUCHPAD_EN) */
 
-#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
+    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_RunMfsFiltering
 ****************************************************************************//**
@@ -1497,18 +1511,20 @@ void Cy_CapSense_RunMfsFiltering(
 }
 #endif
 
+
 #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
-#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED))
 /*******************************************************************************
-* Function Name: Cy_CapSense_ProcessWidgetMptxDeconvolution
+* Function Name: Cy_CapSense_ProcessWidgetMpDeconvolution
 ****************************************************************************//**
 *
-* Performs raw count deconvolution for the specified CSX widget when
-* Multi-phase Tx is enabled.
+* Performs raw count deconvolution for the specified widget:
+* * CSD - when multi-phase Self is enabled
+* * CSX - when multi-phase Tx is enabled
 *
 * This function decodes raw counts received after scanning into normal view by
 * performing deconvolution algorithm. If the function is called for a widget with
-* disabled Multi-phase Tx, the function returns CY_CAPSENSE_STATUS_BAD_DATA.
+* disabled multi-phase, the function returns CY_CAPSENSE_STATUS_BAD_DATA.
 *
 * No need to call this function from application layer since the
 * Cy_CapSense_ProcessAllWidgets() and Cy_CapSense_ProcessWidget() functions calls
@@ -1516,8 +1532,8 @@ void Cy_CapSense_RunMfsFiltering(
 *
 * DAC auto-calibration when enabled performs sensor auto-calibration without
 * performing deconvolution.
-* The deconvolution algorithm for even number of TX electrodes decreases raw count
-* level twice (keeping the signal on the same level).
+* For the CSX widgets, the deconvolution algorithm for even number of TX electrodes
+* decreases raw count level twice (keeping the signal on the same level).
 *
 * If specific processing is implemented using the Cy_CapSense_ProcessWidgetExt()
 * and Cy_CapSense_ProcessSensorExt() function then a call of this function is
@@ -1533,82 +1549,162 @@ void Cy_CapSense_RunMfsFiltering(
 * Returns the status of the processing operation.
 *
 *******************************************************************************/
-cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
+cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
     uint32_t idx;
     uint32_t sumIdx;
-    uint32_t ceIdx;
     uint32_t rotIdx;
-    /* Order of multi-TX sequence */
-    uint32_t mptxOrderLocal;
-    int32_t localBuf[CY_CAPSENSE_MPTX_MAX_ORDER];
-    int16_t deconvCoefRot[CY_CAPSENSE_MAX_TX_PATTERN_NUM * 2u];
+    uint32_t snsIdx = 0u;
+    int32_t localBuf[CY_CAPSENSE_MULTIPHASE_MAX_ORDER];
+    int16_t deconvCoefRot[CY_CAPSENSE_MULTIPHASE_MAX_ORDER * 4u];
+    int16_t * ptrDeconvTable = &deconvCoefRot[0u];
     int32_t accum;
-    uint32_t accumTmp;
     cy_capsense_status_t result = CY_CAPSENSE_STATUS_BAD_DATA;
     uint32_t freqChIndex;
+    uint32_t mpOrderLocal;
+    cy_stc_capsense_mp_table_t * ptrMpTable;
+    uint32_t accumTmp;
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+        int32_t accum_raw[CY_CAPSENSE_MPSC_MAX_ORDER];
+        int32_t diff_buff[CY_CAPSENSE_MPSC_MAX_ORDER];
+        int32_t min_diff;
+        int32_t sign;
+    #endif
 
     ptrWdCfg = &context->ptrWdConfig[widgetId];
-    mptxOrderLocal = ptrWdCfg->mptxOrder;
-    if (mptxOrderLocal >= CY_CAPSENSE_MPTX_MIN_ORDER)
+    mpOrderLocal = ptrWdCfg->mpOrder;
+    ptrMpTable = ptrWdCfg->ptrMpTable;
+
+    if (mpOrderLocal >= CY_CAPSENSE_MPTX_MIN_ORDER)
     {
         result = CY_CAPSENSE_STATUS_SUCCESS;
 
-        (void)memcpy(&deconvCoefRot[0], (const void *)&ptrWdCfg->ptrMptxTable->deconvCoef[0u], mptxOrderLocal * CY_CAPSENSE_BYTES_IN_16_BITS);
-        (void)memcpy(&deconvCoefRot[mptxOrderLocal], (const void *)&ptrWdCfg->ptrMptxTable->deconvCoef[0u], mptxOrderLocal * CY_CAPSENSE_BYTES_IN_16_BITS);
+        (void)memcpy((void *)&deconvCoefRot[0u], (const void *)&ptrMpTable->deconvCoef[0u], mpOrderLocal * CY_CAPSENSE_BYTES_IN_16_BITS);
+        (void)memcpy((void *)&deconvCoefRot[mpOrderLocal], (const void *)&ptrMpTable->deconvCoef[0u], mpOrderLocal * CY_CAPSENSE_BYTES_IN_16_BITS);
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+            if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
+            {
+                ptrMpTable++;
+                (void)memcpy((void *)&deconvCoefRot[CY_CAPSENSE_MPSC_MAX_ORDER * 2u], (const void *)&ptrMpTable->deconvCoef[0u], ptrWdCfg->mpOrderRows * CY_CAPSENSE_BYTES_IN_16_BITS);
+                (void)memcpy((void *)&deconvCoefRot[(CY_CAPSENSE_MPSC_MAX_ORDER * 2u) + ptrWdCfg->mpOrderRows], (const void *)&ptrMpTable->deconvCoef[0u], ptrWdCfg->mpOrderRows * CY_CAPSENSE_BYTES_IN_16_BITS);
+            }
+        #endif
 
         for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
         {
-            ceIdx = (uint32_t)ptrWdCfg->numRows * ptrWdCfg->numCols;
-            while (ceIdx >= mptxOrderLocal)
+            while (snsIdx < ptrWdCfg->numSns)
             {
-                ceIdx -= mptxOrderLocal;
-                /* Copy vector formed by RX[rxIdx] and TX[txIdx..txIdx+mptxOrderLocal]
-                * from sensors to localBuf */
-                idx = mptxOrderLocal;
-                while (0u != idx--)
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                    if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
+                    {
+                        if (snsIdx >= ptrWdCfg->numCols)
+                        {
+                            ptrDeconvTable = &deconvCoefRot[CY_CAPSENSE_MPSC_MAX_ORDER * 2u];
+                            mpOrderLocal = ptrWdCfg->mpOrderRows;
+                        }
+                    }
+                #endif
+
+                /* Copy vector from sensors to localBuf */
+                for (idx = 0u; idx < mpOrderLocal; idx++)
                 {
-                    localBuf[idx] = (int32_t)ptrWdCfg->ptrSnsContext[idx + ceIdx +
+                    localBuf[idx] = (int32_t)ptrWdCfg->ptrSnsContext[idx + snsIdx +
                                     (context->ptrCommonConfig->numSns * freqChIndex)].raw;
                 }
 
-                /* Multiply vector stored in localBuf by the matrix of deconvolution coefficients. */
-                idx = mptxOrderLocal;
-                while (0u != idx--)
+                /* Multiply vector stored in localBuf by the matrix of deconvolution coefficients */
+                idx = 0u;
+                while (idx < mpOrderLocal)
                 {
                     accum = 0;
-                    rotIdx = idx + mptxOrderLocal - 1u;
-                    sumIdx = mptxOrderLocal;
-                    while (0u != sumIdx--)
+                    rotIdx = idx;
+                    sumIdx = 0u;
+                    while (sumIdx < mpOrderLocal)
                     {
-                        accum += localBuf[sumIdx] * deconvCoefRot[rotIdx];
-                        rotIdx--;
+                        accum += localBuf[sumIdx] * ptrDeconvTable[rotIdx];
+                        sumIdx++;
+                        rotIdx++;
                     }
 
-                    if (0 > accum)
-                    {
-                        accumTmp = 0u;
-                    }
-                    else
-                    {
-                        accumTmp = (uint32_t)accum;
-
-                        /* Shift the result in such a way that guarantees no overflow */
-                        accumTmp >>= CY_CAPSENSE_SCALING_SHIFT;
-
-                        if ((uint32_t)UINT16_MAX < accumTmp)
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                        if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
                         {
-                            accumTmp = UINT16_MAX;
+                            sign = (0 > accum) ? -1 : 1;
+                            accum *= sign;
+                            accumTmp = (uint32_t)accum;
+
+                            /* Shift the result in such a way that guarantees no overflow */
+                            accumTmp >>= CY_CAPSENSE_SCALING_SHIFT;
+
+                            /* Store to the temporary signed raw counts buffer */
+                            accum_raw[idx+snsIdx] = (int32_t)accumTmp;
+                            accum_raw[idx+snsIdx] *= sign;
+                        }
+                    #endif
+
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED)
+                        if (CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod)
+                        {
+                            if (0 > accum)
+                            {
+                                accumTmp = 0u;
+                            }
+                            else
+                            {
+                                accumTmp = (uint32_t)accum;
+
+                                /* Shift the result in such a way that guarantees no overflow */
+                                accumTmp >>= CY_CAPSENSE_SCALING_SHIFT;
+
+                                if ((uint32_t)UINT16_MAX < accumTmp)
+                                {
+                                    accumTmp = UINT16_MAX;
+                                }
+                            }
+
+                            /* Convert the result to unsigned 16 bit and store in the target buffer */
+                            ptrWdCfg->ptrSnsContext[idx + snsIdx +
+                                            (context->ptrCommonConfig->numSns * freqChIndex)].raw = (uint16_t)accumTmp;
+                        }
+                    #endif /* CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED */
+
+                    idx++;
+                }
+
+                 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+                    if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
+                    {
+                        /* Calculate diff counts */
+                        for (idx = 0u; idx < mpOrderLocal; idx++)
+                        {
+                            diff_buff[idx] = accum_raw[idx+snsIdx] - (int32_t)ptrWdCfg->ptrSnsContext[idx+snsIdx].bsln;
+                        }
+
+                        /* Find the lowest diff value */
+                        min_diff = diff_buff[0u];
+                        for (idx = 1u; idx < mpOrderLocal; idx++)
+                        {
+                            if (min_diff > diff_buff[idx])
+                            {
+                                min_diff = diff_buff[idx];
+                            }
+                        }
+
+                        /* Apply multi-phase sum0 alignment */
+                        for (idx = 0u; idx < mpOrderLocal; idx++)
+                        {
+                            accum_raw[idx+snsIdx] -= min_diff;
+                            ptrWdCfg->ptrSnsContext[idx+snsIdx].raw = (uint16_t)accum_raw[idx+snsIdx];
                         }
                     }
+                 #endif
 
-                    /* Convert the result to unsigned 16 bit and store in the target buffer */
-                    ptrWdCfg->ptrSnsContext[idx + ceIdx +
-                                    (context->ptrCommonConfig->numSns * freqChIndex)].raw = (uint16_t)accumTmp;
-                }
+                snsIdx += mpOrderLocal;
             }
         }
     }
@@ -1635,9 +1731,9 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetMptxDeconvolution(
 *
 * If specific processing is implemented using the Cy_CapSense_ProcessWidgetExt()
 * and Cy_CapSense_ProcessSensorExt() function then a call of this function is
-* required prior doing the specific processing. If Multi-phase TX is enabled
+* required prior doing the specific processing. If Multi-phase is enabled
 * then deconvolution should be executed after call of this function using
-* the Cy_CapSense_ProcessWidgetMptxDeconvolution() function.
+* the Cy_CapSense_ProcessWidgetMpDeconvolution() function.
 *
 * \param widgetId
 * The widget ID, for which the pre-processing should be executed.
@@ -1698,9 +1794,9 @@ void Cy_CapSense_PreProcessWidget(
 *
 * If specific processing is implemented using the Cy_CapSense_ProcessWidgetExt()
 * and Cy_CapSense_ProcessSensorExt() function then a call of this function is
-* required prior doing the specific processing. If Multi-phase TX is enabled
+* required prior doing the specific processing. If Multi-phase is enabled
 * then deconvolution should be executed after pre-processing of all sensors
-* of the specified widget using the Cy_CapSense_ProcessWidgetMptxDeconvolution()
+* of the specified widget using the Cy_CapSense_ProcessWidgetMpDeconvolution()
 * function.
 *
 * \param widgetId
@@ -1896,7 +1992,8 @@ void Cy_CapSense_PreProcessSensorInvertRaw(
            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)) */
 
 
-#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN) && \
+     ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)))
 /*******************************************************************************
 * Function Name: Cy_CapSense_RunMfsMedian
 ****************************************************************************//**

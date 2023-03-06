@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -96,6 +96,16 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
                     const cy_stc_capsense_context_t * context);
 #endif
 
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP || \
+     ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
+      (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)))
+    cy_capsense_status_t Cy_CapSense_SlotPinState(
+                    uint32_t slotId,
+                    const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
+                    uint32_t pinState,
+                    cy_stc_capsense_context_t * context);
+#endif
+
 cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
                 uint32_t inactiveState,
                 uint32_t sensingGroup,
@@ -112,28 +122,46 @@ cy_capsense_status_t Cy_CapSense_ScanAbort(
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
-    void Cy_CapSense_SetCsdInactiveState(
-                    cy_stc_capsense_context_t * context);
+#if (!CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+        void Cy_CapSense_SetCsdInactiveState(
+                        cy_stc_capsense_context_t * context);
+    #endif
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+        void Cy_CapSense_SetCsxInactiveState(
+                        cy_stc_capsense_context_t * context);
+    #endif
 #endif
 
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
-    void Cy_CapSense_SetCsxInactiveState(
-                    cy_stc_capsense_context_t * context);
-#endif
-
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN))
 cy_capsense_status_t Cy_CapSense_InitializeMaxRaw(
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                const cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_GetMaxRaw(
-                            uint16_t * ptrMaxRawVal,
-                            uint32_t snsClkDivider,
-                            const cy_stc_capsense_widget_config_t * ptrWdConfig,
-                            const cy_stc_capsense_context_t * context);
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP || \
+     ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) && \
+      (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)))
+cy_capsense_status_t Cy_CapSense_ConvertPinState(
+                uint32_t pinState,
+                uint32_t * convertedPinState);
 #endif
 
 /** \} \endcond */
+
+/*******************************************************************************
+* Local definition
+*******************************************************************************/
+
+/* Macro to optimize division operation */
+#define CY_CAPSENSE_DIV4_SHIFT              (2u)
+
+/* Defines the KREF_PRS correcting shift, taking into account Sense Clock Divider
+ * adjustment in scope of the Cy_CapSense_AdjustSnsClkDivider()
+ * routine.
+ */
+#define CY_CAPSENSE_PRS_SNS_KREF_SHIFT      (1u)
 
 #if defined(__cplusplus)
 }

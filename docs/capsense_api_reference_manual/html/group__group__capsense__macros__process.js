@@ -9,5 +9,8 @@ var group__group__capsense__macros__process =
     [ "CY_CAPSENSE_PROCESS_MFS_FILTER", "group__group__capsense__macros__process.html#ga44f2cd15a1ad1da162249da40ac12570", null ],
     [ "CY_CAPSENSE_PROCESS_ALL", "group__group__capsense__macros__process.html#gaa84b286a4e106b5eeed0141339f7ab6b", null ],
     [ "CY_CAPSENSE_MPTX_MIN_ORDER", "group__group__capsense__macros__process.html#ga6dfc332e06a74a6932bedaba71700071", null ],
-    [ "CY_CAPSENSE_MPTX_MAX_ORDER", "group__group__capsense__macros__process.html#ga0ce8f40602fa2d1adac3e8aadda2afe0", null ]
+    [ "CY_CAPSENSE_MPTX_MAX_ORDER", "group__group__capsense__macros__process.html#ga0ce8f40602fa2d1adac3e8aadda2afe0", null ],
+    [ "CY_CAPSENSE_MPSC_MIN_ORDER", "group__group__capsense__macros__process.html#gac63e762b3b4204af483f362508860817", null ],
+    [ "CY_CAPSENSE_MPSC_MAX_ORDER", "group__group__capsense__macros__process.html#ga46b0721f7a5bc00abee5715c091203b2", null ],
+    [ "CY_CAPSENSE_MULTIPHASE_MAX_ORDER", "group__group__capsense__macros__process.html#gad8d97bb03e67db1778052e8291e417c9", null ]
 ];

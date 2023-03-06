@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -1691,7 +1691,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensor(
                     Cy_CapSense_BistSwitchAllSnsPinState(desiredIoState, context);
 
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
-                        Cy_CapSense_BistSwitchAllShieldPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
+                        Cy_CapSense_BistSwitchAllShieldPinState(desiredIoState, context);
                     #endif
 
                     /* Set the divider value for the mod clock 1u lower than the desired divider */
@@ -2037,7 +2037,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorExt(
                     Cy_CapSense_BistSwitchHwConfig(hwConfiguration, context);
                     Cy_CapSense_BistSwitchAllSnsPinState(desiredIoState, context);
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
-                        Cy_CapSense_BistSwitchAllShieldPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
+                        Cy_CapSense_BistSwitchAllShieldPinState(desiredIoState, context);
                     #endif
                     /* Calculate the VrefHigh voltage */
                     vRefMv = Cy_CapSense_GetVrefHighMv((uint32_t)ptrScanConfig->vrefGain, context);
@@ -2341,13 +2341,12 @@ static void Cy_CapSense_BistMeasureCapacitanceSensorInit(
         #endif
     #endif
 
-    /* High-Speed Comparator initialization */
+    /* High-Speed Comparator settings for scan */
     ptrBistCxt->regHscmpScan = CY_CAPSENSE_CSD_HSCMP_HSCMP_EN_MSK;
     ptrBistCxt->regHscmpScanShield = CY_CAPSENSE_CSD_HSCMP_HSCMP_EN_MSK;
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
         ptrBistCxt->regHscmpScan = 0u;
-        ptrBistCxt->regHscmpScanShield = 0u;
     #endif
 
     ptrBistCxt->regSwHsPSelCmodInit = 0u;
@@ -2960,7 +2959,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensorAll(
 * allows detecting a short of the measured capacitor to other pins.
 *
 * To measure all the available capacitors, the Cy_CapSense_RunSelfTest()
-* function can be used with the CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK mask. The measured
+* function can be used with the CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK mask. The measured
 * results are stored in the corresponding field of the
 * \ref cy_stc_capsense_bist_context_t structure.
 *
@@ -3989,6 +3988,9 @@ void Cy_CapSense_BistDsInitialize_V2(cy_stc_capsense_context_t * context)
 
     context->ptrBistContext->hwConfig = CY_CAPSENSE_BIST_HW_UNDEFINED_E;
     context->ptrBistContext->currentISC = CY_CAPSENSE_BIST_IO_UNDEFINED_E;
+    context->ptrBistContext->intrEltdCapCsdISC = context->ptrBistContext->eltdCapCsdISC;
+    context->ptrBistContext->intrEltdCapCsxISC = context->ptrBistContext->eltdCapCsxISC;
+    context->ptrBistContext->intrEltdCapShieldISC = context->ptrBistContext->shieldCapISC;
 }
 
 
@@ -4453,7 +4455,7 @@ static void Cy_CapSense_BistDisconnectElectrode(
             break;
         case CY_CAPSENSE_BIST_IO_SHIELD_E:
             driveModeTmp = CY_CAPSENSE_DM_SHIELD;
-            hsiomTmp = CY_CAPSENSE_HSIOM_SEL_AMUXB;
+            hsiomTmp = CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD;
             break;
         default:
             driveModeTmp = CY_CAPSENSE_DM_GPIO_ANALOG;
