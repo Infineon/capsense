@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.h
-* \version 3.0.1
+* \version 4.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
@@ -37,51 +37,14 @@ extern "C" {
 *******************************************************************************/
 
 /******************************************************************************/
-/** \addtogroup group_capsense_high_level *//** \{ */
-/******************************************************************************/
-cy_capsense_status_t Cy_CapSense_ScanAllSlots(
-                cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_ScanSlots(
-                uint32_t startSlotId,
-                uint32_t numberSlots,
-                cy_stc_capsense_context_t * context);
-cy_capsense_mw_state_t Cy_CapSense_MwState(
-                const cy_stc_capsense_context_t * context);
-/** \} */
-
-
-/******************************************************************************/
-/** \addtogroup group_capsense_low_level *//** \{ */
-/******************************************************************************/
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) ||\
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
-cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(
-                cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_SetCalibrationTargets(
-                uint32_t csdCalibrTarget,
-                uint32_t csxCalibrTarget,
-                cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
-                cy_stc_capsense_context_t * context);
-#endif
-
-#if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
-cy_capsense_status_t Cy_CapSense_SlotPinState(
-                uint32_t slotId,
-                const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
-                uint32_t pinState,
-                cy_stc_capsense_context_t * context);
-#endif
-
-cy_capsense_status_t Cy_CapSense_ScanAbort(
-                cy_stc_capsense_context_t * context);
-/** \} */
-
-
-/******************************************************************************/
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
+
+cy_capsense_status_t Cy_CapSense_ScanSlots_V3(
+                uint32_t startSlotId,
+                uint32_t numberSlots,
+                cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ScanWidget_V3(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
@@ -91,8 +54,6 @@ cy_capsense_status_t Cy_CapSense_ScanSensor_V3(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ScanAllWidgets_V3(
                 cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_IsBusy_V3(
-                const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InterruptHandler_V3(
                 const MSC_Type * base,
                 cy_stc_capsense_context_t * context);
@@ -109,13 +70,22 @@ cy_capsense_status_t Cy_CapSense_SetPinState_V3(
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
 cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets_V3(
                 cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_CalibrateAllSlots_V3(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_SetCalibrationTarget_V3(
+                uint32_t calibrTarget,
+                uint32_t snsMethod,
+                cy_stc_capsense_context_t * context);
+
 #if (1u == CY_CAPSENSE_TOTAL_CH_NUMBER)
 cy_capsense_status_t Cy_CapSense_CalibrateWidget_V3(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
 #endif /* (1u == CY_CAPSENSE_TOTAL_CH_NUMBER) */
+
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) ||\
            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN)) */
+
 void Cy_CapSense_SetBusyFlags(
                 uint32_t chIndex,
                 cy_stc_capsense_context_t * context);
@@ -128,19 +98,26 @@ uint32_t Cy_CapSense_WatchdogCyclesNum(
                 uint32_t desiredTimeUs,
                 uint32_t cpuFreqMHz,
                 uint32_t cyclesPerLoop);
+
 #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
 void Cy_CapSense_ConfigureAnalogMuxResource(
                 uint32_t chIndex,
                 uint32_t snsMethod,
                 cy_stc_capsense_context_t * context);
 #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) */
+
 #if (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == CY_CAPSENSE_SCAN_MODE)
 cy_capsense_status_t Cy_CapSense_InitializeDmaResource(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ConfigureDmaResource(
                 uint32_t mscChIndex,
                 cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InitializeDmaArrays(
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ConfigureDmaArrays(
+                cy_stc_capsense_context_t * context);
 #endif /* (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == CY_CAPSENSE_SCAN_MODE) */
+
 void Cy_CapSense_SetModClkDivider(
                 uint32_t dividerValue,
                 const cy_stc_capsense_context_t * context);
@@ -148,11 +125,13 @@ void Cy_CapSense_ScanISR(void * capsenseContext);
 void Cy_CapSense_SetCmodInDefaultState(
                 uint32_t chIndex,
                 const cy_stc_capsense_context_t * context);
+
 #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
 void Cy_CapSense_SetCmodInAmuxModeState(
                 uint32_t chIndex,
                 const cy_stc_capsense_context_t * context);
 #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) */
+
 void Cy_CapSense_InitActivePtrSns(
                 uint32_t chIndex,
                 uint32_t sensorId,
@@ -166,6 +145,7 @@ void Cy_CapSense_InitActivePtr(
                 uint32_t widgetId,
                 uint32_t sensorId,
                 cy_stc_capsense_context_t * context);
+
 #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
 void Cy_CapSense_SetIOsInDesiredState(
                 uint32_t desiredDriveMode,
@@ -174,6 +154,7 @@ void Cy_CapSense_SetIOsInDesiredState(
                 uint32_t chIndex,
                 const cy_stc_capsense_context_t * context);
 #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) */
+
 void Cy_CapSense_SetIOsInDefaultState(
                 const cy_stc_capsense_context_t * context);
 void Cy_CapSense_SsConfigPinRegisters(
@@ -181,6 +162,7 @@ void Cy_CapSense_SsConfigPinRegisters(
                 uint32_t pinNum,
                 uint32_t dm,
                 en_hsiom_sel_t hsiom);
+
 #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
 void Cy_CapSense_ConnectSensor(
                 uint32_t chIndex,
@@ -221,6 +203,7 @@ void Cy_CapSense_DisableShieldElectrodes(
                 uint32_t chIndex,
                 cy_stc_capsense_context_t * context);
 #endif
+
 #endif /* (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) */
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) ||\
@@ -263,10 +246,36 @@ cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(
 cy_capsense_status_t Cy_CapSense_SsAutoTune(
                 cy_stc_capsense_context_t * context);
 #endif
-uint32_t Cy_CapSense_GetMaxRaw(
-                uint32_t snsClk,
-                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+
+cy_capsense_mw_state_t Cy_CapSense_MwState_V3(
                 const cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_ScanAbort_V3(
+                cy_stc_capsense_context_t * context);
+
+#if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD)
+cy_capsense_status_t Cy_CapSense_SlotPinState_V3(
+                uint32_t slotId,
+                const cy_stc_capsense_electrode_config_t * ptrEltdCfg,
+                uint32_t pinState,
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN)
+    uint32_t Cy_CapSense_GetCIC2SamplesMax(uint32_t cic2Rate);
+    uint32_t Cy_CapSense_GetCIC2HwDivider(uint32_t cic2Samples);
+#endif /* #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN) */
+
+cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
+                uint16_t * ptrMaxRaw,
+                uint32_t scanSlotId,
+                uint32_t mode,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_ConfigureSaturationMode(
+                cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_GetScanWatchdogTime(
+                uint32_t scanSlotId,
+                cy_stc_capsense_context_t * context);
+
 
 /** \} \endcond */
 
@@ -291,6 +300,7 @@ uint32_t Cy_CapSense_GetMaxRaw(
 #define CY_CAPSENSE_FW_NEGATIVE_TX_AMUX_REG_SW_CSD_SHIELD_VALUE      (0x00000060uL)
 
 #define CY_CAPSENSE_CALIBRATION_TIMEOUT                         (1000000uL)
+#define CY_CAPSENSE_LOOP_DURATION_CYCLES                        (5u)
 #define CY_CAPSENSE_MAX_CH_NUM                                  (4u)
 #define CY_CAPSENSE_CDAC_MAX_CODE                               (0xFFu)
 #define CY_CAPSENSE_CAL_MIDDLE_VALUE                            (0x80u)
@@ -327,27 +337,14 @@ uint32_t Cy_CapSense_GetMaxRaw(
 
 #define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB            (8u)
 #define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK         (256u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB_RANGE2     (64u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK_RANGE2  (32u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_REF_CDAC        (10u)
+#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_REF_CDAC        (100u)
 #define CY_CAPSENSE_SMARTSENSE_WD_MAX_NUMBER                    (64u)
-#define CY_CAPSENSE_SMARTSENSE_PRO_EPI_CYCLE_NUMBER             (119u)
-#define CY_CAPSENSE_SMARTSENSE_ROUND_UP_2_BITS_MASK             (0x03u)
-#define CY_CAPSENSE_SMARTSENSE_MAX_KREF_VAL                     (2048u)
-#define CY_CAPSENSE_SMARTSENSE_SCALING_DECI_VAL                 (10u)
-#define CY_CAPSENSE_SMARTSENSE_CORRECTION                       (8u)
 
 #define CY_CAPSENSE_MAX_PRO_EPI_PRS_CYCLE_NUMBER                (1023u)
 
 #define CY_CAPSENSE_CALIBRATION_REF_CDAC_MASK                   (0x01u)
 #define CY_CAPSENSE_CALIBRATION_COMP_DIV_MASK                   (0x02u)
 #define CY_CAPSENSE_CALIBRATION_COMP_CDAC_MASK                  (0x04u)
-
-#define CY_CAPSENSE_MFS_FREQ_CHANNELS_NUM_MASK                  (0xFu)
-#define CY_CAPSENSE_MFS_EN_MASK                                 (0x10u)
-#define CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK                 (0x60u)
-#define CY_CAPSENSE_MFS_WIDGET_FREQ_CH_1_MASK                   (0x20u)
-#define CY_CAPSENSE_MFS_WIDGET_FREQ_CH_2_MASK                   (0x40u)
 
 #define CY_CAPSENSE_SLOT_COUNT_MAX_VALUE                        (0xFFFFu)
 
@@ -377,7 +374,7 @@ uint32_t Cy_CapSense_GetMaxRaw(
  *      - Enables all the sub-blocks of the MSC HW block;
  *      - Enables the Sense Modulator output;
  *  2. Clear all of the pending interrupt requests of the MSC HW block;
- *  3. Sets into default state the rest of the CSD HW block registers which are not related
+ *  3. Sets into default state the rest of the MSC HW block registers which are not related
  *     to actions #1 and #2.
 */
 
@@ -512,6 +509,8 @@ uint32_t Cy_CapSense_GetMaxRaw(
 #define CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
                                                          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) &&\
                                                          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN))
 
 #define CY_CAPSENSE_CSX_CDAC_COMP_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
                                                          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN))
@@ -521,6 +520,13 @@ uint32_t Cy_CapSense_GetMaxRaw(
 #define CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
                                                          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) &&\
                                                          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
+
+/* Used for the Cy_CapSense_ExecuteSaturatedScan() function to obtain the MAX raw count. */
+#define CY_CAPSENSE_SATURATED_MAX_COUNT             (0u)
+/* Used for the Cy_CapSense_ExecuteSaturatedScan() function to obtain the scan duration. */
+#define CY_CAPSENSE_SATURATED_SCAN_TIME             (1u)
 
 
 #if defined(__cplusplus)

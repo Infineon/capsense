@@ -10,6 +10,7 @@ var group__group__capsense__gesture__structures =
       [ "clickTimeoutMin", "structcy__stc__capsense__gesture__config__t.html#a3fd78e04e45942e2780ed93e8bfabcf2", null ],
       [ "secondClickIntervalMax", "structcy__stc__capsense__gesture__config__t.html#a1504ee52ad24c04ac285a6fa3acb3bde", null ],
       [ "secondClickIntervalMin", "structcy__stc__capsense__gesture__config__t.html#a138b9550ac79485932c329daeb3a552f", null ],
+      [ "longPressTimeoutMin", "structcy__stc__capsense__gesture__config__t.html#a31f3637888afe0d163ce3af4810179b7", null ],
       [ "zoomDistanceMin", "structcy__stc__capsense__gesture__config__t.html#ac80c3e733cdc3999e48f02b94c629f05", null ],
       [ "flickDistanceMin", "structcy__stc__capsense__gesture__config__t.html#a4368430ad62e713cfa9c91275ffcceda", null ],
       [ "scrollDistanceMin", "structcy__stc__capsense__gesture__config__t.html#a27e76edb6a8d860482a55b8f4071f337", null ],
@@ -17,6 +18,7 @@ var group__group__capsense__gesture__structures =
       [ "edgeDistanceMin", "structcy__stc__capsense__gesture__config__t.html#a18f7465297e8f690506025215800585a", null ],
       [ "secondClickDistanceMax", "structcy__stc__capsense__gesture__config__t.html#a32dd076cfd7800d96f465c6574059443", null ],
       [ "clickDistanceMax", "structcy__stc__capsense__gesture__config__t.html#a4bce321bd5bc00feafad1e32f35c6c0b", null ],
+      [ "longPressDistanceMax", "structcy__stc__capsense__gesture__config__t.html#a7953b58b937898dc5db564acada0060d", null ],
       [ "zoomDebounce", "structcy__stc__capsense__gesture__config__t.html#a13a289ac07a253455c04f3b124e9a7db", null ],
       [ "scrollDebounce", "structcy__stc__capsense__gesture__config__t.html#a3048bc2987cdde967abbbd4a18051ae1", null ],
       [ "rotateDebounce", "structcy__stc__capsense__gesture__config__t.html#aeebc2692f6432fa15394678fb0278a9b", null ],
@@ -87,6 +89,11 @@ var group__group__capsense__gesture__structures =
       [ "history", "structcy__stc__capsense__ofrt__context__t.html#a4df4b5e9a02cba4b6bba8e6c10c2c68e", null ],
       [ "debounce", "structcy__stc__capsense__ofrt__context__t.html#a3d14b869436d9a7a23c57db47a665140", null ]
     ] ],
+    [ "cy_stc_capsense_oflp_context_t", "structcy__stc__capsense__oflp__context__t.html", [
+      [ "touchStartTime1", "structcy__stc__capsense__oflp__context__t.html#a8a7dfdf24ffe9611e3f0748834ec57d8", null ],
+      [ "touchStartPosition1", "structcy__stc__capsense__oflp__context__t.html#a5a48dd37bff60dd24f156488d695511c", null ],
+      [ "state", "structcy__stc__capsense__oflp__context__t.html#a5728d5f07310fc000e4d5e895e3450f4", null ]
+    ] ],
     [ "cy_stc_capsense_gesture_context_t", "structcy__stc__capsense__gesture__context__t.html", [
       [ "position1", "structcy__stc__capsense__gesture__context__t.html#a35b0182d531b19cf23e454b49ce332bd", null ],
       [ "positionLast1", "structcy__stc__capsense__gesture__context__t.html#aa9ca0fa15854876acb6836093813d18f", null ],
@@ -105,6 +112,7 @@ var group__group__capsense__gesture__structures =
       [ "ofdcContext", "structcy__stc__capsense__gesture__context__t.html#a41504e9edd68b6aab487492c95b6a059", null ],
       [ "ofcdContext", "structcy__stc__capsense__gesture__context__t.html#ab916aaccb1b24a8dc5eee9385d0d2041", null ],
       [ "tfslContext", "structcy__stc__capsense__gesture__context__t.html#a3e8c82cbc4289674f444114478fc1a7b", null ],
+      [ "oflpContext", "structcy__stc__capsense__gesture__context__t.html#ac5433980bc8aff63ef8de3e2c69136f5", null ],
       [ "numPosition", "structcy__stc__capsense__gesture__context__t.html#a5f96cbd3fde2fc2007499bdfc5e8ad59", null ],
       [ "numPositionLast", "structcy__stc__capsense__gesture__context__t.html#adfc86db072daa3b309979efb5768456d", null ]
     ] ]

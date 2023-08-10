@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 3.0.1
+* \version 4.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -27,12 +27,17 @@
 #include "cy_capsense_selftest.h"
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
     #include "cy_csd.h"
+    #include "cy_capsense_sensing_v2.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_msclp.h"
+    #include "cy_capsense_generator_lp.h"
 #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
     #include "cy_msc.h"
+    #include "cy_capsense_generator_v3.h"
+    #include "cy_capsense_sensing_v3.h"
 #endif
-#include "cycfg_capsense_defines.h"
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 /*******************************************************************************
 * Local definition
@@ -49,6 +54,16 @@
 #define CY_CAPSENSE_PARAM_WIDGET_OFFSET     (16u)
 #define CY_CAPSENSE_PARAM_WIDGET_MASK       (0xFFuL << CY_CAPSENSE_PARAM_WIDGET_OFFSET)
 
+#if (defined(CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED))
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+        #define CY_CAPSENSE_MPSC_EN     (CY_CAPSENSE_ENABLE)
+    #else
+        #define CY_CAPSENSE_MPSC_EN     (CY_CAPSENSE_DISABLE)
+    #endif
+#else
+        #define CY_CAPSENSE_MPSC_EN     (CY_CAPSENSE_DISABLE)
+#endif
+
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_IsAnyWidgetActive
@@ -60,6 +75,10 @@
 * information from the widget status registers. This function does
 * not process widget data but extracts previously processed results
 * from the \ref group_capsense_structures.
+*
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed,
+* its status is not taken into account.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -75,13 +94,52 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
     uint32_t capStatus = 0u;
     uint32_t wdIndex;
 
-    for (wdIndex = context->ptrCommonConfig->numWd; wdIndex-- > 0u;)
+    for (wdIndex = CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex-- > 0u;)
     {
-        capStatus |= (uint32_t)context->ptrWdContext[wdIndex].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[wdIndex].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+        {
+            capStatus |= (uint32_t)context->ptrWdContext[wdIndex].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
     }
 
     return capStatus;
 }
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsAnyLpWidgetActive
+****************************************************************************//**
+*
+* Reports whether any low power widget has detected a touch at the previous
+* low power scan.
+*
+* This function reports whether any low power widget has detected a touch
+* by extracting information from the common status register. The function does
+* not process the widget data but extracts the result obtained at the previous
+* low power widget scan. The result remains set up to the next low power widget
+* scan and is reset with the low power scan start.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the touch detection status of all the widgets:
+* - Zero - No touch is detected in any of the low power widgets or sensors
+* - CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK - At least one low power widget or sensor
+*                                         has detected a touch at the previous scan
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_IsAnyLpWidgetActive(const cy_stc_capsense_context_t * context)
+{
+    return ((uint32_t)context->ptrCommonContext->status & CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK);
+}
+#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
 
 
 /*******************************************************************************
@@ -98,6 +156,9 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed and a zero is returned.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -116,9 +177,14 @@ uint32_t Cy_CapSense_IsWidgetActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
-        capStatus = (uint32_t)context->ptrWdContext[widgetId].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+        {
+            capStatus = (uint32_t)context->ptrWdContext[widgetId].status & CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
     }
     return capStatus;
 }
@@ -142,6 +208,9 @@ uint32_t Cy_CapSense_IsWidgetActive(
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \note For the fifth-generation low power CAPSENSE&trade; widgets
+* of the \ref CY_CAPSENSE_WD_LOW_POWER_E type are not processed and a zero is returned.
 *
 * \param sensorId
 * Specifies the ID number of the sensor within the widget. A macro for the
@@ -167,9 +236,12 @@ uint32_t Cy_CapSense_IsSensorActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if ((widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT) &&
+        (sensorId < context->ptrWdConfig[widgetId].numSns))
     {
-        if (sensorId < context->ptrWdConfig[widgetId].numSns)
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
+    #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
         {
             capStatus = context->ptrWdConfig[widgetId].ptrSnsContext[sensorId].status;
         }
@@ -178,7 +250,7 @@ uint32_t Cy_CapSense_IsSensorActive(
 }
 
 
-#if(CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+#if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_IsProximitySensorActive
 ****************************************************************************//**
@@ -219,7 +291,7 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 {
     uint32_t capStatus = 0uL;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
         if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == context->ptrWdConfig[widgetId].wdType)
         {
@@ -235,9 +307,9 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN) */
 
 
-#if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetTouchInfo
 ****************************************************************************//**
@@ -269,7 +341,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
 
-    if (widgetId < context->ptrCommonConfig->numWd)
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
         switch (ptrWdCfg->wdType)
@@ -319,7 +391,7 @@ cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_cont
     const cy_stc_capsense_widget_config_t * ptrWdCfg = context->ptrWdConfig;
     const cy_stc_capsense_widget_context_t * ptrWdCxt = context->ptrWdContext;
     const cy_stc_capsense_pin_config_t * ptrPinCfg = context->ptrPinConfig;
-    const cy_stc_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
+    const cy_stc_capsense_active_scan_sns_t * ptrActScanSns = context->ptrActiveScanSns;
 
     if (ptrCommonCfg == NULL)       {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
     if (ptrCommonCxt == NULL)       {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
@@ -329,7 +401,7 @@ cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_cont
     if (ptrPinCfg == NULL)          {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
     if (ptrActScanSns == NULL)      {capStatus = CY_CAPSENSE_STATUS_BAD_DATA;}
 
-    return (capStatus);
+    return capStatus;
 }
 
 
@@ -422,58 +494,87 @@ uint16_t Cy_CapSense_GetCrcWidget(
 {
     uint16_t crcValue;
     const cy_stc_capsense_widget_context_t * ptrWdCxt;
-    const cy_stc_capsense_widget_config_t * ptrWdCfg;
     cy_stc_capsense_widget_crc_data_t crcDataVal;
-
-    /* Get a pointer to the specified widget config structure */
-    ptrWdCfg = &context->ptrWdConfig[widgetId];
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
+        const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
+    #endif
 
     /* Get a pointer to the specified widget context structure */
     ptrWdCxt = &context->ptrWdContext[widgetId];
 
     (void)memset((void*)&crcDataVal, 0, sizeof(crcDataVal));
 
-    crcDataVal.fingerCapVal      = ptrWdCxt->fingerCap;
-    crcDataVal.sigPFCVal         = ptrWdCxt->sigPFC;
-    crcDataVal.lowBslnRstVal     = ptrWdCxt->lowBslnRst;
-    crcDataVal.snsClkVal         = ptrWdCxt->snsClk;
-    crcDataVal.rowSnsClkVal      = ptrWdCxt->rowSnsClk;
-    crcDataVal.onDebounceVal     = ptrWdCxt->onDebounce;
-    crcDataVal.snsClkSourceVal   = ptrWdCxt->snsClkSource;
+    crcDataVal.fingerCapVal = ptrWdCxt->fingerCap;
+    crcDataVal.sigPFCVal = ptrWdCxt->sigPFC;
+    crcDataVal.lowBslnRstVal = ptrWdCxt->lowBslnRst;
+    crcDataVal.snsClkVal = ptrWdCxt->snsClk;
+    crcDataVal.rowSnsClkVal = ptrWdCxt->rowSnsClk;
+    crcDataVal.onDebounceVal = ptrWdCxt->onDebounce;
+    crcDataVal.snsClkSourceVal = ptrWdCxt->snsClkSource;
+    crcDataVal.maxRawCountVal = ptrWdCxt->maxRawCount;
+    crcDataVal.maxRawCountRowVal = ptrWdCxt->maxRawCountRow;
+    crcDataVal.bslnCoeffVal = ptrWdCxt->bslnCoeff;
 
-    if((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
-       (CY_CAPSENSE_CSD_SS_DIS == context->ptrCommonConfig->csdAutotuneEn))
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MPSC_EN)
+            if ((CY_CAPSENSE_CSD_GROUP != ptrWdCfg->senseMethod) ||
+                ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
+                (ptrWdCfg->mpOrder >= CY_CAPSENSE_MPSC_MIN_ORDER))
+        #else
+            if ((CY_CAPSENSE_CSD_GROUP != ptrWdCfg->senseMethod) ||
+                ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType))
+        #endif
+    #endif
     {
-        crcDataVal.fingerThVal       = ptrWdCxt->fingerTh;
-        crcDataVal.proxThVal         = ptrWdCxt->proxTh;
-        crcDataVal.noiseThVal        = ptrWdCxt->noiseTh;
-        crcDataVal.nNoiseThVal       = ptrWdCxt->nNoiseTh;
-        crcDataVal.hysteresisVal     = ptrWdCxt->hysteresis;
+        crcDataVal.fingerThVal = ptrWdCxt->fingerTh;
+        crcDataVal.proxThVal = ptrWdCxt->proxTh;
+        crcDataVal.noiseThVal = ptrWdCxt->noiseTh;
+        crcDataVal.nNoiseThVal = ptrWdCxt->nNoiseTh;
+        crcDataVal.hysteresisVal = ptrWdCxt->hysteresis;
     }
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
-        crcDataVal.resolutionVal     = ptrWdCxt->resolution;
-        crcDataVal.idacModVal[0u]    = ptrWdCxt->idacMod[0u];
-        crcDataVal.idacModVal[1u]    = ptrWdCxt->idacMod[1u];
-        crcDataVal.idacModVal[2u]    = ptrWdCxt->idacMod[2u];
-        crcDataVal.idacGainIndexVal  = ptrWdCxt->idacGainIndex;
+        crcDataVal.resolutionVal = ptrWdCxt->resolution;
+        crcDataVal.idacModVal[0u] = ptrWdCxt->idacMod[0u];
+        crcDataVal.idacModVal[1u] = ptrWdCxt->idacMod[1u];
+        crcDataVal.idacModVal[2u] = ptrWdCxt->idacMod[2u];
+        crcDataVal.idacGainIndexVal = ptrWdCxt->idacGainIndex;
         crcDataVal.rowIdacModVal[0u] = ptrWdCxt->rowIdacMod[0u];
         crcDataVal.rowIdacModVal[1u] = ptrWdCxt->rowIdacMod[1u];
         crcDataVal.rowIdacModVal[2u] = ptrWdCxt->rowIdacMod[2u];
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        crcDataVal.resolutionVal   = ptrWdCxt->numSubConversions;
-        crcDataVal.cdacRef         = ptrWdCxt->cdacRef;
-        crcDataVal.rowCdacRef      = ptrWdCxt->rowCdacRef;
-        crcDataVal.cdacCompDivider = ptrWdCxt->cdacCompDivider;
-        crcDataVal.cicRate         = ptrWdCxt->cicRate;
-        crcDataVal.lfsrBits        = ptrWdCxt->lfsrBits;
+        crcDataVal.cdacDitherEnVal = ptrWdCxt->cdacDitherEn;
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        crcDataVal.cicShiftVal = ptrWdCxt->cicShift;
+        crcDataVal.rowCicShiftVal = ptrWdCxt->rowCicShift;
+    #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        crcDataVal.resolutionVal = ptrWdCxt->numSubConversions;
+        crcDataVal.cdacRefVal = ptrWdCxt->cdacRef;
+        crcDataVal.rowCdacRefVal = ptrWdCxt->rowCdacRef;
+        crcDataVal.cdacCompDividerVal = ptrWdCxt->cdacCompDivider;
+        crcDataVal.cicRateVal = ptrWdCxt->cicRate;
+        crcDataVal.lfsrBitsVal = ptrWdCxt->lfsrBits;
+        crcDataVal.cdacDitherValueVal = ptrWdCxt->cdacDitherValue;
+        crcDataVal.coarseInitBypassEnVal = ptrWdCxt->coarseInitBypassEn;
+    #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
+         ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN)))
+        crcDataVal.cdacFineVal = ptrWdCxt->cdacFine;
+        crcDataVal.rowCdacFineVal = ptrWdCxt->rowCdacFine;
+    #endif
 
     crcValue = Cy_CapSense_GetCRC((uint8_t *)(&crcDataVal), sizeof(crcDataVal));
 
-    return (crcValue);
+    return crcValue;
 }
 
 
@@ -487,7 +588,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 * argument. The paramId for each register of cy_capsense_tuner is available
 * in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
 * The paramId is a special enumerated value generated by the CAPSENSE&trade;
-* Configurator. The format of paramId is as follows:
+* Configurator tool. The format of paramId is as follows:
 * 1. [ byte 3 byte 2 byte 1 byte 0 ]
 * 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
 * 3. U - indicates if the parameter affects the RAM Widget Object CRC.
@@ -509,7 +610,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
 *
 * \param ptrTuner
 * The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
-* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator generated files:
+* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator tool generated files:
 * * cycfg_capsense.c/h
 *
 * \param context
@@ -584,7 +685,7 @@ cy_capsense_status_t Cy_CapSense_GetParam(
 * argument. The paramId for each register of cy_capsense_tuner is available
 * in the cycfg_capsense.h file as CY_CAPSENSE_<ParameterName>_PARAM_ID.
 * The paramId is a special enumerated value generated by the CAPSENSE&trade;
-* Configurator. The format of paramId is as follows:
+* Configurator tool. The format of paramId is as follows:
 * 1. [ byte 3 byte 2 byte 1 byte 0 ]
 * 2. [ RRRRRUTT IIIIIIII MMMMMMMM LLLLLLLL ]
 * 3. U - indicates if the parameter affects the RAM Widget Object CRC.
@@ -614,7 +715,7 @@ cy_capsense_status_t Cy_CapSense_GetParam(
 *
 * \param ptrTuner
 * The pointer to the cy_capsense_tuner variable of cy_stc_capsense_tuner_t.
-* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator generated files:
+* The cy_capsense_tuner is declared in CAPSENSE&trade; Configurator tool generated files:
 * * cycfg_capsense.c/h
 *
 * \param context
@@ -661,8 +762,7 @@ cy_capsense_status_t Cy_CapSense_SetParam(
              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN))
             paramCrc = (paramId & CY_CAPSENSE_PARAM_CRC_MASK) >> CY_CAPSENSE_PARAM_CRC_OFFSET;
             paramWidget = (paramId & CY_CAPSENSE_PARAM_WIDGET_MASK) >> CY_CAPSENSE_PARAM_WIDGET_OFFSET;
-            if ((paramWidget > context->ptrCommonConfig->numWd) &&
-                (0u != paramCrc))
+            if ((paramWidget > context->ptrCommonConfig->numWd) && (0u != paramCrc))
             {
                 capStatus = CY_CAPSENSE_STATUS_BAD_PARAM;
             }
@@ -716,7 +816,301 @@ cy_capsense_status_t Cy_CapSense_SetParam(
 }
 
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+/*******************************************************************************
+* Function Name: Cy_CapSense_SetWidgetStatus
+****************************************************************************//**
+*
+* Performs configuring of the selected widget.
+*
+* This function performs customized widget status configuration
+* by the mode parameter. There are two general use cases for this function:
+* 1. Make the specified widget Enabled/Disabled. This status is intended
+*    to define a set of widgets to be scanned/processed from the application
+*    layer.
+* 2. Make the specified widget Working/Non-working. This status is
+*    integrated into the built-in self-test (BIST) library. If a test detects
+*    non-working widget, that widget status is set to non-working automatically
+*    by CAPSENSE&trade;. BIST never resets a widget working mask and the user
+*    makes a decision what to do next with this non-working widget.
+*
+* Although other statuses can be changed by this function, this is not
+* recommended to avoid impact on CAPSENSE&trade; operation and
+* is needed to implement only specific use cases.
+*
+* By default, all widgets are enabled and working during CAPSENSE&trade;
+* initialization. All disabled or non-working widgets are excluded
+* from scanning and processing.
+*
+* Excluding a widget from a scanning flow happens
+* immediately by re-generation a new scanning frame. This function does it
+* for optimization, which means that scanning functions save
+* CPU time by checking if any widget status was changed.
+*
+* Excluding from processing flow happens inside the process functions since they
+* perform processing by widgets and not by slots. Therefore, changing
+* the widget status should happen before a new scan and/or after processing.
+*
+* The Cy_CapSense_ProcessWidgetExt() and Cy_CapSense_ProcessSensorExt()
+* functions ignore widget disable and non-working statuses and perform
+* processing based on specified mode provided to those functions.
+*
+* The function also checks if there is at least one enabled and working widget.
+* If no valid widgets are left for scanning, the function returns
+* CY_CAPSENSE_STATUS_BAD_CONFIG separately for active and low-power
+* widgets due to these groups' independent scanning frames.
+*
+* \note
+* For the fifth generation and fifth-generation low power CAPSENSE&trade;,
+* if the specified widget has the enabled multi-frequency scan feature,
+* then the status configuration happens to all the joined widgets:
+* * Sub-widget channel 2
+* * Sub-widget channel 1
+* * Main widget channel 0
+*
+* \param widgetId
+* Specifies the widget ID number. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param mode
+* Specifies the bit mask of widget status to be configured. It is allowed
+* to configure several bits simultaneously.
+* 1. Bit [0]      - CY_CAPSENSE_WD_ACTIVE_MASK
+* 2. Bit [1]      - CY_CAPSENSE_WD_ENABLE_MASK
+* 3. Bit [2]      - CY_CAPSENSE_WD_WORKING_MASK
+* 4. Bit [3]      - CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK
+* 5. Bit [4]      - CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK.
+*
+* \param mask
+* Specifies the value to be configured. All bit values not set by
+* the mode parameter are ignored.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the widget processing operation:
+* - CY_CAPSENSE_STATUS_SUCCESS      - The operation is successful.
+* - CY_CAPSENSE_STATUS_BAD_PARAM    - The input parameter is invalid.
+*
+*******************************************************************************/
+cy_capsense_status_t Cy_CapSense_SetWidgetStatus(
+                uint32_t widgetId,
+                uint32_t mode,
+                uint32_t mask,
+                cy_stc_capsense_context_t * context)
+{
+    cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_BAD_CONFIG;
+    #if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) &&\
+         (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN))
+        const cy_stc_capsense_widget_config_t * ptrWdCfg = context->ptrWdConfig;
+        uint32_t wdIndex;
+    #endif
+
+    /* Check parameter validity */
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
+    {
+        capStatus = CY_CAPSENSE_STATUS_SUCCESS;
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+            context->ptrWdContext[widgetId].status &= (uint8_t)~(uint8_t)mode;
+            context->ptrWdContext[widgetId].status |= ((uint8_t)mask & (uint8_t)mode);
+            (void)Cy_CapSense_SwitchSensingMode(CY_CAPSENSE_UNDEFINED_GROUP, context);
+        #else
+            /* Update scan flags for MSC platforms */
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                context->ptrInternalContext->repeatScanEn = CY_CAPSENSE_DISABLE;
+                context->ptrCommonContext->status &= (uint32_t)~((uint32_t)CY_CAPSENSE_MW_STATE_WD_SCAN_MASK);
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN)
+                /* Checks if MFS is enabled for particular widget */
+                if (0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK))
+                {
+                    wdIndex = widgetId - (((uint32_t)ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK) >> CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_POS);
+                    context->ptrWdContext[wdIndex].status &= (uint8_t)~(uint8_t)mode;
+                    context->ptrWdContext[wdIndex].status |= ((uint8_t)mask & (uint8_t)mode);
+                    context->ptrWdContext[wdIndex + CY_CAPSENSE_MFS_CH1_INDEX].status &= (uint8_t)~(uint8_t)mode;
+                    context->ptrWdContext[wdIndex + CY_CAPSENSE_MFS_CH1_INDEX].status |= ((uint8_t)mask & (uint8_t)mode);
+                    context->ptrWdContext[wdIndex + CY_CAPSENSE_MFS_CH2_INDEX].status &= (uint8_t)~(uint8_t)mode;
+                    context->ptrWdContext[wdIndex + CY_CAPSENSE_MFS_CH2_INDEX].status |= ((uint8_t)mask & (uint8_t)mode);
+                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                        Cy_CapSense_SetSnsFrameValidity(wdIndex, context);
+                        Cy_CapSense_SetSnsFrameValidity(wdIndex + CY_CAPSENSE_MFS_CH1_INDEX, context);
+                        Cy_CapSense_SetSnsFrameValidity(wdIndex + CY_CAPSENSE_MFS_CH2_INDEX, context);
+                    #endif
+                }
+                else
+                {
+                    context->ptrWdContext[widgetId].status &= (uint8_t)~(uint8_t)mode;
+                    context->ptrWdContext[widgetId].status |= ((uint8_t)mask & (uint8_t)mode);
+                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                        Cy_CapSense_SetSnsFrameValidity(widgetId, context);
+                    #endif
+                }
+            #else
+                context->ptrWdContext[widgetId].status &= (uint8_t)~(uint8_t)mode;
+                context->ptrWdContext[widgetId].status |= ((uint8_t)mask & (uint8_t)mode);
+                #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                    Cy_CapSense_SetSnsFrameValidity(widgetId, context);
+                #endif
+            #endif
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+                context->ptrInternalContext->scanSingleSlot = CY_CAPSENSE_SCAN_MULTIPLE_SLOT;
+                #if (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == CY_CAPSENSE_SCAN_MODE)
+                    (void)Cy_CapSense_ConfigureDmaArrays(context);
+                #endif
+            #endif
+        #endif
+    }
+
+    return capStatus;
+}
+
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/*******************************************************************************
+* Function Name: Cy_CapSense_SetSnsFrameValidity
+****************************************************************************//**
+*
+* Performs sensor frame update for the specified widget.
+*
+* For the fifth generation and fifth-generation low power CAPSENSE&trade;,
+* if the specified widget has the enabled multi-frequency scan feature,
+* then the frame update happens to the specified widget Id only.
+*
+* \param widgetId
+* Specifies the widget ID number. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_SetSnsFrameValidity(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint32_t wdStatus = 0u;
+    uint32_t * ptrSnsFrmCxt;
+    uint32_t snsIndex;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
+    uint32_t frameSize = CY_CAPSENSE_SENSOR_FRAME_SIZE;
+
+    ptrSnsFrmCxt = &context->ptrSensorFrameContext[
+            (ptrWdCfg->firstSlotId * frameSize) + CY_CAPSENSE_SNS_CTL_INDEX];
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
+        if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == (ptrWdCfg->wdType))
+        {
+            frameSize = CY_MSCLP_11_SNS_REGS;
+            ptrSnsFrmCxt = &context->ptrSensorFrameLpContext[
+                    (ptrWdCfg->firstSlotId * frameSize) + CY_CAPSENSE_FRM_LP_SNS_CTL_INDEX];
+        }
+    #endif
+
+    if (0u != Cy_CapSense_IsWidgetEnabled(widgetId, context))
+    {
+        wdStatus = MSCLP_SNS_SNS_CTL_VALID_Msk;
+    }
+
+    /* Update sensor frame structure */
+    for (snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
+    {
+        *ptrSnsFrmCxt &= (uint32_t)~MSCLP_SNS_SNS_CTL_VALID_Msk;
+        *ptrSnsFrmCxt |= wdStatus;
+        ptrSnsFrmCxt = &ptrSnsFrmCxt[frameSize];
+    }
+}
+#endif /* #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsWidgetEnabled
+****************************************************************************//**
+*
+* Returns widget enable/working status.
+*
+* \param widgetId
+* Specifies the widget ID number. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the widget:
+* - Zero - The specified widget is disabled and / or non-working or
+* the specified parameter is invalid.
+* - Non-zero - The specified widget is enabled and working.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_IsWidgetEnabled(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context)
+{
+    uint32_t capStatus = 0u;
+
+    if (widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
+    {
+        if ((CY_CAPSENSE_WD_ENABLE_MASK | CY_CAPSENSE_WD_WORKING_MASK) ==
+                (context->ptrWdContext[widgetId].status &
+                (CY_CAPSENSE_WD_ENABLE_MASK | CY_CAPSENSE_WD_WORKING_MASK)))
+        {
+            capStatus = 1u;
+        }
+    }
+    return capStatus;
+}
+
+
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsSlotEnabled
+****************************************************************************//**
+*
+* Returns slot enable/working status.
+*
+* \param slotId
+* Specifies the slot ID number.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the specified slot:
+* - Zero - The specified slot has disabled and / or non-working widgets on all
+* channels or the specified parameter is invalid.
+* - Non-zero - The specified slot has at least one widget enabled and working.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_IsSlotEnabled(
+                uint32_t slotId,
+                const cy_stc_capsense_context_t * context)
+{
+    uint32_t capStatus = 0u;
+    uint32_t wdIndex;
+    uint32_t chIndex;
+
+    for (chIndex = 0u; chIndex < CY_CAPSENSE_TOTAL_CH_NUMBER; chIndex++)
+    {
+        wdIndex = context->ptrScanSlots[(chIndex * CY_CAPSENSE_SLOT_COUNT) + slotId].wdId;
+        if (CY_CAPSENSE_SLOT_SHIELD_ONLY > wdIndex)
+        {
+            if (0u != Cy_CapSense_IsWidgetEnabled(wdIndex, context))
+            {
+                capStatus = 1u;
+                break;
+            }
+        }
+    }
+    return capStatus;
+}
+#endif
+
+
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 
 /* [] END OF FILE */

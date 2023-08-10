@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0.1: cy_stc_capsense_common_context_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 4.0: cy_stc_capsense_common_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0.1</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
   </td>
  </tr>
  </tbody>
@@ -98,7 +98,7 @@ Data Fields</h2></td></tr>
 <tr class="memdesc:afae9853b830d6549b35bafc214acc040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tuner Command Register <a class="el" href="group__group__capsense__enums.html#ga049118d05a2bdf4f2d37d7b75c511f79">cy_en_capsense_tuner_cmd_t</a>.  <a href="#afae9853b830d6549b35bafc214acc040">More...</a><br /></td></tr>
 <tr class="separator:afae9853b830d6549b35bafc214acc040"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6406229ffd99b912c09ca0c80ea3f4ee"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a6406229ffd99b912c09ca0c80ea3f4ee">scanCounter</a></td></tr>
-<tr class="memdesc:a6406229ffd99b912c09ca0c80ea3f4ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">This counter increments after each scan.  <a href="#a6406229ffd99b912c09ca0c80ea3f4ee">More...</a><br /></td></tr>
+<tr class="memdesc:a6406229ffd99b912c09ca0c80ea3f4ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">This counter increments after each scan of active widgets.  <a href="#a6406229ffd99b912c09ca0c80ea3f4ee">More...</a><br /></td></tr>
 <tr class="separator:a6406229ffd99b912c09ca0c80ea3f4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26f741c17c454d43f6a07dbf87d8154e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a26f741c17c454d43f6a07dbf87d8154e">tunerSt</a></td></tr>
 <tr class="memdesc:a26f741c17c454d43f6a07dbf87d8154e"><td class="mdescLeft">&#160;</td><td class="mdescRight">State of CAPSENSE&trade; middleware tuner module.  <a href="#a26f741c17c454d43f6a07dbf87d8154e">More...</a><br /></td></tr>
@@ -108,7 +108,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="memdesc:a0181ebd06d8e03e3b18ac5c08ca14742"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keep information whether initialization was done or not. <br /></td></tr>
 <tr class="separator:a0181ebd06d8e03e3b18ac5c08ca14742"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae823664536f36878278584c2e8967035"><td class="memItemLeft" align="right" valign="top">volatile uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#ae823664536f36878278584c2e8967035">status</a></td></tr>
-<tr class="memdesc:ae823664536f36878278584c2e8967035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Middleware status information, scan in progress (1) or not (0).  <a href="#ae823664536f36878278584c2e8967035">More...</a><br /></td></tr>
+<tr class="memdesc:ae823664536f36878278584c2e8967035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Middleware status information:  <a href="#ae823664536f36878278584c2e8967035">More...</a><br /></td></tr>
 <tr class="separator:ae823664536f36878278584c2e8967035"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6178b4758bc7095bbafe2bf8bc62783a"><td class="memItemLeft" align="right" valign="top"><a id="a6178b4758bc7095bbafe2bf8bc62783a"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a6178b4758bc7095bbafe2bf8bc62783a">timestampInterval</a></td></tr>
@@ -128,27 +128,24 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#ac6502f0565b37d6ba97cce1c81a773b3">tunerCnt</a></td></tr>
 <tr class="memdesc:ac6502f0565b37d6ba97cce1c81a773b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command counter of CAPSENSE&trade; middleware tuner module. <br /></td></tr>
 <tr class="separator:ac6502f0565b37d6ba97cce1c81a773b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77232b6c0e10717e7ae1af4353a03bcd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a77232b6c0e10717e7ae1af4353a03bcd">numFineInitCycles</a></td></tr>
-<tr class="memdesc:a77232b6c0e10717e7ae1af4353a03bcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of ProDummy SubConversions.  <a href="#a77232b6c0e10717e7ae1af4353a03bcd">More...</a><br /></td></tr>
-<tr class="separator:a77232b6c0e10717e7ae1af4353a03bcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbfaf0d277487c7b7d4c29373a0c1c28"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#acbfaf0d277487c7b7d4c29373a0c1c28">numFineInitWaitCycles</a></td></tr>
-<tr class="memdesc:acbfaf0d277487c7b7d4c29373a0c1c28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of ProDummy Wait Cycles.  <a href="#acbfaf0d277487c7b7d4c29373a0c1c28">More...</a><br /></td></tr>
-<tr class="separator:acbfaf0d277487c7b7d4c29373a0c1c28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6de81bf892d8f25e7cd5ea1428d9a2c9"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a6de81bf892d8f25e7cd5ea1428d9a2c9">lfsrPoly</a></td></tr>
-<tr class="memdesc:a6de81bf892d8f25e7cd5ea1428d9a2c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">LFSR Polynomial.  <a href="#a6de81bf892d8f25e7cd5ea1428d9a2c9">More...</a><br /></td></tr>
-<tr class="separator:a6de81bf892d8f25e7cd5ea1428d9a2c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a971f5a3a5454addde057e0f9179e77e8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a971f5a3a5454addde057e0f9179e77e8">lfsrScale</a></td></tr>
-<tr class="memdesc:a971f5a3a5454addde057e0f9179e77e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">LFSR Scale value.  <a href="#a971f5a3a5454addde057e0f9179e77e8">More...</a><br /></td></tr>
-<tr class="separator:a971f5a3a5454addde057e0f9179e77e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ea8ee5aae4993e4f86a9d2cd05b537c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a4ea8ee5aae4993e4f86a9d2cd05b537c">cdacDitherSeed</a></td></tr>
-<tr class="memdesc:a4ea8ee5aae4993e4f86a9d2cd05b537c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dither CDAC Seed.  <a href="#a4ea8ee5aae4993e4f86a9d2cd05b537c">More...</a><br /></td></tr>
-<tr class="separator:a4ea8ee5aae4993e4f86a9d2cd05b537c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75c97af43dbcd9a4553d556bd8c454d7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a75c97af43dbcd9a4553d556bd8c454d7">cdacDitherPoly</a></td></tr>
-<tr class="memdesc:a75c97af43dbcd9a4553d556bd8c454d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dither CDAC Polynomial.  <a href="#a75c97af43dbcd9a4553d556bd8c454d7">More...</a><br /></td></tr>
-<tr class="separator:a75c97af43dbcd9a4553d556bd8c454d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5468b6895f747291aeb4225a66ff2ccd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a5468b6895f747291aeb4225a66ff2ccd">modClk</a></td></tr>
-<tr class="memdesc:a5468b6895f747291aeb4225a66ff2ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The modulator clock divider.  <a href="#a5468b6895f747291aeb4225a66ff2ccd">More...</a><br /></td></tr>
-<tr class="separator:a5468b6895f747291aeb4225a66ff2ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa31a53c2469d657255434141859a67ff"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#aa31a53c2469d657255434141859a67ff">lpDataSt</a></td></tr>
+<tr class="memdesc:aa31a53c2469d657255434141859a67ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">State of Low Power data processing:  <a href="#aa31a53c2469d657255434141859a67ff">More...</a><br /></td></tr>
+<tr class="separator:aa31a53c2469d657255434141859a67ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93612ae88d67b72c3cc0e9ae7b978692"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a93612ae88d67b72c3cc0e9ae7b978692">lpFirstSnsId</a></td></tr>
+<tr class="memdesc:a93612ae88d67b72c3cc0e9ae7b978692"><td class="mdescLeft">&#160;</td><td class="mdescRight">The first scanned low power sensor within LP frame.  <a href="#a93612ae88d67b72c3cc0e9ae7b978692">More...</a><br /></td></tr>
+<tr class="separator:a93612ae88d67b72c3cc0e9ae7b978692"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac157a3338cbf70d3f6e2e873fb21c8e8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#ac157a3338cbf70d3f6e2e873fb21c8e8">lpSnsNumber</a></td></tr>
+<tr class="memdesc:ac157a3338cbf70d3f6e2e873fb21c8e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of consecutive scanned low power sensors from the .lpFirstSnsID.  <a href="#ac157a3338cbf70d3f6e2e873fb21c8e8">More...</a><br /></td></tr>
+<tr class="separator:ac157a3338cbf70d3f6e2e873fb21c8e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a450fd2b3f328865bf2987c8b513e570c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a450fd2b3f328865bf2987c8b513e570c">lpNumFrame</a></td></tr>
+<tr class="memdesc:a450fd2b3f328865bf2987c8b513e570c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of fully scanned low power frames available in the packet.  <a href="#a450fd2b3f328865bf2987c8b513e570c">More...</a><br /></td></tr>
+<tr class="separator:a450fd2b3f328865bf2987c8b513e570c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a3c019d3d17dcdb181f5690f5096eee"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a6a3c019d3d17dcdb181f5690f5096eee">lpScanCounter</a></td></tr>
+<tr class="memdesc:a6a3c019d3d17dcdb181f5690f5096eee"><td class="mdescLeft">&#160;</td><td class="mdescRight">This counter increments after each scan of low power widgets.  <a href="#a6a3c019d3d17dcdb181f5690f5096eee">More...</a><br /></td></tr>
+<tr class="separator:a6a3c019d3d17dcdb181f5690f5096eee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8217d371adc11cfeb059d10acf4814eb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__common__context__t.html#a8217d371adc11cfeb059d10acf4814eb">lpScanSt</a></td></tr>
+<tr class="memdesc:a8217d371adc11cfeb059d10acf4814eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state / status of low power sensor baselines:  <a href="#a8217d371adc11cfeb059d10acf4814eb">More...</a><br /></td></tr>
+<tr class="separator:a8217d371adc11cfeb059d10acf4814eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a id="aa9d6aeaa1e73aac634d4ca090d353af2"></a>
@@ -197,7 +194,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
       </table>
 </div><div class="memdoc">
 
-<p>This counter increments after each scan. </p>
+<p>This counter increments after each scan of active widgets. </p>
 
 </div>
 </div>
@@ -230,8 +227,24 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
       </table>
 </div><div class="memdoc">
 
-<p>Middleware status information, scan in progress (1) or not (0). </p>
-<p>For MSCv3 each bit shows the correspondent channel status </p>
+<p>Middleware status information: </p>
+<ul>
+<li>Bit[0-3] - The set [x] bit of the result means that the previously initiated scan for the [x] channel is in progress. For MSCv3 each bit shows a busyness of a corresponding sensing channel. The next scan frame cannot be started (CY_CAPSENSE_BUSY_ALL_CH_MASK)</li>
+<li>Bit[4] - The last or currently scanned widget type is Active widget (CY_CAPSENSE_MW_STATE_ACTIVE_WD_SCAN_MASK)</li>
+<li>Bit[5] - The last or currently scanned widget type is Low Power widget (CY_CAPSENSE_MW_STATE_LP_WD_SCAN_MASK)</li>
+<li>Bit[6] - Reserved</li>
+<li>Bit[7] - The previously initiated scan is in progress (CY_CAPSENSE_BUSY)</li>
+<li>Bit[8] - Reserved</li>
+<li>Bit[9] - Reserved</li>
+<li>Bit[10] - A touch is detected on any low power widget. The bit is automatically cleared when a new low power scan triggered (CY_CAPSENSE_MW_STATE_LP_ACTIVE_MASK)</li>
+<li>Bit[11] - CapSense Middleware performs BIST functionality which might include multiple HW scanning and result processing (CY_CAPSENSE_MW_STATE_BIST_MASK)</li>
+<li>Bit[12] - The auto-calibration in Single CDAC mode (CY_CAPSENSE_MW_STATE_CALIBRATION_SINGLE_MASK)</li>
+<li>Bit[13] - The auto-calibration is in progress. The next scan frame cannot be started (CY_CAPSENSE_MW_STATE_CALIBRATION_MASK)</li>
+<li>Bit[14] - The smart sensing algorithm is in progress. The next scan frame cannot be started (CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK)</li>
+<li>Bit[15] - Middleware initialization is in progress and the next scan frame cannot be initiated (CY_CAPSENSE_MW_STATE_INITIALIZATION_MASK)</li>
+<li>Bit[16-31] - The set [x] number of the result means that the previously initiated scan for the [x] slot is completed or in progress. In CS-DMA mode, this field is set only for the first scanned slot (CY_CAPSENSE_MW_STATE_SCAN_SLOT_MASK[x]) <dl class="section note"><dt>Note</dt><dd>For the the forth-generation CAPSENSE&trade; only Bit[7] is available. </dd></dl>
+</li>
+</ul>
 
 </div>
 </div>
@@ -269,122 +282,115 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 </div>
 </div>
-<a id="a77232b6c0e10717e7ae1af4353a03bcd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77232b6c0e10717e7ae1af4353a03bcd">&#9670;&nbsp;</a></span>numFineInitCycles</h2>
+<a id="aa31a53c2469d657255434141859a67ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa31a53c2469d657255434141859a67ff">&#9670;&nbsp;</a></span>lpDataSt</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t cy_stc_capsense_common_context_t::numFineInitCycles</td>
+          <td class="memname">uint16_t cy_stc_capsense_common_context_t::lpDataSt</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Number of ProDummy SubConversions. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>State of Low Power data processing: </p>
+<ul>
+<li>Bit[0] = 0 (Default) - data is not copied and cannot be transmitted to Tuner</li>
+<li>Bit[0] = 1 - data copied by CAPSENSE&trade; and transmitted to Tuner. <dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
+</li>
+</ul>
 
 </div>
 </div>
-<a id="acbfaf0d277487c7b7d4c29373a0c1c28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acbfaf0d277487c7b7d4c29373a0c1c28">&#9670;&nbsp;</a></span>numFineInitWaitCycles</h2>
+<a id="a93612ae88d67b72c3cc0e9ae7b978692"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93612ae88d67b72c3cc0e9ae7b978692">&#9670;&nbsp;</a></span>lpFirstSnsId</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint16_t cy_stc_capsense_common_context_t::numFineInitWaitCycles</td>
+          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lpFirstSnsId</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Number of ProDummy Wait Cycles. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>The first scanned low power sensor within LP frame. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
-<a id="a6de81bf892d8f25e7cd5ea1428d9a2c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6de81bf892d8f25e7cd5ea1428d9a2c9">&#9670;&nbsp;</a></span>lfsrPoly</h2>
+<a id="ac157a3338cbf70d3f6e2e873fb21c8e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac157a3338cbf70d3f6e2e873fb21c8e8">&#9670;&nbsp;</a></span>lpSnsNumber</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint16_t cy_stc_capsense_common_context_t::lfsrPoly</td>
+          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lpSnsNumber</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>LFSR Polynomial. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>The number of consecutive scanned low power sensors from the .lpFirstSnsID. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
-<a id="a971f5a3a5454addde057e0f9179e77e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a971f5a3a5454addde057e0f9179e77e8">&#9670;&nbsp;</a></span>lfsrScale</h2>
+<a id="a450fd2b3f328865bf2987c8b513e570c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a450fd2b3f328865bf2987c8b513e570c">&#9670;&nbsp;</a></span>lpNumFrame</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lfsrScale</td>
+          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lpNumFrame</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>LFSR Scale value. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>The number of fully scanned low power frames available in the packet. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
-<a id="a4ea8ee5aae4993e4f86a9d2cd05b537c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ea8ee5aae4993e4f86a9d2cd05b537c">&#9670;&nbsp;</a></span>cdacDitherSeed</h2>
+<a id="a6a3c019d3d17dcdb181f5690f5096eee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a3c019d3d17dcdb181f5690f5096eee">&#9670;&nbsp;</a></span>lpScanCounter</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t cy_stc_capsense_common_context_t::cdacDitherSeed</td>
+          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lpScanCounter</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Dither CDAC Seed. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>This counter increments after each scan of low power widgets. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
-<a id="a75c97af43dbcd9a4553d556bd8c454d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75c97af43dbcd9a4553d556bd8c454d7">&#9670;&nbsp;</a></span>cdacDitherPoly</h2>
+<a id="a8217d371adc11cfeb059d10acf4814eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8217d371adc11cfeb059d10acf4814eb">&#9670;&nbsp;</a></span>lpScanSt</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t cy_stc_capsense_common_context_t::cdacDitherPoly</td>
+          <td class="memname">uint8_t cy_stc_capsense_common_context_t::lpScanSt</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Dither CDAC Polynomial. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
-
-</div>
-</div>
-<a id="a5468b6895f747291aeb4225a66ff2ccd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5468b6895f747291aeb4225a66ff2ccd">&#9670;&nbsp;</a></span>modClk</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t cy_stc_capsense_common_context_t::modClk</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The modulator clock divider. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<p>The state / status of low power sensor baselines: </p>
+<ul>
+<li>Bit[0] = 0 - baseline reset: does not happen</li>
+<li>Bit[0] = 1 - baseline reset: happen</li>
+<li>Bit[1] = 0 - baseline is not valid due to FIFO overflow</li>
+<li>Bit[1] = 1 - baseline is valid. <dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
+</li>
+</ul>
 
 </div>
 </div>
@@ -394,7 +400,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0.1</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

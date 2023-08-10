@@ -8,7 +8,9 @@ var group__group__capsense__macros__bist =
     [ "CY_CAPSENSE_BIST_SHIELD_CAP_MASK", "group__group__capsense__macros__bist.html#ga5892e01404f93ac02d8c324dc4d31eb9", null ],
     [ "CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK", "group__group__capsense__macros__bist.html#ga13c098393a6570c7c8d13ae57b4c4666", null ],
     [ "CY_CAPSENSE_BIST_VDDA_MASK", "group__group__capsense__macros__bist.html#ga0e658fb59f70e15c77629b558347d68b", null ],
+    [ "CY_CAPSENSE_BIST_ELTD_CAP_MASK", "group__group__capsense__macros__bist.html#ga56d50ace10e3d53182dfa31949addd62", null ],
     [ "CY_CAPSENSE_BIST_RUN_AVAILABLE_SELF_TEST_MASK", "group__group__capsense__macros__bist.html#gab2507f4af9281e8032caac62016a7e8a", null ],
     [ "CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN", "group__group__capsense__macros__bist.html#gac8d7ca915ba94312bd39fc5f1d5745a0", null ],
-    [ "CY_CAPSENSE_TST_HW_GROUP_EN", "group__group__capsense__macros__bist.html#gae520bda9769db3b66038f58bd133180c", null ]
+    [ "CY_CAPSENSE_TST_HW_GROUP_EN", "group__group__capsense__macros__bist.html#gae520bda9769db3b66038f58bd133180c", null ],
+    [ "CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE", "group__group__capsense__macros__bist.html#ga6968e0a265c68afe1e45aaa510c15e0d", null ]
 ];

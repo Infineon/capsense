@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0.1: CAPSENSE&trade; Middleware Library 3.0.1</title>
+<title>CAPSENSE™ Middleware Library 4.0: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0.1</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
   </td>
  </tr>
  </tbody>
@@ -81,33 +81,34 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">CAPSENSE&trade; Middleware Library 3.0.1 </div>  </div>
+<div class="title">CAPSENSE™ Middleware Library 4.0 Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon.Capacitive sensing can be used in a variety of applications and products where conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. These include home appliances, and automotive, IoT, and industrial applications. CAPSENSE&trade; supports multiple interfaces (widgets) using both CSX and CSD sensing methods with robust performance.</p>
+<div class="textblock"><p>CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon.Capacitive sensing can be used in a variety of applications and products where conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. These include home appliances, and automotive, IoT, and industrial applications. CAPSENSE&trade; supports multiple interfaces (widgets) using CSD, CSX, and ISX sensing methods with robust performance.</p>
 <p>CAPSENSE&trade; has become a popular technology to replace conventional mechanical- and optical-based user interfaces. There are fewer parts involved, which saves cost and increases reliability with no wear-and-tear. The main advantages of CAPSENSE&trade; compared with other solutions are: robust performance in harsh environmental conditions and rejection of a wide range of external noise sources.</p>
 <p>Use CAPSENSE&trade; for:</p><ul>
 <li>Touch and gesture detection for various interfaces</li>
-<li>Proximity detection for innovative user experiences and low-power optimization</li>
+<li>Proximity detection for innovative user experiences and low power optimization</li>
 <li>Contactless liquid-level sensing in a variety of applications</li>
 <li>Touch-free operations in hazardous materials</li>
 </ul>
 <h1><a class="anchor" id="section_capsense_general"></a>
 General Description</h1>
-<p>The CAPSENSE&trade; middleware Library supports operation with fourth-generation and fifth-generation of CAPSENSE&trade; HW. CAPSENSE&trade; HW enables multiple sensing capabilities on PSoC&trade; devices including the self-cap (CSD) and mutual-cap (CSX) capacitive touch sensing solutions, inductive sensing, impedance measurement, and other features.</p>
+<p>The CAPSENSE&trade; middleware Library supports operation with fourth-generation, fifth-generation and fifth-generation LP of CAPSENSE&trade; HW. CAPSENSE&trade; HW enables the multiple sensing capabilities on PSoC&trade; devices including the Self-Capacitance (CSD) and Mutual-Capacitance (CSX) capacitive touch sensing solutions, inductive sensing (ISX), impedance measurement, and other features.</p>
 <p>Middleware access available the CAPSENSE&trade; HW block through the corresponding peripheral Driver:</p><ul>
 <li>CSD (CAPSENSE&trade; Sigma-Delta) driver for the forth-generation of the CAPSENSE&trade; HW;</li>
 <li>MSC (Multi-Sensor Converter) driver for the fifth-generation of the CAPSENSE&trade; HW;</li>
+<li>MSCLP (Multi-Sensor Converter Low Power) driver for the fifth-generation of the CAPSENSE&trade; HW;</li>
 </ul>
 <p>The CAPSENSE&trade; peripheral driver does not provide any system-level functions. It only implements the interface to the CAPSENSE&trade; HW resource.</p>
-<p>The supported CAPSENSE&trade; HW blocks can perform only one function at a time. However, all supported functionality (like CAPSENSE&trade;, CSDADC, etc.) can be time-multiplexed in a design. I.e. you can save the existing state of the CAPSENSE&trade; middleware, restore the state of the the CSDADC middleware, perform CSDADC measurements, and then switch back to the CAPSENSE&trade; functionality. For details and code examples, refer to the description of the <a class="el" href="group__group__capsense__high__level.html#ga899ef1058ead082503771da68e584b82" title="Saves the state of CAPSENSE™ so the functionality can be restored using the Cy_CapSense_Restore() fu...">Cy_CapSense_Save()</a> and <a class="el" href="group__group__capsense__high__level.html#gaf87102783ec511c2e5f2024680112d16" title="Resumes the middleware operation if the Cy_CapSense_Save() function was called previously. ">Cy_CapSense_Restore()</a> functions.</p>
+<p>The supported CAPSENSE&trade; HW blocks can perform only one function at a time. However, all supported functionality (like CAPSENSE&trade;, CSDADC, etc.) can be time-multiplexed in a design. I.e. you can save the existing state of the CAPSENSE&trade; middleware, restore the state of the CSDADC middleware, perform CSDADC measurements, and then switch back to the CAPSENSE&trade; functionality. For details and code examples, refer to the description of the <a class="el" href="group__group__capsense__high__level.html#ga899ef1058ead082503771da68e584b82" title="Saves the state of CAPSENSE™ so the functionality can be restored using the Cy_CapSense_Restore() fu...">Cy_CapSense_Save()</a> and <a class="el" href="group__group__capsense__high__level.html#gaf87102783ec511c2e5f2024680112d16" title="Resumes the middleware operation if the Cy_CapSense_Save() function was called previously. ">Cy_CapSense_Restore()</a> functions.</p>
 <div class="image">
-<img src="capsense_solution.png" alt="capsense_solution.png" width="800px"/>
+<img src="CAPSENSE_SOLUTION_MSCLP.png" alt="CAPSENSE_SOLUTION_MSCLP.png" width="800px"/>
 <div class="caption">
 CAPSENSE&trade; Solution</div></div>
  <p>This section describes only the CAPSENSE&trade; middleware. Refer to the corresponding sections of documentation for other middleware supported by the CAPSENSE&trade; HW.</p>
 <p>A CAPSENSE&trade; solution includes:</p><ul>
-<li>The CAPSENSE&trade; Configurator to create and configure CAPSENSE&trade; widgets. It can be launched in ModusToolbox&trade; from the CAPSENSE&trade; superblock personality and in Stand-alone mode. It contains a separate document about how to create and configure widgets, parameters and algorithm descriptions.</li>
+<li>The CAPSENSE&trade; Configurator tool to create and configure CAPSENSE&trade; widgets. It can be launched in ModusToolbox&trade; from the CAPSENSE&trade; superblock personality and in Stand-alone mode. It contains a separate document about how to create and configure widgets, parameters and algorithm descriptions.</li>
 <li>API to control the design from the application program. This documentation describes API with code snippets of how to use them.</li>
 <li>The CAPSENSE&trade; Tuner tool for real-time tuning, testing, and debugging, for easy and smooth designing of human interfaces on customer products. The Tuner tool communicates with a device through a HW bridge and communication drivers (EzI2C, UART, etc.) and allows to monitor widget statuses, sensor signals, detected touch positions, gestures, etc. The application program does not need to interact with the CSD driver and/or other drivers such as GPIO, SysClk directly. All of that is configured and managed by middleware.</li>
 </ul>
@@ -117,8 +118,10 @@ Features</h2>
 <ul>
 <li>Offers best-in-class signal-to-noise ratio (SNR)</li>
 <li>Supports Self-Capacitance (CSD) and Mutual-Capacitance (CSX) sensing methods</li>
+<li>Inductive sensing method (ISX) available for fifth-generation low power CAPSENSE&trade;</li>
+<li>Fifth-generation low power CAPSENSE&trade; supports autonomous scanning in Deep Sleep power mode</li>
 <li>Supports various Widgets, such as Buttons, Matrix Buttons, Sliders, Touchpads, and Proximity Sensors</li>
-<li>Provides ultra-low power consumption and liquid-tolerant capacitive sensing technology</li>
+<li>Provides ultra-low power consumption capacitive sensing technology</li>
 <li>Contains the integrated graphical CAPSENSE&trade; Tuner tool for real-time tuning, testing, and debugging</li>
 <li>Provides superior immunity against external noise and low-radiated emission</li>
 <li>Offers best-in-class liquid tolerance</li>
@@ -139,7 +142,7 @@ Code Examples for PSoC™ 4 Devices with fifth-generation CAPSENSE™</h2>
 <ul>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-button-tuning"><b>CSD Button Manual Tuning</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csx-button-tuning"><b>CSX Button Manual Tuning</b></a></li>
-<li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense--csd-slider-tuning"><b>CSD Slider Manual Tuning</b></a></li>
+<li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-slider-tuning"><b>CSD Slider Manual Tuning</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-touchpad-tuning"><b>CSD Touchpad Manual Tuning</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csx-touchpad-tuning"><b>CSX Touchpad Manual Tuning</b></a></li>
 </ul>
@@ -147,7 +150,7 @@ Code Examples for PSoC™ 4 Devices with fifth-generation CAPSENSE™</h2>
 Code Examples for PSoC™ 6 Devices with fourth-generation CAPSENSE™</h2>
 <ul>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider"><b>Two Buttons and Slider with CAPSENSE&trade; Tuner</b></a></li>
-<li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-low-power-capsense-freertos"><b>Low-Power Slider and Ganged Sensors with FreeRTOS</b></a></li>
+<li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-low-power-capsense-freertos"><b>low power Slider and Ganged Sensors with FreeRTOS</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-custom-scan"><b>Custom Scan</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-ble-capsense-tuner-client"><b>BLE Client for CAPSENSE&trade; Tuning</b></a></li>
 <li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-ble-capsense-tuner-server"><b>BLE Server for CAPSENSE&trade; Tuning</b></a></li>
@@ -160,19 +163,19 @@ ModusToolbox™ Configuration Considerations</h2>
 <li>The <a href="https:/\/github.com/Infineon/mtb-pdl-cat2"><b>CAT2 Peripheral Driver Library (PDL)</b></a> is included in the project in case if the PSoC&trade; 4 device is used.</li>
 <li><a href="https:/\/www.cypress.com/ModusToolboxDeviceConfig"><b>ModusToolbox&trade; Device Configurator Tool</b></a>, <a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade; CAPSENSE&trade; Configurator Tool</b></a>, and <a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade; CAPSENSE&trade; Tuner Tool</b></a> are installed on the machine.</li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>Ensure to set up the device power voltages correctly to the proper operation of the device power domains. The Setup is on the System Tab of the Device Configurator. Enable the Power check box and set up the voltages as they are red-outlined in the picture below.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Ensure to set up the device power voltages correctly to the proper operation of the device power domains. The Setup is on the System Tab of the Device Configurator tool. Enable the Power check box and set up the voltages as they are red-outlined in the picture below.</dd></dl>
 <div class="image">
 <img src="check_power.png" alt="check_power.png" width="800px"/>
 <div class="caption">
 Power Setup</div></div>
  <h2><a class="anchor" id="group_capsense_quick_start_mbed"></a>
 MBED OS Configuration Considerations</h2>
-<p>You can immediately start with the following MBED OS code example available at the <a href="https:/\/github.com/cypresssemiconductorco"><b> Cypress Semiconductor GitHub</b></a>:</p><ul>
-<li><a href="https:/\/github.com/cypresssemiconductorco/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
+<p>You can immediately start with the following MBED OS code example available at the <a href="https:/\/github.com/Infineon/"><b> Infineon GitHub</b></a>:</p><ul>
+<li><a href="https:/\/github.com/Infineon/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
 </ul>
-<p>If you are doing your own project, remember to include cycfg.h file: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;cycfg.h&quot;</span></div></div><!-- fragment --><p> and call the resource initialization functions in main() at the beginning: </p><div class="fragment"><div class="line">    init_cycfg_all();</div></div><!-- fragment --><h1><a class="anchor" id="section_capsense_configuration"></a>
+<p>If you are doing your own project, remember to include cycfg.h file: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;cycfg.h&quot;</span></div></div><!-- fragment --><p> and call the resource initialization functions in main() at the beginning: </p><div class="fragment"><div class="line">init_cycfg_all();</div></div><!-- fragment --><h1><a class="anchor" id="section_capsense_configuration"></a>
 Summary of Application Programming Interface (API)</h1>
-<p>The CAPSENSE&trade; middleware operates on the top of the MSC/CSD HW driver. Refer to the PDL API Reference Manual.</p>
+<p>The CAPSENSE&trade; middleware operates on the top of the MSCLP/MSC/CSD HW driver. Refer to the PDL API Reference Manual.</p>
 <p>This document provides descriptions of the functions in the CAPSENSE&trade; middleware library, and descriptions of the data structures (register map) used by the middleware library.</p>
 <p>The Application Programming Interface (API) routines allow controlling and executing specific tasks using the CAPSENSE&trade; middleware. The CAPSENSE&trade; API is described in the following sections:</p><ul>
 <li><a class="el" href="group__group__capsense__high__level.html">High-level Functions</a></li>
@@ -188,27 +191,29 @@ Supported Software and Tools</h1>
 <tr>
 <th>Software and Tools </th><th>Version  </th></tr>
 <tr>
-<td>ModusToolbox&trade; Software Environment </td><td>3.0  </td></tr>
+<td>ModusToolbox&trade; Software Environment </td><td>3.1  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; Device Configurator </td><td>4.0  </td></tr>
+<td>- ModusToolbox&trade; Device Configurator tool </td><td>4.10  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; MSC Superblock Personality for for PSoC&trade; 4 devices in the Device Configurator </td><td>1.0  </td></tr>
+<td>- ModusToolbox&trade; MSC Superblock Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>1.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator </td><td>1.1  </td></tr>
+<td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>1.1  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator </td><td>2.0  </td></tr>
+<td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>3.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator </td><td>3.0  </td></tr>
+<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator tool </td><td>2.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool </td><td>5.0.0  </td></tr>
+<td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator tool </td><td>2.0  </td></tr>
 <tr>
-<td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool </td><td>5.0.0  </td></tr>
+<td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool </td><td>6.10  </td></tr>
 <tr>
-<td>CAT1 Peripheral Driver Library (PDL) </td><td>3.0.0  </td></tr>
+<td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool </td><td>6.10  </td></tr>
 <tr>
-<td>CAT2 Peripheral Driver Library (PDL) </td><td>2.0.0  </td></tr>
+<td>CAT1 Peripheral Driver Library (PDL) </td><td>3.3.1  </td></tr>
 <tr>
-<td>GCC Compiler </td><td>10.3.1  </td></tr>
+<td>CAT2 Peripheral Driver Library (PDL) </td><td>2.5.0  </td></tr>
+<tr>
+<td>GCC Compiler </td><td>11.3.1  </td></tr>
 <tr>
 <td>IAR Compiler </td><td>8.42.1  </td></tr>
 <tr>
@@ -228,14 +233,14 @@ Supported Software and Tools</h1>
 Update to Newer Versions</h1>
 <p>Refer to the <a class="el" href="index.html#section_capsense_changelog">Changelog</a> to learn about the design impact of the newer version. Set up your environment in accordance with <a class="el" href="index.html#section_capsense_toolchain">Supported Software and Tools</a>.</p>
 <p>Ensure:</p><ul>
-<li>The specified version of the ModusToolbox&trade; Device Configurator and the Personality are used to re-generate the device configuration.</li>
-<li>The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator is used to re-generate the middleware configuration.</li>
+<li>The specified version of the ModusToolbox&trade; Device Configurator tool and the Personality are used to re-generate the device configuration.</li>
+<li>The specified version of the ModusToolbox&trade; CAPSENSE&trade; Configurator tool is used to re-generate the middleware configuration.</li>
 <li>The toolchains are set up properly for your environment per the settings outlined in the Supported Software and Tools.</li>
 <li>The project is re-built once the toolchains are configured and the configuration is completed.</li>
 </ul>
 <p>You might need to re-generate the configuration structures for either the device initialization code or the middleware initialization code.</p><ul>
-<li>Launch the ModusToolbox&trade; Device Configurator and perform the File-&gt;Save command to re-generate the device initialization code.</li>
-<li>From the ModusToolbox&trade; Device Configurator, launch the ModusToolbox&trade; CAPSENSE&trade; Configurator and perform the File-&gt;Save command to re-generate the middleware initialization code.</li>
+<li>Launch the ModusToolbox&trade; Device Configurator tool and perform the File-&gt;Save command to re-generate the device initialization code.</li>
+<li>From the ModusToolbox&trade; Device Configurator tool, launch the ModusToolbox&trade; CAPSENSE&trade; Configurator tool and perform the File-&gt;Save command to re-generate the middleware initialization code.</li>
 </ul>
 <h1><a class="anchor" id="section_capsense_memory_usage"></a>
 Memory Usage</h1>
@@ -249,21 +254,25 @@ Memory Usage</h1>
 <tr>
 <th>Configuration:</th><th>Mode</th><th>Sensor Connection Type</th><th>Memory Type</th><th>Configuration 1</th><th>Configuration 2</th><th>Configuration 3</th><th>Configuration 4</th><th>Configuration 5</th><th>Configuration 6</th><th>Configuration 7</th><th>Configuration 8</th><th>Configuration 9 </th></tr>
 <tr align="center">
-<td rowspan="2">4th Gen</td><td rowspan="2">IntDrv</td><td rowspan="2">AMUX</td><td>Flash:</td><td>&lt; 5.9 kB</td><td>&lt; 8.5 kB</td><td>&lt; 11.7 kB</td><td>&lt; 5.5 kB </td><td>&lt; 6.8 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.1 kB</td><td>&lt; 9.4 kB</td><td>&lt; 18.7 kB </td></tr>
+<td rowspan="2">4th Gen</td><td rowspan="2">IntDrv</td><td rowspan="2">AMUX</td><td>Flash:</td><td>&lt; 6.0 kB</td><td>&lt; 8.8 kB</td><td>&lt; 11.7 kB</td><td>&lt; 5.5 kB </td><td>&lt; 6.8 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.1 kB</td><td>&lt; 9.4 kB</td><td>&lt; 18.7 kB </td></tr>
 <tr align="center">
-<td>SRAM:</td><td>&lt; 0.6 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 1.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 0.7 kB</td><td>&lt; 2.4 kB </td></tr>
+<td>SRAM:</td><td>&lt; 0.6 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.9 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 1.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 0.7 kB</td><td>&lt; 2.4 kB </td></tr>
 <tr align="center">
-<td rowspan="6">5th Gen</td><td rowspan="4">IntDrv</td><td rowspan="2">AMUX</td><td>Flash:</td><td>&lt; 7.3 kB</td><td>&lt; 10.3 kB</td><td>&lt; 11.5 kB</td><td>&lt; 7.4 kB </td><td>&lt; 8.8 kB</td><td>&lt; 9.9 kB</td><td>&lt; 11.0 kB</td><td>&lt; 11.3 kB</td><td>&lt; 15.0 kB </td></tr>
+<td rowspan="6">5th Gen</td><td rowspan="4">IntDrv</td><td rowspan="2">AMUX</td><td>Flash:</td><td>&lt; 8.0 kB</td><td>&lt; 10.4 kB</td><td>&lt; 11.8 kB</td><td>&lt; 7.9 kB </td><td>&lt; 9.3 kB</td><td>&lt; 10.1 kB</td><td>&lt; 11.2 kB</td><td>&lt; 12.0 kB</td><td>&lt; 15.0 kB </td></tr>
 <tr align="center">
-<td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.2 kB</td><td>&lt; 1.1 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB </td></tr>
+<td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.4 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.4 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB </td></tr>
 <tr align="center">
-<td rowspan="2">CTRL_MUX</td><td>Flash:</td><td colspan="9">Flash memory consumption 1000 bytes higher then CTRL_MUX - DMA </td></tr>
+<td rowspan="2">CTRL_MUX</td><td>Flash:</td><td>&lt; 7.6 kB</td><td>&lt; 10.7 kB</td><td>&lt; 11.4 kB</td><td>&lt; 7.4 kB </td><td>&lt; 9.2 kB</td><td>&lt; 9.8 kB</td><td>&lt; 10.9 kB</td><td>&lt; 11.9 kB</td><td>&lt; 14.8 kB </td></tr>
 <tr align="center">
-<td>SRAM:</td><td colspan="9">SRAM memory consumption is the same as in CTRL_MUX - DMA </td></tr>
+<td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.4 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.4 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB </td></tr>
 <tr align="center">
-<td rowspan="2">DMA</td><td rowspan="2">CTRL_MUX</td><td>Flash:</td><td>&lt; 7.7 kB</td><td>&lt; 11.0 kB</td><td>&lt; 11.1 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.6 kB</td><td>&lt; 10.2 kB</td><td>&lt; 11.4 kB</td><td>&lt; 11.7 kB</td><td>&lt; 15.4 kB </td></tr>
+<td rowspan="2">DMA</td><td rowspan="2">CTRL_MUX</td><td>Flash:</td><td>&lt; 7.9 kB</td><td>&lt; 11.3 kB</td><td>&lt; 12.1 kB</td><td>&lt; 8.0 kB</td><td>&lt; 9.8 kB</td><td>&lt; 10.4 kB</td><td>&lt; 11.5 kB</td><td>&lt; 12.0 kB</td><td>&lt; 15.4 kB </td></tr>
 <tr align="center">
-<td>SRAM:</td><td>&lt; 1.3 kB</td><td>&lt; 1.5 kB</td><td>&lt; 1.4 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB </td></tr>
+<td>SRAM:</td><td>&lt; 1.4 kB</td><td>&lt; 1.6 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.7 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB </td></tr>
+<tr align="center">
+<td rowspan="2">5th Gen Low Power</td><td rowspan="2">LP-AOS</td><td rowspan="2">AMUX</td><td>Flash:</td><td>&lt; 7.5 kB</td><td>&lt; 10.8 kB</td><td>&lt; 11.3 kB</td><td>&lt; 7.4 kB </td><td>&lt; 9.2 kB</td><td>&lt; 9.6 kB</td><td>&lt; 11.1 kB</td><td>&lt; 11.3 kB</td><td>&lt; 14.4 kB </td></tr>
+<tr align="center">
+<td>SRAM:</td><td>&lt; 1.4 kB</td><td>&lt; 1.6 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 5.1 kB </td></tr>
 <tr>
 <th colspan="13">Widgets </th></tr>
 <tr>
@@ -364,6 +373,8 @@ CAPSENSE™ Middleware Deviation</h2>
 <tr>
 <td>Rule 8.13 </td><td>A pointer should point to const-qualified type whenever possible.  </td><td>Advisory. During the code analysis, the same source files are compiled multiple times with device-specific options. A function argument can be const for some specific run.   </td></tr>
 <tr>
+<td>Rule 11.4 </td><td>A conversion should not be performed between a pointer to object and an integer type.  </td><td>Advisory. There is an issue with a SYSCLK driver (IFXID-10550), due to which integer type is cast to an object pointer type. Code is manually checked and reviewed to be safe.   </td></tr>
+<tr>
 <td>Rule 11.5 </td><td>A conversion should not be performed from pointer to void into pointer to object.  </td><td>Advisory. The cast from void pointer to an object pointer does not have any unintended effect, as it is a consequence of the definition of a structure based on function pointers.   </td></tr>
 <tr>
 <td>Rule 14.2 </td><td>A for loop shall be well-formed.  </td><td>The third clause of the for loop is empty to improve execution time.   </td></tr>
@@ -371,14 +382,14 @@ CAPSENSE™ Middleware Deviation</h2>
 <td>Rule 18.4 </td><td>The +, -, += and -= operators should not be applied to an expression of pointer type.  </td><td>Advisory. There are several instances of pointer arithmetic in drivers. They cannot be avoided, so are manually checked and reviewed to be safe.   </td></tr>
 </table>
 <h2><a class="anchor" id="subsection_capsense_misra-cfg"></a>
-CAPSENSE™ Configurator Generated Sources Deviation</h2>
+CAPSENSE™ Configurator Tool Generated Sources Deviation</h2>
 <table class="doxtable">
 <tr>
 <th>Rule ID </th><th>Rule Description </th><th>Description of Deviation(s)  </th></tr>
 <tr>
 <td>Rule 3.1 </td><td>The character sequences / * and / / shall not be used within a comment. </td><td>Using of the special comment symbols is need for Doxygen comment support, it does not have any impact on functionality.   </td></tr>
 <tr>
-<td>Rule 8.4 </td><td>A compatible declaration shall be visible when an object or function with external linkage is defined. </td><td>The CAPSENSE&trade; middleware library consists of several modules. One of them is CapSense Built-in Self Test (BIST). All the BIST variables are used in other data structures and accessed using pointers.  </td></tr>
+<td>Rule 8.4 </td><td>A compatible declaration shall be visible when an object or function with external linkage is defined. </td><td>The CAPSENSE&trade; middleware library consists of several modules. One of them is CAPSENSE&trade; Built-in Self Test (BIST). All the BIST variables are used in other data structures and accessed using pointers.  </td></tr>
 <tr>
 <td>Rule 11.4 </td><td>A conversion should not be performed between a pointer to object and an integer type. </td><td>Advisory. There are several instances of pointer conversions in Generated Source. They are manually checked and reviewed to be safe.  </td></tr>
 </table>
@@ -407,7 +418,37 @@ Changelog</h1>
 <tr>
 <th>Version</th><th>Changes</th><th>Reason for Change </th></tr>
 <tr>
-<td rowspan="1">3.0.1 </td><td>Fixed call of Cy_DMAC_Descriptor_SetDstAddress() accordingly to changes in DMAC v1.20 mtb-pdl-cat2 driver. </td><td>mtb-pdl-cat2 v2.0.0 support  </td></tr>
+<td rowspan="16">4.0 </td><td colspan="2"><em><b> This version is not backward compatible with the previous version due to fifth-generation LP devices support implementation and defect fixes. We tried to keep the established API, but your design may need to be updated to operate with CAPSENSE&trade; middleware v4.0. </b></em>   </td></tr>
+<tr>
+<td>Added CAPSENSE&trade; fifth-generation LP device support  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Added the Inductive sensing method support (ISX)  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Added the feature of enabling/disabling widgets and built-in self-test working/non-working widgets  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Added Multi-phase Self support for fifth-generation LP devices  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Updated the CIC2 functionality for the fifth-generation devices to be consistent with the fifth-generation LP devices.  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Added saturated scan during CAPSENSE&trade; initialization to measure maximum rawcounts precisely instead of using equations.  </td><td>Feature enhancement   </td></tr>
+<tr>
+<td>Changed the meaning of bit[2] of the widget status register in the <a class="el" href="structcy__stc__capsense__widget__context__t.html" title="Widget context structure. ">cy_stc_capsense_widget_context_t</a>: logical 1 means the widget is enabled. Replaced CY_CAPSENSE_WD_DISABLE_MASK with CY_CAPSENSE_WD_ENABLE_MASK for consistency  </td><td>Defect fixing   </td></tr>
+<tr>
+<td>Swapped the position of bit[0] and bit[1] of the sensor status register in the <a class="el" href="structcy__stc__capsense__sensor__context__t.html" title="Sensor context structure. ">cy_stc_capsense_sensor_context_t</a>: bit[0] reports the Proximity sensor status, bit[1] - the regular sensor status. Updated values of CY_CAPSENSE_SNS_PROX_STATUS_MASK and CY_CAPSENSE_SNS_TOUCH_STATUS_MASK macros.  </td><td>Defect fixing   </td></tr>
+<tr>
+<td>Renamed cy_stc_active_scan_sns_t to <a class="el" href="structcy__stc__capsense__active__scan__sns__t.html" title="Declares active sensor details. ">cy_stc_capsense_active_scan_sns_t</a>.  </td><td>Following naming convention. Defect fixing   </td></tr>
+<tr>
+<td>Renamed cy_stc_msc_channel_config_t to <a class="el" href="structcy__stc__capsense__channel__config__t.html" title="Declares MSC channel (HW block) configuration. ">cy_stc_capsense_channel_config_t</a>, updated field names  </td><td>Following naming convention. Updated for consistency between fifth-generation and fifth-generation LP devices   </td></tr>
+<tr>
+<td>Renamed Cy_CapSense_ProcessWidgetMptxDeconvolution() to <a class="el" href="group__group__capsense__low__level.html#ga1460eefc048d987a811dbb7deba56e0f" title="Performs raw count deconvolution for the specified widget: ">Cy_CapSense_ProcessWidgetMpDeconvolution()</a>  </td><td>Updated function name to better reflect its purpose   </td></tr>
+<tr>
+<td>Renamed Cy_CapSense_SetCalibrationTargets() to <a class="el" href="group__group__capsense__low__level.html#ga2f9c2fe584e7038a923d28bf445205ee" title="Sets the CapDAC auto-calibration raw count target for CSD, CSX or ISX widgets. ">Cy_CapSense_SetCalibrationTarget()</a>, updated function interface and implementation to cover all sensing methods.  </td><td>Feature enhancement.   </td></tr>
+<tr>
+<td>Fixed incorrect shield pins configuration for <a class="el" href="group__group__capsense__low__level.html#ga3bf9894c313d4ffce1be841141d6b8e5" title="Measures the specified CSD sensor / CSX electrode capacitance in femtofarads. ">Cy_CapSense_MeasureCapacitanceSensor()</a> function for fourth-generation devices  </td><td>Defect fixing   </td></tr>
+<tr>
+<td>Updater measurement error handling for <a class="el" href="group__group__capsense__low__level.html#gaff014dbf80fc7824a7e6e3e377d2942f" title="Measures shield electrode capacitances in femtofarads. ">Cy_CapSense_MeasureCapacitanceShieldElectrode()</a>, <a class="el" href="group__group__capsense__low__level.html#gadb467c284dc3fea4c7347a25c5ff57df" title="Measures the specified slot sensor capacitance in femtofarads. ">Cy_CapSense_MeasureCapacitanceSlotSensors()</a> and <a class="el" href="group__group__capsense__low__level.html#ga23f23f4e684b25788f999851f20aa58c" title="Measures the specified CSD sensor / CSX electrode capacitance in femtofarads. ">Cy_CapSense_MeasureCapacitanceSensorElectrode()</a> functions for fifth-generation devices  </td><td>Defect fixing   </td></tr>
+<tr>
+<td>Optimized <a class="el" href="structcy__stc__capsense__common__config__t.html" title="Common configuration structure. ">cy_stc_capsense_common_config_t</a> structure (renamed fields, removed unused fields)  </td><td>User experience improvement   </td></tr>
 <tr>
 <td rowspan="12">3.0 </td><td colspan="2"><p class="starttd"><em><b> This version is not backward compatible with the previous version due to implemented memory consumption optimization. We tried to keep the established API, but your design may need to be updated to operate with CAPSENSE&trade; middleware v3.0.</b></em></p>
 <p class="endtd"><em><b> Also, if you use the CAPSENSE&trade; middleware v3.0 version then you must use the CAPSENSE&trade; Configurator v4.0 tool or later. This MW version is not compatible with the previous Configurator tool versions. </b></em>  </p>
@@ -456,7 +497,7 @@ Changelog</h1>
 <tr>
 <td>Added call of the <a class="el" href="group__group__capsense__high__level.html#gaf9436a7ec9b18880dbc046e91462710b" title="Resumes the middleware after System Deep Sleep. ">Cy_CapSense_Wakeup()</a> function to the registered callback in the <a class="el" href="group__group__capsense__high__level.html#ga9c47887109b22521eba45109b7a27f31" title="Handles CPU active to System Deep Sleep power mode transition for the CAPSENSE™ middleware. ">Cy_CapSense_DeepSleepCallback()</a> function </td><td>Improved robustness of a sensing module  </td></tr>
 <tr>
-<td>Added a possibility to enable / disable independent features of BIST module </td><td>Expanded flexibility  </td></tr>
+<td>Added a possibility to enable/disable independent features of BIST module </td><td>Expanded flexibility  </td></tr>
 <tr>
 <td rowspan="9">2.10 </td><td>Added Built-in Self-test (BIST) library </td><td>Support Class B (IEC-60730), safety integrity-level compliant design  </td></tr>
 <tr>
@@ -537,37 +578,35 @@ Changelog</h1>
 </table>
 <h1><a class="anchor" id="section_capsense_more_information"></a>
 More Information</h1>
-<p>Important information about the CAPSENSE&trade;-technology overview, appropriate CYPRESS&trade; device from Infineon for the design, CAPSENSE&trade; system and sensor design guidelines, different interfaces and tuning guidelines necessary for a successful design of a CAPSENSE&trade; system is available in the Getting Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide. CYPRESS&trade; highly recommends starting with these documents. They can be found on the CYPRESS&trade; web site at www.cypress.com.</p>
+<p>Important information about the CAPSENSE&trade;-technology overview, appropriate CYPRESS&trade; device from Infineon for the design, CAPSENSE&trade; system and sensor design guidelines, different interfaces and tuning guidelines necessary for a successful design of a CAPSENSE&trade; system is available in the Getting Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide. Infineon Technologies highly recommends starting with these documents. They can be found on the Infineon Technologies web site at www.infineon.com.</p>
 <p>For more information, refer to the following documents:</p>
 <ul>
 <li>CAPSENSE&trade; Overview:<ul>
 <li><a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade; CAPSENSE&trade; Configurator Tool Guide</b></a></li>
 <li><a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade; CAPSENSE&trade; Tuner Tool Guide</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/application-notes/an85951-psoc-4-and-psoc-6-mcu-capsense-design-guide"><b>CAPSENSE&trade; Design Guide</b></a></li>
+<li><a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661"><b>CAPSENSE&trade; Design Guide</b></a></li>
 </ul>
 </li>
 <li>ModusToolbox&trade; Overview:<ul>
-<li><a href="https:/\/www.cypress.com/products/modustoolbox-software-environment"><b>ModusToolbox&trade; Software Environment, Quick Start Guide, Documentation, and Videos</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software"><b>ModusToolbox&trade; Software Environment, Quick Start Guide, Documentation, and Videos</b></a></li>
 <li><a href="https:/\/www.cypress.com/ModusToolboxDeviceConfig"><b>ModusToolbox&trade; Device Configurator Tool Guide</b></a></li>
 </ul>
 </li>
 <li>Infineon Technologies Kits and Code Examples:<ul>
-<li><a href="https:/\/github.com/cypresssemiconductorco/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/code-examples/ce218136-psoc-6-mcu-e-ink-display-capsense-rtos"><b>CAPSENSE&trade; Middleware Code Example for FreeRTOS</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-145-40xx-psoc-4000s-capsense-prototyping-kit"><b>CY8CKIT-145-40XX PSoC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-149-psoc-4100s-plus-prototyping-kit"><b>CY8CKIT-149 PSoC&trade; 4100S Plus Prototyping Kit</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-041-psoc-4-s-series-pioneer-kit"><b>CY8CKIT-041-40XX PSoC&trade; 4 S-Series Pioneer Kit</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/development-kitsboards/cy8ckit-041-41xx-psoc-4100s-capsense-pioneer-kit"><b>CY8CKIT-041-41XX PSoC&trade; 4100S CAPSENSE&trade; Pioneer Kit</b></a></li>
+<li><a href="https:/\/github.com/Infineon/mbed-os-example-capsense"><b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a></li>
+<li><a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider-freertos"><b>CAPSENSE&trade; Middleware Code Example for FreeRTOS</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx"><b>CY8CKIT-145-40XX PSoC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149"><b>CY8CKIT-149 PSoC&trade; 4100S Plus Prototyping Kit</b></a></li>
 </ul>
 </li>
 <li>General Information:<ul>
-<li><a href="https:/\/cypresssemiconductorco.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html"><b>CAT1 PDL API Reference</b></a></li>
-<li><a href="https:/\/cypresssemiconductorco.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html"><b>CAT2 PDL API Reference</b></a></li>
-<li><a href="http:/\/www.cypress.com/an210781"><b>AN210781 Getting Started with PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-6-mcu-psoc-63-ble-architecture-technical-reference"><b>PSoC&trade; 6 Technical Reference Manual</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-4000s-family-psoc-4-architecture-technical-reference"><b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
-<li><a href="https:/\/www.cypress.com/documentation/technical-reference-manuals/psoc-4100s-and-psoc-4100s-plus-psoc-4-architecture"><b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
-<li><a href="http:/\/www.cypress.com/ds218787"><b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a></li>
+<li><a href="https:/\/infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html"><b>CAT1 PDL API Reference</b></a></li>
+<li><a href="https:/\/infineon.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html"><b>CAT2 PDL API Reference</b></a></li>
+<li><a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&amp;view=downloads"><b>AN210781 Getting Started with PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&amp;view=downloads"><b>PSoC&trade; 6 Technical Reference Manual</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&amp;view=downloads"><b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
+<li><a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&amp;view=downloads"><b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a></li>
+<li><a href="http:/\/www.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&amp;view=downloads"><b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a></li>
 <li><a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a></li>
 <li><a href="http:/\/www.infineon.com"><b>Infineon Technologies</b></a></li>
 </ul>
@@ -580,7 +619,7 @@ More Information</h1>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0.1</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

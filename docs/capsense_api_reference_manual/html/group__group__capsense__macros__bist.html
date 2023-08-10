@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0.1: Built-in Self-test Macros</title>
+<title>CAPSENSE™ Middleware Library 4.0: Built-in Self-test Macros</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0.1</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
   </td>
  </tr>
  </tbody>
@@ -123,6 +123,10 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__bist.html#ga0e658fb59f70e15c77629b558347d68b">CY_CAPSENSE_BIST_VDDA_MASK</a>&#160;&#160;&#160;((uint32_t)CY_CAPSENSE_TST_VDDA_EN &lt;&lt; 7uL)</td></tr>
 <tr class="memdesc:ga0e658fb59f70e15c77629b558347d68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask for a VDDA measurement test. <br /></td></tr>
 <tr class="separator:ga0e658fb59f70e15c77629b558347d68b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56d50ace10e3d53182dfa31949addd62"><td class="memItemLeft" align="right" valign="top"><a id="ga56d50ace10e3d53182dfa31949addd62"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__bist.html#ga56d50ace10e3d53182dfa31949addd62">CY_CAPSENSE_BIST_ELTD_CAP_MASK</a>&#160;&#160;&#160;((uint32_t)CY_CAPSENSE_TST_ELTD_CAP_EN &lt;&lt; 8uL)</td></tr>
+<tr class="memdesc:ga56d50ace10e3d53182dfa31949addd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask for an electrode capacitance measurement test. <br /></td></tr>
+<tr class="separator:ga56d50ace10e3d53182dfa31949addd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab2507f4af9281e8032caac62016a7e8a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__bist.html#gab2507f4af9281e8032caac62016a7e8a">CY_CAPSENSE_BIST_RUN_AVAILABLE_SELF_TEST_MASK</a></td></tr>
 <tr class="memdesc:gab2507f4af9281e8032caac62016a7e8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask for all enabled self-test functions.  <a href="#gab2507f4af9281e8032caac62016a7e8a">More...</a><br /></td></tr>
 <tr class="separator:gab2507f4af9281e8032caac62016a7e8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,6 +136,9 @@ Macros</h2></td></tr>
 <tr class="memitem:gae520bda9769db3b66038f58bd133180c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__bist.html#gae520bda9769db3b66038f58bd133180c">CY_CAPSENSE_TST_HW_GROUP_EN</a></td></tr>
 <tr class="memdesc:gae520bda9769db3b66038f58bd133180c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask for all enabled self-test functions which changes HW configuration.  <a href="#gae520bda9769db3b66038f58bd133180c">More...</a><br /></td></tr>
 <tr class="separator:gae520bda9769db3b66038f58bd133180c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6968e0a265c68afe1e45aaa510c15e0d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__bist.html#ga6968e0a265c68afe1e45aaa510c15e0d">CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE</a>&#160;&#160;&#160;(1000u)</td></tr>
+<tr class="memdesc:ga6968e0a265c68afe1e45aaa510c15e0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The estimated serial resistance value of the external capacitor charging/discharging circuit including GPIO, AMuxBus, PCB and all another resistances.  <a href="#ga6968e0a265c68afe1e45aaa510c15e0d">More...</a><br /></td></tr>
+<tr class="separator:ga6968e0a265c68afe1e45aaa510c15e0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="gab2507f4af9281e8032caac62016a7e8a"></a>
@@ -145,7 +152,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(<a class="code" href="group__group__capsense__macros__bist.html#gaabe36e7d49b10767ad5f54682f90fb50">CY_CAPSENSE_BIST_CRC_WDGT_MASK</a> | \</div><div class="line">                                                                    CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK | \</div><div class="line">                                                                    CY_CAPSENSE_BIST_SNS_CAP_MASK | \</div><div class="line">                                                                    CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK |\</div><div class="line">                                                                    CY_CAPSENSE_BIST_VDDA_MASK |\</div><div class="line">                                                                    CY_CAPSENSE_BIST_SHIELD_CAP_MASK)</div><div class="ttc" id="group__group__capsense__macros__bist_html_gaabe36e7d49b10767ad5f54682f90fb50"><div class="ttname"><a href="group__group__capsense__macros__bist.html#gaabe36e7d49b10767ad5f54682f90fb50">CY_CAPSENSE_BIST_CRC_WDGT_MASK</a></div><div class="ttdeci">#define CY_CAPSENSE_BIST_CRC_WDGT_MASK</div><div class="ttdoc">The mask for a widget CRC test. </div><div class="ttdef"><b>Definition:</b> cy_capsense_common.h:739</div></div>
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code" href="group__group__capsense__macros__bist.html#gaabe36e7d49b10767ad5f54682f90fb50">CY_CAPSENSE_BIST_CRC_WDGT_MASK</a> | \</div><div class="line">                                                                     CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK | \</div><div class="line">                                                                     CY_CAPSENSE_BIST_SNS_CAP_MASK | \</div><div class="line">                                                                     CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK |\</div><div class="line">                                                                     CY_CAPSENSE_BIST_VDDA_MASK |\</div><div class="line">                                                                     CY_CAPSENSE_BIST_SHIELD_CAP_MASK)</div><div class="ttc" id="group__group__capsense__macros__bist_html_gaabe36e7d49b10767ad5f54682f90fb50"><div class="ttname"><a href="group__group__capsense__macros__bist.html#gaabe36e7d49b10767ad5f54682f90fb50">CY_CAPSENSE_BIST_CRC_WDGT_MASK</a></div><div class="ttdeci">#define CY_CAPSENSE_BIST_CRC_WDGT_MASK</div><div class="ttdoc">The mask for a widget CRC test. </div><div class="ttdef"><b>Definition:</b> cy_capsense_common.h:895</div></div>
 </div><!-- fragment -->
 <p>The mask for all enabled self-test functions. </p>
 
@@ -162,7 +169,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(CY_CAPSENSE_BIST_EN &amp;&amp; \</div><div class="line">                                                                    (CY_CAPSENSE_TST_SNS_CAP_EN || \</div><div class="line">                                                                    CY_CAPSENSE_TST_SH_CAP_EN ||\</div><div class="line">                                                                    CY_CAPSENSE_TST_VDDA_EN ||\</div><div class="line">                                                                    CY_CAPSENSE_TST_EXTERNAL_CAP_EN))</div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line">(CY_CAPSENSE_BIST_EN &amp;&amp; \</div><div class="line">                                                                     (CY_CAPSENSE_TST_SNS_CAP_EN || \</div><div class="line">                                                                      CY_CAPSENSE_TST_SH_CAP_EN ||\</div><div class="line">                                                                      CY_CAPSENSE_TST_VDDA_EN ||\</div><div class="line">                                                                      CY_CAPSENSE_TST_EXTERNAL_CAP_EN))</div></div><!-- fragment -->
 <p>The mask for all enabled measurement self-test functions. </p>
 
 </div>
@@ -178,8 +185,25 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(CY_CAPSENSE_BIST_EN &amp;&amp; \</div><div class="line">                                                                    (CY_CAPSENSE_TST_SNS_SHORT_EN ||\</div><div class="line">                                                                    CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN))</div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line">(CY_CAPSENSE_BIST_EN &amp;&amp; \</div><div class="line">                                                                     (CY_CAPSENSE_TST_SNS_SHORT_EN ||\</div><div class="line">                                                                      CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN))</div></div><!-- fragment -->
 <p>The mask for all enabled self-test functions which changes HW configuration. </p>
+
+</div>
+</div>
+<a id="ga6968e0a265c68afe1e45aaa510c15e0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6968e0a265c68afe1e45aaa510c15e0d">&#9670;&nbsp;</a></span>CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE&#160;&#160;&#160;(1000u)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The estimated serial resistance value of the external capacitor charging/discharging circuit including GPIO, AMuxBus, PCB and all another resistances. </p>
+<p>The value is used for the external capacitor charging/discharging time estimations </p>
 
 </div>
 </div>
@@ -189,7 +213,7 @@ Macros</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0.1</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

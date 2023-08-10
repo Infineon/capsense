@@ -5,10 +5,13 @@ var searchData=
   ['idacgain',['iDacGain',['../structcy__stc__capsense__auto__tune__config__t.html#aaa6b7ff2794e44d8f333ecf6048dd6f6',1,'cy_stc_capsense_auto_tune_config_t']]],
   ['idacgainindex',['idacGainIndex',['../structcy__stc__capsense__widget__context__t.html#aca335177119844084a40aab5a8e4022e',1,'cy_stc_capsense_widget_context_t::idacGainIndex()'],['../structcy__stc__capsense__bist__custom__parameters__t.html#a60c9a9e518194f83bd0bba955066474f',1,'cy_stc_capsense_bist_custom_parameters_t::idacGainIndex()']]],
   ['idacgainindexval',['idacGainIndexVal',['../structcy__stc__capsense__widget__crc__data__t.html#a16b1ee33055b4f7d5c1d9c6ff0cdade2',1,'cy_stc_capsense_widget_crc_data_t']]],
-  ['idacgaintable',['idacGainTable',['../structcy__stc__capsense__common__config__t.html#aa420b265a50ab175b9a0902bcc3a0b08',1,'cy_stc_capsense_common_config_t']]],
-  ['idacmod',['iDacMod',['../structcy__stc__capsense__auto__tune__config__t.html#adbec8688c917a7a25a7cc4b14b1e49ed',1,'cy_stc_capsense_auto_tune_config_t::iDacMod()'],['../structcy__stc__capsense__widget__context__t.html#a0af701de0ec391286d2df0ba67299b9d',1,'cy_stc_capsense_widget_context_t::idacMod()'],['../structcy__stc__capsense__bist__custom__parameters__t.html#ada4f2a1109cc40af7ad1455e67252153',1,'cy_stc_capsense_bist_custom_parameters_t::idacMod()']]],
+  ['idacgaintable',['idacGainTable',['../structcy__stc__capsense__common__config__t.html#a9f74f43222dc438d39bfffa7f865a3e0',1,'cy_stc_capsense_common_config_t']]],
+  ['idacmod',['idacMod',['../structcy__stc__capsense__widget__context__t.html#a0af701de0ec391286d2df0ba67299b9d',1,'cy_stc_capsense_widget_context_t::idacMod()'],['../structcy__stc__capsense__bist__custom__parameters__t.html#ada4f2a1109cc40af7ad1455e67252153',1,'cy_stc_capsense_bist_custom_parameters_t::idacMod()'],['../structcy__stc__capsense__auto__tune__config__t.html#adbec8688c917a7a25a7cc4b14b1e49ed',1,'cy_stc_capsense_auto_tune_config_t::iDacMod()']]],
   ['idacmodval',['idacModVal',['../structcy__stc__capsense__widget__crc__data__t.html#a7377454579441d2f33c2d96b458e5bba',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['iircoeff',['iirCoeff',['../structcy__stc__capsense__widget__config__t.html#a3837d9686917c0fdfc96cadb261dbc03',1,'cy_stc_capsense_widget_config_t']]],
+  ['iircoeffhw',['iirCoeffHw',['../structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f',1,'cy_stc_capsense_widget_config_t']]],
+  ['iircoefflp',['iirCoeffLp',['../structcy__stc__capsense__internal__context__t.html#aca37c679b6d761382bfc75927b76fcdd',1,'cy_stc_capsense_internal_context_t']]],
+  ['ilocompensationfactor',['iloCompensationFactor',['../structcy__stc__capsense__internal__context__t.html#a4d2228c37ad5849094080a6c042cb0bd',1,'cy_stc_capsense_internal_context_t']]],
   ['initdone',['initDone',['../structcy__stc__capsense__common__context__t.html#a0181ebd06d8e03e3b18ac5c08ca14742',1,'cy_stc_capsense_common_context_t']]],
   ['intrcsdinactsnsconn',['intrCsdInactSnsConn',['../structcy__stc__capsense__internal__context__t.html#ac5af80cd4336ff0a3ca1e4b3a94c2343',1,'cy_stc_capsense_internal_context_t']]],
   ['intrcsdrawtarget',['intrCsdRawTarget',['../structcy__stc__capsense__internal__context__t.html#a3e4d3c24280c56169f481c91db5928e7',1,'cy_stc_capsense_internal_context_t']]],
@@ -16,5 +19,11 @@ var searchData=
   ['intrcsxrawtarget',['intrCsxRawTarget',['../structcy__stc__capsense__internal__context__t.html#aa567c9166072174f081d982b47246c47',1,'cy_stc_capsense_internal_context_t']]],
   ['intreltdcapcsdisc',['intrEltdCapCsdISC',['../structcy__stc__capsense__bist__context__t.html#ac61c103d20cb691984135ab15b7c7a24',1,'cy_stc_capsense_bist_context_t']]],
   ['intreltdcapcsxisc',['intrEltdCapCsxISC',['../structcy__stc__capsense__bist__context__t.html#a5f7f79777ce7fb2bcd270d1001a7f932',1,'cy_stc_capsense_bist_context_t']]],
-  ['intreltdcapshieldisc',['intrEltdCapShieldISC',['../structcy__stc__capsense__bist__context__t.html#af75d6d1eea62a6f89d6d812cd6488252',1,'cy_stc_capsense_bist_context_t']]]
+  ['intreltdcapshieldisc',['intrEltdCapShieldISC',['../structcy__stc__capsense__bist__context__t.html#af75d6d1eea62a6f89d6d812cd6488252',1,'cy_stc_capsense_bist_context_t']]],
+  ['intrisxinactsnsconn',['intrIsxInactSnsConn',['../structcy__stc__capsense__internal__context__t.html#a697bbc45d7428255dcf5c3d4a8652939',1,'cy_stc_capsense_internal_context_t']]],
+  ['intrisxrawtarget',['intrIsxRawTarget',['../structcy__stc__capsense__internal__context__t.html#a76b775ea247ac23160c1286fa965adb3',1,'cy_stc_capsense_internal_context_t']]],
+  ['isxcalibrationerror',['isxCalibrationError',['../structcy__stc__capsense__common__config__t.html#a51d97e88c598f8f2f9caf844d652b2cc',1,'cy_stc_capsense_common_config_t']]],
+  ['isxcdacditheren',['isxCdacDitherEn',['../structcy__stc__capsense__internal__context__t.html#a843a6bbc752b57f61b1028af51213040',1,'cy_stc_capsense_internal_context_t']]],
+  ['isxinactivesnsconnection',['isxInactiveSnsConnection',['../structcy__stc__capsense__common__config__t.html#ae11d43954cd2a5bd2d2be0dc3ef349c6',1,'cy_stc_capsense_common_config_t']]],
+  ['isxrawtarget',['isxRawTarget',['../structcy__stc__capsense__common__config__t.html#a12e0de779c3a1f759e349210dbd3d2a4',1,'cy_stc_capsense_common_config_t']]]
 ];

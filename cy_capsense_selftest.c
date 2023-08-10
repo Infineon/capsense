@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.c
-* \version 3.0.1
+* \version 4.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -18,12 +18,19 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "cy_capsense_common.h"
 #include "cy_capsense_selftest.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+    #include "cy_capsense_selftest_v2.h"
+#elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_capsense_selftest_lp.h"
+#else /* (CY_CAPSENSE_PSOC4_FIFTH_GEN) */
+    #include "cy_capsense_selftest_v3.h"
+#endif
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN)
-
 /*******************************************************************************
 * Function Name: Cy_CapSense_RunSelfTest
 ****************************************************************************//**
@@ -38,21 +45,41 @@
 * all the self-tests or any combination of the masks
 * (defined in testEnMask parameter) to specify the desired test list.
 *
+* This function does not execute two tests: sensor raw count and
+* baseline integrity.
+*
 * To execute a single-element test (i.e. for one widget or one sensor),
 * the following low-level functions are available:
-* for the fourth-generation CAPSENSE&trade;:
-* - Cy_CapSense_CheckCRCWidget()
-* - Cy_CapSense_CheckIntegritySensorPins()
-* - Cy_CapSense_MeasureCapacitanceSensor()
-* - Cy_CapSense_MeasureCapacitanceShield()
-* - Cy_CapSense_MeasureCapacitanceCap()
-* - Cy_CapSense_MeasureVdda()
-* for the fifth-generation CAPSENSE&trade;:
-* - Cy_CapSense_CheckCRCWidget()
-* - Cy_CapSense_CheckIntegritySensorPins()
-* - Cy_CapSense_MeasureCapacitanceSensorElectrode()
-* - Cy_CapSense_MeasureCapacitanceSlotSensors()
-* - Cy_CapSense_MeasureCapacitanceShieldElectrode()
+*
+* For the fourth-generation CAPSENSE&trade;:
+* * Cy_CapSense_CheckCRCWidget()
+* * Cy_CapSense_CheckIntegritySensorRawcount()
+* * Cy_CapSense_CheckIntegritySensorBaseline()
+* * Cy_CapSense_CheckIntegritySensorPins()
+* * Cy_CapSense_MeasureCapacitanceSensor()
+* * Cy_CapSense_MeasureCapacitanceShield()
+* * Cy_CapSense_MeasureCapacitanceCap()
+* * Cy_CapSense_MeasureVdda()
+*
+* For the fifth-generation CAPSENSE&trade;:
+* * Cy_CapSense_CheckCRCWidget()
+* * Cy_CapSense_CheckIntegritySensorRawcount()
+* * Cy_CapSense_CheckIntegritySensorBaseline()
+* * Cy_CapSense_CheckIntegritySensorPins()
+* * Cy_CapSense_MeasureCapacitanceSensorElectrode()
+* * Cy_CapSense_MeasureCapacitanceSlotSensors()
+* * Cy_CapSense_MeasureCapacitanceShieldElectrode()
+*
+* For the fifth-generation low power CAPSENSE&trade;:
+* * Cy_CapSense_CheckCRCWidget()
+* * Cy_CapSense_CheckIntegritySensorRawcount()
+* * Cy_CapSense_CheckIntegritySensorBaseline()
+* * Cy_CapSense_CheckIntegritySensorPins()
+* * Cy_CapSense_MeasureCapacitanceSensorElectrode()
+* * Cy_CapSense_MeasureCapacitanceSlotSensors()
+* * Cy_CapSense_MeasureCapacitanceShieldElectrode()
+* * Cy_CapSense_MeasureCapacitanceCap()
+* * Cy_CapSense_MeasureVdda()
 *
 * Refer to these functions descriptions for detail information
 * on the corresponding test.
@@ -73,8 +100,7 @@
 *                                          (only for the fourth-generation CAPSENSE&trade;).
 * - CY_CAPSENSE_BIST_VDDA_MASK           - Measures the VDDA voltage
 *                                          (only for the fourth-generation CAPSENSE&trade;).
-* - CY_CAPSENSE_BIST_RUN_AVAILABLE_SELF_TEST_MASK
-*                                        - Executes all available tests.
+* - CY_CAPSENSE_BIST_RUN_AVAILABLE_SELF_TEST_MASK - Executes all available tests.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -86,7 +112,7 @@
 *                                     testEnMask parameter or the context is
 *                                     a NULL pointer. The function
 *                                     was not performed.
-* - CY_CAPSENSE_BIST_HW_BUSY_E      - The CSD HW block is busy with a previous
+* - CY_CAPSENSE_BIST_HW_BUSY_E      - The CAPSENSE&trade; HW block is busy with a previous
 *                                     operation. The function was not performed.
 * - CY_CAPSENSE_BIST_ERROR_E        - An unexpected fault occurred during
 *                                     the measurement, you may need to repeat
@@ -102,13 +128,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_RunSelfTest_V3(testEnMask, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_RunSelfTest_V2(testEnMask, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_RunSelfTest_V3(testEnMask, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_RunSelfTest_V3Lp(testEnMask, context);
     #endif
 
-    return (result);
+    return result;
 }
 
 
@@ -181,13 +209,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckCRCWidget_V3(widgetId, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_CheckCRCWidget_V2(widgetId, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckCRCWidget_V3(widgetId, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckCRCWidget_V3Lp(widgetId, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN) */
 
@@ -224,6 +254,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 * Use this function to verify the uniformity of sensors, for example, at
 * mass-production or during an operation phase together with the
 * Cy_CapSense_CheckIntegritySensorRawcount() function.
+*
+* The function should be called after sensors scanning and processing. Do not
+* call the function before processing since processing changes sensor
+* baselines.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -266,21 +300,18 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorBaseline_V3(widgetId,
-                                                            sensorId,
-                                                            baselineHighLimit,
-                                                            baselineLowLimit,
-                                                            context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-        result = Cy_CapSense_CheckIntegritySensorBaseline_V2(widgetId,
-                                                            sensorId,
-                                                            baselineHighLimit,
-                                                            baselineLowLimit,
-                                                            context);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V2(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V3(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(widgetId, sensorId,
+                baselineHighLimit, baselineLowLimit, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_BSLN_INTEGRITY_EN) */
 
@@ -307,6 +338,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 * Use this function to verify the uniformity of sensors, for example, at
 * mass-production or during an operation phase together with the
 * Cy_CapSense_CheckIntegritySensorBaseline() function.
+*
+* The function should be called after sensors scanning and processing. Do not
+* call the function before processing since processing changes sensor
+* raw counts.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -348,21 +383,18 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorRawcount_V3(widgetId,
-                                                            sensorId,
-                                                            rawcountHighLimit,
-                                                            rawcountLowLimit,
-                                                            context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-        result = Cy_CapSense_CheckIntegritySensorRawcount_V2(widgetId,
-                                                            sensorId,
-                                                            rawcountHighLimit,
-                                                            rawcountLowLimit,
-                                                            context);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V2(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V3(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(widgetId, sensorId,
+                rawcountHighLimit, rawcountLowLimit, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_RAW_INTEGRITY_EN) */
 
@@ -446,6 +478,11 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
 * This test can be executed only if the CAPSENSE&trade; Middleware is in the IDLE
 * state. This function must not be called while CAPSENSE&trade; Middleware is busy.
 *
+* \note
+* Rx/Lx electrodes for ISX widgets are excluded from the test as 
+* they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
+* for such widgets is returned.
+*
 * \param widgetId
 * Specifies the ID number of the widget.
 * A macro for the widget ID can be found in the
@@ -480,7 +517,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
 *                                         specified sensor.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
 *                                         The test was not executed.
-* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CSD HW block is busy with a
+* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CAPSENSE&trade; HW block is busy with a
 *                                         previous operation. The function
 *                                         was not executed.
 *
@@ -492,13 +529,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins(
 {
     cy_en_capsense_bist_status_t result;
 
-    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        result = Cy_CapSense_CheckIntegritySensorPins_V3(widgetId, sensorId, context);
-    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         result = Cy_CapSense_CheckIntegritySensorPins_V2(widgetId, sensorId, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        result = Cy_CapSense_CheckIntegritySensorPins_V3(widgetId, sensorId, context);
+    #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+        result = Cy_CapSense_CheckIntegritySensorPins_V3Lp(widgetId, sensorId, context);
     #endif
 
-    return (result);
+    return result;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_SHORT_EN) */
 
@@ -532,62 +571,74 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins(
 *******************************************************************************/
 void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context)
 {
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-    Cy_CapSense_BistDsInitialize_V3(context);
-#else /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
-    Cy_CapSense_BistDsInitialize_V2(context);
-#endif
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        Cy_CapSense_BistDsInitialize_V2(context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        Cy_CapSense_BistDsInitialize_V3(context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        Cy_CapSense_BistDsInitialize_V3Lp(context);
+    #else
+        /* Supported platform not found */
+    #endif
 }
 
 
-#if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_EXTERNAL_CAP_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_MeasureCapacitanceCap
 ****************************************************************************//**
 *
-* Measures the capacitance in picofarads of the specified CAPSENSE&trade; integration
-* (external) capacitor.
+* Measures the capacitance in picofarads of the specified CAPSENSE&trade;
+* integration (external) capacitor.
 *
 * The function measures the capacitance of the specified external capacitor
 * such as Cmod and returns the result through ptrValue, alternatively
 * the measurement result is stored in the corresponding field of the
 * \ref cy_stc_capsense_bist_context_t structure (either .cModCap, .cIntACap,
-* .cIntBCap, or .cShieldCap).
+* .cIntBCap, or .cShieldCap for the fourth-generation, and .cMod01Cap or
+* .cMod02Cap the fifth-generation low power CAPSENSE&trade; HW blocks).
 *
 * The maximum measurement capacitance is 25nF. The measurement accuracy is
-* up to 15%. The measurement resolution is 10 bit which corresponds to the
-* maximum capacitance specified by the maxCapacitance parameter. The bigger
-* specified maximum capacitance is, the bigger capacitance value is for
-* one measured count.
+* up to 15% for the fourth-generation and up to 30% for the fifth-generation low
+* power CAPSENSE&trade; HW blocks. The measurement resolution is 10 bit
+* which corresponds to the maximum capacitance specified
+* by the maxCapacitance parameter. The bigger specified maximum capacitance is,
+* the bigger capacitance value is for one measured count.
 * It is recommended to specify the maximum capacitance twice bigger as the
 * nominal capacitor capacitance. For example, if the nominal Cmod value
 * is 2.2nF, the maxCapacitance parameter is set to 4nF-5nF.
 *
-* The function configures all CAPSENSE&trade; pins to  Strong-drive-low mode that
-* allows detecting a short of the measured capacitor to other pins.
+* The function configures all CAPSENSE&trade; pins to  Strong-drive-low mode
+* that allows detecting a short of the measured capacitor to other pins.
 *
 * To measure all the available capacitors, the Cy_CapSense_RunSelfTest()
-* function can be used with the CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK mask. The measured
-* results are stored in the corresponding field of the
+* function can be used with the CY_CAPSENSE_BIST_EXTERNAL_CAP_MASK mask.
+* The measured results are stored in the corresponding field of the
 * \ref cy_stc_capsense_bist_context_t structure.
 *
 * Measurement can be done only if the CAPSENSE&trade; Middleware is in the IDLE
-* state. This function must not be called while the CAPSENSE&trade; Middleware is busy.
-* The function is blocking, i.e. waits for the measurement to be completed
-* prior to returning to the caller.
+* state. This function must not be called while the CAPSENSE&trade; Middleware
+* is busy. The function is blocking, i.e. waits for the measurement to be
+* completed prior to returning to the caller.
 *
 * \note
-* This function is available only for the fourth-generation CAPSENSE&trade;.
+* This function is available for the fourth-generation and fifth-generation
+* low power CAPSENSE&trade;.
 *
 * \param integrationCapId
 * Indexes of external capacitors to measure their capacitance.
-* There are macros for each of them, namely:
+* There are the enumeration list /ref cy_en_capsense_bist_external_cap_id_t
+* for each of them. Their values could be for the fourth-generation
+* CAPSENSE&trade; HW blocks:
 * * CY_CAPSENSE_BIST_CMOD_ID for the CSD method Cmod capacitor
 * * CY_CAPSENSE_BIST_CINTA_ID for the CSX method CintA capacitor
 * * CY_CAPSENSE_BIST_CINTB_ID for the CSX method CintB capacitor
 * * CY_CAPSENSE_BIST_CSH_ID for the CSD method Csh capacitor
+* and for the fifth-generation low power CAPSENSE&trade; HW blocks:
+* * CY_CAPSENSE_BIST_CMOD01_ID_E for the Cmod1 capacitor
+* * CY_CAPSENSE_BIST_CMOD02_ID_E for the Cmod2 capacitor
 *
 * \param ptrValue
 * The pointer to the result of the measurement. The result is calculated as
@@ -602,7 +653,8 @@ void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context)
 * nanofarads in the range from 1 to 25 nF.
 *
 * \param context
-* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns a status of the test execution:
@@ -610,21 +662,26 @@ void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context)
 *                                         successfully, the result is valid.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
 *                                         The measurement was not executed.
-* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CSD HW block is busy with
-*                                         a previous operation. The measurement
-*                                         was not executed.
+* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CAPSENSE&trade; HW block is busy
+*                                         with a previous operation.
+*                                         The measurement was not executed.
 * - CY_CAPSENSE_BIST_LOW_LIMIT_E        - The measurement was performed
 *                                         but the scanning result is
 *                                         below the minimum possible value.
-*                                         The measurement result could be invalid.
-*                                         The capacitor might be shorted to
-*                                         VDD or a PCB track
-*                                         is broken (open capacitor).
+*                                         The measurement result could be
+*                                         invalid. The capacitor might be
+*                                         shorted to VDD or a PCB track
+*                                         is broken (open capacitor) The return
+*                                         could occur only the fourth-generation
+*                                         CAPSENSE&trade;.
 * - CY_CAPSENSE_BIST_HIGH_LIMIT_E       - The measurement was performed but
 *                                         the scanning result is above the
 *                                         maximum possible value.
-*                                         The measurement result could be invalid.
-*                                         The capacitor might be shorted to GND.
+*                                         The measurement result could be
+*                                         invalid. The capacitor might be
+*                                         shorted to GND. The result could occur
+*                                         only for the fourth-generation
+*                                         CAPSENSE&trade;.
 * - CY_CAPSENSE_BIST_ERROR_E            - An unexpected fault occurred during
 *                                         the measurement.
 *
@@ -637,12 +694,19 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
 {
     cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_SUCCESS_E;
 
-    bistStatus = Cy_CapSense_MeasureCapacitanceCap_V2(integrationCapId,
-                                                     ptrValue,
-                                                     maxCapacitance,
-                                                     context);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        bistStatus = Cy_CapSense_MeasureCapacitanceCap_V2(integrationCapId,
+                                                         ptrValue,
+                                                         maxCapacitance,
+                                                         context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        bistStatus = Cy_CapSense_MeasureCapacitanceCap_V3Lp(integrationCapId,
+                                                         ptrValue,
+                                                         maxCapacitance,
+                                                         context);
+    #endif
 
-    return (bistStatus);
+    return bistStatus;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_EXTERNAL_CAP_EN) */
 
@@ -666,7 +730,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
 * prior to returning to the caller.
 *
 * \note
-* This function is available only for the fourth-generation CAPSENSE&trade;.
+* This function is available only for the fourth-generation and fifth
+* generation low power CAPSENSE&trade;.
 *
 * \param ptrValue
 * The pointer to the uint32_t to store measured VDDA voltage value.
@@ -691,14 +756,379 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
                 uint32_t * ptrValue,
                 cy_stc_capsense_context_t * context)
 {
-    cy_en_capsense_bist_status_t result = CY_CAPSENSE_BIST_BAD_PARAM_E;
-    result = Cy_CapSense_MeasureVdda_V2(ptrValue, context);
+    cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_BAD_PARAM_E;
 
-    return (result);
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        bistStatus = Cy_CapSense_MeasureVdda_V2(ptrValue, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        bistStatus = Cy_CapSense_MeasureVdda_V3Lp(ptrValue, context);
+    #endif
+
+    return bistStatus;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_VDDA_EN) */
 
-#endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
+#endif /* ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) */
+
+
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_MeasureCapacitanceSensorElectrode
+****************************************************************************//**
+*
+* Measures the specified CSD sensor / CSX electrode capacitance in femtofarads.
+*
+* This function measures the sensor capacitance for CSD widgets or the electrode
+* capacitance for CSX
+* widgets and returns the measurement status. For a CSX sensor, the
+* measurement is done on either Rx or Tx electrode.
+* For a CSD sensor, measurement is done on a sensor (refer to the
+* eltdId parameter description).
+* If the specified sensor (electrode) is a ganged sensor, the capacitance
+* is measured for all the pins ganged together that belong to this sensor
+* (electrode).
+*
+* The measured capacitance is stored in the .eltdCap[] array.
+* The .ptrEltdCapacitance field of the
+* \ref cy_stc_capsense_widget_config_t structure contains a pointer to
+* the first widget sensor (electrode) element within the .eltdCap[] array.
+*
+* In addition to the measuring sensor (electrode) capacitance, this function
+* is used to identify various fault conditions with sensors such
+* as electrically-opened or -shorted sensors. For example, the PCB track is
+* broken or shorted to other nodes in the system - in all of these conditions,
+* this function returns changed capacitance which can be compared
+* against predetermined capacitance for the sensor to detect a
+* fault condition.
+*
+* The sensor capacitance is measured independently of the sensor scan
+* configuration. For the capacitance measurement, the CSD sensing method is used.
+* The default scanning parameters are the following:
+* * SnsClk divider (256) is the divider for the sensor clock frequency.
+* * NumConv (100) is the number of sub-conversions.
+* * The reference CDAC capacitance (886 fF) is equivalent to CDAC Code of 100u.
+* * The compensation CDAC is disabled.
+* * The CIC2 filter is disabled.
+* * The dithering is disabled.
+* * The chopping is disabled.
+*
+* The raw count is converted into capacitance using the following equation:
+*
+*  Cs = Rawcount * RefCDAC capacitance / NumConv
+*
+* where:
+* * Cs is the sensor capacitance.
+* * Rawcount is the measured raw count value.
+*
+* The minimum measurable input by this function is 1pF and the
+* maximum is either 200pF or limited by the RC time constant
+* (Cs < 1 / (2*5*SnsClk*R), where R is the total sensor series
+* resistance that includes on-chip GPIO resistance ~500 Ohm and
+* external series resistance). The measurement accuracy is about 30% and
+* is defined by the RefCDAC tolerance.
+*
+* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
+* measured are set to the GND state for CSD measured electrodes (sensors) and
+* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
+* Shield electrodes are also configured to the GND state.
+* The inactive state can be changed in run-time by using
+* the Cy_CapSense_SetInactiveElectrodeState() function.
+*
+* By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
+*
+* The sensor measurement can be done on all the electrodes using
+* the Cy_CapSense_RunSelfTest() function along with
+* the CY_CAPSENSE_BIST_ELTD_CAP_MASK mask.
+*
+* This function must not be called while the CAPSENSE&trade; MW is busy
+* by another scan.
+*
+* \note
+* This function is available for the fifth-generation and fifth-generation
+* low power CAPSENSE&trade;.
+* Rx/Lx electrodes for ISX widgets are excluded from the test as 
+* they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
+* for such widgets is returned.
+*
+* \param widgetId
+* Specifies the ID number of the widget.
+* A macro for the widget ID can be found in the
+* CAPSENSE&trade; Configuration header file (cycfg_capsense.h) defined as
+* CY_CAPSENSE_<WidgetName>_WDGT_ID.
+*
+* \param eltdId
+* Specifies the ID of the electrode within the widget (sensorID for CSD
+* widgets and Rx or Tx electrode ID for CSX widgets).
+*
+* For the CSD widgets, a macro for the sensor ID within the specified widget
+* can be found in the CAPSENSE&trade; Configuration header file (cycfg_capsense.h)
+* defined as CY_CAPSENSE_<WidgetName>_SNS<SensorNumber>_ID.
+*
+* For the CSX widgets, eltdId is an electrode ID and is defined as Rx ID
+* or Tx ID. The first Rx in a widget corresponds to eltdId = 0, the
+* second Rx in a widget corresponds to eltdId = 1, and so on.
+* The last Tx in a widget corresponds to eltdId = (RxNum + TxNum - 1).
+* Macros for Rx and Tx IDs can be found in the CAPSENSE&trade; Configuration header
+* file (cycfg_capsense.h) defined as:
+* * CapSense_<WidgetName>_RX<RXNumber>_ID
+* * CapSense_<WidgetName>_TX<TXNumber>_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns a status of the test execution:
+* - CY_CAPSENSE_BIST_SUCCESS_E          - The measurement completes
+*                                         successfully, the result is valid.
+* - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
+*                                         The measurement was not executed.
+* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CAPSENSE&trade; HW block is busy with a
+*                                         previous operation.
+*                                         The measurement was not executed.
+*
+*******************************************************************************/
+cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
+                uint32_t widgetId,
+                uint32_t eltdId,
+                cy_stc_capsense_context_t * context)
+{
+    cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_BAD_PARAM_E;
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        bistStatus = Cy_CapSense_MeasureCapacitanceSensorElectrode_V3(widgetId, eltdId, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        bistStatus = Cy_CapSense_MeasureCapacitanceSensorElectrode_V3Lp(widgetId, eltdId, context);
+    #endif
+
+    return bistStatus;
+}
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) */
+
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_MeasureCapacitanceSlotSensors
+****************************************************************************//**
+*
+* Measures the specified slot sensor capacitance in femtofarads. The function
+* measures the Cp capacitance for CSD widgets and the Cm capacitance
+* for CSX widgets.
+*
+* This function performs BIST slot scan with predefined parameters,
+* back-calculates the slot sensor capacitances (Cp for CSD and Cm for CSX)
+* by using the raw-count equation, stores the calculated capacitances
+* to the sensor context structure, and returns the measurement status.
+* If the specified slot has a ganged sensor, the capacitance
+* is measured for all the pins ganged together that belong to this sensor.
+*
+* Besides the sensor capacitance measuring, this function could be
+* used to identify various fault conditions with sensors such
+* as electrically-opened or -shorted sensors. For example, the PCB track is
+* broken or shorted to other nodes in the system - in all of these conditions,
+* the function returns changed capacitance which can be compared
+* against predetermined capacitance for the sensor to detect a
+* fault condition.
+*
+* The sensor capacitance is measured independently of the sensor regular scan
+* configuration. For the capacitance measurement, the BIST specific scan
+* parameters are used. They can be found in the Electrode capacitance measurement
+* macros group.
+* The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF
+* of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF).
+* Compensation CDAC is disabled during the BIST scan.
+* Another default scanning parameters are the following:
+* * NumConv (100) is the number of sub-conversions.
+* * SnsClk divider (256) is the divider for the sensor clock frequency.
+*
+* The raw count is converted into capacitance using the following equation:
+*
+*  Cs = Rawcount * CDAC / 2 / NumConv / 2
+*
+* where:
+* * Cs is the sensor capacitance.
+* * Rawcount is the measured raw count value.
+* * The first divider of 2 is determined by the divided ref_clk frequency usage.
+* * The second divider of 2 is used only for CSX sensors.
+*
+* The minimum measurable input by this function is 0.5 pF and the
+* maximum is either 200pF or limited by the RC time constant
+* (Cs < 1 / (2*10*SnsClk*R), where R is the total sensor series
+* resistance that includes on-chip pin resistance ~500 Ohm and
+* external series resistance). The measurement accuracy is about 30%.
+*
+* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
+* measured are set to the GND state for CSD measured electrodes (sensors) and
+* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
+* Shield electrodes are also configured to the GND state.
+* The inactive state can be changed in run-time by using
+* the Cy_CapSense_SetInactiveElectrodeState() function.
+*
+* By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
+*
+* Measured capacitance values (Cp for CSD widgets and Cm for CSX widgets)
+* are stored in the .snsCap field of the \ref cy_stc_capsense_sensor_context_t
+* structure.
+*
+* The all sensor measurement can be done on all the sensors using
+* the Cy_CapSense_RunSelfTest() function along with
+* the CY_CAPSENSE_BIST_SNS_CAP_MASK mask.
+*
+* This function must not be called while the CAPSENSE&trade; MW is busy
+* by another scan.
+*
+* \note
+* This function is available for the fifth-generation and fifth-generation
+* low power CAPSENSE&trade;.
+* Rx/Lx electrodes for ISX widgets are excluded from the test as 
+* they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
+* for such widgets is returned.
+*
+* \param slotId
+* Specifies the ID number of the slot to measure sensor capacitance.
+* The slot ID should be in the admissible range.
+*
+* \param skipChMask
+* Specifies the mask to skip some channels during the slot sensor capacitance
+* measurement. If the bit N in the skipChMask is set to 1, the channel N
+* will be excluded from measuring and all its pins will be set to the inactive
+* sensor connection state (see the .eltdCapCsdISC field
+* of the \ref cy_stc_capsense_bist_context_t structure for CSD widgets
+* and the .eltdCapCsxISC field respectively for CSX widgets).
+* For fifth-generation low power CAPSENSE&trade; this argument is kept for
+* uniformity and backward compatibility and is not used. The function can be
+* called with value 0u.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns a status of the test execution:
+* - CY_CAPSENSE_BIST_SUCCESS_E          - The measurement completes
+*                                         successfully, the result is valid.
+* - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
+*                                         The measurement was not executed.
+* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CAPSENSE&trade; HW block is busy with a
+*                                         previous operation.
+*                                         The measurement was not executed.
+* - CY_CAPSENSE_BIST_ERROR_E            - An unexpected fault occurred during
+*                                         the measurement.
+*
+*******************************************************************************/
+cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
+                uint32_t slotId,
+                uint32_t skipChMask,
+                cy_stc_capsense_context_t * context)
+{
+    cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_BAD_PARAM_E;
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        bistStatus = Cy_CapSense_MeasureCapacitanceSlotSensors_V3(slotId, skipChMask, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        bistStatus = Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(slotId, skipChMask, context);
+    #endif
+
+    return bistStatus;
+}
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN) */
+
+
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) &&\
+        (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN))
+/*******************************************************************************
+* Function Name: Cy_CapSense_MeasureCapacitanceShieldElectrode
+****************************************************************************//**
+*
+* Measures shield electrode capacitances in femtofarads.
+*
+* This function measures the capacitances of all shield electrodes for all
+* enabled MSCv3 channels and returns a status of this measurement.
+* The function checks if there is any CSD widget in the project and
+* if the shield is enabled.
+* The measurement results in femtofarads are stored
+* in the chShieldCap[CY_MSC_ENABLED_CH_NUMBER] array.
+* The pointer to the array is in the .ptrChShieldCap field
+* of the \ref cy_stc_capsense_bist_context_t structure,
+* the CY_MSC_ENABLED_CH_NUMBER define is in the cycfg_peripherals.h file.
+* If the any channel shield consists of several electrodes, the total
+* capacitance of all the shield electrodes is measured.
+*
+* This function uses an algorithm identical to the electrode capacitance
+* measurement. Refer to the Cy_CapSense_MeasureCapacitanceSensorElectrode()
+* function for more details.
+*
+* In addition to measuring shield capacitance, this function is used to
+* identify various fault conditions with shield electrodes such as an
+* electrically-open or -short shield electrodes, e.g. the PCB track is broken or
+* shorted to other nodes in the system - in all of these conditions,
+* this function returns changed capacitance that can be compared
+* against pre-determined capacitance for the shield electrode to
+* detect a hardware fault.
+*
+* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
+* measured are set to the GND state.
+* The inactive state can be changed in run-time by using
+* the Cy_CapSense_SetInactiveElectrodeState() function.
+* When the inactive sensor (electrode) connection is set
+* to the CY_CAPSENSE_SNS_CONNECTION_SHIELD state,
+* all the CAPSENSE&trade; electrodes are connected to the shield and
+* the total capacitance are measured.
+*
+* By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
+*
+* This test can be executed using the CapSense_RunSelfTest()
+* function with the CY_CAPSENSE_BIST_SHIELD_CAP_MASK mask.
+*
+* \note
+* This function is available for the fifth-generation and fifth-generation
+* low power CAPSENSE&trade;.
+*
+* \param skipChMask
+* Specifies the mask to skip some channels during the shield electrode
+* capacitance measurement. If the bit N in the skipChMask is set to 1,
+* the channel N will be excluded from measuring and all its shield pins will be
+* set to the shield inactive sensor connection state (see the .shieldCapISC
+* field of the \ref cy_stc_capsense_bist_context_t structure).
+* For fifth-generation low power CAPSENSE&trade; this argument is kept for
+* uniformity and backward compatibility and is not used. The function can be
+* called with value 0u.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context
+* structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns a status of the test execution:
+* - CY_CAPSENSE_BIST_SUCCESS_E          - The measurement completes
+*                                         successfully, the result is valid.
+* - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
+*                                         The measurement was not executed.
+* - CY_CAPSENSE_BIST_HW_BUSY_E          - The CAPSENSE&trade; HW block is busy with a
+*                                         previous operation.
+*                                         The measurement was not executed.
+* - CY_CAPSENSE_BIST_BAD_CONFIG_E       - The shield is disabled.
+*
+*******************************************************************************/
+cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceShieldElectrode(
+                uint32_t skipChMask,
+                cy_stc_capsense_context_t * context)
+{
+    cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_BAD_PARAM_E;
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
+        bistStatus = Cy_CapSense_MeasureCapacitanceShieldElectrode_V3(skipChMask, context);
+    #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        bistStatus = Cy_CapSense_MeasureCapacitanceShieldElectrode_V3Lp(skipChMask, context);
+    #endif
+
+    return bistStatus;
+}
+#endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) &&\
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN)) */
+
+
+#endif /* ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) */
 
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) */
 

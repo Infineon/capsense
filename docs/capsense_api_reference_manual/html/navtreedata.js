@@ -1,6 +1,6 @@
 var NAVTREE =
 [
-  [ "CAPSENSE™ Middleware Library 3.0.1", "index.html", [
+  [ "CAPSENSE™ Middleware Library 4.0", "index.html", [
     [ "General Description", "index.html#section_capsense_general", [
       [ "Features", "index.html#subsection_capsense_features", null ]
     ] ],
@@ -17,7 +17,7 @@ var NAVTREE =
     [ "Memory Usage", "index.html#section_capsense_memory_usage", null ],
     [ "MISRA-C:2012 Compliance", "index.html#section_capsense_misra", [
       [ "CAPSENSE™ Middleware Deviation", "index.html#subsection_capsense_misra-mw", null ],
-      [ "CAPSENSE™ Configurator Generated Sources Deviation", "index.html#subsection_capsense_misra-cfg", null ]
+      [ "CAPSENSE™ Configurator Tool Generated Sources Deviation", "index.html#subsection_capsense_misra-cfg", null ]
     ] ],
     [ "Errata", "index.html#section_capsense_errata", null ],
     [ "Changelog", "index.html#section_capsense_changelog", null ],
@@ -29,10 +29,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__group__capsense__callbacks.html",
-"group__group__capsense__macros__pin.html",
-"structcy__stc__capsense__advanced__centroid__config__t.html#af68f4b04172c275b6be6e12768dc7991",
-"structcy__stc__capsense__common__context__t.html#a6406229ffd99b912c09ca0c80ea3f4ee",
-"structcy__stc__capsense__tfsl__context__t.html#abda60903e50cdc56ca4bc60476c2fedf"
+"group__group__capsense__macros__gesture.html#gae743ee30b6856ba519a9f7b3f34cf31b",
+"group__group__capsense__macros__touch.html#ga72bcd596f6407f2c35cfe8d92a2a1f6d",
+"structcy__stc__capsense__common__config__t.html#a314b8ab78e6a189daeb4d150d3f51512",
+"structcy__stc__capsense__internal__context__t.html#a8039192ef3f4f1c6b01788d8a5aeb460"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

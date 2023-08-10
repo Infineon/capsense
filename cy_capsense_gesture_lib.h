@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_gesture_lib.h
-* \version 3.0.1
+* \version 4.0
 *
 * \brief
 * Provides the gesture interface.
@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3))
+#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
 #if defined(__cplusplus)
 extern "C" {
@@ -48,6 +48,7 @@ typedef struct
     uint16_t clickTimeoutMin;                                   /**< Click minimum timeout */
     uint16_t secondClickIntervalMax;                            /**< Second Click maximum interval */
     uint16_t secondClickIntervalMin;                            /**< Second Click minimum interval */
+    uint16_t longPressTimeoutMin;                               /**< Long Press minimum timeout */
 
     /* Distance */
     uint16_t zoomDistanceMin;                                   /**< Zoom minimum distance */
@@ -57,6 +58,7 @@ typedef struct
     uint16_t edgeDistanceMin;                                   /**< Edge Swipe minimum distance */
     uint8_t secondClickDistanceMax;                             /**< Second Click maximum distance */
     uint8_t clickDistanceMax;                                   /**< Click maximum distance */
+    uint8_t longPressDistanceMax;                               /**< Long Press maximum distance */
 
     /* Debounce */
     uint8_t zoomDebounce;                                       /**< Zoom debounce */
@@ -165,6 +167,14 @@ typedef struct
     uint8_t debounce;                                           /**< Gesture debounce counter */
 } cy_stc_capsense_ofrt_context_t;
 
+/** Gesture One Finger Long Press context structure */
+typedef struct
+{
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_oflp_context_t;
+
 /** Gesture global context structure */
 typedef struct
 {
@@ -172,11 +182,11 @@ typedef struct
     cy_stc_capsense_gesture_position_t positionLast1;           /**< Previous position of the first touch */
     cy_stc_capsense_gesture_position_t position2;               /**< Current position of the second touch */
     cy_stc_capsense_gesture_position_t positionLast2;           /**< Previous position of the second touch */
-    
+
     uint32_t timestamp;                                         /**< Current timestamp */
     uint16_t detected;                                          /**< Detected gesture mask */
     uint16_t direction;                                         /**< Mask of direction of detected gesture */
-    
+
     cy_stc_capsense_ofrt_context_t ofrtContext;                 /**< One-finger rotate gesture context */
     cy_stc_capsense_ofsl_context_t ofslContext;                 /**< One-finger scroll gesture context */
     cy_stc_capsense_tfzm_context_t tfzmContext;                 /**< Two-finger zoom gesture context */
@@ -187,6 +197,7 @@ typedef struct
     cy_stc_capsense_ofdc_context_t ofdcContext;                 /**< One-finger double click gesture context */
     cy_stc_capsense_ofcd_context_t ofcdContext;                 /**< One-finger click and drag gesture context */
     cy_stc_capsense_tfsl_context_t tfslContext;                 /**< Two-finger scroll gesture context */
+    cy_stc_capsense_oflp_context_t oflpContext;                 /**< One-finger long press gesture context */
 
     uint8_t numPosition;                                        /**< Current number of touches */
     uint8_t numPositionLast;                                    /**< Previous number of touches */
@@ -211,7 +222,7 @@ typedef struct
 * Initializes internal variables and states.
 *
 * \param context
-* The pointer to the gesture context structure 
+* The pointer to the gesture context structure
 * \ref cy_stc_capsense_gesture_context_t.
 *
 *******************************************************************************/
@@ -235,11 +246,11 @@ void Cy_CapSense_Gesture_ResetState(
 * The pointer to the array of positions \ref cy_stc_capsense_gesture_position_t.
 *
 * \param config
-* The pointer to the gesture configuration structure 
+* The pointer to the gesture configuration structure
 * \ref cy_stc_capsense_gesture_config_t.
 *
 * \param context
-* The pointer to the gesture context structure 
+* The pointer to the gesture context structure
 * \ref cy_stc_capsense_gesture_context_t.
 *
 *******************************************************************************/
@@ -262,7 +273,7 @@ void Cy_CapSense_Gesture_Decode(
 /** No gesture detected */
 #define CY_CAPSENSE_GESTURE_NO_GESTURE                      (0x00u)
 /** All gestures enable / detection mask */
-#define CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK               (0x03FFu)
+#define CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK               (0x07FFu)
 /** Gesture enable filtering mask */
 #define CY_CAPSENSE_GESTURE_FILTERING_MASK                  (0x8000u)
 /** Detection mask of Touchdown */
@@ -290,6 +301,8 @@ void Cy_CapSense_Gesture_Decode(
 #define CY_CAPSENSE_GESTURE_ONE_FNGR_ROTATE_MASK            (0x0100u)
 /** Enable / detection mask of two-finger zoom gesture */
 #define CY_CAPSENSE_GESTURE_TWO_FNGR_ZOOM_MASK              (0x0200u)
+/** Enable / detection mask of one-finger long press gesture */
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_LONG_PRESS_MASK        (0x0400u)
 
 /* Direction Offsets */
 /** Offset of direction of one-finger scroll gesture */
@@ -356,7 +369,7 @@ void Cy_CapSense_Gesture_Decode(
 }
 #endif
 
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3)) */
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_GESTURE_LIB_H */
 

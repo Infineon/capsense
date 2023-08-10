@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.h
-* \version 3.0.1
+* \version 4.0
 *
 * \brief
 * This file provides the function prototypes specific to the register

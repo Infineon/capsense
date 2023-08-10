@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE&trade; Middleware Library 3.0.1: cy_stc_capsense_bist_context_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 4.0: cy_stc_capsense_bist_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE&trade; Middleware Library 3.0.1</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
   </td>
  </tr>
  </tbody>
@@ -128,6 +128,9 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a613da7b7df71cbc3d2405eaf4d4df3e9"><td class="memItemLeft" align="right" valign="top">uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a613da7b7df71cbc3d2405eaf4d4df3e9">ptrChShieldCap</a></td></tr>
 <tr class="memdesc:a613da7b7df71cbc3d2405eaf4d4df3e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pointer to the channel shield capacitance measurement result array.  <a href="#a613da7b7df71cbc3d2405eaf4d4df3e9">More...</a><br /></td></tr>
 <tr class="separator:a613da7b7df71cbc3d2405eaf4d4df3e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acae5fb65a370e8e1c14d13c2da578f12"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#acae5fb65a370e8e1c14d13c2da578f12">vddaVoltage</a></td></tr>
+<tr class="memdesc:acae5fb65a370e8e1c14d13c2da578f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of VDDA measurement in millivolts.  <a href="#acae5fb65a370e8e1c14d13c2da578f12">More...</a><br /></td></tr>
+<tr class="separator:acae5fb65a370e8e1c14d13c2da578f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fecccd03e56148f208e64836aa070b4"><td class="memItemLeft" align="right" valign="top"><a id="a3fecccd03e56148f208e64836aa070b4"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a3fecccd03e56148f208e64836aa070b4">eltdCapSnsClkFreqHz</a></td></tr>
 <tr class="memdesc:a3fecccd03e56148f208e64836aa070b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the SnsClk frequency is Hz. <br /></td></tr>
@@ -148,6 +151,9 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a6b8b7d2d90ea3d1dde78f8cea3f7f40c">eltdCapSnsClk</a></td></tr>
 <tr class="memdesc:a6b8b7d2d90ea3d1dde78f8cea3f7f40c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The SnsClk divider for electrode capacitance measurement scans. <br /></td></tr>
 <tr class="separator:a6b8b7d2d90ea3d1dde78f8cea3f7f40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7905e472e1b8aa89e92b44b24e5306d"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#aa7905e472e1b8aa89e92b44b24e5306d">curBistWdId</a></td></tr>
+<tr class="memdesc:aa7905e472e1b8aa89e92b44b24e5306d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current widget ID for BIST operations.  <a href="#aa7905e472e1b8aa89e92b44b24e5306d">More...</a><br /></td></tr>
+<tr class="separator:aa7905e472e1b8aa89e92b44b24e5306d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c9e63a331fdb827a3eae43e735aa3cb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a0c9e63a331fdb827a3eae43e735aa3cb">eltdCapSenseGroup</a></td></tr>
 <tr class="memdesc:a0c9e63a331fdb827a3eae43e735aa3cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The sensor group for capacitance measurement:  <a href="#a0c9e63a331fdb827a3eae43e735aa3cb">More...</a><br /></td></tr>
 <tr class="separator:a0c9e63a331fdb827a3eae43e735aa3cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -285,9 +291,6 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a2adb7abe65479371b8474bed393b719b"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a2adb7abe65479371b8474bed393b719b">capacitorSettlingTime</a></td></tr>
 <tr class="memdesc:a2adb7abe65479371b8474bed393b719b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum possible external capacitor charge/discharge time in microseconds.  <a href="#a2adb7abe65479371b8474bed393b719b">More...</a><br /></td></tr>
 <tr class="separator:a2adb7abe65479371b8474bed393b719b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acae5fb65a370e8e1c14d13c2da578f12"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#acae5fb65a370e8e1c14d13c2da578f12">vddaVoltage</a></td></tr>
-<tr class="memdesc:acae5fb65a370e8e1c14d13c2da578f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of VDDA measurement in millivolts.  <a href="#acae5fb65a370e8e1c14d13c2da578f12">More...</a><br /></td></tr>
-<tr class="separator:acae5fb65a370e8e1c14d13c2da578f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa97a347c3230f3b8227df50a734e487c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#aa97a347c3230f3b8227df50a734e487c">vddaModClk</a></td></tr>
 <tr class="memdesc:aa97a347c3230f3b8227df50a734e487c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ModClk divider for VDDA measurements.  <a href="#aa97a347c3230f3b8227df50a734e487c">More...</a><br /></td></tr>
 <tr class="separator:aa97a347c3230f3b8227df50a734e487c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -350,6 +353,36 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:a318f6d95e0876a729148b7329afb133b"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a318f6d95e0876a729148b7329afb133b">eltdCapNumFineInitWaitCycles</a></td></tr>
 <tr class="memdesc:a318f6d95e0876a729148b7329afb133b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of ProDummy Wait Cycles.  <a href="#a318f6d95e0876a729148b7329afb133b">More...</a><br /></td></tr>
 <tr class="separator:a318f6d95e0876a729148b7329afb133b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac68b6aaa0e9215ba48f345f5362f557"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#aac68b6aaa0e9215ba48f345f5362f557">extCapDischargeTime</a></td></tr>
+<tr class="memdesc:aac68b6aaa0e9215ba48f345f5362f557"><td class="mdescLeft">&#160;</td><td class="mdescRight">The discharging time in us needed to discharge the external capacitor before the measurement.  <a href="#aac68b6aaa0e9215ba48f345f5362f557">More...</a><br /></td></tr>
+<tr class="separator:aac68b6aaa0e9215ba48f345f5362f557"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9a516271a11b9948d574c673b8f508f"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#ab9a516271a11b9948d574c673b8f508f">extCapSubConvNum</a></td></tr>
+<tr class="memdesc:ab9a516271a11b9948d574c673b8f508f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The sub-conversion number for Cmod measurement.  <a href="#ab9a516271a11b9948d574c673b8f508f">More...</a><br /></td></tr>
+<tr class="separator:ab9a516271a11b9948d574c673b8f508f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a854d0baeb01828a8d2e21a30c99bf93a"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a854d0baeb01828a8d2e21a30c99bf93a">cMod01Cap</a></td></tr>
+<tr class="memdesc:a854d0baeb01828a8d2e21a30c99bf93a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC0 Cmod1 capacitance measurement result in picofarads.  <a href="#a854d0baeb01828a8d2e21a30c99bf93a">More...</a><br /></td></tr>
+<tr class="separator:a854d0baeb01828a8d2e21a30c99bf93a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af730e190820fe159e3fd59854c670a2e"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#af730e190820fe159e3fd59854c670a2e">cMod02Cap</a></td></tr>
+<tr class="memdesc:af730e190820fe159e3fd59854c670a2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC0 Cmod2 capacitance measurement result in picofarads.  <a href="#af730e190820fe159e3fd59854c670a2e">More...</a><br /></td></tr>
+<tr class="separator:af730e190820fe159e3fd59854c670a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9433cb008fb99dca3add9a67b2019920"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a9433cb008fb99dca3add9a67b2019920">cMod03Cap</a></td></tr>
+<tr class="memdesc:a9433cb008fb99dca3add9a67b2019920"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC0 Cmod3 capacitance measurement result in picofarads.  <a href="#a9433cb008fb99dca3add9a67b2019920">More...</a><br /></td></tr>
+<tr class="separator:a9433cb008fb99dca3add9a67b2019920"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06345a67fd2d5fe8a8a4b27ac1be4e71"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a06345a67fd2d5fe8a8a4b27ac1be4e71">cMod04Cap</a></td></tr>
+<tr class="memdesc:a06345a67fd2d5fe8a8a4b27ac1be4e71"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC0 Cmod4 capacitance measurement result in picofarads.  <a href="#a06345a67fd2d5fe8a8a4b27ac1be4e71">More...</a><br /></td></tr>
+<tr class="separator:a06345a67fd2d5fe8a8a4b27ac1be4e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52b496ed91ad0238aa667a6b391381e6"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a52b496ed91ad0238aa667a6b391381e6">cMod11Cap</a></td></tr>
+<tr class="memdesc:a52b496ed91ad0238aa667a6b391381e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC1 Cmod1 capacitance measurement result in picofarads.  <a href="#a52b496ed91ad0238aa667a6b391381e6">More...</a><br /></td></tr>
+<tr class="separator:a52b496ed91ad0238aa667a6b391381e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca7ad3ed7edb55b91afb043a6664f729"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#aca7ad3ed7edb55b91afb043a6664f729">cMod12Cap</a></td></tr>
+<tr class="memdesc:aca7ad3ed7edb55b91afb043a6664f729"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC1 Cmod2 capacitance measurement result in picofarads.  <a href="#aca7ad3ed7edb55b91afb043a6664f729">More...</a><br /></td></tr>
+<tr class="separator:aca7ad3ed7edb55b91afb043a6664f729"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a320d9142757331984ec75f25e8147eaf"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a320d9142757331984ec75f25e8147eaf">cMod13Cap</a></td></tr>
+<tr class="memdesc:a320d9142757331984ec75f25e8147eaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC1 Cmod3 capacitance measurement result in picofarads.  <a href="#a320d9142757331984ec75f25e8147eaf">More...</a><br /></td></tr>
+<tr class="separator:a320d9142757331984ec75f25e8147eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4851d372b823abc48740b62060d4f556"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#a4851d372b823abc48740b62060d4f556">cMod14Cap</a></td></tr>
+<tr class="memdesc:a4851d372b823abc48740b62060d4f556"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MSC1 Cmod4 capacitance measurement result in picofarads.  <a href="#a4851d372b823abc48740b62060d4f556">More...</a><br /></td></tr>
+<tr class="separator:a4851d372b823abc48740b62060d4f556"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad94089c4e62e6ea3eba8083fd7153e71"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__bist__context__t.html#ad94089c4e62e6ea3eba8083fd7153e71">eltdCapNumFineInitCycles</a></td></tr>
 <tr class="memdesc:ad94089c4e62e6ea3eba8083fd7153e71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of ProDummy SubConversions.  <a href="#ad94089c4e62e6ea3eba8083fd7153e71">More...</a><br /></td></tr>
 <tr class="separator:ad94089c4e62e6ea3eba8083fd7153e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -504,6 +537,40 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 
 </div>
 </div>
+<a id="acae5fb65a370e8e1c14d13c2da578f12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acae5fb65a370e8e1c14d13c2da578f12">&#9670;&nbsp;</a></span>vddaVoltage</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::vddaVoltage</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The result of VDDA measurement in millivolts. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="aa7905e472e1b8aa89e92b44b24e5306d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7905e472e1b8aa89e92b44b24e5306d">&#9670;&nbsp;</a></span>curBistWdId</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::curBistWdId</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The current widget ID for BIST operations. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
 <a id="a0c9e63a331fdb827a3eae43e735aa3cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0c9e63a331fdb827a3eae43e735aa3cb">&#9670;&nbsp;</a></span>eltdCapSenseGroup</h2>
 
@@ -589,7 +656,10 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>The SW watchdog timeout used to prevent a hang in case of short. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;. </dd></dl>
+<p>The SW watchdog timeout used to prevent a hang in case of short the external capacitor.</p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;.</dd>
+<dd>
+This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -691,23 +761,6 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>The maximum possible external capacitor charge/discharge time in microseconds. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;. </dd></dl>
-
-</div>
-</div>
-<a id="acae5fb65a370e8e1c14d13c2da578f12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acae5fb65a370e8e1c14d13c2da578f12">&#9670;&nbsp;</a></span>vddaVoltage</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::vddaVoltage</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The result of VDDA measurement in millivolts. </p>
 <dl class="section note"><dt>Note</dt><dd>This field is available only for the fourth-generation CAPSENSE&trade;. </dd></dl>
 
 </div>
@@ -929,7 +982,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>The current slot ID for BIST operations. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -946,7 +999,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>The sub-conversion number for electrode capacitance measurement scans. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -963,7 +1016,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>Number of clk_mod cycles to be run during EPILOGUE. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -980,7 +1033,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>Configure duration of Cmod initialization, phase 1. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -997,7 +1050,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>Configure duration of Cmod initialization, phase 2. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -1014,7 +1067,177 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </div><div class="memdoc">
 
 <p>Number of ProDummy Wait Cycles. </p>
-<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth-generation CAPSENSE&trade;. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="aac68b6aaa0e9215ba48f345f5362f557"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac68b6aaa0e9215ba48f345f5362f557">&#9670;&nbsp;</a></span>extCapDischargeTime</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::extCapDischargeTime</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The discharging time in us needed to discharge the external capacitor before the measurement. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="ab9a516271a11b9948d574c673b8f508f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9a516271a11b9948d574c673b8f508f">&#9670;&nbsp;</a></span>extCapSubConvNum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::extCapSubConvNum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The sub-conversion number for Cmod measurement. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a854d0baeb01828a8d2e21a30c99bf93a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a854d0baeb01828a8d2e21a30c99bf93a">&#9670;&nbsp;</a></span>cMod01Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod01Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC0 Cmod1 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="af730e190820fe159e3fd59854c670a2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af730e190820fe159e3fd59854c670a2e">&#9670;&nbsp;</a></span>cMod02Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod02Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC0 Cmod2 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a9433cb008fb99dca3add9a67b2019920"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9433cb008fb99dca3add9a67b2019920">&#9670;&nbsp;</a></span>cMod03Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod03Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC0 Cmod3 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a06345a67fd2d5fe8a8a4b27ac1be4e71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06345a67fd2d5fe8a8a4b27ac1be4e71">&#9670;&nbsp;</a></span>cMod04Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod04Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC0 Cmod4 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a52b496ed91ad0238aa667a6b391381e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52b496ed91ad0238aa667a6b391381e6">&#9670;&nbsp;</a></span>cMod11Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod11Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC1 Cmod1 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="aca7ad3ed7edb55b91afb043a6664f729"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca7ad3ed7edb55b91afb043a6664f729">&#9670;&nbsp;</a></span>cMod12Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod12Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC1 Cmod2 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a320d9142757331984ec75f25e8147eaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a320d9142757331984ec75f25e8147eaf">&#9670;&nbsp;</a></span>cMod13Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod13Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC1 Cmod3 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a4851d372b823abc48740b62060d4f556"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4851d372b823abc48740b62060d4f556">&#9670;&nbsp;</a></span>cMod14Cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_bist_context_t::cMod14Cap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The MSC1 Cmod4 capacitance measurement result in picofarads. </p>
+<dl class="section note"><dt>Note</dt><dd>This field is available only for the fifth- generation CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -1113,7 +1336,7 @@ en_hsiom_sel_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE&trade; Middleware Library 3.0.1</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>
