@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 4.0: Status Macros</title>
+<title>CAPSENSE™ Middleware Library 5.0: Status Macros</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
   </td>
  </tr>
  </tbody>
@@ -131,13 +131,13 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__status.html#ga1dc4b760862d830170ca6a7a0f3847c4">CY_CAPSENSE_STATUS_CALIBRATION_FAIL</a>&#160;&#160;&#160;(0x100u)</td></tr>
 <tr class="memdesc:ga1dc4b760862d830170ca6a7a0f3847c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return status <a class="el" href="group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7">cy_capsense_status_t</a> of CAPSENSE&trade; operation: Unable to perform calibration. <br /></td></tr>
 <tr class="separator:ga1dc4b760862d830170ca6a7a0f3847c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0efb73a86bce0609b8d1a0046ed01abe"><td class="memItemLeft" align="right" valign="top"><a id="ga0efb73a86bce0609b8d1a0046ed01abe"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__status.html#ga0efb73a86bce0609b8d1a0046ed01abe">CY_CAPSENSE_STATUS_CALIBRATION_OVERFLOW</a>&#160;&#160;&#160;(0x200u)</td></tr>
-<tr class="memdesc:ga0efb73a86bce0609b8d1a0046ed01abe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return status <a class="el" href="group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7">cy_capsense_status_t</a> of CAPSENSE&trade; operation: Calibration scan with the maximum CDAC code is saturated. <br /></td></tr>
-<tr class="separator:ga0efb73a86bce0609b8d1a0046ed01abe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae43f4dd03e94bc8d64862dac97a72f2a"><td class="memItemLeft" align="right" valign="top"><a id="gae43f4dd03e94bc8d64862dac97a72f2a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__status.html#gae43f4dd03e94bc8d64862dac97a72f2a">CY_CAPSENSE_STATUS_CALIBRATION_REF_CHECK_FAIL</a>&#160;&#160;&#160;(0x200u)</td></tr>
+<tr class="memdesc:gae43f4dd03e94bc8d64862dac97a72f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return status <a class="el" href="group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7">cy_capsense_status_t</a> of CAPSENSE&trade; operation: CapDac calibration fail - The reference/fine CapDAC calibration stage is failed as the raw count minimum across widget is out of range. <br /></td></tr>
+<tr class="separator:gae43f4dd03e94bc8d64862dac97a72f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9f3803d22196b2817b13876dc40235e7"><td class="memItemLeft" align="right" valign="top"><a id="ga9f3803d22196b2817b13876dc40235e7"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__status.html#ga9f3803d22196b2817b13876dc40235e7">CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL</a>&#160;&#160;&#160;(0x400u)</td></tr>
-<tr class="memdesc:ga9f3803d22196b2817b13876dc40235e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return status <a class="el" href="group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7">cy_capsense_status_t</a> of CAPSENSE&trade; operation: Unable to perform calibration. <br /></td></tr>
+<tr class="memdesc:ga9f3803d22196b2817b13876dc40235e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return status <a class="el" href="group__group__capsense__structures.html#gadb42bb859316b21e708ad01184fba9c7">cy_capsense_status_t</a> of CAPSENSE&trade; operation: CapDac calibration fail - The resulting rawcounts across all sensors in widget are out of defined range. <br /></td></tr>
 <tr class="separator:ga9f3803d22196b2817b13876dc40235e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga481480b9c9d3b3ac244342cc3b6a3fb3"><td class="memItemLeft" align="right" valign="top"><a id="ga481480b9c9d3b3ac244342cc3b6a3fb3"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__status.html#ga481480b9c9d3b3ac244342cc3b6a3fb3">CY_CAPSENSE_STATUS_BAD_CLOCK_CONFIG</a>&#160;&#160;&#160;(0x800u)</td></tr>
@@ -170,7 +170,7 @@ Macros</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

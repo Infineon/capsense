@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 4.0: cy_stc_capsense_touch_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 5.0: cy_stc_capsense_touch_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 4.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
   </td>
  </tr>
  </tbody>
@@ -134,8 +134,48 @@ Data Fields</h2></td></tr>
 <li>1 - a single touch is detected</li>
 <li>2 - two touches are detected</li>
 <li>3 - three touches are detected</li>
-<li>CY_CAPSENSE_POSITION_MULTIPLE - multiple touches are detected and information in position structure should be ignored. </li>
+<li>CY_CAPSENSE_POSITION_MULTIPLE - multiple touches are detected and information in position structure should be ignored.</li>
 </ul>
+<p>The below table specifies a number of touches could be reported for a specific widget. </p><table class="doxtable">
+<tr>
+<th colspan="2">CAPSENSE </th><th colspan="5">Number of positions  </th></tr>
+<tr align="center">
+<td>Sensing method </td><td>Widget type </td><td>0 </td><td>1 </td><td>2 </td><td>&emsp;&emsp;3&emsp;&emsp; </td><td>Multiple  </td></tr>
+<tr align="center">
+<td rowspan="6">CSD </td><td>Button </td><td rowspan="10">&emsp;No touch&emsp; <br />
+ &emsp;detected&emsp; </td><td colspan="3">Number of active sensors <br />
+ (up to number of sensors) </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Matrix button </td><td>Single touch <br />
+ detected </td><td>N/A </td><td>N/A </td><td>Multiple touches <br />
+ detected  </td></tr>
+<tr align="center">
+<td>Linear slider </td><td>Single touch <br />
+ detected </td><td>N/A </td><td>N/A </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Radial slider </td><td>Single touch <br />
+ detected </td><td>N/A </td><td>N/A </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Touchpad </td><td>Single touch <br />
+ detected </td><td>Two touches <br />
+ detected </td><td>N/A </td><td>Multiple touches <br />
+ detected  </td></tr>
+<tr align="center">
+<td>Proximity </td><td colspan="3">Number of active sensors <br />
+ (up to number of sensors) </td><td>N/A  </td></tr>
+<tr align="center">
+<td rowspan="4">CSX </td><td>Button </td><td colspan="3">Number of active sensors <br />
+ (up to number of sensors) </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Matrix button </td><td colspan="3">Number of active sensors <br />
+ (up to number of sensors) </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Linear slider </td><td>Single touch <br />
+ detected </td><td>N/A </td><td>N/A </td><td>N/A  </td></tr>
+<tr align="center">
+<td>Touchpad </td><td colspan="3">Number of touches <br />
+ (up to 3) </td><td>N/A  </td></tr>
+</table>
 
 </div>
 </div>
@@ -145,7 +185,7 @@ Data Fields</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 4.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

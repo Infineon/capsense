@@ -1,5 +1,8 @@
 var NAVTREEINDEX3 =
 {
+"structcy__stc__capsense__common__config__t.html#a25a6e1ee6c1b95b92f69b56471e90198":[10,2,0,23,27],
+"structcy__stc__capsense__common__config__t.html#a2f0d703959ecf591d93fead29797ef0b":[10,2,0,23,22],
+"structcy__stc__capsense__common__config__t.html#a3023ed9a75800748f3af86571b42a5b0":[10,2,0,23,19],
 "structcy__stc__capsense__common__config__t.html#a314b8ab78e6a189daeb4d150d3f51512":[10,2,0,23,3],
 "structcy__stc__capsense__common__config__t.html#a325bae184f92fdb4eface75f45491a0a":[10,2,0,23,7],
 "structcy__stc__capsense__common__config__t.html#a3b5b13d1df8ccf3ee3cda514b76a1e2c":[10,2,0,23,24],
@@ -246,8 +249,5 @@ var NAVTREEINDEX3 =
 "structcy__stc__capsense__internal__context__t.html#a697bbc45d7428255dcf5c3d4a8652939":[10,2,0,27,62],
 "structcy__stc__capsense__internal__context__t.html#a69a75b1f9b0b9ee96d91fec2150e0b2e":[10,2,0,27,22],
 "structcy__stc__capsense__internal__context__t.html#a6af1dd5754837d8be8da11a72241cc15":[10,2,0,27,26],
-"structcy__stc__capsense__internal__context__t.html#a6c28b93814ffaa55e6fb872700b4ca39":[10,2,0,27,13],
-"structcy__stc__capsense__internal__context__t.html#a76b775ea247ac23160c1286fa965adb3":[10,2,0,27,75],
-"structcy__stc__capsense__internal__context__t.html#a76c03a3f16ce28d70d2cfe61a6fcb459":[10,2,0,27,2],
-"structcy__stc__capsense__internal__context__t.html#a77b0f978e588d9a90b05c2ff127e7f21":[10,2,0,27,89]
+"structcy__stc__capsense__internal__context__t.html#a6c28b93814ffaa55e6fb872700b4ca39":[10,2,0,27,13]
 };

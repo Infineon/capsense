@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -67,6 +67,7 @@
 #define CY_CAPSENSE_BIST_CP_MAX_VALUE                           (200000u)
 #define CY_CAPSENSE_BIST_CSH_MAX_VALUE                          (1600000u)
 #define CY_CAPSENSE_BIST_PROMILLE_FACTOR                        (1000u)
+#define CY_CAPSENSE_BIST_ELTD_CAP_NUM_EPI_CYCLES                (2u)
 
 /*******************************************************************************
 * Macros for the external capacitor capacitance measurement test
@@ -300,7 +301,7 @@
 * possible to launch the function with any combination of the available tests.
 * - CY_CAPSENSE_BIST_CRC_WDGT_MASK       - Verifies the RAM widget structure CRC
 *                                          for all the widgets.
-* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensors for a short
+* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensor pins for a short
 *                                          to GND / VDD / other sensors.
 * - CY_CAPSENSE_BIST_SNS_CAP_MASK        - Measures all the sensors capacitance.
 * - CY_CAPSENSE_BIST_ELTD_CAP_MASK       - Measures all the electrodes capacitance.
@@ -1691,9 +1692,9 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * is defined by the RefCDAC tolerance.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2036,17 +2037,18 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * external series resistance). The measurement accuracy is about 30%.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
 * By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
 *
 * Measured capacitance values (Cp for CSD widgets and Cm for CSX widgets)
-* are stored in the .snsCap field of the \ref cy_stc_capsense_sensor_context_t
-* structure.
+* are stored in the ptrSnsCapacitance sensor capacitance array field 
+* and in the ptrEltdCapacitance electrode capacitance array
+* of the \ref cy_stc_capsense_widget_config_t structure.
 *
 * The all sensor measurement can be done on all the sensors using
 * the Cy_CapSense_RunSelfTest() function along with
@@ -2146,17 +2148,18 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(
 * external series resistance). The measurement accuracy is about 30%.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
 * By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
 *
 * Measured capacitance values (Cp for CSD widgets and Cm for CSX widgets)
-* are stored in the .snsCap field of the \ref cy_stc_capsense_sensor_context_t
-* structure.
+* are stored in the ptrSnsCapacitance sensor capacitance array field 
+* and in the ptrEltdCapacitance electrode capacitance array
+* of the \ref cy_stc_capsense_widget_config_t structure.
 *
 * The all sensor measurement can be done on all the sensors using
 * the Cy_CapSense_RunSelfTest() function along with
@@ -2166,8 +2169,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(
 * by another scan.
 *
 * \note
-* This function is available for the fifth-generation and fifth-generation
-* low power CAPSENSE&trade;.
+* This function is available only for the fifth-generation low power
+* CAPSENSE&trade;.
 *
 * \param slotId
 * Specifies the ID number of the slot to measure sensor capacitance.
@@ -2393,7 +2396,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
     watchdog = Cy_CapSense_WaitEndOfCpuScan(watchdog, context);
 
     /* Check if the watchdog timeout happened */
-    if(0u == watchdog)
+    if (0u == watchdog)
     {
         result = CY_CAPSENSE_BIST_TIMEOUT_E;
     }
@@ -2544,7 +2547,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSlot(
     watchdog = Cy_CapSense_WaitEndOfCpuScan(watchdog, context);
 
     /* Check if the watchdog timeout happened */
-    if(0u == watchdog)
+    if (0u == watchdog)
     {
         result = CY_CAPSENSE_BIST_TIMEOUT_E;
     }
@@ -2721,8 +2724,6 @@ static void Cy_CapSense_BistGenerateBaseConfig(
                        context->ptrCommonConfig->ptrChConfig->ptrHwContext);
 
     Cy_CapSense_SetupCpuOperatingMode(context);
-
-    Cy_SysLib_DelayUs(CY_CAPSENSE_ANALOG_SETTLING_TIME_US);
 }
 #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SNS_CAP_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_ELTD_CAP_EN) || \
            ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_SH_CAP_EN))) */
@@ -4075,8 +4076,7 @@ void Cy_CapSense_BistMeasureCapacitanceSensorInit(
     }
     /* NumSubConv */
     ptrBistCxt->eltdCapSubConvNum = (uint16_t)CY_CAPSENSE_BIST_ELTD_CAP_SUBCONV_NUM_DEFAULT;
-    /* NumEpiCycles and NumProWaitCycles depends on SnsClk divider */
-    ptrBistCxt->eltdCapNumEpiCycles = ptrBistCxt->eltdCapSnsClk / CY_CAPSENSE_DIVIDER_TWO;
+    ptrBistCxt->eltdCapNumEpiCycles = CY_CAPSENSE_BIST_ELTD_CAP_NUM_EPI_CYCLES;
     ptrBistCxt->eltdCapNumFineInitWaitCycles = ptrBistCxt->eltdCapNumEpiCycles;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_MEASUREMENT_GROUP_EN) */

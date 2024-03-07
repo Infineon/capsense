@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -185,11 +185,11 @@
 * * The <a href="https:/\/github.com/Infineon/mtb-pdl-cat2">
 * <b>CAT2 Peripheral Driver Library (PDL)</b></a> is included in the project
 * in case if the PSoC&trade; 4 device is used.
-* * <a href="https:/\/www.cypress.com/ModusToolboxDeviceConfig">
+* * <a href="https:/\/www.infineon.com/ModusToolboxDeviceConfig">
 * <b>ModusToolbox&trade; Device Configurator Tool</b></a>,
-* <a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig">
+* <a href="https:/\/www.infineon.com/ModusToolboxCapSenseConfig">
 * <b>ModusToolbox&trade; CAPSENSE&trade; Configurator Tool</b></a>, and
-* <a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner">
+* <a href="https:/\/www.infineon.com/ModusToolboxCapSenseTuner">
 * <b>ModusToolbox&trade; CAPSENSE&trade; Tuner Tool</b></a>
 * are installed on the machine.
 *
@@ -250,11 +250,11 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>3.1</td>
+*     <td>3.2</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator tool</td>
-*     <td>4.10</td>
+*     <td>4.20</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; MSC Superblock Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
@@ -274,11 +274,11 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator tool</td>
-*     <td>2.0</td>
+*     <td>3.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>6.10</td>
+*     <td>6.20</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
@@ -661,6 +661,9 @@
 *   </tr>
 * </table>
 *
+* \note Refer to the "Errata" section of the device datasheet to get information
+* about the known problems related to the CAPSENSE&trade; HW IP block.
+*
 ********************************************************************************
 * \section section_capsense_changelog Changelog
 ********************************************************************************
@@ -668,7 +671,126 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td rowspan="16" >4.0</td>
+*     <td rowspan="13">5.0</td>
+*     <td colspan="2"><i><b>
+*       This version is not backward compatible with the
+*       previous version due to re-designed CDAC Auto-calibration.
+*       We tried to keep the established API, but your design may need to be
+*       updated to operate with CAPSENSE&trade; middleware v5.0.
+*       Also, if you use the CAPSENSE&trade middleware v5.0, you must use
+*       the CAPSENSE&trade Configurator v6.20 tool or later. This MW version is not
+*       compatible with the previous Configurator tool versions.
+*     </b></i>
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Re-designed CDAC Auto-calibration algorithm for the fifth-generation
+*         LP devices
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Added auto selection mode of CIC2 decimation rate for the
+*         fifth-generation LP devices
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Added Auto-selection mode of CDAC Dither scale value for the
+*         fifth-generation and fifth-generation LP devices
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Added the HW IIR Filter initialization function
+*         Cy_CapSense_ScanInitializeHwIirAllSlots() and
+*         Cy_CapSense_ScanInitializeHwIirSlots() for fifth-generation LP devices
+*     </td>
+*     <td>
+*         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Corrected the low power widget scanning flow by excluding waking up at a
+*         signal detection - only the end of the frame interrupt is kept.
+*         Condition: multiple low power sensors. This will avoid multiple interrupt
+*         generation and in some cases prevent the device from hanging.
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Corrected description of the cy_stc_capsense_position_t structure
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Removed Epilogue cycles from the maximum Raw Counts definition
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Hidden a Multi-phase Self feature for fifth-generation LP devices
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Disabled the External Frame Start in the Cy_CapSense_InitializeMaxRaw()
+*         function for the fifth-generation devices
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Corrected description of the BIST measurement function
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Corrected description of the cy_stc_capsense_touch_t structure
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Updated description of the software watchdog time calculation for
+*         the fifth-generation devices
+*     </td>
+*     <td>
+*         Defect fixing
+*     </td>
+*   </tr>
+*   <tr>
+*     <td rowspan="17" >4.0</td>
 *     <td colspan="2"><i><b>
 *       This version is not backward compatible with the
 *       previous version due to fifth-generation LP devices support
@@ -807,6 +929,14 @@
 *     </td>
 *     <td>
 *         User experience improvement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Added Long Press gesture
+*     </td>
+*     <td>
+*         Feature enhancement
 *     </td>
 *   </tr>
 *   <tr>
@@ -1043,10 +1173,10 @@
 *
 * * CAPSENSE&trade; Overview:
 *
-*   * <a href="https:/\/www.cypress.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade;
+*   * <a href="https:/\/www.infineon.com/ModusToolboxCapSenseConfig"><b>ModusToolbox&trade;
 *   CAPSENSE&trade; Configurator Tool Guide</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade;
+*   * <a href="https:/\/www.infineon.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade;
 *   CAPSENSE&trade; Tuner Tool Guide</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661">
@@ -1058,7 +1188,7 @@
 *   <b>ModusToolbox&trade; Software Environment, Quick Start Guide, Documentation,
 *   and Videos</b></a>
 *
-*   * <a href="https:/\/www.cypress.com/ModusToolboxDeviceConfig"><b>ModusToolbox&trade;
+*   * <a href="https:/\/www.infineon.com/ModusToolboxDeviceConfig"><b>ModusToolbox&trade;
 *   Device Configurator Tool Guide</b></a>
 *
 * * Infineon Technologies Kits and Code Examples:
@@ -1085,6 +1215,9 @@
 *
 *   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
 *   PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
+*
+*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads"><b>AN215671 PSoC&trade; 6 MCU
+*   firmware design for BLE applications</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">
 *   <b>PSoC&trade; 6 Technical Reference Manual</b></a>

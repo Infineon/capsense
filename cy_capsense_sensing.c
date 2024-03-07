@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file consists of common parts for different supported platforms
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -37,8 +37,9 @@
 * Function Name: Cy_CapSense_ScanWidget
 ****************************************************************************//**
 *
-* Initiates the scanning of all sensors in the widget. 
-
+* Performs the initialization required to scan the specified widget and triggers
+* the scanning of all sensors in the widget.
+*
 * If the middleware is busy, do not initiate a new scan or set up widgets.
 * Use the Cy_CapSense_IsBusy() function to check HW busyness at a particular moment.
 * Use the Cy_CapSense_MwState() function to verify if MW executes any firmware 
@@ -49,6 +50,12 @@
 * the Cy_CapSense_ScanLpWidget() function.
 *
 * \note
+* For the fourth-generation this function is also available and it should be used
+* instead of Cy_CapSense_SetupWidget() and Cy_CapSense_Scan() functions.
+* The specified widget will remain set up after scanning completes.
+* If this function is called multiple times on the same widget, the set up
+* is only done the first time but a scan will be done each time the function
+* is called.
 * For the fifth-generation CAPSENSE&trade; this function is available in
 * single-channel solution only. It is recommended to use
 * the Cy_CapSense_ScanSlots() function instead for compatibility with
@@ -151,7 +158,7 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * Configurator, the scanning process will be triggered immediately.
 * If the "Enable external frame start" option is enabled in the CAPSENSE&trade;
 * Configurator, the scanning process will be triggered by the first external
-* synchronization signal after call of the function.
+* synchronization signal after a function call.
 * The number of slots in frame in this case should not exceed the maximum
 * possible slot number to fit into the internal buffer of the CAPSENSE&trade;
 * hardware block.
@@ -160,7 +167,7 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 *   * - the interval between the return of the function and the rising edge
 *     of an external synchronization signal must not be less than 2 ILO cycles;
 *   * - the pulse duration of an external synchronization signal
-*     (i.e. signal is in High level) must not be less than 2 ILO cycles and more
+*     (if the signal is in High level) must not be less than 2 ILO cycles and more
 *     than the full scanning process duration. The full scanning process
 *     duration is the time between the rising edge of the external
 *     synchronization pulse and clearing of BUSY flag. The Cy_CapSense_IsBusy()
@@ -173,7 +180,7 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * To decrease the start scan time when it is intended to scan the same frame,
 * i.e. startSlotId and numberSlots parameters are the same, then the scan
 * is performed without the MSC HW block reconfiguration.
-* The number of slots in frame in this case should not exceed the maximum
+* In this case, the number of slots in the frame shall not exceed the maximum
 * possible slot number to fit into the internal buffer of the CAPSENSE&trade;
 * hardware block.
 *
@@ -182,7 +189,7 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * the first slot for all channels and then exits. Scans for the remaining slots
 * in the Interrupt-driven scan mode are initiated in the interrupt service
 * routine (part of middleware) triggered at the end
-* of each scan completion for each channel. If the syncMode field in the
+* of each scan completed for each channel. If the syncMode field in the
 * cy_stc_capsense_common_config_t structure is set to CY_CAPSENSE_SYNC_MODE_OFF,
 * then the next slot scan for the channel with the fired interrupt,
 * will start regardless of the another channel readiness for the next scan.
@@ -193,7 +200,7 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * for the next scan (the next scan configuration is loaded into the channel MSC HW block).
 * Scans for the remaining slots in CS-DMA scan mode are initiated
 * by DMAC triggered at the end
-* of each scan completion for each channel. The channel scan synchronization is
+* of each scan completed for each channel. The channel scan synchronization is
 * performed as in Interrupt-driven scan mode. After all slots are scanned,
 * the FRAME interrupt is fired and the interrupt service routine (part of middleware)
 * updates the busy status. The transition into system DEEP SLEEP mode is allowed
@@ -259,8 +266,8 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * Configurator, the scanning process will be triggered immediately.
 * If the "Enable external frame start" option is enabled in the CAPSENSE&trade;
 * Configurator, the scanning process will be triggered by the first external
-* synchronization signal after call of the function.
-* The number of slots in frame in this case should not exceed the maximum
+* synchronization signal after a function call.
+* In this case, the number of slots in the frame shall not exceed the maximum
 * possible slot number to fit into the internal buffer of the CAPSENSE&trade;
 * hardware block.
 * The External synchronization signal parameters should meet the following
@@ -268,7 +275,7 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 *   * - the interval between the return of the function and the rising edge
 *     of an external synchronization signal must not be less than 2 ILO cycles;
 *   * - the pulse duration of an external synchronization signal
-*     (i.e. signal is in High level) must not be less than 2 ILO cycles and more
+*     (if the signal is in High level) must not be less than 2 ILO cycles and more
 *     than the full scanning process duration. The full scanning process
 *     duration is the time between the rising edge of the external
 *     synchronization pulse and clearing of BUSY flag. The Cy_CapSense_IsBusy()
@@ -276,12 +283,12 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 *   * - the interval between sub-sequent pulses should not be less than full
 *     scanning process duration.
 * Disregarding the "Enable external frame start" option, the transition into
-* system DEEP SLEEP mode is allowed after the scan process is started
+* a system DEEP SLEEP mode is allowed after the scan process is started
 * by the function.
 * To decrease the start scan time when it is intended to scan the same frame,
 * i.e. startSlotId and numberSlots parameters are the same, then the scan
 * is performed without the MSC HW block reconfiguration.
-* The number of slots in frame in this case should not exceed the maximum
+* In this case, the number of slots in the frame shall not exceed the maximum
 * possible slot number to fit into the internal buffer of the CAPSENSE&trade;
 * hardware block.
 *
@@ -290,7 +297,7 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * the first slot for all channels and then exits. Scans for the remaining slots
 * in the Interrupt-driven scan mode are initiated in the interrupt service
 * routine (part of middleware) triggered at the end
-* of each scan completion for each channel. If the syncMode field in the
+* of each scan completed for each channel. If the syncMode field in the
 * cy_stc_capsense_common_config_t structure is set to CY_CAPSENSE_SYNC_MODE_OFF,
 * then the next slot scan for the channel with the fired interrupt,
 * will start regardless of the another channel readiness for the next scan.
@@ -304,7 +311,7 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * of each scan completion for each channel. The channel scan synchronization is
 * performed as in Interrupt-driven scan mode. After all specified slots are
 * scanned, the FRAME interrupt is fired and the interrupt service routine
-* (part of middleware) updates the busy status. The transition into system
+* (part of middleware) updates the busy status. The transition into a system
 * DEEP SLEEP mode is allowed only when all specified scans are finished.
 * To decrease the start scan time when it is intended to scan the same slot,
 * i.e. the startSlotId parameter is the same and numberSlots = 1u, then the scan
@@ -356,7 +363,7 @@ cy_capsense_status_t Cy_CapSense_ScanSlots(
 *
 * Initiates scanning of all enabled widgets (and sensors) in the project.
 * For fifth-generation low power CAPSENSE&trade; the function initiates only
-* Active widget scans. To initiate Low Power widget scan use
+* Active widget scans. The initiation of a Low Power widget scan uses
 * the Cy_CapSense_ScanAllLpWidgets() function.
 *
 * This function initiates a scan only for the first sensor in the first widget
@@ -376,6 +383,10 @@ cy_capsense_status_t Cy_CapSense_ScanSlots(
 * tasks related to initialization, scanning, and processing at a particular moment.
 * The application program should wait until the current frame scan is finished prior 
 * to start a next scan by using the function.
+*
+* To get widget enable/working status the Cy_CapSense_IsWidgetEnabled() and
+* Cy_CapSense_IsSlotEnabled() functions should be used. This status can be configured
+* with Cy_CapSense_SetWidgetStatus() function.
 *
 * \note
 * For the fifth-generation CAPSENSE&trade; and fifth-generation low power
@@ -740,9 +751,11 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 * - CY_CAPSENSE_STATUS_CALIBRATION_FAIL - The calibration is failed due to
 *                                         the issues with scanning (either
 *                                         watchdog timer, interrupt breaking, etc.).
-* - CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL - The calibration is failed
-*                                         because of rawcount is out of the
-*                                         defined range.
+* - CY_CAPSENSE_STATUS_CALIBRATION_REF_CHECK_FAIL - The reference/fine CapDAC
+*                                  calibration stage is failed as the raw count
+*                                  minimum across widget is out of range.
+* - CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL - The resulting rawcounts across
+*                                  all sensors in widget are out of defined range.
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(cy_stc_capsense_context_t * context)
@@ -1585,56 +1598,68 @@ cy_capsense_status_t Cy_CapSense_InitializeMaxRaw(
     uint32_t tmpVal;
     cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_SUCCESS;
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
-    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+    #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
         uint32_t scanSlotId;
         const cy_stc_capsense_scan_slot_t * ptrScanSlots;
     #endif
+    uint32_t tempRaw = 0u;
 
-    if(0u != (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK & ptrWdCfg->ptrWdContext->status))
+    if (0u != (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK & ptrWdCfg->ptrWdContext->status))
     {
         /* Prepare and execute the measurement to obtain the MAX raw count for the one-dimension widgets
          * or columns for two-dimension widgets.
          */
         tmpVal = ptrWdCfg->firstSlotId;
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCount, widgetId,
+            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&tempRaw, widgetId,
                     tmpVal, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
         #else
-            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCount,
+            capStatus |= Cy_CapSense_ExecuteSaturatedScan(&tempRaw,
                     tmpVal, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
         #endif
+        if (CY_CAPSENSE_16_BIT_MASK < tempRaw)
+        {
+            tempRaw = CY_CAPSENSE_16_BIT_MASK;
+        }
+        ptrWdCfg->ptrWdContext->maxRawCount = (uint16_t)tempRaw;
     }
 
-    #if((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
-        if(CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
+    #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
+        if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
         {
-           if(((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType) || ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType))
+           if (((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType) || ((uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E == ptrWdCfg->wdType))
             {
-                if(0u != (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK & ptrWdCfg->ptrWdContext->status))
+                if (0u != (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK & ptrWdCfg->ptrWdContext->status))
                 {
                     /* Prepare and execute the measurement to obtain the MAX raw count for rows for two-dimension widgets. */
                     scanSlotId = (uint32_t)ptrWdCfg->firstSlotId + ptrWdCfg->numSlots - 1u;
 
                     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCountRow, widgetId,
+                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&tempRaw, widgetId,
                                 scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
+                        ptrWdCfg->ptrWdContext->maxRawCountRow = (uint16_t)tempRaw;
                     #else
-                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&ptrWdCfg->ptrWdContext->maxRawCountRow,
+                        capStatus |= Cy_CapSense_ExecuteSaturatedScan(&tempRaw,
                                 scanSlotId, CY_CAPSENSE_SATURATED_MAX_COUNT, context);
                     #endif
 
+                    if (CY_CAPSENSE_16_BIT_MASK < tempRaw)
+                    {
+                        tempRaw = CY_CAPSENSE_16_BIT_MASK;
+                    }
+                    ptrWdCfg->ptrWdContext->maxRawCountRow = (uint16_t)tempRaw;
                     /* For the multi-channel mode, iterate through enabled channels and find the sensing channel that
                      * drives the sensor (not Shield only, Tx only, or Empty).
                      */
                     for (tmpVal = 0u; tmpVal < CY_CAPSENSE_TOTAL_CH_NUMBER; tmpVal++)
                     {
                         ptrScanSlots = &context->ptrScanSlots[scanSlotId + (CY_CAPSENSE_SLOT_COUNT * tmpVal)];
-                        if(CY_CAPSENSE_SLOT_SHIELD_ONLY > ptrScanSlots->wdId)
+                        if (CY_CAPSENSE_SLOT_SHIELD_ONLY > ptrScanSlots->wdId)
                         {
                             break;
                         }
                     }
-                    if(tmpVal >= CY_CAPSENSE_TOTAL_CH_NUMBER)
+                    if (tmpVal >= CY_CAPSENSE_TOTAL_CH_NUMBER)
                     {
                         capStatus |= CY_CAPSENSE_STATUS_BAD_CONFIG;
                     }

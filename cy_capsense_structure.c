@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -194,7 +194,7 @@ uint32_t Cy_CapSense_IsWidgetActive(
 * Function Name: Cy_CapSense_IsSensorActive
 ****************************************************************************//**
 *
-* Reports whether the specified sensor in the widget detected touch.
+* Reports whether the specified sensor in the widget is sensor detects a touch.
 *
 * This function reports whether the specified sensor in the widget has detected a
 * touch by extracting information from the widget status register.
@@ -881,8 +881,8 @@ cy_capsense_status_t Cy_CapSense_SetParam(
 * 5. Bit [4]      - CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK.
 *
 * \param mask
-* Specifies the value to be configured. All bit values not set by
-* the mode parameter are ignored.
+* Specifies the value of widget status field to be configured. All bit values
+* not set by the mask passed as the mode parameter are ignored.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context

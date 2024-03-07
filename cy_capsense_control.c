@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -56,7 +56,7 @@
 *
 * The following tasks are executed:
 * 1. Capturing not used HW blocks. If any
-*    of HW block is
+*    of HW blocks are
 *    already in use, then the function returns the fail status, and
 *    the application program should perform corresponding actions. For example, releasing
 *    the HW block captured by another middleware.
@@ -126,7 +126,7 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
     uint32_t wdIndex;
     cy_stc_capsense_widget_context_t * ptrWdCxt;
 
-    #if((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         const cy_stc_capsense_common_config_t * ptrCommonCfg;
     #endif
 
@@ -176,11 +176,11 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
             ptrWdCxt = context->ptrWdConfig->ptrWdContext;
             for (wdIndex = 0u; wdIndex < CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex++)
             {
-                if(0u == ptrWdCxt->maxRawCount)
+                if (0u == ptrWdCxt->maxRawCount)
                 {
                     ptrWdCxt->status |= CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK;
                 }
-                if(0u == ptrWdCxt->maxRawCountRow)
+                if (0u == ptrWdCxt->maxRawCountRow)
                 {
                     ptrWdCxt->status |= CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK;
                 }
@@ -258,7 +258,7 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * 7. If the firmware filters are enabled in the Advanced General tab, the
 *    filter histories are also initialized.
 *
-* Any subsequent call of this function repeats initialization process.
+* Any subsequent call of this function repeats the initialization process.
 * Therefore, it is possible to change the middleware configuration
 * from the application program by writing registers to the data structure
 * and calling this function again.
@@ -521,8 +521,8 @@ cy_capsense_status_t Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 *
 * When the middleware operation is stopped by the Cy_CapSense_DeInit()
 * function, subsequent call of the Cy_CapSense_Init() function repeats
-* initialization process and it is not needed to call the Cy_CapSense_Enable()
-* function second time. However, to implement time-multiplexed mode
+* the initialization process, so a subsequent call of the Cy_CapSense_Enable()
+* function is not required. However, to implement Time-multiplexed mode
 * (sharing the CAPSENSE&trade; HW block(s) between multiple middleware)
 * the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used
 * instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for
@@ -623,16 +623,15 @@ cy_capsense_status_t Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * c
 *
 * This function performs exactly the same tasks as
 * Cy_CapSense_ProcessAllWidgets(), but only for a specified widget. This
-* function can be used along with the Cy_CapSense_SetupWidget() and
-* Cy_CapSense_Scan() functions (4th Generation) to scan and process data for a specific
-* widget or with the Cy_CapSense_ScanSlots() function (5th Generation).
-* This function is called only after all the sensors in the
-* widgets are scanned.
+* function can be used along with the Cy_CapSense_ScanWidget() function
+* (4th Generation) to scan and process data for a specific widget or with
+* the Cy_CapSense_ScanSlots() function (5th Generation).
+* This function is called only after all the sensors in the widgets are scanned.
 *
 * The disabled and/or non-working widgets are not processed by this function.
 *
-* A pipeline scan method (i.e. during scanning of a current widget (N),
-* perform processing of the previously scanned widget (N-1)) can be
+* The pipeline scan method, which during scanning a current widget (N),
+* performs the processing of the previously scanned widget (N-1)) can be
 * implemented using this function and it may reduce the total execution time,
 * increase the refresh rate, and decrease the average power consumption.
 * See the function usage example below for details on usage.
@@ -1311,8 +1310,8 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 *
 * Increments the timestamp register for the predefined timestamp interval.
 *
-* A timestamp is required for operation of the Gesture and Ballistic multiplier
-* feature. Hence this function and timestamp is required only if the Gesture
+* A timestamp is required for the operation of the Gesture and Ballistic multiplier
+* feature. Hence, this function and timestamp are required only if the Gesture
 * detection or Ballistic multiplier feature is enabled.
 *
 * This function increments the timestamp by the interval specified
@@ -1338,7 +1337,7 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * The interval at which this function is called should match with interval
 * defined in context->ptrCommonContext->timestampInterval register. Either the
 * register value can be updated to match the callback interval or the callback
-* can be made at interval set in the register.
+* can be made to be set in the register at an interval.
 *
 * If a timestamp is available from another source, the application program
 * may choose to periodically update the timestamp by using the
@@ -1491,6 +1490,7 @@ cy_capsense_status_t Cy_CapSense_Restore_V2(cy_stc_capsense_context_t * context)
     {
         /* Reset CSD HW block sequencer state always to handle a corner case when the sequencer is not in the idle state */
         context->ptrCommonConfig->ptrCsdBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK;
+        (void)context->ptrCommonConfig->ptrCsdBase->INTR_MASK;
         context->ptrCommonConfig->ptrCsdBase->SEQ_START = CY_CAPSENSE_CSD_SEQ_START_ABORT_MSK;
         watchdogCounter = Cy_CapSense_WatchdogCyclesNum(watchdogTimeoutUs,
             context->ptrCommonConfig->cpuClkHz / CY_CAPSENSE_CONVERSION_MEGA, cyclesPerLoop);
@@ -1501,7 +1501,7 @@ cy_capsense_status_t Cy_CapSense_Restore_V2(cy_stc_capsense_context_t * context)
         }
         while((CY_CSD_BUSY == csdHwStatus) && (0u != watchdogCounter));
 
-        if(CY_CSD_SUCCESS == csdHwStatus)
+        if (CY_CSD_SUCCESS == csdHwStatus)
         {
             #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_USE_CAPTURE)
                 csdHwStatus = Cy_CSD_Capture(ptrCsdBaseAdd, CY_CSD_CAPSENSE_KEY, ptrCsdCxt);

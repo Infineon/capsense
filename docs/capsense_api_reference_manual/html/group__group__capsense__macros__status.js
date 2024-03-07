@@ -10,7 +10,7 @@ var group__group__capsense__macros__status =
     [ "CY_CAPSENSE_STATUS_HW_BUSY", "group__group__capsense__macros__status.html#gaedbe037a646fceb93087fb5737d9477a", null ],
     [ "CY_CAPSENSE_STATUS_HW_LOCKED", "group__group__capsense__macros__status.html#gae73ebe440322cda669c2cdecd2296445", null ],
     [ "CY_CAPSENSE_STATUS_CALIBRATION_FAIL", "group__group__capsense__macros__status.html#ga1dc4b760862d830170ca6a7a0f3847c4", null ],
-    [ "CY_CAPSENSE_STATUS_CALIBRATION_OVERFLOW", "group__group__capsense__macros__status.html#ga0efb73a86bce0609b8d1a0046ed01abe", null ],
+    [ "CY_CAPSENSE_STATUS_CALIBRATION_REF_CHECK_FAIL", "group__group__capsense__macros__status.html#gae43f4dd03e94bc8d64862dac97a72f2a", null ],
     [ "CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL", "group__group__capsense__macros__status.html#ga9f3803d22196b2817b13876dc40235e7", null ],
     [ "CY_CAPSENSE_STATUS_BAD_CLOCK_CONFIG", "group__group__capsense__macros__status.html#ga481480b9c9d3b3ac244342cc3b6a3fb3", null ],
     [ "CY_CAPSENSE_STATUS_CIC2_ACC_UNDERFLOW", "group__group__capsense__macros__status.html#ga731203578f532b6e1a51fa1b241495a1", null ],

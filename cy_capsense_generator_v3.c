@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -314,6 +314,7 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     #else
         ptrBaseCfg->intrMask |= MSC_INTR_MASK_SCAN_Msk;
     #endif /* (CY_CAPSENSE_SCAN_MODE_DMA_DRIVEN == CY_CAPSENSE_SCAN_MODE) */
+    (void)ptrBaseCfg->intrMask;
 
     /* Shielding is available in CSD only */
     #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\

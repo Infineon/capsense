@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -176,6 +176,22 @@ typedef enum
     CY_CAPSENSE_BIST_FAIL_E                = 0x0Fu,             /**< The failed test status */
 } cy_en_capsense_bist_status_t;
 
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+/** Defines IDs of the external capacitors */
+typedef enum
+{
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        CY_CAPSENSE_BIST_CMOD01_ID_E         = 0x00u,                /**< ID for the MSC0 Cmod1 external capacitor \note This value is available for the fifth-generation low power CAPSENSE&trade;.*/
+        CY_CAPSENSE_BIST_CMOD02_ID_E         = 0x01u,                /**< ID for the MSC0 Cmod2 external capacitor \note This value is available for the fifth-generation low power CAPSENSE&trade;.*/
+    #endif
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
+        CY_CAPSENSE_BIST_CMOD_ID_E           = 0x00u,                /**< ID for Cmod external capacitor \note This value is available only for the fourth-generation CAPSENSE&trade;.*/
+        CY_CAPSENSE_BIST_CINTA_ID_E          = 0x01u,                /**< ID for CintA external capacitor \note This value is available only for the fourth-generation CAPSENSE&trade;.*/
+        CY_CAPSENSE_BIST_CINTB_ID_E          = 0x02u,                /**< ID for CintB external capacitor \note This value is available only for the fourth-generation CAPSENSE&trade;.*/
+        CY_CAPSENSE_BIST_CSH_ID_E            = 0x03u,                /**< ID for Csh external capacitor \note This value is available only for the fourth-generation CAPSENSE&trade;.*/
+    #endif
+} cy_en_capsense_bist_external_cap_id_t;
+#endif
 
 /** Defines the raw count accumulation mode for MSC HW block */
 typedef enum
@@ -371,6 +387,7 @@ typedef struct
                                                                  * Touchpad and CSD Matrix buttons widgets
                                                                  * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+
         #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
              ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
               (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
@@ -393,7 +410,7 @@ typedef struct
                                                                      */
         #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
 
-        uint8_t cdacDitherValue;                                /**< CDAC dither value in percentage
+        uint8_t cdacDitherValue;                                /**< CDAC dither scale value in bits
                                                                  * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
         uint8_t coarseInitBypassEn;                             /**< Skip Cmod coarse initialization sensors scan within widget
@@ -585,7 +602,7 @@ typedef struct
         uint8_t snsClkSourceAutoSelMode;                        /**< Defines set of rules that are used by clock source auto-selection algorithm
                                                                  * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
-        uint8_t mfsConfig;                                      /**< Multi-frequency Scan (MFS) widget configuration.
+        uint8_t mfsConfig;                                      /**< Multi-frequency Scan (MFS) widget configuration
                                                                  **  Contains masks:
                                                                  * * bit[0:3] - Number of MFS Channels (CY_CAPSENSE_MFS_FREQ_CHANNELS_NUM_MASK).
                                                                  * * bit[4]   - MFS Configuration (CY_CAPSENSE_MFS_EN_MASK):
@@ -597,14 +614,49 @@ typedef struct
                                                                  *   * 2 - Frequency channel 2 widget (CY_CAPSENSE_MFS_WIDGET_FREQ_CH_2_MASK)
                                                                  * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
+        uint8_t cdacDitherScaleMode;                            /**< CDAC dither scale mode
+                                                                 * * 0 (CY_CAPSENSE_CDAC_DITHERING_MODE_DISABLE) - CDAC dithering is disabled
+                                                                 * * 1 (CY_CAPSENSE_CDAC_DITHERING_MODE_MANUAL)  - CDAC dither value set manually
+                                                                 * * 2 (CY_CAPSENSE_CDAC_DITHERING_MODE_AUTO)    - CDAC dither value set automatically
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
     #endif
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint8_t cicRateMode;                                    /**< CIC2 filter decimation rate mode
+                                                                 * * 0 (CY_CAPSENSE_CIC_RATE_MODE_MANUAL)     - The cicRate value set by users
+                                                                 * * 1 (CY_CAPSENSE_CIC_RATE_MODE_AUTO)       - The cicRate value configured by middleware
+                                                                 * * 2 (CY_CAPSENSE_CIC_RATE_MODE_SMARTSENSE) - The cicRate value configured by SMARTSENSE&trade; algorithm
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
         uint8_t iirCoeffHw;                                     /**< Raw count HW IIR filter coefficient. Smaller value leads to lower filtering.
-                                                                * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
-                                                                */
+                                                                 * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t cdacConfig;                                    /**< Bit-mask for widget CDAC configuration:
+                                                                 *  * bit[0..1]  - Reference CDAC mode (CY_CAPSENSE_CDAC_REF_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The reference CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of reference CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of reference CDAC set automatically
+                                                                 *  * bit[2..3]  - Fine CDAC mode (CY_CAPSENSE_CDAC_FINE_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The fine CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of fine CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of fine CDAC set automatically
+                                                                 *  * bit[4..5]  - Compensation CDAC mode (CY_CAPSENSE_CDAC_COMP_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The compensation CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC set automatically
+                                                                 *  * bit[6..7]  - Compensation CDAC divider mode (CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC divider set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC divider set automatically
+                                                                 *  * bit[8..9]  - Sensitivity boost (CY_CAPSENSE_CDAC_BOOST_VAL_MASK)
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_BOOST_DISABLED) - Boost disabled
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_BOOST_2X)       - 2X Boost
+                                                                 *    * 3 (CY_CAPSENSE_CDAC_BOOST_3X)       - 3X Boost
+                                                                 *    * 4 (CY_CAPSENSE_CDAC_BOOST_4X)       - 4X Boost
+                                                                 * \note This field is available for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
     #endif
-    
+
 } cy_stc_capsense_widget_config_t;
 
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
@@ -1963,6 +2015,14 @@ cy_capsense_status_t Cy_CapSense_SetWidgetStatus(
                 uint32_t mode,
                 uint32_t value,
                 cy_stc_capsense_context_t * context);
+uint32_t Cy_CapSense_IsWidgetEnabled(
+                uint32_t widgetId,
+                const cy_stc_capsense_context_t * context);
+#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+    uint32_t Cy_CapSense_IsSlotEnabled(
+                    uint32_t slotId,
+                    const cy_stc_capsense_context_t * context);
+#endif
 /** \} */
 
 
@@ -1976,18 +2036,10 @@ cy_capsense_status_t Cy_CapSense_CheckConfigIntegrity(
 uint16_t Cy_CapSense_GetCrcWidget(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
-uint32_t Cy_CapSense_IsWidgetEnabled(
-                uint32_t widgetId,
-                const cy_stc_capsense_context_t * context);
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
     void Cy_CapSense_SetSnsFrameValidity(
                     uint32_t widgetId,
                     cy_stc_capsense_context_t * context);
-#endif
-#if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
-    uint32_t Cy_CapSense_IsSlotEnabled(
-                    uint32_t slotId,
-                    const cy_stc_capsense_context_t * context);
 #endif
 
 /** This enumeration is obsolete and should not be used further.

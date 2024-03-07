@@ -41,10 +41,14 @@ var group__group__capsense__low__level =
     [ "Cy_CapSense_LpSlotPinState", "group__group__capsense__low__level.html#ga182defda982b92d1f098b5b74184ef55", null ],
     [ "Cy_CapSense_CalibrateAllLpWidgets", "group__group__capsense__low__level.html#ga5977d1af9e19f447f861bb9919afb30a", null ],
     [ "Cy_CapSense_CalibrateAllLpSlots", "group__group__capsense__low__level.html#ga5cebf3e9d41b7e874369d1a083ab88c6", null ],
+    [ "Cy_CapSense_ScanInitializeHwIirAllSlots", "group__group__capsense__low__level.html#ga99c4c3b3a577706d47fb4b01ca8d29c0", null ],
+    [ "Cy_CapSense_ScanInitializeHwIirSlots", "group__group__capsense__low__level.html#gac8445556444b88df5ecab63085e698c7", null ],
     [ "Cy_CapSense_SetupWidgetExt", "group__group__capsense__low__level.html#gaf43c0cf61a95f11a5981f82f5b0d4e86", null ],
     [ "Cy_CapSense_ScanExt", "group__group__capsense__low__level.html#ga31834a3fce1f5b57c72107b419626bab", null ],
     [ "Cy_CapSense_GetParam", "group__group__capsense__low__level.html#gaa89c8ed15cddd778c2232c85300eb02d", null ],
     [ "Cy_CapSense_SetParam", "group__group__capsense__low__level.html#ga6049654627a08e866ebe5e93ac414177", null ],
     [ "Cy_CapSense_GetCRC", "group__group__capsense__low__level.html#ga2de812825cd421ee05fec733206e157a", null ],
-    [ "Cy_CapSense_SetWidgetStatus", "group__group__capsense__low__level.html#ga2ad536f018dd41e585fdd27107355a47", null ]
+    [ "Cy_CapSense_SetWidgetStatus", "group__group__capsense__low__level.html#ga2ad536f018dd41e585fdd27107355a47", null ],
+    [ "Cy_CapSense_IsWidgetEnabled", "group__group__capsense__low__level.html#gad1ce2644b0e056f861befcf8180de138", null ],
+    [ "Cy_CapSense_IsSlotEnabled", "group__group__capsense__low__level.html#ga4fbab9345b72bd9fe35d7f6084feed52", null ]
 ];

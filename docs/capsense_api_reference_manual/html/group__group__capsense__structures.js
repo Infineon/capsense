@@ -158,8 +158,6 @@ var group__group__capsense__structures =
       [ "numSubConversions", "structcy__stc__capsense__widget__context__t.html#a722c7050783603a3796dc6e3ea6ed994", null ],
       [ "cdacRef", "structcy__stc__capsense__widget__context__t.html#a1ca9544ef549d7fc214f7703efc596c7", null ],
       [ "rowCdacRef", "structcy__stc__capsense__widget__context__t.html#a86df00e59d6d922a0e229694d24f7288", null ],
-      [ "cdacFine", "structcy__stc__capsense__widget__context__t.html#a1e42a67ec881eb6f92538c598407be76", null ],
-      [ "rowCdacFine", "structcy__stc__capsense__widget__context__t.html#af5ae4dd7c7a65dc79fea22fba9678594", null ],
       [ "cicRate", "structcy__stc__capsense__widget__context__t.html#ad9f98bd3c96b57f8da2246dbf30c697d", null ],
       [ "cdacDitherEn", "structcy__stc__capsense__widget__context__t.html#a82a04a4c0dbb4de9fc2d5ae21ce943f3", null ],
       [ "cdacDitherValue", "structcy__stc__capsense__widget__context__t.html#ab6edaa841fd57f6e920b1f796d7f8cf4", null ],
@@ -237,7 +235,10 @@ var group__group__capsense__structures =
       [ "lfsrDitherLimit", "structcy__stc__capsense__widget__config__t.html#a445ca73990cf5d8d7eabf37dd3411267", null ],
       [ "snsClkSourceAutoSelMode", "structcy__stc__capsense__widget__config__t.html#ad6f1c79005cc909bf91dc5f18ef9c695", null ],
       [ "mfsConfig", "structcy__stc__capsense__widget__config__t.html#aa3e4f9fe91ed0dd44f74246ea10ad98e", null ],
-      [ "iirCoeffHw", "structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f", null ]
+      [ "cdacDitherScaleMode", "structcy__stc__capsense__widget__config__t.html#a42fdde812a30b3ff8021af651413076f", null ],
+      [ "cicRateMode", "structcy__stc__capsense__widget__config__t.html#a5364d6f63b077b1ef9b9b4f38822fb59", null ],
+      [ "iirCoeffHw", "structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f", null ],
+      [ "cdacConfig", "structcy__stc__capsense__widget__config__t.html#ab76c9c7585fcdee65af8c7b13ea27233", null ]
     ] ],
     [ "cy_stc_capsense_idac_gain_table_t", "structcy__stc__capsense__idac__gain__table__t.html", [
       [ "gainReg", "structcy__stc__capsense__idac__gain__table__t.html#ad44c7d56219cb4db0e7aaaba7821fb40", null ],
@@ -567,7 +568,8 @@ var group__group__capsense__structures =
       [ "mrssStateAfterScan", "structcy__stc__capsense__internal__context__t.html#a77b0f978e588d9a90b05c2ff127e7f21", null ],
       [ "repeatScanEn", "structcy__stc__capsense__internal__context__t.html#a0d92e183f57ac38c05b30dc98f819d6a", null ],
       [ "intrCsdInactSnsConn", "structcy__stc__capsense__internal__context__t.html#ac5af80cd4336ff0a3ca1e4b3a94c2343", null ],
-      [ "intrCsxInactSnsConn", "structcy__stc__capsense__internal__context__t.html#a1b23217340d393196be42de9c458aec8", null ]
+      [ "intrCsxInactSnsConn", "structcy__stc__capsense__internal__context__t.html#a1b23217340d393196be42de9c458aec8", null ],
+      [ "hwIirInit", "structcy__stc__capsense__internal__context__t.html#a9a11ca939785dec4d3ec854373409c94", null ]
     ] ],
     [ "cy_stc_capsense_widget_crc_data_t", "structcy__stc__capsense__widget__crc__data__t.html", [
       [ "fingerThVal", "structcy__stc__capsense__widget__crc__data__t.html#a373d9ef4767624a402f7b5212474c2e7", null ],
@@ -592,8 +594,6 @@ var group__group__capsense__structures =
       [ "cdacDitherEnVal", "structcy__stc__capsense__widget__crc__data__t.html#ae53618e920de629b6936d5ed53958f38", null ],
       [ "cicShiftVal", "structcy__stc__capsense__widget__crc__data__t.html#aae98a5a5cc46be38eaceea712d506ae5", null ],
       [ "rowCicShiftVal", "structcy__stc__capsense__widget__crc__data__t.html#a2fcebee2fc19cedcec51d021ef553290", null ],
-      [ "cdacFineVal", "structcy__stc__capsense__widget__crc__data__t.html#a714096dad049109119f89b695eeec85f", null ],
-      [ "rowCdacFineVal", "structcy__stc__capsense__widget__crc__data__t.html#aa140b98653ca8b3a33fcbefa99eb91bf", null ],
       [ "cdacCompDividerVal", "structcy__stc__capsense__widget__crc__data__t.html#a8625b276567604972258ec921d837709", null ],
       [ "cdacRefVal", "structcy__stc__capsense__widget__crc__data__t.html#a983f64526f1f5a4c14e83e17ad4e23ad", null ],
       [ "rowCdacRefVal", "structcy__stc__capsense__widget__crc__data__t.html#acd5f9ce426c01b570a950cf24fcf8728", null ],

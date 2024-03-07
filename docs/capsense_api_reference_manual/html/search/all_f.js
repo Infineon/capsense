@@ -35,8 +35,6 @@ var searchData=
   ['resolutiony',['resolutionY',['../structcy__stc__capsense__gesture__config__t.html#ac418cd1cf76d0dcfe90232450954eb82',1,'cy_stc_capsense_gesture_config_t::resolutionY()'],['../structcy__stc__capsense__advanced__centroid__config__t.html#a41e2b2272353ff198fca4fbe4397d9bd',1,'cy_stc_capsense_advanced_centroid_config_t::resolutionY()']]],
   ['rotatedebounce',['rotateDebounce',['../structcy__stc__capsense__gesture__config__t.html#aeebc2692f6432fa15394678fb0278a9b',1,'cy_stc_capsense_gesture_config_t']]],
   ['rotatedistancemin',['rotateDistanceMin',['../structcy__stc__capsense__gesture__config__t.html#adf604320c16786aa9e89b5f02f02a643',1,'cy_stc_capsense_gesture_config_t']]],
-  ['rowcdacfine',['rowCdacFine',['../structcy__stc__capsense__widget__context__t.html#af5ae4dd7c7a65dc79fea22fba9678594',1,'cy_stc_capsense_widget_context_t']]],
-  ['rowcdacfineval',['rowCdacFineVal',['../structcy__stc__capsense__widget__crc__data__t.html#aa140b98653ca8b3a33fcbefa99eb91bf',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['rowcdacref',['rowCdacRef',['../structcy__stc__capsense__widget__context__t.html#a86df00e59d6d922a0e229694d24f7288',1,'cy_stc_capsense_widget_context_t']]],
   ['rowcdacrefval',['rowCdacRefVal',['../structcy__stc__capsense__widget__crc__data__t.html#acd5f9ce426c01b570a950cf24fcf8728',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['rowcicshift',['rowCicShift',['../structcy__stc__capsense__widget__context__t.html#a14509b3dff9d39405dcde5ec86babaf6',1,'cy_stc_capsense_widget_context_t']]],

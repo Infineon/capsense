@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the function prototypes of the BIST module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -30,24 +30,6 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-
-/*******************************************************************************
-* CAPSENSE&trade; BIST Enumerated Types
-*******************************************************************************/
-
-/******************************************************************************/
-/** \addtogroup group_capsense_enums *//** \{ */
-/******************************************************************************/
-
-/** Defines IDs of the external capacitors */
-typedef enum
-{
-    CY_CAPSENSE_BIST_CMOD01_ID_E         = 0x00u,                /**< ID for the MSC0 Cmod1 external capacitor */
-    CY_CAPSENSE_BIST_CMOD02_ID_E         = 0x01u,                /**< ID for the MSC0 Cmod2 external capacitor */
-} cy_en_capsense_bist_external_cap_id_t;
-
-/** \} */
 
 
 /*******************************************************************************

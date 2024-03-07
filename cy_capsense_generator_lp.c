@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -428,7 +428,7 @@ cy_capsense_status_t Cy_CapSense_GenerateSensorConfig(
         ptrSensorCfgLocal[CY_CAPSENSE_SNS_SCAN_CTL_INDEX] |= (uint32_t)(tempValue & (uint32_t)~(uint32_t)CY_CAPSENSE_CIC_AUTO_MASK) << CY_CAPSENSE_CIC_FIELD_POSITION;
     #endif
 
-    if((CY_CAPSENSE_ENABLE == ptrWdCxt->coarseInitBypassEn) &&
+    if ((CY_CAPSENSE_ENABLE == ptrWdCxt->coarseInitBypassEn) &&
       (scanSlot != ptrWdCfg->firstSlotId))
     {
         ptrSensorCfgLocal[CY_CAPSENSE_SNS_SCAN_CTL_INDEX] |= MSCLP_SNS_SNS_SCAN_CTL_INIT_BYPASS_Msk;
@@ -796,7 +796,7 @@ void Cy_CapSense_GenerateAllSensorConfig(
             ptrWdCfg = &context->ptrWdConfig[wdIndex];
             snsMethod = ptrWdCfg->senseMethod;
 
-            if(CY_CAPSENSE_ISX_GROUP == snsMethod)
+            if (CY_CAPSENSE_ISX_GROUP == snsMethod)
             {
                 numEltd = (uint32_t)ptrWdCfg->numRows + ptrWdCfg->numCols;
                 eltdPinCfg = ptrWdCfg->ptrEltdConfig;

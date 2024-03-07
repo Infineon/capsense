@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -266,11 +266,11 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3(
 #endif /* #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN) */
 
 cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
-                uint16_t * ptrMaxRaw,
+                uint32_t * ptrMaxRaw,
                 uint32_t scanSlotId,
                 uint32_t mode,
                 cy_stc_capsense_context_t * context);
-void Cy_CapSense_ConfigureSaturationMode(
+cy_capsense_status_t Cy_CapSense_ConfigureSaturationMode(
                 cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_GetScanWatchdogTime(
                 uint32_t scanSlotId,

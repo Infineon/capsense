@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * The file contains application programming interface to the CAPSENSE&trade; library.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -107,7 +107,8 @@ typedef struct
 *     <td>Reserved</td>
 *     <td>Reserved</td>
 *     <td>MSB = Age of touch; LSB = Z-value represents a touch strength (summ of sensor diff counts divided by 16
-*        that form 3x3 matrix with a local maximum in the center)</td>
+*        that form 3x3 matrix with a local maximum in the center). It is not used by Middleware, however can be
+*        re-used by users to define a touch shape or a finger size.</td>
 *   </tr>
 *   <tr>
 *     <td>id</td>
@@ -138,6 +139,86 @@ typedef struct
                                                     *    * 3 - three touches are detected
                                                     *    * CY_CAPSENSE_POSITION_MULTIPLE - multiple touches are detected 
                                                     *        and information in position structure should be ignored.
+                                                    *
+                                                    * The below table specifies a number of touches could be reported for a specific widget.
+                                                    * <table class="doxtable">
+                                                    *    <tr>
+                                                    *      <th colspan="2">CAPSENSE</th>
+                                                    *      <th colspan="5">Number of positions</th>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *       <td>Sensing method</td>
+                                                    *       <td>Widget type</td>
+                                                    *       <td>0</td>
+                                                    *       <td>1</td>
+                                                    *       <td>2</td>
+                                                    *       <td>&emsp;&emsp;3&emsp;&emsp;</td>
+                                                    *       <td>Multiple</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td rowspan="6">CSD</td>
+                                                    *      <td>Button</td>
+                                                    *      <td rowspan="10">&emsp;No touch&emsp; <br> &emsp;detected&emsp;</td>
+                                                    *      <td colspan="3">Number of active sensors <br> (up to number of sensors)</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Matrix button</td>
+                                                    *      <td>Single touch <br> detected</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>Multiple touches <br>  detected</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Linear slider</td>
+                                                    *      <td>Single touch <br> detected</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Radial slider</td>
+                                                    *      <td>Single touch <br> detected</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Touchpad</td>
+                                                    *      <td>Single touch <br> detected</td>
+                                                    *      <td>Two touches <br> detected</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>Multiple touches <br> detected</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Proximity</td>
+                                                    *      <td colspan="3">Number of active sensors <br> (up to number of sensors)</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td rowspan="4">CSX</td>
+                                                    *      <td>Button</td>
+                                                    *      <td colspan="3">Number of active sensors <br> (up to number of sensors)</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Matrix button</td>
+                                                    *      <td colspan="3">Number of active sensors <br> (up to number of sensors)</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Linear slider</td>
+                                                    *      <td>Single touch <br> detected</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    *    <tr align="center">
+                                                    *      <td>Touchpad</td>
+                                                    *      <td colspan="3">Number of touches <br> (up to 3)</td>
+                                                    *      <td>N/A</td>
+                                                    *    </tr>
+                                                    * </table>
                                                     */
 } cy_stc_capsense_touch_t;
 

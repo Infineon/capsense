@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csd_v2.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -232,6 +232,7 @@ void Cy_CapSense_CSDInitialize(cy_stc_capsense_context_t * context)
         context->ptrCommonConfig->ptrCsdBase->IO_SEL = context->ptrInternalContext->csdRegIoSel;
     #endif
     context->ptrCommonConfig->ptrCsdBase->INTR_SET = CY_CAPSENSE_DEFAULT_CSD_INTR_SET;
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR_SET;
     context->ptrCommonConfig->ptrCsdBase->SW_DSI_SEL = context->ptrInternalContext->csdRegSwDsiSel;
     context->ptrCommonConfig->ptrCsdBase->ADC_CTL = CY_CAPSENSE_DEFAULT_CSD_ADC_CTL;
 
@@ -1877,6 +1878,7 @@ static void Cy_CapSense_CSDTriggerScan(cy_stc_capsense_context_t * context)
 
     /* Enable SAMPLE interrupt */
     context->ptrCommonConfig->ptrCsdBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_SAMPLE_MSK;
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR_MASK;
     context->ptrCommonConfig->ptrCsdBase->SW_HS_P_SEL = context->ptrInternalContext->csdRegSwHsPSelScan;
 
     /* Set scanning configuration for switches */

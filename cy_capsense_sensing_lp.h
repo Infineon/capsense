@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -80,6 +80,15 @@ cy_capsense_status_t Cy_CapSense_IloCompensate(
 cy_capsense_status_t Cy_CapSense_CalibrateAllLpWidgets(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_CalibrateAllLpSlots(
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_RC_HW_IIR_FILTER_EN)
+    cy_capsense_status_t Cy_CapSense_ScanInitializeHwIirAllSlots(
+                cy_stc_capsense_context_t * context);
+    cy_capsense_status_t Cy_CapSense_ScanInitializeHwIirSlots(
+                uint32_t startSlotId,
+                uint32_t numberSlots,
                 cy_stc_capsense_context_t * context);
 #endif
 /** \} */
@@ -156,11 +165,30 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN))
-cy_capsense_status_t Cy_CapSense_CalibrateCompDivider(
-                uint32_t widgetId,
-                uint32_t target,
-                cy_stc_capsense_context_t * context);
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_REF_AUTO_EN)
+    cy_capsense_status_t Cy_CapSense_CalibrateRefCdac(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_FINE_AUTO_EN)
+    cy_capsense_status_t Cy_CapSense_CalibrateFineCdac(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_COMP_DIV_AUTO_EN)
+    cy_capsense_status_t Cy_CapSense_CalibrateCompDivider(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_COMP_AUTO_EN)
+    cy_capsense_status_t Cy_CapSense_CalibrateCompCdac(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
 cy_capsense_status_t Cy_CapSense_VerifyCalibration(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_VerifyReferenceCdac(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets_V3Lp(
@@ -220,13 +248,17 @@ cy_capsense_status_t Cy_CapSense_ScanAbort_V3Lp(
         cy_capsense_status_t Cy_CapSense_InitializeCic2Shift(
                         cy_stc_capsense_context_t * context);
     #endif
+    #if (CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)
+        cy_capsense_status_t Cy_CapSense_InitializeCic2Rate(
+                        cy_stc_capsense_context_t * context);
+    #endif
 #endif /* #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CIC2_FILTER_EN) */
 
 void Cy_CapSense_SetupCpuOperatingMode(cy_stc_capsense_context_t * context);
 void Cy_CapSense_StartCpuScan(const uint32_t * scanConfig, cy_stc_capsense_context_t * context);
 uint32_t Cy_CapSense_WaitEndOfCpuScan(uint32_t watchdogTime, cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
-                uint16_t * ptrMaxRaw,
+                uint32_t * ptrMaxRaw,
                 uint32_t widgetId,
                 uint32_t scanSlotId,
                 uint32_t mode,
@@ -264,6 +296,10 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
 #define CY_CAPSENSE_REF_CDAC_LSB_X100                           (886u)
 #define CY_CAPSENSE_MULTIPLIER_TWO                              (2u)
 
+#define CY_CAPSENSE_CAL_REF_CDAC_MIDDLE_CODE                    (0x80u)
+#define CY_CAPSENSE_CAL_FINE_CDAC_MIDDLE_CODE                   (0x10u)
+#define CY_CAPSENSE_CAL_COMP_CDAC_MIDDLE_CODE                   (0x80u)
+
 #define CY_CAPSENSE_CAL_FINE_CDAC_Msk                           (0x1FUL)
 #define CY_CAPSENSE_CAL_CDAC_Msk                                (0x1FE0UL)
 #define CY_CAPSENSE_CAL_CDAC_Pos                                (5u)
@@ -274,6 +310,10 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
 
 #define CY_CAPSENSE_CAL_MODE_REF_CDAC_SUC_APPR                  (0u)
 #define CY_CAPSENSE_CAL_MODE_COMP_CDAC_SUC_APPR                 (2u)
+
+#define CY_CAPSENSE_CAL_MODE_COMP_CDAC_CODE_MIN                 (0u)
+#define CY_CAPSENSE_CAL_MODE_COMP_CDAC_CODE_MAX                 (1u)
+#define CY_CAPSENSE_CAL_MODE_COMP_CDAC_CODE_VAL                 (2u)
 
 #define CY_CAPSENSE_MRSS_TURN_ON                                (0u)
 #define CY_CAPSENSE_MRSS_TURN_OFF                               (1u)
@@ -519,6 +559,29 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
 #define CY_CAPSENSE_CDAC_REF_AUTO_USAGE_MSK          (CY_CAPSENSE_ENABLE << CY_CAPSENSE_CDAC_REF_AUTO_USAGE_POS)
 #define CY_CAPSENSE_CDAC_CDAC_FINE_USAGE_MSK         (CY_CAPSENSE_ENABLE << CY_CAPSENSE_CDAC_CDAC_FINE_USAGE_POS)
 
+#define CY_CAPSENSE_CDAC_REF_MODE_MASK               (0x3u)
+#define CY_CAPSENSE_CDAC_REF_MODE_POS                (0u)
+#define CY_CAPSENSE_CDAC_FINE_MODE_MASK              (0xCu)
+#define CY_CAPSENSE_CDAC_FINE_MODE_POS               (2u)
+#define CY_CAPSENSE_CDAC_COMP_MODE_MASK              (0x30u)
+#define CY_CAPSENSE_CDAC_COMP_MODE_POS               (4u)
+#define CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK          (0xC0u)
+#define CY_CAPSENSE_CDAC_COMP_DIV_MODE_POS           (6u)
+#define CY_CAPSENSE_CDAC_BOOST_VAL_MASK              (0x700u)
+#define CY_CAPSENSE_CDAC_BOOST_VAL_POS               (8u)
+
+#define CY_CAPSENSE_CDAC_MODE_DISABLED               (0x0u)
+#define CY_CAPSENSE_CDAC_MODE_MANUAL                 (0x1u)
+#define CY_CAPSENSE_CDAC_MODE_AUTO                   (0x2u)
+
+#define CY_CAPSENSE_CDAC_REF_MODE_MANUAL_MASK        (CY_CAPSENSE_CDAC_MODE_MANUAL << CY_CAPSENSE_CDAC_REF_MODE_POS)
+#define CY_CAPSENSE_CDAC_REF_MODE_AUTO_MASK          (CY_CAPSENSE_CDAC_MODE_AUTO << CY_CAPSENSE_CDAC_REF_MODE_POS)
+#define CY_CAPSENSE_CDAC_FINE_MODE_MANUAL_MASK       (CY_CAPSENSE_CDAC_MODE_MANUAL << CY_CAPSENSE_CDAC_FINE_MODE_POS)
+#define CY_CAPSENSE_CDAC_FINE_MODE_AUTO_MASK         (CY_CAPSENSE_CDAC_MODE_AUTO << CY_CAPSENSE_CDAC_FINE_MODE_POS)
+#define CY_CAPSENSE_CDAC_COMP_MODE_MANUAL_MASK       (CY_CAPSENSE_CDAC_MODE_MANUAL << CY_CAPSENSE_CDAC_COMP_MODE_POS)
+#define CY_CAPSENSE_CDAC_COMP_MODE_AUTO_MASK         (CY_CAPSENSE_CDAC_MODE_AUTO << CY_CAPSENSE_CDAC_COMP_MODE_POS)
+#define CY_CAPSENSE_CDAC_COMP_DIV_MODE_AUTO_MASK     (CY_CAPSENSE_CDAC_MODE_AUTO << CY_CAPSENSE_CDAC_COMP_DIV_MODE_POS)
+
 #if CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE
     #define CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE_EN (CY_CAPSENSE_ENABLE)
 #else
@@ -644,11 +707,6 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
                                                        (CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_USAGE_MSK) |\
                                                        (CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE_MSK)      |\
                                                        (CY_CAPSENSE_ISX_CDAC_CDAC_FINE_USAGE_MSK))
-
-/* CAPSENSE IMO clock values in MHz */
-#define CY_CAPSENSE_IMO_CLK_25_MHZ                  (25u)
-#define CY_CAPSENSE_IMO_CLK_38_MHZ                  (38u)
-#define CY_CAPSENSE_IMO_CLK_46_MHZ                  (46u)
 
 #define CY_CAPSENSE_CPU_CLK_MHZ                     (CY_CAPSENSE_CPU_CLK / CY_CAPSENSE_CONVERSION_MEGA)
 

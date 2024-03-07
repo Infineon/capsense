@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v2.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the function prototypes of the BIST module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2019-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -35,26 +35,6 @@ extern "C" {
 #define CY_CAPSENSE_BIST_ELTD_CAP_SNSCLK_DEFAULT      (375000uL)
 /* The default maximum possible external capacitor charge/discharge time in microseconds */
 #define CY_CAPSENSE_BIST_CAP_SETTLING_TIME_DEFAULT    (2u)
-
-
-/*******************************************************************************
-* CAPSENSE&trade; BIST Enumerated Types
-*******************************************************************************/
-
-/******************************************************************************/
-/** \addtogroup group_capsense_enums *//** \{ */
-/******************************************************************************/
-
-/** Defines IDs of the external capacitors */
-typedef enum
-{
-    CY_CAPSENSE_BIST_CMOD_ID_E          = 0x00u,                /**< ID for Cmod external capacitor */
-    CY_CAPSENSE_BIST_CINTA_ID_E         = 0x01u,                /**< ID for CintA external capacitor */
-    CY_CAPSENSE_BIST_CINTB_ID_E         = 0x02u,                /**< ID for CintB external capacitor */
-    CY_CAPSENSE_BIST_CSH_ID_E           = 0x03u,                /**< ID for Csh external capacitor */
-} cy_en_capsense_bist_external_cap_id_t;
-
-/** \} */
 
 
 /*******************************************************************************

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v2.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2019-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -368,7 +368,7 @@
 * possible to launch the function with any combination of the available tests.
 * - CY_CAPSENSE_BIST_CRC_WDGT_MASK       - Verifies the RAM widget structure CRC
 *                                          for all the widgets.
-* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensors for a short
+* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensor pins for a short
 *                                          to GND / VDD / other sensors.
 * - CY_CAPSENSE_BIST_SNS_CAP_MASK        - Measures all the sensors capacitance.
 * - CY_CAPSENSE_BIST_SHIELD_CAP_MASK     - Measures the shield capacitance.
@@ -1551,9 +1551,9 @@ static void Cy_CapSense_SetPinPc(
 * external series resistance). The measurement accuracy is about 15%.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2477,6 +2477,7 @@ static void Cy_CapSense_BistMeasureCapacitanceSensorEnable(
         }
     #endif
     ptrCsdHwBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK;
+    (void)ptrCsdHwBase->INTR_MASK;
     ptrCsdHwBase->AMBUF = context->ptrBistContext->regAmbuf;
     ptrCsdHwBase->ADC_CTL = 0u;
     ptrCsdHwBase->SEQ_TIME = 0u;
@@ -2553,6 +2554,7 @@ static void Cy_CapSense_BistMeasureCapacitanceSensorShieldEnable(
         }
     #endif
     ptrCsdHwBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK;
+    (void)ptrCsdHwBase->INTR_MASK;
     ptrCsdHwBase->AMBUF = context->ptrBistContext->regAmbufShield;
     ptrCsdHwBase->ADC_CTL = 0u;
     ptrCsdHwBase->SEQ_TIME = 0u;

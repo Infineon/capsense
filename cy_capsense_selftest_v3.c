@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v3.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -498,7 +498,7 @@
 * possible to launch the function with any combination of the available tests.
 * - CY_CAPSENSE_BIST_CRC_WDGT_MASK       - Verifies the RAM widget structure CRC
 *                                          for all the widgets.
-* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensors for a short
+* - CY_CAPSENSE_BIST_SNS_INTEGRITY_MASK  - Checks all the sensor pins for a short
 *                                          to GND / VDD / other sensors.
 * - CY_CAPSENSE_BIST_SNS_CAP_MASK        - Measures all the sensors capacitance.
 * - CY_CAPSENSE_BIST_ELTD_CAP_MASK       - Measures all the electrodes capacitance.
@@ -1852,9 +1852,9 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * is defined by the RefCDAC tolerance.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2148,17 +2148,18 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * external series resistance). The measurement accuracy is about 30%.
 *
 * By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state for CSD measured electrodes (sensors) and
-* to the HIGH-Z state for CSX measured electrodes (Rx and Tx).
-* Shield electrodes are also configured to the GND state.
+* are set to a corresponding Inactive sensor connection parameter matching
+* configuration used for a specified sensing method. Shield electrodes are
+* also matching the CSD Inactive sensor connection parameter.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
 * By default, the both Cmod1 and Cmod2 capacitors are used for the measurement.
 *
 * Measured capacitance values (Cp for CSD widgets and Cm for CSX widgets)
-* are stored in the .snsCap field of the \ref cy_stc_capsense_sensor_context_t
-* structure.
+* are stored in the ptrSnsCapacitance sensor capacitance array field 
+* and in the ptrEltdCapacitance electrode capacitance array
+* of the \ref cy_stc_capsense_widget_config_t structure.
 *
 * The all sensor measurement can be done on all the sensors using
 * the Cy_CapSense_RunSelfTest() function along with
@@ -2408,9 +2409,7 @@ static cy_capsense_status_t Cy_CapSense_BistMeasureCapacitanceSensorEnable(
         {
             capStatus = CY_CAPSENSE_STATUS_HW_BUSY;
             break;
-        }
-        /* The time interval is required for settling analog part of the HW block. */
-        Cy_SysLib_DelayUs(CY_CAPSENSE_ANALOG_SETTLING_TIME_US);
+        }      
         Cy_CapSense_BistGenerateBaseConfig(curChIndex, context);
     }
     /* Check if all MSC channel is not busy and clear all pending interrupts */

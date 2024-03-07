@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v2.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file contains the source of functions common for different sensing
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -135,6 +135,10 @@ void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context)
 *
 * Performs the initialization required to scan the specified widget.
 *
+* \deprecated This function is deprecated, it will become obsolete in upcoming
+* major version of middleware. It is kept for backward compatibility only.
+* The Cy_CapSense_ScanWidget() function should be used instead.
+*
 * This function prepares the middleware to scan all the sensors in the specified
 * widget by executing the following tasks:
 * 1. Configure the CSD HW block if it is not configured to perform the
@@ -229,14 +233,19 @@ cy_capsense_status_t Cy_CapSense_SetupWidget(
 * Initiates scanning of all the sensors in the widget initialized by
 * Cy_CapSense_SetupWidget(), if no scan is in progress.
 *
+* \deprecated This function is deprecated, it will become obsolete in upcoming
+* major version of middleware. It is kept for backward compatibility only.
+* The Cy_CapSense_ScanWidget() function should be used instead without additional
+* call of Cy_CapSense_SetupWidget().
+*
 * Prior to calling this function to scan sensors, the widget required
 * to be scanned must be initialized using Cy_CapSense_SetupWidget() function.
 *
 * This function initiates scan only for the first sensor in the widget and then
 * exits the function. The scan for the remaining sensors in the widget is
 * initiated in the interrupt service routine (part of middleware) triggered
-* at the end of each scan completion. Hence, status of the current scan
-* should be checked using the Cy_CapSense_IsBusy() and wait until all scans
+* at the end of each scan completion. Hence, check the status of the current scan
+* using the Cy_CapSense_IsBusy() function and wait until all scans
 * in the current widget are finished prior to starting the next scan or
 * initializing another widget.
 *

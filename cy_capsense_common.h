@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -106,11 +106,11 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MW_VERSION_MAJOR                    (4)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                    (5)
 /** Middleware minor version */
 #define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (400)
+#define CY_CAPSENSE_MW_VERSION                          (500)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */
@@ -202,7 +202,7 @@ extern "C" {
 
 /** Widget active status mask */
 #define CY_CAPSENSE_WD_ACTIVE_MASK                      (0x01u)
-/** Widget disable status mask */
+/** Widget enable status mask */
 #define CY_CAPSENSE_WD_ENABLE_MASK                      (0x02u)
 /** Widget working status mask */
 #define CY_CAPSENSE_WD_WORKING_MASK                     (0x04u)
@@ -281,6 +281,12 @@ extern "C" {
 #define CY_CAPSENSE_CIC_FILTER                          (0u)
 /** CIC2 filter mode */
 #define CY_CAPSENSE_CIC2_FILTER                         (1u)
+/** Maximum CIC2 Decimation Rate */
+#define CY_CAPSENSE_MAX_DECIMATION_RATE                 (255u)
+/** CIC2 filter minimum valid sample number */
+#define CY_CAPSENSE_CIC2_MIN_VALID_SAMPLES              (2u)
+/** CIC2 filter maximum valid sample number */
+#define CY_CAPSENSE_CIC2_MAX_VALID_SAMPLES              (515u)
 
 /** Raw count counter mode saturate */
 #define CY_CAPSENSE_COUNTER_MODE_SATURATE               (0u)
@@ -525,6 +531,14 @@ extern "C" {
 #define CY_CAPSENSE_LFSR_BITS_RANGE_2                   (0x02u)
 /** LFSR range for LFSR_BITS=3 */
 #define CY_CAPSENSE_LFSR_BITS_RANGE_3                   (0x03u)
+
+/* CIC2 Decimation Rate Mode selection options */
+/** The cicRate value set by users */
+#define CY_CAPSENSE_CIC_RATE_MODE_MANUAL                (0u)
+/** The cicRate value configured by middleware */
+#define CY_CAPSENSE_CIC_RATE_MODE_AUTO                  (1u)
+/** The cicRate value configured by SMARTSENSE&trade; algorithm */
+#define CY_CAPSENSE_CIC_RATE_MODE_SMARTSENSE            (2u)
 
 /* Sense clock auto-selection modes for MSCv3 */
 /** This mode implements checking the following rules:
@@ -806,7 +820,7 @@ extern "C" {
      * CAPSENSE&trade;
      */
     #define CY_CAPSENSE_ISX_RX_PIN                          (8u)
-    /** Configuring of pin as an ISX Rx
+    /** Configuring of pin as an VDDA/2
      * \note This macro is available only for the fifth-generation CAPSENSE&trade; and  the fifth-generation low power
      * CAPSENSE&trade;
      */
@@ -882,9 +896,9 @@ extern "C" {
 #define CY_CAPSENSE_HW_CONFIG_CHANNEL_SATURATION        (5u)
 /** CAPSENSE&trade; related HW is configured to the smart sense */
 #define CY_CAPSENSE_HW_CONFIG_SMARTSENSE                (6u)
+/** CAPSENSE&trade; related HW is configured to execute a scan to define CDAC dither parameters */
+#define CY_CAPSENSE_HW_CONFIG_AUTO_DITHERING            (7u)
 
-/** Maximum Decimation Rate */
-#define CY_CAPSENSE_MAX_DECIMATION_RATE                 (255u)
 /** \} */
 
 
@@ -1005,9 +1019,9 @@ extern "C" {
 #define CY_CAPSENSE_STATUS_HW_LOCKED                    (0x80u)
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unable to perform calibration */
 #define CY_CAPSENSE_STATUS_CALIBRATION_FAIL             (0x100u)
-/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Calibration scan with the maximum CDAC code is saturated */
-#define CY_CAPSENSE_STATUS_CALIBRATION_OVERFLOW         (0x200u)
-/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unable to perform calibration */
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: CapDac calibration fail - The reference/fine CapDAC calibration stage is failed as the raw count minimum across widget is out of range */
+#define CY_CAPSENSE_STATUS_CALIBRATION_REF_CHECK_FAIL   (0x200u)
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: CapDac calibration fail - The resulting rawcounts across all sensors in widget are out of defined range */
 #define CY_CAPSENSE_STATUS_CALIBRATION_CHECK_FAIL       (0x400u)
 /** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Sense Clock Divider
 *   is out of the valid range for the specified Clock source configuration
@@ -1059,25 +1073,6 @@ extern "C" {
 #define CY_CAPSENSE_MODE_AS_MS                          (0x2u) /* The Autonomous-Scan Multi-Sensor Mode */
 #define CY_CAPSENSE_MODE_LP_AOS                         (0x3u) /* The Low Power Always-On-Scanning Mode */
 
-/* These definitions on CDAC_ FINE below should be removed once Configurator support achieved */
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
-    #if !defined(CY_CAPSENSE_CSD_CDAC_FINE_EN)
-        #define CY_CAPSENSE_CSD_CDAC_FINE_EN              (CY_CAPSENSE_ENABLE)
-    #endif
-#endif
-
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
-    #if !defined(CY_CAPSENSE_CSX_CDAC_FINE_EN)
-        #define CY_CAPSENSE_CSX_CDAC_FINE_EN              (CY_CAPSENSE_ENABLE)
-    #endif
-#endif
-
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
-    #if !defined(CY_CAPSENSE_ISX_CDAC_FINE_EN)
-        #define CY_CAPSENSE_ISX_CDAC_FINE_EN              (CY_CAPSENSE_DISABLE)
-    #endif
-#endif
-
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
 
 #define CY_CAPSENSE_BYTES_IN_16_BITS                    (2uL)
@@ -1087,6 +1082,8 @@ extern "C" {
 #define CY_CAPSENSE_CONVERSION_HECTO                    (100u)
 #define CY_CAPSENSE_CONVERSION_DEKA                     (10u)
 #define CY_CAPSENSE_DIVIDER_TWO                         (2u)
+#define CY_CAPSENSE_32_BIT_MASK                         (0xFFFFFFFFu)
+#define CY_CAPSENSE_25_BIT_MASK                         (0x01FFFFFFu)
 #define CY_CAPSENSE_16_BIT_MASK                         (0xFFFFu)
 #define CY_CAPSENSE_14_BIT_MASK                         (0x3FFFu)
 
@@ -1099,6 +1096,21 @@ extern "C" {
 #define CY_CAPSENSE_MDW_ID                              (CY_CAPSENSE_ID)
 #define CY_CAPSENSE_SW_STS_BUSY                         (CY_CAPSENSE_BUSY)
 
+/* CAPSENSE IMO clock values in MHz */
+#define CY_CAPSENSE_IMO_CLK_25_MHZ                      (25u)
+#define CY_CAPSENSE_IMO_CLK_38_MHZ                      (38u)
+#define CY_CAPSENSE_IMO_CLK_46_MHZ                      (46u)
+
+#if defined(CY_IP_M0S8MSCV3LP)
+    /* CAPSENSE MRSS IMO frequency value */
+    #if (CY_CAPSENSE_IMO_FREQUENCY == CY_CAPSENSE_IMO_25_MHZ)
+        #define CY_CAPSENSE_MOD_CLOCK_MHZ   CY_CAPSENSE_IMO_CLK_25_MHZ
+    #elif (CY_CAPSENSE_IMO_FREQUENCY == CY_CAPSENSE_IMO_38_MHZ)
+        #define CY_CAPSENSE_MOD_CLOCK_MHZ   CY_CAPSENSE_IMO_CLK_38_MHZ
+    #else /* (CY_CAPSENSE_IMO_FREQUENCY == CY_CAPSENSE_IMO_46_MHZ) */
+        #define CY_CAPSENSE_MOD_CLOCK_MHZ   CY_CAPSENSE_IMO_CLK_46_MHZ
+    #endif
+#endif /* CY_IP_M0S8MSCV3LP */
 
 #if defined(__cplusplus)
 }

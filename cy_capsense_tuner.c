@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying

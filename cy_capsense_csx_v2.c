@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx_v2.c
-* \version 4.0
+* \version 5.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2023, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -104,10 +104,13 @@ void Cy_CapSense_CSXInitialize(cy_stc_capsense_context_t * context)
 
     /* Clear all pending interrupts of the CSD HW block */
     context->ptrCommonConfig->ptrCsdBase->INTR = CY_CAPSENSE_CSD_INTR_ALL_MSK;
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR;
 
     /* Enable the End Of Scan interrupt */
     context->ptrCommonConfig->ptrCsdBase->INTR_MASK = CY_CAPSENSE_DEFAULT_CSD_INTR_MASK_CFG;
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR_MASK;
     context->ptrCommonConfig->ptrCsdBase->INTR_SET = 0u;
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR_SET;
     context->ptrCommonConfig->ptrCsdBase->HSCMP = CY_CAPSENSE_DEFAULT_CSD_HSCMP_CFG;
     context->ptrCommonConfig->ptrCsdBase->AMBUF = context->ptrInternalContext->csxRegAMuxBuf;
     context->ptrCommonConfig->ptrCsdBase->REFGEN = context->ptrInternalContext->csxRegRefgen;
@@ -717,7 +720,7 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 
     /* Enable interrupt */
     context->ptrCommonConfig->ptrCsdBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_SAMPLE_MSK;
-
+    (void)context->ptrCommonConfig->ptrCsdBase->INTR_MASK;
     if (NULL != context->ptrInternalContext->ptrSSCallback)
     {
         context->ptrInternalContext->ptrSSCallback(context->ptrActiveScanSns);
@@ -1078,11 +1081,10 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext)
     uint32_t maxCount = (uint32_t) ptrActive->ptrWdContext->maxRawCount;
 
     cxt->ptrCommonConfig->ptrCsdBase->INTR_MASK = CY_CAPSENSE_CSD_INTR_MASK_CLEAR_MSK;
-
+    (void)cxt->ptrCommonConfig->ptrCsdBase->INTR_MASK;
     /* Clear all pending interrupts of the CSD HW block */
     cxt->ptrCommonConfig->ptrCsdBase->INTR = CY_CAPSENSE_CSD_INTR_ALL_MSK;
     (void)cxt->ptrCommonConfig->ptrCsdBase->INTR;
-
 
     tmpRawCount  = (uint16_t)(cxt->ptrCommonConfig->ptrCsdBase->RESULT_VAL1 &
                                              CY_CAPSENSE_CSD_RESULT_VAL1_VALUE_MSK);

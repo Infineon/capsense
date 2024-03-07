@@ -1,5 +1,8 @@
 var NAVTREEINDEX2 =
 {
+"group__group__capsense__macros__touch.html#ga41f9db75b066c5d862d822bea199fe2f":[10,4,6,10],
+"group__group__capsense__macros__touch.html#ga4841683021756c1260950771ed54c841":[10,4,6,5],
+"group__group__capsense__macros__touch.html#ga7178f206572f3066be919024efcd824f":[10,4,6,18],
 "group__group__capsense__macros__touch.html#ga72bcd596f6407f2c35cfe8d92a2a1f6d":[10,4,6,0],
 "group__group__capsense__macros__touch.html#ga7666446ef2e080e96ad3583bb2a83391":[10,4,6,15],
 "group__group__capsense__macros__touch.html#ga84fe184256d5a95975dbdd25b7388f63":[10,4,6,3],
@@ -246,8 +249,5 @@ var NAVTREEINDEX2 =
 "structcy__stc__capsense__common__config__t.html#a1a7933f4724093478a9434d5a7442aac":[10,2,0,23,84],
 "structcy__stc__capsense__common__config__t.html#a2086ec7840bcff2a38a1f4dbc96297ee":[10,2,0,23,66],
 "structcy__stc__capsense__common__config__t.html#a21d3bc1dab9651fed220ebdfead85453":[10,2,0,23,17],
-"structcy__stc__capsense__common__config__t.html#a24b0f48c3101f30ea3981e496cf3bf20":[10,2,0,23,12],
-"structcy__stc__capsense__common__config__t.html#a25a6e1ee6c1b95b92f69b56471e90198":[10,2,0,23,27],
-"structcy__stc__capsense__common__config__t.html#a2f0d703959ecf591d93fead29797ef0b":[10,2,0,23,22],
-"structcy__stc__capsense__common__config__t.html#a3023ed9a75800748f3af86571b42a5b0":[10,2,0,23,19]
+"structcy__stc__capsense__common__config__t.html#a24b0f48c3101f30ea3981e496cf3bf20":[10,2,0,23,12]
 };
