@@ -26,13 +26,16 @@ This version of the CAPSENSE™ middleware was validated for compatibility with 
 | - ModusToolbox™ CSD Personality for PSoC™ 4 devices in the Device Configurator                    | 2.0     |
 | - ModusToolbox™ CSD Personality for PSoC™ 6 devices in the Device Configurator                    | 3.0     |
 | - ModusToolbox™ CAPSENSE™ Configurator / Tuner                                                    | 6.20    |
-| CAT1 Peripheral Driver Library (PDL)                                                              | 3.3.1   |
-| CAT2 Peripheral Driver Library (PDL)                                                              | 2.5.0   |
+| CAT1 Peripheral Driver Library (PDL)                                                              | 3.9.0   |
+| CAT2 Peripheral Driver Library (PDL)                                                              | 2.8.0   |
 | GCC Compiler                                                                                      | 11.3.1  |
 | IAR Compiler                                                                                      | 8.42.1  |
 | ARM Compiler 6                                                                                    | 6.13    |
 | MBED OS                                                                                           | 5.15.8  |
 | FreeRTOS                                                                                          | 10.4.5  |
+
+### Migration Guide
+* [Migrating CAPSENSE™ Middleware from version 4.x to 5.x](https://community.infineon.com/t5/Knowledge-Base-Articles/Migrating-CAPSENSE-Middleware-from-version-4-x-to-5-x-KBA239563/ta-p/715751)
 
 ### More information
 For more information, refer to:
