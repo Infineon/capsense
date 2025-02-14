@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v2.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes specific to the sensing module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -122,8 +122,7 @@ cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(
                 uint8_t mode,
                 cy_stc_capsense_context_t * context);
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
 cy_capsense_status_t Cy_CapSense_SsAutoTune(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file consists of common parts for different supported platforms
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -630,6 +630,7 @@ void Cy_CapSense_InterruptHandler(
 * * 85% of the maximum raw count for CSD widgets
 * * 40% of the maximum raw count for CSX widgets.
 * * 40% of the maximum raw count for ISX widgets.
+*
 * Use the Cy_CapSense_SetCalibrationTarget() function to change calibration targets .
 *
 * For fifth-generation low power CAPSENSE&trade; the function calibrates only
@@ -729,6 +730,7 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 * * 85% of the maximum raw count for CSD widgets
 * * 40% of the maximum raw count for CSX widgets.
 * * 40% of the maximum raw count for ISX widgets.
+*
 * Use the Cy_CapSense_SetCalibrationTarget() function to change calibration targets .
 *
 * For the fifth-generation
@@ -926,6 +928,7 @@ cy_capsense_status_t Cy_CapSense_CalibrateWidget(
 * callback (see the \ref group_capsense_callbacks section for details)
 * or with low-level functions that perform a single-sensor scanning.
 *
+* \note
 * The function is available for the fourth-generation and fifth-generation (only
 * for CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) CAPSENSE&trade;. For fifth-generation
 * CAPSENSE&trade with CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD and for fifth-
@@ -1079,16 +1082,18 @@ cy_capsense_status_t Cy_CapSense_SetPinState(
 *     (for multi-phase TX method)
 * * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
 * * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+*
 * The desired pins state for CSD widget electrodes could be:
 * * CY_CAPSENSE_SENSOR - Self-cap sensor
 * * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
 * * CY_CAPSENSE_GROUND - Grounded
 * * CY_CAPSENSE_SHIELD - Shield is routed to the pin.
+*
 * The desired pins state for ISX widget electrodes could be:
 * * CY_CAPSENSE_ISX_RX_PIN - ISX Rx electrode
 * * CY_CAPSENSE_ISX_LX_PIN - ISX Lx electrode
-* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
-* * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+* * CY_CAPSENSE_HIGHZ - Unconnected (High-Z).
+* * CY_CAPSENSE_GROUND - Grounded
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -1364,7 +1369,8 @@ cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
 
         #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN))
             if ((CY_CAPSENSE_ISX_GROUP == sensingGroup) &&
-                (CY_CAPSENSE_SNS_CONNECTION_HIGHZ == inactiveState))
+                ((CY_CAPSENSE_SNS_CONNECTION_GROUND == inactiveState) ||
+                (CY_CAPSENSE_SNS_CONNECTION_HIGHZ == inactiveState)))
             {
                 capStatus = CY_CAPSENSE_STATUS_SUCCESS;
                 if (context->ptrInternalContext->intrIsxInactSnsConn != (uint8_t)inactiveState)

@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -97,7 +97,7 @@
 *
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
-* For PSoC&trade; 4 CPU or for PSoC&trade; 6 CM0+ core:
+* For PSOC&trade; 4 CPU or for PSOC&trade; 6 CM0+ core:
 * \snippet capsense/snippet/main.c snippet_m0p_capsense_interrupt_source_declaration
 * \note MSCLP HW contains two interrupt sources.
 * The CAPSENSE&trade; Middleware supports only the msclp_interrupt_<b>lp</b>_IRQn 
@@ -249,7 +249,7 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * 1. Check CAPSENSE&trade; configuration integrity.
 * 2. Pre-calculate of internal register values to speed up operation.
 * 3. Configure the CAPSENSE&trade; HW block to perform capacitive sensing operation.
-* 4. If the smart sensing algorithm is selected for the CSD Tuning mode in the
+* 4. If the smart sensing algorithm is selected in the
 *    Basic tab, the auto-tuning functionality is executed to set the optimal
 *    values for the CAPSENSE&trade; HW block parameters of the widgets/sensors.
 * 5. Calibrate the sensors and find the optimal values for DACs of each widget/sensor,
@@ -334,8 +334,7 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
     if (CY_CAPSENSE_STATUS_SUCCESS == result)
     {
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
-            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
                 result |= Cy_CapSense_SsAutoTune(context);
             #elif (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN)
                 result |= Cy_CapSense_CalibrateAllCsdWidgets(context);
@@ -345,8 +344,7 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
                 result |= Cy_CapSense_CalibrateAllCsxWidgets(context);
             #endif
         #elif (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
                 result |= Cy_CapSense_SsAutoTune(context);
             #endif
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
@@ -354,9 +352,7 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
                 result |= Cy_CapSense_CalibrateAllSlots(context);
             #endif
         #else /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
-            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_LP_HW_EN))
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
                 result |= Cy_CapSense_SsAutoTune(context);
             #endif
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
@@ -373,7 +369,8 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
 
         /* Scan each widget separately if the MPSC is enabled */
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
+            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED) || \
+                (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN))
                 for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
                 {
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
@@ -446,7 +443,7 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
         Cy_CapSense_InitializeAllFilters(context);
     #endif
-    Cy_CapSense_InitializeAllBaselines(context);
+    result |= Cy_CapSense_InitializeAllBaselines(context);
 
     #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         context->ptrCommonContext->status &= ~(uint32_t)CY_CAPSENSE_MW_STATE_INITIALIZATION_MASK;
@@ -565,12 +562,13 @@ cy_capsense_status_t Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
 * and sensors. The following tasks are executed as part of processing all the
 * widgets:
 * 1. Apply raw count filters to the raw counts, if they are enabled.
-* 2. Update the thresholds if the smart sensing algorithm Full Auto-Tuning
+* 2. Update the thresholds if the smart sensing algorithm Full auto-tuning
 *    is enabled.
 * 3. Update the baselines and difference counts for all the sensors.
 * 4. Update the sensor and widget output status. Updates on/off status for
 *    buttons and proximity widgets, centroid/position for
-*    the sliders and the X/Y position for the touchpads.
+*    the sliders and the X/Y position for the touchpads,
+*    liquid level calculation for liquid level widgets.
 *
 * This function is called by the application program only after all the enabled
 * widgets (and sensors) in the middleware are scanned. Calling this function
@@ -591,7 +589,7 @@ cy_capsense_status_t Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * c
     uint32_t wdIndex;
     cy_capsense_status_t result = CY_CAPSENSE_STATUS_SUCCESS;
 
-    for (wdIndex = CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex-- > 0u;)
+    for (wdIndex = 0u; wdIndex < CY_CAPSENSE_TOTAL_WIDGET_COUNT; wdIndex++)
     {
         if (0u != Cy_CapSense_IsWidgetEnabled(wdIndex, context))
         {
@@ -775,7 +773,7 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
         {
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
                 case CY_CAPSENSE_CSD_GROUP:
-                    Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
+                    result |= Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
                     break;
             #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
 
@@ -816,8 +814,7 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
 * disabled and/or non-working and performs processing in any case.
 *
 * The CY_CAPSENSE_PROCESS_CALC_NOISE and CY_CAPSENSE_PROCESS_THRESHOLDS masks
-* for mode parameter are supported only when smart sensing algorithm is enabled
-* for CSD widgets.
+* for mode parameter are supported only when smart sensing algorithm is enabled.
 *
 * The execution order of processing tasks starts from LSB to MSB of the
 * mode parameter. To implement a different order of execution, call this
@@ -838,6 +835,8 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
 * * Cy_CapSense_PreProcessWidget()
 * * Cy_CapSense_ProcessWidgetMpDeconvolution()
 * * Cy_CapSense_ProcessWidgetExt()
+*
+* For liquid level widget this function updates only widget status, other is skipped.
 *
 * \note
 * For the fifth generation and fifth-generation low power CAPSENSE&trade;
@@ -870,9 +869,9 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
 *                   (applicable only for fifth-generation CAPSENSE&trade;
 *                   and fifth-generation low power CAPSENSE&trade;).
 * 5. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Update the thresholds
-*                   (only in CSD auto-tuning mode).
+*                   (only in full auto-tuning mode).
 * 6. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculate the noise
-*                   (only in CSD auto-tuning mode).
+*                   (only in full auto-tuning mode).
 * 7. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Update the difference
 *                   counts of each sensor.
 * 8. Bit [1]      - CY_CAPSENSE_PROCESS_BASELINE - Update the baselines
@@ -934,6 +933,18 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                             (CY_CAPSENSE_IIR_HISTORY_LOW_SIZE / CY_CAPSENSE_CONFIGURED_FREQ_NUM)];
                 }
 
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+                    if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
+                    {
+                        if (0u != (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_CM_EN_MASK))
+                        {
+                            /* Runs common mode filter */
+                            Cy_CapSense_CommonModeFilter_Lib(ptrWdCfg->cmfThreshold, ptrWdCfg->numSns,
+                                    (uint16_t *)ptrWdCfg->ptrSnsContext);
+                        }
+                    }
+                #endif
+
                 for (snsIndex = 0u; snsIndex < ptrWdCfg->numSns; snsIndex++)
                 {
                      capStatus |= Cy_CapSense_DpProcessSensorRawCountsExt(ptrWdCfg, ptrSnsCxtSns, ptrHistorySns,
@@ -951,18 +962,23 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
 
             #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
-                ptrSnsCxtSns = ptrWdCfg->ptrSnsContext;
-                for (snsIndex = ptrWdCfg->numSns; snsIndex-- > 0u;)
+                /* Disable filtering for liquid level widgets */
+                if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
                 {
-                    Cy_CapSense_RunMfsFiltering(ptrSnsCxtSns, context);
-                    ptrSnsCxtSns++;
+                    ptrSnsCxtSns = ptrWdCfg->ptrSnsContext;
+                    for (snsIndex = ptrWdCfg->numSns; snsIndex-- > 0u;)
+                    {
+                        Cy_CapSense_RunMfsFiltering(ptrSnsCxtSns, context);
+                        ptrSnsCxtSns++;
+                    }
                 }
             #endif
 
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_WIDGET_EN) && \
                  ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)))
                 if ((0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK)) &&
-                    (0u == (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)))
+                    (0u == (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)) &&
+                    ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType))
                 {
                     if (0u != (mode & CY_CAPSENSE_PROCESS_MFS_FILTER))
                     {
@@ -983,7 +999,7 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
 
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
                         case CY_CAPSENSE_CSD_GROUP:
-                            Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
+                            capStatus |= Cy_CapSense_DpProcessCsdWidgetStatus(ptrWdCfg, context);
                             break;
                     #endif
 
@@ -1054,15 +1070,24 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
 * \param mode
 * Specifies the type of the sensor processing that must be executed for the
 * specified sensor:
-* 1. Bits [31..5] - Reserved
-* 2. Bits [4..0]  - CY_CAPSENSE_PROCESS_ALL - Executes all the tasks
-* 3. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Updates the thresholds
-*                   (only in auto-tuning mode)
-* 4. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculates the noise
-*                   (only in auto-tuning mode)
-* 5. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Updates the diff count
-* 6. Bit [1]      - CY_CAPSENSE_PROCESS_BASELINE - Updates the baseline
-* 7. Bit [0]      - CY_CAPSENSE_PROCESS_FILTER - Runs the firmware filters
+* 1. Bits [31..7] - Reserved.
+* 2. Bits [6..0]  - CY_CAPSENSE_PROCESS_ALL - Execute all of the below tasks.
+* 3. Bit [6]      - CY_CAPSENSE_PROCESS_STATUS - Update the status
+*                   (on/off, centroid position) - not available for this function.
+* 4. Bit [5]      - CY_CAPSENSE_PROCESS_MFS_FILTER - Run the firmware filters
+*                   for MFS on sensor rawcounts - not available for this function.
+*                   (applicable only for fifth-generation CAPSENSE&trade;
+*                   and fifth-generation low power CAPSENSE&trade;).
+* 5. Bit [4]      - CY_CAPSENSE_PROCESS_THRESHOLDS - Update the thresholds
+*                   (only in full auto-tuning mode).
+* 6. Bit [3]      - CY_CAPSENSE_PROCESS_CALC_NOISE - Calculate the noise
+*                   (only in full auto-tuning mode).
+* 7. Bit [2]      - CY_CAPSENSE_PROCESS_DIFFCOUNTS - Update the difference
+*                   counts of each sensor.
+* 8. Bit [1]      - CY_CAPSENSE_PROCESS_BASELINE - Update the baselines
+*                   for all sensor.
+* 9. Bit [0]      - CY_CAPSENSE_PROCESS_FILTER - Run the firmware filters
+*                   on sensor rawcounts.
 *
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
@@ -1125,8 +1150,12 @@ cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                 }
                 #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
-                    ptrSnsCxt = ptrWdCfg->ptrSnsContext;
-                    Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
+                    /* Disable filtering for liquid level widgets */
+                    if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
+                    {
+                        ptrSnsCxt = ptrWdCfg->ptrSnsContext;
+                        Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
+                    }
                 #endif
             }
         }

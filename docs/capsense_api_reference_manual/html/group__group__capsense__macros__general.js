@@ -2,6 +2,7 @@ var group__group__capsense__macros__general =
 [
     [ "CY_CAPSENSE_MW_VERSION_MAJOR", "group__group__capsense__macros__general.html#ga104c621005040ae8af24f65224291585", null ],
     [ "CY_CAPSENSE_MW_VERSION_MINOR", "group__group__capsense__macros__general.html#gad6ec980865b471c2f2dfb2cdc35d4c2b", null ],
+    [ "CY_CAPSENSE_MW_VERSION_PATCH", "group__group__capsense__macros__general.html#ga0859da778f23a7fd431252c0d8feb838", null ],
     [ "CY_CAPSENSE_MW_VERSION", "group__group__capsense__macros__general.html#ga59b36b476019e5ba3efbf23db693afc0", null ],
     [ "CY_CSD_DRV_VERSION_REQUIRED", "group__group__capsense__macros__general.html#gae3c1bba4e246712abae8a73ff3be3f99", null ],
     [ "CY_CSD_DRV2_VERSION", "group__group__capsense__macros__general.html#ga69647cf4fe9cf4cd4082e53d4e14bfd8", null ],

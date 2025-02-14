@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 5.0: High-level Functions</title>
+<title>CAPSENSE™ Middleware Library 6.10.0: High-level Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 6.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -199,7 +199,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga96509342c580a9c5f6e17bdf8c74e53a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports the status of the specified proximity widget/sensor.  <a href="#ga96509342c580a9c5f6e17bdf8c74e53a">More...</a><br /></td></tr>
 <tr class="separator:ga96509342c580a9c5f6e17bdf8c74e53a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6192ba34167662ac9573c0a4cd71682f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcy__stc__capsense__touch__t.html">cy_stc_capsense_touch_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__high__level.html#ga6192ba34167662ac9573c0a4cd71682f">Cy_CapSense_GetTouchInfo</a> (uint32_t widgetId, const <a class="el" href="structcy__stc__capsense__context__t.html">cy_stc_capsense_context_t</a> *context)</td></tr>
-<tr class="memdesc:ga6192ba34167662ac9573c0a4cd71682f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports the details of touch position detected on the specified touchpad, matrix buttons or slider widgets.  <a href="#ga6192ba34167662ac9573c0a4cd71682f">More...</a><br /></td></tr>
+<tr class="memdesc:ga6192ba34167662ac9573c0a4cd71682f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports the details of touch position detected on the specified touchpad, matrix buttons, slider or liquid level widgets.  <a href="#ga6192ba34167662ac9573c0a4cd71682f">More...</a><br /></td></tr>
 <tr class="separator:ga6192ba34167662ac9573c0a4cd71682f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0c613df550388c119fdab4e50341a6b4"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__high__level.html#ga0c613df550388c119fdab4e50341a6b4">Cy_CapSense_RunTuner</a> (<a class="el" href="structcy__stc__capsense__context__t.html">cy_stc_capsense_context_t</a> *context)</td></tr>
 <tr class="memdesc:ga0c613df550388c119fdab4e50341a6b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Establishes synchronized operation between the CAPSENSE&trade; Middleware and the CAPSENSE&trade; Tuner tool.  <a href="#ga0c613df550388c119fdab4e50341a6b4">More...</a><br /></td></tr>
@@ -243,7 +243,7 @@ Functions</h2></td></tr>
 <dl class="section user"><dt>Function Usage</dt><dd></dd></dl>
 <div class="fragment"><div class="line"></div><div class="line">    <span class="comment">/* Capture the HW block and initialize it to the default state. */</span></div><div class="line">    <a class="code" href="group__group__capsense__high__level.html#ga19b3aa9e14a04b76188f917c0dc004f5">Cy_CapSense_Init</a>(&amp;cy_capsense_context);</div><div class="line"></div><div class="line">    <span class="comment">/* Initialize interrupt */</span></div><div class="line">    Cy_SysInt_Init(&amp;CapSense_ISR_cfg, &amp;CapSense_InterruptHandler);</div><div class="line">    NVIC_ClearPendingIRQ(CapSense_ISR_cfg.intrSrc);</div><div class="line">    NVIC_EnableIRQ(CapSense_ISR_cfg.intrSrc);</div><div class="line"></div><div class="line">    <span class="comment">/* Initialize the firmware modules. */</span></div><div class="line">    <a class="code" href="group__group__capsense__high__level.html#gade28f1f915ce6b97f13399074a819c0d">Cy_CapSense_Enable</a>(&amp;cy_capsense_context);</div><div class="line"></div></div><!-- fragment --><p>The 'cy_capsense_context' variable that is used as the parameter of the <a class="el" href="group__group__capsense__high__level.html#ga19b3aa9e14a04b76188f917c0dc004f5" title="Captures HW blocks (one or more) for CAPSENSE™ operations and configures them to the default state...">Cy_CapSense_Init()</a> and <a class="el" href="group__group__capsense__high__level.html#gade28f1f915ce6b97f13399074a819c0d" title="Initializes the CAPSENSE™ firmware modules. ">Cy_CapSense_Enable()</a> functions is declared in the cycfg_capsense.h file.</p>
 <p>The CapSense_ISR_cfg variable should be declared by the application program according to the examples below:<br />
- For PSoC&trade; 4 CPU or for PSoC&trade; 6 CM0+ core: </p><div class="fragment"><div class="line"></div><div class="line"><span class="preprocessor">    #if (CY_CAPSENSE_PSOC4_FOURTH_GEN)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = csd_interrupt_IRQn,  <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,             <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #elif (CY_CAPSENSE_PSOC4_FIFTH_GEN)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = msc_0_interrupt_IRQn,  <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,               <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #elif (CY_CAPSENSE_PSOC4_FIFTH_GEN_LP)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = msclp_interrupt_lp_IRQn, <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,                 <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #endif</span></div><div class="line"></div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>MSCLP HW contains two interrupt sources. The CAPSENSE&trade; Middleware supports only the msclp_interrupt_<b>lp</b>_IRQn vector and therefore it should be used.</dd></dl>
+ For PSOC&trade; 4 CPU or for PSOC&trade; 6 CM0+ core: </p><div class="fragment"><div class="line"></div><div class="line"><span class="preprocessor">    #if (CY_CAPSENSE_PSOC4_FOURTH_GEN)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = csd_interrupt_IRQn,  <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,             <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #elif (CY_CAPSENSE_PSOC4_FIFTH_GEN)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = msc_0_interrupt_IRQn,  <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,               <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #elif (CY_CAPSENSE_PSOC4_FIFTH_GEN_LP)</span></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = msclp_interrupt_lp_IRQn, <span class="comment">/* CM0+ interrupt is NVIC #2 */</span></div><div class="line">            .intrPriority = 3u,                 <span class="comment">/* Interrupt priority is 3 */</span></div><div class="line">        };</div><div class="line"><span class="preprocessor">    #endif</span></div><div class="line"></div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>MSCLP HW contains two interrupt sources. The CAPSENSE&trade; Middleware supports only the msclp_interrupt_<b>lp</b>_IRQn vector and therefore it should be used.</dd></dl>
 <p>For CM4 core: </p><div class="fragment"><div class="line"></div><div class="line">        <span class="keyword">const</span> cy_stc_sysint_t CapSense_ISR_cfg =</div><div class="line">        {</div><div class="line">            .intrSrc = csd_interrupt_IRQn, <span class="comment">/* Interrupt source is the CSD interrupt */</span></div><div class="line">            .intrPriority = 7u,            <span class="comment">/* Interrupt priority is 7 */</span></div><div class="line">        };</div><div class="line"></div></div><!-- fragment --><p> The CAPSENSE&trade; interrupt handler should be declared by the application program according to the example below: </p><div class="fragment"><div class="line"></div><div class="line"><span class="keywordtype">void</span> CapSense_InterruptHandler(<span class="keywordtype">void</span>)</div><div class="line">{</div><div class="line">    <a class="code" href="group__group__capsense__high__level.html#gaeab57caca852dae59618fbfbcd431c27">Cy_CapSense_InterruptHandler</a>(CapSense_HW, &amp;cy_capsense_context);</div><div class="line">}</div><div class="line"></div></div><!-- fragment --><p> The CapSense_HW is the pointer to the base register address of the CAPSENSE&trade; HW block. A macro for the pointer is in the cycfg_peripherals.h file defined as &lt;Personality_Name&gt;_HW. If no name is specified, the following default names are used:</p><ul>
 <li>csd_&lt;Block_Number&gt;_csd_&lt;Block_Number&gt;_HW - for forth-generation CAPSENSE&trade; HW.</li>
 <li>msc_&lt;Block_Number&gt;_msc_&lt;Block_Number&gt;_HW - for fifth-generation CAPSENSE&trade; HW.</li>
@@ -304,7 +304,7 @@ Functions</h2></td></tr>
 <li>Check CAPSENSE&trade; configuration integrity.</li>
 <li>Pre-calculate of internal register values to speed up operation.</li>
 <li>Configure the CAPSENSE&trade; HW block to perform capacitive sensing operation.</li>
-<li>If the smart sensing algorithm is selected for the CSD Tuning mode in the Basic tab, the auto-tuning functionality is executed to set the optimal values for the CAPSENSE&trade; HW block parameters of the widgets/sensors.</li>
+<li>If the smart sensing algorithm is selected in the Basic tab, the auto-tuning functionality is executed to set the optimal values for the CAPSENSE&trade; HW block parameters of the widgets/sensors.</li>
 <li>Calibrate the sensors and find the optimal values for DACs of each widget/sensor, if the auto-calibration is enabled in the CSD Settings, CSX Settings or ISX Settings tabs.</li>
 <li>Perform scanning for all the sensors and initialize the baseline history.</li>
 <li>If the firmware filters are enabled in the Advanced General tab, the filter histories are also initialized.</li>
@@ -417,9 +417,9 @@ Functions</h2></td></tr>
 <p>Performs full data processing of all enabled widgets. </p>
 <p>This function performs all data processes for all enabled widgets and sensors in the middleware to produce meaningful status output from widgets and sensors. The following tasks are executed as part of processing all the widgets:</p><ol type="1">
 <li>Apply raw count filters to the raw counts, if they are enabled.</li>
-<li>Update the thresholds if the smart sensing algorithm Full Auto-Tuning is enabled.</li>
+<li>Update the thresholds if the smart sensing algorithm Full auto-tuning is enabled.</li>
 <li>Update the baselines and difference counts for all the sensors.</li>
-<li>Update the sensor and widget output status. Updates on/off status for buttons and proximity widgets, centroid/position for the sliders and the X/Y position for the touchpads.</li>
+<li>Update the sensor and widget output status. Updates on/off status for buttons and proximity widgets, centroid/position for the sliders and the X/Y position for the touchpads, liquid level calculation for liquid level widgets.</li>
 </ol>
 <p>This function is called by the application program only after all the enabled widgets (and sensors) in the middleware are scanned. Calling this function multiple times without sensor scanning causes unexpected behavior.</p>
 <p>Disabled and/or non-working widgets are not processed by this function.</p>
@@ -866,6 +866,9 @@ Functions</h2></td></tr>
 <li><a class="el" href="group__group__capsense__low__level.html#ga80ad1c421ea794bd493bb37e76c48a2b" title="Measures the capacitance in picofarads of the specified CAPSENSE™ integration (external) capacitor...">Cy_CapSense_MeasureCapacitanceCap()</a></li>
 <li><a class="el" href="group__group__capsense__low__level.html#ga0214428f5737ef46a2f755620c4e7316" title="Measures a VDDA voltage, returns the measured voltage in millivolts through the ptrValue argument and...">Cy_CapSense_MeasureVdda()</a></li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd><a class="el" href="group__group__capsense__low__level.html#gadcc9fa570b4c5aa91c66570f5c6f57d4" title="Checks the specified widget/sensor for shorts to GND, VDD or other sensors. ">Cy_CapSense_CheckIntegritySensorPins()</a>, <a class="el" href="group__group__capsense__low__level.html#ga23f23f4e684b25788f999851f20aa58c" title="Measures the specified CSD sensor / CSX electrode capacitance in femtofarads. ">Cy_CapSense_MeasureCapacitanceSensorElectrode()</a>, and <a class="el" href="group__group__capsense__low__level.html#gadb467c284dc3fea4c7347a25c5ff57df" title="Measures the specified slot sensor capacitance in femtofarads. ">Cy_CapSense_MeasureCapacitanceSlotSensors()</a> are not supported for ISX sensing method yet.</dd>
+<dd>
+This function is available when self-test library is enabled.</dd></dl>
 <p>Refer to these functions descriptions for detail information on the corresponding test.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1505,8 +1508,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
 <dl class="section return"><dt>Returns</dt><dd>Returns the status of the widget setting up operation:<ul>
 <li>CY_CAPSENSE_STATUS_SUCCESS - The operation is successfully completed.</li>
 <li>CY_CAPSENSE_STATUS_BAD_PARAM - The widget is invalid or if the specified widget is disabled.</li>
-<li>CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and the CSD HW block is busy.</li>
-<li>CY_CAPSENSE_STATUS_UNKNOWN - An unknown sensing method is used by the widget or any other spurious error occurred. </li>
+<li>CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and the CSD HW block is busy. any other spurious error occurred. </li>
 </ul>
 </dd></dl>
 
@@ -1542,7 +1544,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
 <dl class="section return"><dt>Returns</dt><dd>Returns the status of the scan initiation operation:<ul>
 <li>CY_CAPSENSE_STATUS_SUCCESS - Scanning is successfully started.</li>
 <li>CY_CAPSENSE_STATUS_INVALID_STATE - The previous scan is not completed and the CSD HW block is busy.</li>
-<li>CY_CAPSENSE_STATUS_UNKNOWN - An unknown sensing method is used by the widget. </li>
+<li>CY_CAPSENSE_STATUS_BAD_CONFIG - The function does not suppose to be called with the current CAPSENSE&trade; configuration. </li>
 </ul>
 </dd></dl>
 
@@ -1797,7 +1799,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
       </table>
 </div><div class="memdoc">
 
-<p>Reports the details of touch position detected on the specified touchpad, matrix buttons or slider widgets. </p>
+<p>Reports the details of touch position detected on the specified touchpad, matrix buttons, slider or liquid level widgets. </p>
 <p>This function does not process widget data but extracts previously processed results from the <a class="el" href="group__group__capsense__structures.html">Structures</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1806,7 +1808,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns the pointer to widget <a class="el" href="structcy__stc__capsense__touch__t.html" title="Declares touch structure used to store positions of Touchpad, Matrix buttons and Slider widgets...">cy_stc_capsense_touch_t</a> structure that contains number of positions and data about each position. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the pointer to widget <a class="el" href="structcy__stc__capsense__touch__t.html" title="Declares touch structure used to store positions of Touchpad, Matrix buttons, Slider and Liquid Level...">cy_stc_capsense_touch_t</a> structure that contains number of positions and data about each position. </dd></dl>
 
 </div>
 </div>
@@ -1947,7 +1949,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 6.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

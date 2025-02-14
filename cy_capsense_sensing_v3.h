@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -241,8 +241,7 @@ uint32_t Cy_CapSense_GetLfsrDitherLimit(
 cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(
                 const cy_stc_capsense_context_t * context);
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
 cy_capsense_status_t Cy_CapSense_SsAutoTune(
                 cy_stc_capsense_context_t * context);
 #endif

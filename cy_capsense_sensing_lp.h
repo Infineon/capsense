@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -225,11 +225,11 @@ uint32_t Cy_CapSense_GetLfsrDitherLimit(
 cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(
                 const cy_stc_capsense_context_t * context);
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_LP_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
     cy_capsense_status_t Cy_CapSense_SsAutoTune(
                     cy_stc_capsense_context_t * context);
+    cy_capsense_status_t Cy_CapSense_IsSmarSenseWidgetValid(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig);
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN)
         uint32_t Cy_CapSense_SsSquareRoot16(uint16_t value);
     #endif
@@ -332,11 +332,18 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
 #define CY_CAPSENSE_2PH_DIRECT_SNS_CLOCK_DIVIDER_MIN            (4u)
 #define CY_CAPSENSE_4PH_DIRECT_SNS_CLOCK_DIVIDER_MIN            (8u)
 
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB            (64u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_SNS_CLK         (256u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_REF_CDAC        (100u)
-#define CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_WDT             (1000000u)
 #define CY_CAPSENSE_SMARTSENSE_WD_MAX_NUMBER                    (64u)
+
+#define CY_CAPSENSE_SMARTSENSE_CSD_PRELIMINARY_SCAN_NSUB        (64u)
+#define CY_CAPSENSE_SMARTSENSE_CSD_PRELIMINARY_SCAN_SNS_CLK     (256u)
+#define CY_CAPSENSE_SMARTSENSE_CSD_PRELIMINARY_SCAN_REF_CDAC    (100u)
+
+#define CY_CAPSENSE_SMARTSENSE_ISX_PRELIMINARY_SCAN_NSUB        (185u)
+#define CY_CAPSENSE_SMARTSENSE_ISX_PRELIMINARY_SCAN_SNS_CLK     (200u)
+#define CY_CAPSENSE_SMARTSENSE_ISX_PRELIMINARY_SCAN_REF_CDAC    (255u)
+#define CY_CAPSENSE_SMARTSENSE_ISX_SNS_CLK_MIN                  (8u)
+#define CY_CAPSENSE_SMARTSENSE_ISX_SNS_CLK_STEP                 (4u)
+#define CY_CAPSENSE_SMARTSENSE_ISX_PRELIMINARY_SCAN_STOP        (95u)
 
 #define CY_CAPSENSE_MAX_EPI_KREF_DELAY_PRS_NUMBER               (255u)
 #define CY_CAPSENSE_MAX_PRO_WAIT_KREF_DELAY_PRS_NUMBER          (31u)

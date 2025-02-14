@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -60,21 +60,23 @@ typedef enum
 /** Defines the Tuner command codes */
 typedef enum
 {
-    CY_CAPSENSE_TU_CMD_NONE_E           = 0u,                   /**< No command */
-    CY_CAPSENSE_TU_CMD_SUSPEND_E        = 1u,                   /**< Suspend command */
-    CY_CAPSENSE_TU_CMD_RESUME_E         = 2u,                   /**< Resume command switches state from suspend to running */
-    CY_CAPSENSE_TU_CMD_RESTART_E        = 3u,                   /**< Restart command requests to perform CAPSENSE&trade; re-initialization and switches state to running */
-    CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E   = 4u,                   /**< Reserved */
-    CY_CAPSENSE_TU_CMD_PING_E           = 5u,                   /**< Ping command to check whether application program calls Cy_CapSense_RunTuner() */
-    CY_CAPSENSE_TU_CMD_ONE_SCAN_E       = 6u,                   /**< Execute one scan cycle and then switch to suspend state */
-    CY_CAPSENSE_TU_CMD_WRITE_E          = 7u,                   /**< Writes specified data with offset into cy_capsense_tuner */
-    CY_CAPSENSE_TU_CMD_COMM_DIS_E       = 8u,                   /**< Disables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
+    CY_CAPSENSE_TU_CMD_NONE_E                    = 0u,          /**< No command */
+    CY_CAPSENSE_TU_CMD_SUSPEND_E                 = 1u,          /**< Suspend command */
+    CY_CAPSENSE_TU_CMD_RESUME_E                  = 2u,          /**< Resume command switches state from suspend to running */
+    CY_CAPSENSE_TU_CMD_RESTART_E                 = 3u,          /**< Restart command requests to perform CAPSENSE&trade; re-initialization and switches state to running */
+    CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E            = 4u,          /**< Reserved */
+    CY_CAPSENSE_TU_CMD_PING_E                    = 5u,          /**< Ping command to check whether application program calls Cy_CapSense_RunTuner() */
+    CY_CAPSENSE_TU_CMD_ONE_SCAN_E                = 6u,          /**< Execute one scan cycle and then switch to suspend state */
+    CY_CAPSENSE_TU_CMD_WRITE_E                   = 7u,          /**< Writes specified data with offset into cy_capsense_tuner */
+    CY_CAPSENSE_TU_CMD_COMM_DIS_E                = 8u,          /**< Disables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
                                                                  * * Low power sensors rawcounts does not copied to communication structure
                                                                  * * Communication of CapSense data structure to Tuner does not happen (in case of UART or protocol-agnostic method) */
-    CY_CAPSENSE_TU_CMD_COMM_EN_E        = 9u,                   /**< Enables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
+    CY_CAPSENSE_TU_CMD_COMM_EN_E                 = 9u,                   /**< Enables the communication mode (used in the fifth-generation low power CAPSENSE&trade; only):
                                                                  * * Low power sensors rawcounts are copied to communication structure
                                                                  * * Data is transferred to Tuner (in case of UART or protocol-agnostic method) */
-    CY_CAPSENSE_TU_CMD_RESTART_ONLY_E   = 10u,                  /**< Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged */
+    CY_CAPSENSE_TU_CMD_RESTART_ONLY_E            = 10u,         /**< Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged */
+    CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E = 11u,         /**< Sets duty cycle and executes one scan (used only when foam-rejection is enabled for LLW) */
+    CY_CAPSENSE_TU_CMD_LAST_E                    = 12u,         /**< The last command */
 } cy_en_capsense_tuner_cmd_t;
 
 /** Defines widget types */
@@ -87,6 +89,8 @@ typedef enum
     CY_CAPSENSE_WD_TOUCHPAD_E           = 0x05u,                /**< Touchpad widget */
     CY_CAPSENSE_WD_PROXIMITY_E          = 0x06u,                /**< Proximity widget */
     CY_CAPSENSE_WD_LOW_POWER_E          = 0x07u,                /**< Low Power widget, used in the fifth-generation low power CAPSENSE&trade; only */
+    CY_CAPSENSE_WD_LIQUID_LEVEL_E       = 0x08u,                /**< Liquid level widget, used in the fifth-generation low power CAPSENSE&trade; only */
+    CY_CAPSENSE_WD_LIQUID_DETECTION_E   = 0x09u,                /**< Liquid detection widget, used in the fifth-generation low power CAPSENSE&trade; only */
 } cy_en_capsense_widget_type_t;
 
 /** Defines CAPSENSE&trade; return statuses types */
@@ -94,9 +98,9 @@ typedef enum
 {
     CY_CAPSENSE_SUCCESS_E               = 0x00u,                /**< The success return status */
     CY_CAPSENSE_BAD_PARAM_E             = 0x01u,                /**< One or more invalid input parameters  */
-    CY_CAPSENSE_HW_LOCKED_E             = 0x02u,                /**< The CSD HW block is captured by another middleware */
-    CY_CAPSENSE_HW_BUSY_E               = 0x03u,                /**< The CSD HW block is busy by previous operation */
-    CY_CAPSENSE_TIMEOUT_E               = 0x04u,                /**< The CSD HW block operation was not finished correctly */
+    CY_CAPSENSE_HW_LOCKED_E             = 0x02u,                /**< The sensing HW block is captured by another middleware */
+    CY_CAPSENSE_HW_BUSY_E               = 0x03u,                /**< The sensing HW block is busy by previous operation */
+    CY_CAPSENSE_TIMEOUT_E               = 0x04u,                /**< The sensing HW block operation was not finished correctly */
 } cy_en_capsense_return_status_t;
 
 /** Defines types of electrode */
@@ -220,7 +224,6 @@ typedef enum
  * * CY_CAPSENSE_STATUS_BAD_CONFIG
  * * CY_CAPSENSE_STATUS_CONFIG_OVERFLOW
  * * CY_CAPSENSE_STATUS_HW_BUSY
- * * CY_CAPSENSE_STATUS_UNKNOWN
  */
 typedef uint32_t cy_capsense_status_t;
 
@@ -305,9 +308,10 @@ typedef struct
 /** Widget context structure */
 typedef struct
 {
-    uint16_t fingerCap;                                         /**< Widget finger capacitance parameter used for the CSD
-                                                                   * widgets only when smart sensing algorithm is enabled */
-    uint16_t sigPFC;                                            /**< The 75% of signal per user-defined finger capacitance */
+    uint16_t fingerCap;                                         /**< Touch sensitivity used when full auto-tuning mode is enabled:
+                                                                   * * For CSD widgets is a finger capacitance introduced at touch
+                                                                   * * For ISX widgets is a coil inductance change at touch */
+    uint16_t sigPFC;                                            /**< The 75% of signal per the user-defined touch sensitivity parameter */
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint16_t resolution;                                    /**< Provides scan resolution for the CSD Widgets.
                                                                  * Provides number of sub-conversions for the CSX Widgets
@@ -317,7 +321,7 @@ typedef struct
     uint16_t maxRawCount;                                       /**< Calculated maximum raw count of widget */
     uint16_t maxRawCountRow;                                    /**< Calculated row maximum raw count of widget */
     uint16_t fingerTh;                                          /**< Widget Finger Threshold */
-    uint16_t proxTh;                                            /**< Widget Proximity Threshold */
+    uint16_t proxTh;                                            /**< Widget Proximity Threshold or Foam Correction Coefficient for Liquid level widget */
     uint16_t lowBslnRst;                                        /**< The widget low baseline reset count. Specifies the number
                                                                    * of samples the sensor signal must be below the Negative
                                                                    * Noise Threshold \ref nNoiseTh to trigger a baseline reset */
@@ -532,7 +536,8 @@ typedef struct
     uint8_t * ptrDebounceArr;                                   /**< Pointer to the debounce array of the widget */
 
     const uint8_t * ptrDiplexTable;                             /**< Pointer to the diplex table used for Linear slider when Diplex option is enabled */
-    uint32_t centroidConfig;                                    /**< Configuration of centroids */
+    uint32_t centroidConfig;                                    /**< Bit mask defining centroid configuration including centroid type, number of touches, 
+                                                                   * diplexing, foam rejection, edge correction, etc. */
     uint16_t xResolution;                                       /**< Keeps maximum position value. For Touchpads X-axis maximum position */
     uint16_t yResolution;                                       /**< For Touchpads Y-Axis maximum position */
     uint16_t numSns;                                            /**< The total number of sensors:
@@ -556,17 +561,63 @@ typedef struct
     cy_stc_capsense_gesture_config_t * ptrGestureConfig;        /**< Pointer to Gesture configuration structure */
     cy_stc_capsense_gesture_context_t * ptrGestureContext;      /**< Pointer to Gesture context structure */
 
-    cy_stc_capsense_ballistic_config_t ballisticConfig;         /**< The configuration data for position ballistic filter. */
+    cy_stc_capsense_ballistic_config_t ballisticConfig;         /**< The configuration data for position ballistic filter */
     cy_stc_capsense_ballistic_context_t * ptrBallisticContext;  /**< Pointer to Ballistic filter context structure */
 
-    cy_stc_capsense_adaptive_filter_config_t aiirConfig;        /**< The configuration of position adaptive filter. */
+    cy_stc_capsense_adaptive_filter_config_t aiirConfig;        /**< The configuration of position adaptive filter */
     cy_stc_capsense_advanced_touchpad_config_t advConfig;       /**< The configuration of CSD advanced touchpad */
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        cy_stc_capsense_mp_table_t * ptrMpTable;                /**< Pointer to the multi-phase vector and de-convolution coefficients
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif
 
     uint32_t posFilterConfig;                                   /**< Position filters configuration */
     uint16_t rawFilterConfig;                                   /**< Raw count filters configuration */
 
     uint16_t alpOnThreshold;                                    /**< ALP Filter ON threshold */
     uint16_t alpOffThreshold;                                   /**< ALP Filter OFF threshold */
+    uint16_t cmfThreshold;                                      /**< CMF threshold */
+
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint16_t cdacConfig;                                    /**< Bit-mask for widget CDAC configuration:
+                                                                 *  * bit[0..1]  - Reference CDAC mode (CY_CAPSENSE_CDAC_REF_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The reference CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of reference CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of reference CDAC set automatically
+                                                                 *  * bit[2..3]  - Fine CDAC mode (CY_CAPSENSE_CDAC_FINE_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The fine CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of fine CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of fine CDAC set automatically
+                                                                 *  * bit[4..5]  - Compensation CDAC mode (CY_CAPSENSE_CDAC_COMP_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The compensation CDAC is disabled
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC set automatically
+                                                                 *  * bit[6..7]  - Compensation CDAC divider mode (CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK)
+                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC divider set manually
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC divider set automatically
+                                                                 *  * bit[8..9]  - Sensitivity boost (CY_CAPSENSE_CDAC_BOOST_VAL_MASK)
+                                                                 *    * 1 (CY_CAPSENSE_CDAC_BOOST_DISABLED) - Boost disabled
+                                                                 *    * 2 (CY_CAPSENSE_CDAC_BOOST_2X)       - 2X Boost
+                                                                 *    * 3 (CY_CAPSENSE_CDAC_BOOST_3X)       - 3X Boost
+                                                                 *    * 4 (CY_CAPSENSE_CDAC_BOOST_4X)       - 4X Boost
+                                                                 * \note This field is available for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+
+        uint16_t foamCoefficient;                               /**< Foam rejection coefficient. This decides the scanning cycle for foam sensing mechanism.
+                                                                 * \note This field is available for the fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif
+
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
+        uint16_t firstSlotId;                                   /**< The slot ID in the widget to start scan from
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+        uint16_t numSlots;                                      /**< The number of slots in the widget
+                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
+                                                                 */
+    #endif
 
     uint8_t senseMethod;                                        /**< Specifies the widget sensing method:
                                                                     * * 0 - UNDEFINED   (CY_CAPSENSE_UNDEFINED_GROUP)
@@ -576,15 +627,6 @@ typedef struct
     uint8_t wdType;                                             /**< Specifies the widget type */
 
     #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
-        cy_stc_capsense_mp_table_t * ptrMpTable;                /**< Pointer to the multi-phase vector and de-convolution coefficients
-                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
-                                                                 */
-        uint16_t firstSlotId;                                   /**< The slot ID in the widget to start scan from
-                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
-                                                                 */
-        uint16_t numSlots;                                      /**< The number of slots in the widget
-                                                                 * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
-                                                                 */
         uint8_t numChopCycles;                                  /**< Defines number of chopping cycles. One cycle means the feature is disabled
                                                                  * \note This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.
                                                                  */
@@ -631,29 +673,6 @@ typedef struct
                                                                  */
         uint8_t iirCoeffHw;                                     /**< Raw count HW IIR filter coefficient. Smaller value leads to lower filtering.
                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
-                                                                 */
-        uint16_t cdacConfig;                                    /**< Bit-mask for widget CDAC configuration:
-                                                                 *  * bit[0..1]  - Reference CDAC mode (CY_CAPSENSE_CDAC_REF_MODE_MASK)
-                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The reference CDAC is disabled
-                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of reference CDAC set manually
-                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of reference CDAC set automatically
-                                                                 *  * bit[2..3]  - Fine CDAC mode (CY_CAPSENSE_CDAC_FINE_MODE_MASK)
-                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The fine CDAC is disabled
-                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of fine CDAC set manually
-                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of fine CDAC set automatically
-                                                                 *  * bit[4..5]  - Compensation CDAC mode (CY_CAPSENSE_CDAC_COMP_MODE_MASK)
-                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_DISABLED)  - The compensation CDAC is disabled
-                                                                 *    * 1 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC set manually
-                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC set automatically
-                                                                 *  * bit[6..7]  - Compensation CDAC divider mode (CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK)
-                                                                 *    * 0 (CY_CAPSENSE_CDAC_MODE_MANUAL)    - The value of compensation CDAC divider set manually
-                                                                 *    * 2 (CY_CAPSENSE_CDAC_MODE_AUTO)      - The value of compensation CDAC divider set automatically
-                                                                 *  * bit[8..9]  - Sensitivity boost (CY_CAPSENSE_CDAC_BOOST_VAL_MASK)
-                                                                 *    * 1 (CY_CAPSENSE_CDAC_BOOST_DISABLED) - Boost disabled
-                                                                 *    * 2 (CY_CAPSENSE_CDAC_BOOST_2X)       - 2X Boost
-                                                                 *    * 3 (CY_CAPSENSE_CDAC_BOOST_3X)       - 3X Boost
-                                                                 *    * 4 (CY_CAPSENSE_CDAC_BOOST_4X)       - 4X Boost
-                                                                 * \note This field is available for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
     #endif
 
@@ -1983,9 +2002,10 @@ uint32_t Cy_CapSense_IsSensorActive(
                     uint32_t sensorId,
                     const cy_stc_capsense_context_t * context);
 #endif
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TOUCHPAD_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MATRIX_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SLIDER_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN))
     cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
                     uint32_t widgetId,
                     const cy_stc_capsense_context_t * context);

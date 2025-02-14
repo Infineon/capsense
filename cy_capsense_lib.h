@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * The file contains application programming interface to the CAPSENSE&trade; library.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -36,6 +36,14 @@ extern "C" {
 #define CY_CAPSENSE_ADVANCED_CENTROID_NO_TOUCHES                        (0x00u)
 /** An error in touch calculation or number of detected touches is above supported touches */
 #define CY_CAPSENSE_ADVANCED_CENTROID_POSITION_ERROR                    (0xFFu)
+/** \} */
+
+
+/******************************************************************************/
+/** \addtogroup group_capsense_macros_miscellaneous *//** \{ */
+/******************************************************************************/
+/** Left shift of returned liquid level */
+#define CY_CAPSENSE_LLW_RESULT_SHIFT                                    (14u)
 /** \} */
 
 
@@ -86,6 +94,7 @@ typedef struct
 *     <th>Matrix Buttons</th>
 *     <th>CSD Touchpad</th>
 *     <th>CSX Touchpad</th>
+*     <th>Liquid Level</th>
 *   </tr>
 *   <tr>
 *     <td>x</td>
@@ -93,6 +102,7 @@ typedef struct
 *     <td>Active Column</td>
 *     <td>X-axis position</td>
 *     <td>X-axis position</td>
+*     <td>Liquid level</td>
 *   </tr>
 *   <tr>
 *     <td>y</td>
@@ -100,6 +110,7 @@ typedef struct
 *     <td>Active Row</td>
 *     <td>Y-axis position</td>
 *     <td>Y-axis position</td>
+*     <td>Reserved</td>
 *   </tr>
 *   <tr>
 *     <td>z</td>
@@ -109,6 +120,7 @@ typedef struct
 *     <td>MSB = Age of touch; LSB = Z-value represents a touch strength (summ of sensor diff counts divided by 16
 *        that form 3x3 matrix with a local maximum in the center). It is not used by Middleware, however can be
 *        re-used by users to define a touch shape or a finger size.</td>
+*     <td>Reserved</td>
 *   </tr>
 *   <tr>
 *     <td>id</td>
@@ -116,6 +128,7 @@ typedef struct
 *     <td>Logical number of button</td>
 *     <td>Reserved</td>
 *     <td>MSB = Debounce; LSB = touch ID</td>
+*     <td>Reserved</td>
 *   </tr>
 * </table>
 */
@@ -127,7 +140,8 @@ typedef struct
     uint16_t id;                                    /**< ID of touch */
 } cy_stc_capsense_position_t;
 
-/** Declares touch structure used to store positions of Touchpad, Matrix buttons and Slider widgets */
+/** Declares touch structure used to store positions of Touchpad, Matrix buttons, Slider and
+ *  Liquid Level widgets */
 typedef struct
 {
     cy_stc_capsense_position_t * ptrPosition;       /**< Pointer to the array containing the position information. 
@@ -222,7 +236,7 @@ typedef struct
                                                     */
 } cy_stc_capsense_touch_t;
 
-/** Declares HW smart sensing algorithm data structure for CSD widgets for fourth-generation CAPSENSE&trade; */
+/** Declares HW smart sensing algorithm data structure for fourth-generation CAPSENSE&trade; */
 typedef struct
 {
     uint32_t sensorCap;                             /**< Sensor parasitic capacitance in fF 10^-15 */
@@ -238,7 +252,7 @@ typedef struct
     uint8_t iDacComp;                               /**< Compensation idac code */
 } cy_stc_capsense_auto_tune_config_t;
 
-/** Declares HW smart sensing algorithm data structure for CSD widgets for fifth-generation CAPSENSE&trade; */
+/** Declares HW smart sensing algorithm data structure for fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade; */
 typedef struct
 {
     uint32_t snsCapacitance;                        /**< Sensor parasitic capacitance in fF 10^-15 */
@@ -255,7 +269,7 @@ typedef struct
     uint8_t correctionCoeff;                        /**< Correction coefficient for CTRL_MUX mode */
 } cy_stc_capsense_hw_smartsense_config_t;
 
-/** Declares Noise envelope data structure for CSD widgets when smart sensing algorithm is enabled */
+/** Declares Noise envelope data structure when smart sensing algorithm is enabled */
 typedef struct
 {
     uint16_t param0;                                /**< Parameter 0 configuration */
@@ -614,7 +628,7 @@ uint32_t Cy_CapSense_GetSmartSenseNumSubconversions(
 * The pointer to the thresholds object.
 *
 * \param sigPFC           
-* Signal per finger capacitance.
+* Signal per touch sensitivity.
 *
 * \param startFlag           
 * The flag indicates a first sensor in a widget.
@@ -657,7 +671,7 @@ void Cy_CapSense_InitializeNoiseEnvelope_Lib(
 * The RawCount value for a given sensor.
 *
 * \param sigPFC           
-* Signal per finger capacitance.
+* Signal per touch sensitivity.
 *
 * \param ptrNoiseEnvelope 
 * The pointer to the noise-envelope RAM object of the sensor.
@@ -667,6 +681,98 @@ void Cy_CapSense_RunNoiseEnvelope_Lib(
                 uint16_t rawCount,
                 uint16_t sigPFC,
                 cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNoiseEnvelope);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetLiquidLevel
+****************************************************************************//**
+*
+* Calculates liquid level.
+*
+* \param ptrLlwConfig
+* Specifies the pointer to liquid level configuration.
+*
+* \param ptrLlwContext
+* Specifies the pointer to sensor context structure which belongs to the
+* desired widget.
+*
+* \return
+* Returns a calculated liquid level in range
+* from 0 to 2 ^ CY_CAPSENSE_LLW_RESULT_SHIFT
+*
+*******************************************************************************/
+uint16_t Cy_CapSense_GetLiquidLevel_Lib(
+                const uint8_t * ptrLlwConfig,
+                const uint16_t * ptrLlwContext);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_CommonModeFilter_Lib
+****************************************************************************//**
+*
+* Applies common mode filter to all sensors inside a desired widget.
+*
+* \param cmfThreshold
+* Specifies the common mode filter threshold.
+*
+* \param numSns
+* Specifies the number of sensors in a desired widget.
+*
+* \param ptrSnsContext
+* Specifies the pointer to the sensor context structure. The structure size
+* is 10-byte wide.
+*
+*******************************************************************************/
+void Cy_CapSense_CommonModeFilter_Lib(const uint16_t cmfThreshold,
+                const uint16_t numSns,
+                uint16_t * ptrSnsContext);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseIsxInductance
+****************************************************************************//**
+*
+* Returns inductance per resistance that corresponds to the provided parameters.
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns inductance divided by total resistance in 10^-10.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseIsxInductance(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseIsxFrequencyDivider
+****************************************************************************//**
+*
+* Returns sense clock divider.
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns sense clock divider.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseIsxFrequencyDivider(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_GetSmartSenseIsxNumSubconversions
+****************************************************************************//**
+*
+* Returns optimum number of sub-conversions.
+*
+* \param autoTuneConfig
+* The configuration structure.
+*
+* \return
+* Returns the calculated number of sub-conversions.
+*
+*******************************************************************************/
+uint32_t Cy_CapSense_GetSmartSenseIsxNumSubconversions(
+                cy_stc_capsense_hw_smartsense_config_t * autoTuneConfig);
+
 /** \} \endcond */
 
 #if defined(__cplusplus)

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 5.0: cy_stc_capsense_widget_config_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 6.10.0: cy_stc_capsense_widget_config_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 6.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -137,9 +137,8 @@ uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 const uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a6224ab7605e28404d786633b2c1c1f6b">ptrDiplexTable</a></td></tr>
 <tr class="memdesc:a6224ab7605e28404d786633b2c1c1f6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the diplex table used for Linear slider when Diplex option is enabled. <br /></td></tr>
 <tr class="separator:a6224ab7605e28404d786633b2c1c1f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2825a42c272b5c46dbcb15a21ec913f"><td class="memItemLeft" align="right" valign="top"><a id="ad2825a42c272b5c46dbcb15a21ec913f"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ad2825a42c272b5c46dbcb15a21ec913f">centroidConfig</a></td></tr>
-<tr class="memdesc:ad2825a42c272b5c46dbcb15a21ec913f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration of centroids. <br /></td></tr>
+<tr class="memitem:ad2825a42c272b5c46dbcb15a21ec913f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ad2825a42c272b5c46dbcb15a21ec913f">centroidConfig</a></td></tr>
+<tr class="memdesc:ad2825a42c272b5c46dbcb15a21ec913f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bit mask defining centroid configuration including centroid type, number of touches, diplexing, foam rejection, edge correction, etc.  <a href="#ad2825a42c272b5c46dbcb15a21ec913f">More...</a><br /></td></tr>
 <tr class="separator:ad2825a42c272b5c46dbcb15a21ec913f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfae2ef0d4316555d1e3c54e39c4aeb5"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#adfae2ef0d4316555d1e3c54e39c4aeb5">xResolution</a></td></tr>
 <tr class="memdesc:adfae2ef0d4316555d1e3c54e39c4aeb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keeps maximum position value.  <a href="#adfae2ef0d4316555d1e3c54e39c4aeb5">More...</a><br /></td></tr>
@@ -181,20 +180,25 @@ uint16_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 <a class="el" href="structcy__stc__capsense__gesture__context__t.html">cy_stc_capsense_gesture_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ad60be1a14aded108976eb2d66daac7f1">ptrGestureContext</a></td></tr>
 <tr class="memdesc:ad60be1a14aded108976eb2d66daac7f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to Gesture context structure. <br /></td></tr>
 <tr class="separator:ad60be1a14aded108976eb2d66daac7f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fc7dffe9f218833d42b73769d0e6965"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcy__stc__capsense__ballistic__config__t.html">cy_stc_capsense_ballistic_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a5fc7dffe9f218833d42b73769d0e6965">ballisticConfig</a></td></tr>
-<tr class="memdesc:a5fc7dffe9f218833d42b73769d0e6965"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration data for position ballistic filter.  <a href="#a5fc7dffe9f218833d42b73769d0e6965">More...</a><br /></td></tr>
+<tr class="memitem:a5fc7dffe9f218833d42b73769d0e6965"><td class="memItemLeft" align="right" valign="top"><a id="a5fc7dffe9f218833d42b73769d0e6965"></a>
+<a class="el" href="structcy__stc__capsense__ballistic__config__t.html">cy_stc_capsense_ballistic_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a5fc7dffe9f218833d42b73769d0e6965">ballisticConfig</a></td></tr>
+<tr class="memdesc:a5fc7dffe9f218833d42b73769d0e6965"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration data for position ballistic filter. <br /></td></tr>
 <tr class="separator:a5fc7dffe9f218833d42b73769d0e6965"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad510b796c693e08b4f4b8bf8f76c3fb5"><td class="memItemLeft" align="right" valign="top"><a id="ad510b796c693e08b4f4b8bf8f76c3fb5"></a>
 <a class="el" href="structcy__stc__capsense__ballistic__context__t.html">cy_stc_capsense_ballistic_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ad510b796c693e08b4f4b8bf8f76c3fb5">ptrBallisticContext</a></td></tr>
 <tr class="memdesc:ad510b796c693e08b4f4b8bf8f76c3fb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to Ballistic filter context structure. <br /></td></tr>
 <tr class="separator:ad510b796c693e08b4f4b8bf8f76c3fb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44c45fc836a80c8fe858ab3d5133d751"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcy__stc__capsense__adaptive__filter__config__t.html">cy_stc_capsense_adaptive_filter_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a44c45fc836a80c8fe858ab3d5133d751">aiirConfig</a></td></tr>
-<tr class="memdesc:a44c45fc836a80c8fe858ab3d5133d751"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration of position adaptive filter.  <a href="#a44c45fc836a80c8fe858ab3d5133d751">More...</a><br /></td></tr>
+<tr class="memitem:a44c45fc836a80c8fe858ab3d5133d751"><td class="memItemLeft" align="right" valign="top"><a id="a44c45fc836a80c8fe858ab3d5133d751"></a>
+<a class="el" href="structcy__stc__capsense__adaptive__filter__config__t.html">cy_stc_capsense_adaptive_filter_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a44c45fc836a80c8fe858ab3d5133d751">aiirConfig</a></td></tr>
+<tr class="memdesc:a44c45fc836a80c8fe858ab3d5133d751"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration of position adaptive filter. <br /></td></tr>
 <tr class="separator:a44c45fc836a80c8fe858ab3d5133d751"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94b1400ac7cf425e79664f4e19f54d0b"><td class="memItemLeft" align="right" valign="top"><a id="a94b1400ac7cf425e79664f4e19f54d0b"></a>
 <a class="el" href="structcy__stc__capsense__advanced__touchpad__config__t.html">cy_stc_capsense_advanced_touchpad_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a94b1400ac7cf425e79664f4e19f54d0b">advConfig</a></td></tr>
 <tr class="memdesc:a94b1400ac7cf425e79664f4e19f54d0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration of CSD advanced touchpad. <br /></td></tr>
 <tr class="separator:a94b1400ac7cf425e79664f4e19f54d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65cd4657db96f3711a88345be6527353"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcy__stc__capsense__mp__table__t.html">cy_stc_capsense_mp_table_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a65cd4657db96f3711a88345be6527353">ptrMpTable</a></td></tr>
+<tr class="memdesc:a65cd4657db96f3711a88345be6527353"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the multi-phase vector and de-convolution coefficients.  <a href="#a65cd4657db96f3711a88345be6527353">More...</a><br /></td></tr>
+<tr class="separator:a65cd4657db96f3711a88345be6527353"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477c8db37f2ff589fa1967272d1f5260"><td class="memItemLeft" align="right" valign="top"><a id="a477c8db37f2ff589fa1967272d1f5260"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a477c8db37f2ff589fa1967272d1f5260">posFilterConfig</a></td></tr>
 <tr class="memdesc:a477c8db37f2ff589fa1967272d1f5260"><td class="mdescLeft">&#160;</td><td class="mdescRight">Position filters configuration. <br /></td></tr>
@@ -211,6 +215,22 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a6592a3b822fe251c28fd54ddc75d11b9">alpOffThreshold</a></td></tr>
 <tr class="memdesc:a6592a3b822fe251c28fd54ddc75d11b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">ALP Filter OFF threshold. <br /></td></tr>
 <tr class="separator:a6592a3b822fe251c28fd54ddc75d11b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af30581269d29471c11870fb1c024cf1f"><td class="memItemLeft" align="right" valign="top"><a id="af30581269d29471c11870fb1c024cf1f"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#af30581269d29471c11870fb1c024cf1f">cmfThreshold</a></td></tr>
+<tr class="memdesc:af30581269d29471c11870fb1c024cf1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">CMF threshold. <br /></td></tr>
+<tr class="separator:af30581269d29471c11870fb1c024cf1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab76c9c7585fcdee65af8c7b13ea27233"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ab76c9c7585fcdee65af8c7b13ea27233">cdacConfig</a></td></tr>
+<tr class="memdesc:ab76c9c7585fcdee65af8c7b13ea27233"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bit-mask for widget CDAC configuration:  <a href="#ab76c9c7585fcdee65af8c7b13ea27233">More...</a><br /></td></tr>
+<tr class="separator:ab76c9c7585fcdee65af8c7b13ea27233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b7c2929e9128c81c59b4c494a71a744"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a0b7c2929e9128c81c59b4c494a71a744">foamCoefficient</a></td></tr>
+<tr class="memdesc:a0b7c2929e9128c81c59b4c494a71a744"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foam rejection coefficient.  <a href="#a0b7c2929e9128c81c59b4c494a71a744">More...</a><br /></td></tr>
+<tr class="separator:a0b7c2929e9128c81c59b4c494a71a744"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63">firstSlotId</a></td></tr>
+<tr class="memdesc:a87a81dc03b7e5a64d58ed7286765bd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">The slot ID in the widget to start scan from.  <a href="#a87a81dc03b7e5a64d58ed7286765bd63">More...</a><br /></td></tr>
+<tr class="separator:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a474207c2ce55e017800877298895cf53"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a474207c2ce55e017800877298895cf53">numSlots</a></td></tr>
+<tr class="memdesc:a474207c2ce55e017800877298895cf53"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of slots in the widget.  <a href="#a474207c2ce55e017800877298895cf53">More...</a><br /></td></tr>
+<tr class="separator:a474207c2ce55e017800877298895cf53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a417a8786dfe62d3940fd7d5e265b9e2e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a417a8786dfe62d3940fd7d5e265b9e2e">senseMethod</a></td></tr>
 <tr class="memdesc:a417a8786dfe62d3940fd7d5e265b9e2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies the widget sensing method:  <a href="#a417a8786dfe62d3940fd7d5e265b9e2e">More...</a><br /></td></tr>
 <tr class="separator:a417a8786dfe62d3940fd7d5e265b9e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -218,15 +238,6 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a78fb9e1d1b8c8cdad2d4257f5881ddc2">wdType</a></td></tr>
 <tr class="memdesc:a78fb9e1d1b8c8cdad2d4257f5881ddc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies the widget type. <br /></td></tr>
 <tr class="separator:a78fb9e1d1b8c8cdad2d4257f5881ddc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65cd4657db96f3711a88345be6527353"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcy__stc__capsense__mp__table__t.html">cy_stc_capsense_mp_table_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a65cd4657db96f3711a88345be6527353">ptrMpTable</a></td></tr>
-<tr class="memdesc:a65cd4657db96f3711a88345be6527353"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the multi-phase vector and de-convolution coefficients.  <a href="#a65cd4657db96f3711a88345be6527353">More...</a><br /></td></tr>
-<tr class="separator:a65cd4657db96f3711a88345be6527353"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63">firstSlotId</a></td></tr>
-<tr class="memdesc:a87a81dc03b7e5a64d58ed7286765bd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">The slot ID in the widget to start scan from.  <a href="#a87a81dc03b7e5a64d58ed7286765bd63">More...</a><br /></td></tr>
-<tr class="separator:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a474207c2ce55e017800877298895cf53"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a474207c2ce55e017800877298895cf53">numSlots</a></td></tr>
-<tr class="memdesc:a474207c2ce55e017800877298895cf53"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of slots in the widget.  <a href="#a474207c2ce55e017800877298895cf53">More...</a><br /></td></tr>
-<tr class="separator:a474207c2ce55e017800877298895cf53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b355886a6abacc4fa1aa77423d092e6"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a4b355886a6abacc4fa1aa77423d092e6">numChopCycles</a></td></tr>
 <tr class="memdesc:a4b355886a6abacc4fa1aa77423d092e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines number of chopping cycles.  <a href="#a4b355886a6abacc4fa1aa77423d092e6">More...</a><br /></td></tr>
 <tr class="separator:a4b355886a6abacc4fa1aa77423d092e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,9 +265,6 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="memitem:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f">iirCoeffHw</a></td></tr>
 <tr class="memdesc:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw count HW IIR filter coefficient.  <a href="#a7d45ff7ce8f45fd9a26fac8ae98ec60f">More...</a><br /></td></tr>
 <tr class="separator:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab76c9c7585fcdee65af8c7b13ea27233"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ab76c9c7585fcdee65af8c7b13ea27233">cdacConfig</a></td></tr>
-<tr class="memdesc:ab76c9c7585fcdee65af8c7b13ea27233"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bit-mask for widget CDAC configuration:  <a href="#ab76c9c7585fcdee65af8c7b13ea27233">More...</a><br /></td></tr>
-<tr class="separator:ab76c9c7585fcdee65af8c7b13ea27233"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a id="a872610c19b274d4daa48c9d29990f7cc"></a>
@@ -290,6 +298,22 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 <p>Raw count IIR filter coefficient. </p>
 <p>Smaller value leads to higher filtering </p>
+
+</div>
+</div>
+<a id="ad2825a42c272b5c46dbcb15a21ec913f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2825a42c272b5c46dbcb15a21ec913f">&#9670;&nbsp;</a></span>centroidConfig</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t cy_stc_capsense_widget_config_t::centroidConfig</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bit mask defining centroid configuration including centroid type, number of touches, diplexing, foam rejection, edge correction, etc. </p>
 
 </div>
 </div>
@@ -361,60 +385,6 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 </div>
 </div>
-<a id="a5fc7dffe9f218833d42b73769d0e6965"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fc7dffe9f218833d42b73769d0e6965">&#9670;&nbsp;</a></span>ballisticConfig</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structcy__stc__capsense__ballistic__config__t.html">cy_stc_capsense_ballistic_config_t</a> cy_stc_capsense_widget_config_t::ballisticConfig</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The configuration data for position ballistic filter. </p>
-
-</div>
-</div>
-<a id="a44c45fc836a80c8fe858ab3d5133d751"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44c45fc836a80c8fe858ab3d5133d751">&#9670;&nbsp;</a></span>aiirConfig</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structcy__stc__capsense__adaptive__filter__config__t.html">cy_stc_capsense_adaptive_filter_config_t</a> cy_stc_capsense_widget_config_t::aiirConfig</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The configuration of position adaptive filter. </p>
-
-</div>
-</div>
-<a id="a417a8786dfe62d3940fd7d5e265b9e2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a417a8786dfe62d3940fd7d5e265b9e2e">&#9670;&nbsp;</a></span>senseMethod</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t cy_stc_capsense_widget_config_t::senseMethod</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Specifies the widget sensing method: </p>
-<ul>
-<li>0 - UNDEFINED (CY_CAPSENSE_UNDEFINED_GROUP)</li>
-<li>1 - CSD (CY_CAPSENSE_CSD_GROUP)</li>
-<li>2 - CSX (CY_CAPSENSE_CSX_GROUP)</li>
-<li>3 - ISX (CY_CAPSENSE_ISX_GROUP) </li>
-</ul>
-
-</div>
-</div>
 <a id="a65cd4657db96f3711a88345be6527353"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a65cd4657db96f3711a88345be6527353">&#9670;&nbsp;</a></span>ptrMpTable</h2>
 
@@ -429,6 +399,72 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 <p>Pointer to the multi-phase vector and de-convolution coefficients. </p>
 <dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="ab76c9c7585fcdee65af8c7b13ea27233"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab76c9c7585fcdee65af8c7b13ea27233">&#9670;&nbsp;</a></span>cdacConfig</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_widget_config_t::cdacConfig</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bit-mask for widget CDAC configuration: </p>
+<ul>
+<li>bit[0..1] - Reference CDAC mode (CY_CAPSENSE_CDAC_REF_MODE_MASK)<ul>
+<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The reference CDAC is disabled</li>
+<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of reference CDAC set manually</li>
+<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of reference CDAC set automatically</li>
+</ul>
+</li>
+<li>bit[2..3] - Fine CDAC mode (CY_CAPSENSE_CDAC_FINE_MODE_MASK)<ul>
+<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The fine CDAC is disabled</li>
+<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of fine CDAC set manually</li>
+<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of fine CDAC set automatically</li>
+</ul>
+</li>
+<li>bit[4..5] - Compensation CDAC mode (CY_CAPSENSE_CDAC_COMP_MODE_MASK)<ul>
+<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The compensation CDAC is disabled</li>
+<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of compensation CDAC set manually</li>
+<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of compensation CDAC set automatically</li>
+</ul>
+</li>
+<li>bit[6..7] - Compensation CDAC divider mode (CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK)<ul>
+<li>0 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of compensation CDAC divider set manually</li>
+<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of compensation CDAC divider set automatically</li>
+</ul>
+</li>
+<li>bit[8..9] - Sensitivity boost (CY_CAPSENSE_CDAC_BOOST_VAL_MASK)<ul>
+<li>1 (CY_CAPSENSE_CDAC_BOOST_DISABLED) - Boost disabled</li>
+<li>2 (CY_CAPSENSE_CDAC_BOOST_2X) - 2X Boost</li>
+<li>3 (CY_CAPSENSE_CDAC_BOOST_3X) - 3X Boost</li>
+<li>4 (CY_CAPSENSE_CDAC_BOOST_4X) - 4X Boost <dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+<a id="a0b7c2929e9128c81c59b4c494a71a744"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b7c2929e9128c81c59b4c494a71a744">&#9670;&nbsp;</a></span>foamCoefficient</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t cy_stc_capsense_widget_config_t::foamCoefficient</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Foam rejection coefficient. </p>
+<p>This decides the scanning cycle for foam sensing mechanism. </p><dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
 
 </div>
 </div>
@@ -463,6 +499,28 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 <p>The number of slots in the widget. </p>
 <dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;. </dd></dl>
+
+</div>
+</div>
+<a id="a417a8786dfe62d3940fd7d5e265b9e2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a417a8786dfe62d3940fd7d5e265b9e2e">&#9670;&nbsp;</a></span>senseMethod</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t cy_stc_capsense_widget_config_t::senseMethod</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Specifies the widget sensing method: </p>
+<ul>
+<li>0 - UNDEFINED (CY_CAPSENSE_UNDEFINED_GROUP)</li>
+<li>1 - CSD (CY_CAPSENSE_CSD_GROUP)</li>
+<li>2 - CSX (CY_CAPSENSE_CSX_GROUP)</li>
+<li>3 - ISX (CY_CAPSENSE_ISX_GROUP) </li>
+</ul>
 
 </div>
 </div>
@@ -643,62 +701,13 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 </div>
 </div>
-<a id="ab76c9c7585fcdee65af8c7b13ea27233"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab76c9c7585fcdee65af8c7b13ea27233">&#9670;&nbsp;</a></span>cdacConfig</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t cy_stc_capsense_widget_config_t::cdacConfig</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Bit-mask for widget CDAC configuration: </p>
-<ul>
-<li>bit[0..1] - Reference CDAC mode (CY_CAPSENSE_CDAC_REF_MODE_MASK)<ul>
-<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The reference CDAC is disabled</li>
-<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of reference CDAC set manually</li>
-<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of reference CDAC set automatically</li>
-</ul>
-</li>
-<li>bit[2..3] - Fine CDAC mode (CY_CAPSENSE_CDAC_FINE_MODE_MASK)<ul>
-<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The fine CDAC is disabled</li>
-<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of fine CDAC set manually</li>
-<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of fine CDAC set automatically</li>
-</ul>
-</li>
-<li>bit[4..5] - Compensation CDAC mode (CY_CAPSENSE_CDAC_COMP_MODE_MASK)<ul>
-<li>0 (CY_CAPSENSE_CDAC_MODE_DISABLED) - The compensation CDAC is disabled</li>
-<li>1 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of compensation CDAC set manually</li>
-<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of compensation CDAC set automatically</li>
-</ul>
-</li>
-<li>bit[6..7] - Compensation CDAC divider mode (CY_CAPSENSE_CDAC_COMP_DIV_MODE_MASK)<ul>
-<li>0 (CY_CAPSENSE_CDAC_MODE_MANUAL) - The value of compensation CDAC divider set manually</li>
-<li>2 (CY_CAPSENSE_CDAC_MODE_AUTO) - The value of compensation CDAC divider set automatically</li>
-</ul>
-</li>
-<li>bit[8..9] - Sensitivity boost (CY_CAPSENSE_CDAC_BOOST_VAL_MASK)<ul>
-<li>1 (CY_CAPSENSE_CDAC_BOOST_DISABLED) - Boost disabled</li>
-<li>2 (CY_CAPSENSE_CDAC_BOOST_2X) - 2X Boost</li>
-<li>3 (CY_CAPSENSE_CDAC_BOOST_3X) - 3X Boost</li>
-<li>4 (CY_CAPSENSE_CDAC_BOOST_4X) - 4X Boost <dl class="section note"><dt>Note</dt><dd>This field is available for the fifth-generation low power CAPSENSE&trade;. </dd></dl>
-</li>
-</ul>
-</li>
-</ul>
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 6.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

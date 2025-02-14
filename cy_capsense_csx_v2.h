@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx_v2.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes specific to the CSX sensing
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -90,13 +90,13 @@ void Cy_CapSense_CSXScanISR(void * capsenseContext);
 #define CY_CAPSENSE_DEFAULT_CSD_HSCMP_CFG                   (0x00000000u)
 #define CY_CAPSENSE_DEFAULT_CSD_AMBUF_CFG                   (0x00000000u)
 #define CY_CAPSENSE_LOW_VOLTAGE_CSD_AMBUF_CFG               (0x00000001u)
-/* Intended to be used for PSoC&trade; 4 devices in case if VDDA >= 2V */
+/* Intended to be used for PSOC&trade; 4 devices in case if VDDA >= 2V */
 #define CY_CAPSENSE_DEFAULT_CSD_REFGEN_CFG                  (0x00001F41u)
-/* Intended to be used for PSoC&trade; 4 devices in case if VDDA < 2V */
+/* Intended to be used for PSOC&trade; 4 devices in case if VDDA < 2V */
 #define CY_CAPSENSE_LOW_VOLTAGE_CSD_REFGEN_CFG              (0x00800011u)
-/* Intended to be used for PSoC&trade; 6 devices in case if the PASS is selected as the VREF source */
+/* Intended to be used for PSOC&trade; 6 devices in case if the PASS is selected as the VREF source */
 #define CY_CAPSENSE_PASS_CSD_REFGEN_CFG                     (0x00001F41u)
-/* Intended to be used for PSoC&trade; 6 devices in case if the SRSS is selected as the VREF source */
+/* Intended to be used for PSOC&trade; 6 devices in case if the SRSS is selected as the VREF source */
 #define CY_CAPSENSE_SRSS_CSD_REFGEN_CFG                     (0x00001541u)
 #define CY_CAPSENSE_DEFAULT_CSD_CSDCMP_CFG                  (0x00000300u)
 #define CY_CAPSENSE_DEFAULT_CSD_IDACA_CFG                   (0x010F0E80u)

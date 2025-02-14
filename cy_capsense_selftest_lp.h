@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes of the BIST module.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying

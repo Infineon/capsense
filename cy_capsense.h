@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -18,13 +18,13 @@
 ********************************************************************************
 * \mainpage
 ********************************************************************************
-* CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon.
-* Capacitive sensing can be used in a variety of applications and products where
-* conventional mechanical buttons can be replaced with sleek human interfaces to
-* transform the way users interact with electronic systems. These include home
-* appliances, and automotive, IoT, and industrial applications. CAPSENSE&trade;
-* supports multiple interfaces (widgets) using CSD, CSX, and ISX sensing methods
-* with robust performance.
+* CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from
+* Infineon. Capacitive sensing can be used in a variety of applications
+* and products where conventional mechanical buttons can be replaced with
+* sleek human interfaces to transform the way users interact with electronic
+* systems. These include home appliances, and automotive, IoT, and
+* industrial applications. CAPSENSE&trade; supports multiple interfaces
+* (widgets) using CSD, CSX, and ISX sensing methods with robust performance.
 *
 * CAPSENSE&trade; has become a popular technology to replace conventional
 * mechanical- and optical-based user interfaces. There are fewer parts
@@ -45,9 +45,9 @@
 ********************************************************************************
 *
 * The CAPSENSE&trade; middleware Library supports operation with fourth-generation,
-* fifth-generation and fifth-generation LP of CAPSENSE&trade; HW.
+* fifth-generation and fifth-generation low power of CAPSENSE&trade; HW.
 * CAPSENSE&trade; HW enables the multiple sensing
-* capabilities on PSoC&trade; devices including the Self-Capacitance (CSD) and Mutual-Capacitance (CSX)
+* capabilities on PSOC&trade; devices including the Self-Capacitance (CSD) and Mutual-Capacitance (CSX)
 * capacitive touch sensing solutions, inductive sensing (ISX), impedance measurement, and
 * other features.
 *
@@ -125,9 +125,9 @@
 * at the <a href="http:/\/www.infineon.com"><b>Infineon Technologies</b></a>
 * and at the <a href="https:/\/github.com/Infineon">
 * <b> Infineon Technologies GitHub</b></a>. The following are the links
-* to code examples for different PSoC&trade; families presented on GitHub.
+* to code examples for different PSOC&trade; families presented on GitHub.
 *
-* \subsection group_capsense_quick_start_psoc4_csd_ces Code Examples for PSoC&trade; 4 Devices with fourth-generation CAPSENSE&trade;
+* \subsection group_capsense_quick_start_psoc4_csd_ces Code Examples for PSOC&trade; 4 Devices with fourth-generation CAPSENSE&trade;
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-capsense-csd-button-tuning">
 *   <b>CSD Button Manual Tuning</b></a>
@@ -138,7 +138,7 @@
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-capsense-csd-slider-tuning">
 *   <b>CSD Slider Manual Tuning</b></a>
 *
-* \subsection group_capsense_quick_start_psoc4_msc_ces Code Examples for PSoC&trade; 4 Devices with fifth-generation CAPSENSE&trade;
+* \subsection group_capsense_quick_start_psoc4_msc_ces Code Examples for PSOC&trade; 4 Devices with fifth-generation CAPSENSE&trade;
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csd-button-tuning">
 *   <b>CSD Button Manual Tuning</b></a>
@@ -155,7 +155,24 @@
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msc-capsense-csx-touchpad-tuning">
 *   <b>CSX Touchpad Manual Tuning</b></a>
 *
-* \subsection group_capsense_quick_start_psoc6_csd_ces Code Examples for PSoC&trade; 6 Devices with fourth-generation CAPSENSE&trade;
+* \subsection group_capsense_quick_start_psoc4_msclp_ces Code Examples for PSOC&trade; 4 Devices with fifth-generation low power CAPSENSE&trade;
+*
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msclp-capsense-low-power">
+*   <b>MSCLP CAPSENSE&trade; low power</b></a>
+*
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msclp-low-power-csd-button">
+*   <b>MSCLP low-power self-capacitance button</b></a>
+*
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msclp-low-power-csx-slider">
+*   <b>MSCLP low-power mutual-capacitance slider</b></a>
+*
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msclp-liquid-tolerant-proximity">
+*   <b>MSCLP CAPSENSE&trade; liquid-tolerant proximity-sensing</b></a>
+*
+* * <a href="https:/\/github.com/Infineon/mtb-example-psoc4-msclp-csx-touchpad">
+*   <b>MSCLP multitouch mutual-capacitance touchpad tuning</b></a>
+*
+* \subsection group_capsense_quick_start_psoc6_csd_ces Code Examples for PSOC&trade; 6 Devices with fourth-generation CAPSENSE&trade;
 *
 * * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider">
 *   <b>Two Buttons and Slider with CAPSENSE&trade; Tuner</b></a>
@@ -181,10 +198,10 @@
 * This quick start guide assumes that the environment is configured:
 * * The <a href="https:/\/github.com/Infineon/mtb-pdl-cat1">
 * <b>CAT1 Peripheral Driver Library (PDL)</b></a> is included in the project
-* in case if the PSoC&trade; 6 device is used.
+* in case if the PSOC&trade; 6 device is used.
 * * The <a href="https:/\/github.com/Infineon/mtb-pdl-cat2">
 * <b>CAT2 Peripheral Driver Library (PDL)</b></a> is included in the project
-* in case if the PSoC&trade; 4 device is used.
+* in case if the PSOC&trade; 4 device is used.
 * * <a href="https:/\/www.infineon.com/ModusToolboxDeviceConfig">
 * <b>ModusToolbox&trade; Device Configurator Tool</b></a>,
 * <a href="https:/\/www.infineon.com/ModusToolboxCapSenseConfig">
@@ -208,7 +225,7 @@
 * at the <a href="https:/\/github.com/Infineon/">
 * <b> Infineon GitHub</b></a>:
 * * <a href="https:/\/github.com/Infineon/mbed-os-example-capsense">
-*   <b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a>
+*   <b>CAPSENSE&trade; buttons and slider for PSOC&trade; 6 MCU with Mbed OS</b></a>
 *
 * If you are doing your own project, remember to include cycfg.h file:
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Resource_Include
@@ -250,47 +267,47 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>3.2</td>
+*     <td>3.4.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator tool</td>
-*     <td>4.20</td>
+*     <td>5.20</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; MSC Superblock Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
+*     <td>- ModusToolbox&trade; MSC Superblock Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>1.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; MSC Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
-*     <td>1.1</td>
-*   </tr>
-*   <tr>
-*     <td>- ModusToolbox&trade; MSCLP Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
+*     <td>- ModusToolbox&trade; MSCLP Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>3.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 4 devices in the Device Configurator tool</td>
+*     <td>- ModusToolbox&trade; MSC Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
+*     <td>1.1</td>
+*   </tr>
+*   <tr>
+*     <td>- ModusToolbox&trade; CSD Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
 *     <td>2.0</td>
 *   </tr>
 *   <tr>
-*     <td>- ModusToolbox&trade; CSD Personality for PSoC&trade; 6 devices in the Device Configurator tool</td>
+*     <td>- ModusToolbox&trade; CSD Personality for PSOC&trade; 6 devices in the Device Configurator tool</td>
 *     <td>3.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>6.20</td>
+*     <td>7.10.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>6.10</td>
+*     <td>7.10.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
-*     <td>3.3.1</td>
+*     <td>3.14.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>2.5.0</td>
+*     <td>2.15.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
@@ -298,30 +315,26 @@
 *   </tr>
 *   <tr>
 *     <td>IAR Compiler</td>
-*     <td>8.42.1</td>
+*     <td>9.50.2</td>
 *   </tr>
 *   <tr>
 *     <td>Arm Compiler 6 <sup><b>(Note 1)</b></sup></td>
-*     <td>6.13</td>
+*     <td>6.22.0</td>
 *   </tr>
 *   <tr>
-*     <td>MBED OS (only for PSoC&trade; 6)</td>
+*     <td>MBED OS (only for PSOC&trade; 6)</td>
 *     <td>5.15.8</td>
-*   </tr>
-*   <tr>
-*     <td>FreeRTOS</td>
-*     <td>10.4.5</td>
 *   </tr>
 * </table>
 *
-* <b>Note 1</b> The CAPSENSE&trade; middleware includes the pre-compiled libraries for
+* \note
+* The CAPSENSE&trade; middleware includes the pre-compiled libraries for
 * Arm Compiler 6. They are built with the following options to be compatible
 * with ModusToolbox&trade; and MBED:
-*
 * * -fshort-enums - Set the size of an enumeration type to the smallest
 *                   data type that can hold all enumerator values
 * * -fshort-wchar - Set the size of wchar_t to 2 bytes
-*
+* \note
 * To operate in custom environments with Arm Compiler 6, apply
 * the above mentioned build options.
 *
@@ -369,20 +382,16 @@
 *
 * <table class="doxtable">
 *  <tr><th>Configuration:</th><th>Mode</th><th>Sensor Connection Type</th><th>Memory Type</th><th>Configuration 1</th><th>Configuration 2</th><th>Configuration 3</th><th>Configuration 4</th><th>Configuration 5</th><th>Configuration 6</th><th>Configuration 7</th><th>Configuration 8</th><th>Configuration 9</th></tr>
-*  <tr align="center"><td rowspan=2>4th Gen</td><td rowspan=2>IntDrv</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 6.0 kB</td><td>&lt; 8.8 kB</td><td>&lt; 11.7 kB</td><td>&lt; 5.5 kB</td>
-*   <td>&lt; 6.8 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.1 kB</td><td>&lt; 9.4 kB</td><td>&lt; 18.7 kB</td></tr>
-*  <tr align="center"><td>SRAM:</td><td>&lt; 0.6 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.9 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 1.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 0.7 kB</td><td>&lt; 2.4 kB</td></tr>
-*  <tr align="center"><td rowspan=6>5th Gen</td><td rowspan=4>IntDrv</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 8.0 kB</td><td>&lt; 10.4 kB</td><td>&lt; 11.8 kB</td><td>&lt; 7.9 kB</td>
-*   <td>&lt; 9.3 kB</td><td>&lt; 10.1 kB</td><td>&lt; 11.2 kB</td><td>&lt; 12.0 kB</td><td>&lt; 15.0 kB</td></tr>
-*  <tr align="center"><td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.4 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.4 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB</td></tr>
-*  <tr align="center"><td rowspan=2>CTRL_MUX</td><td>Flash:</td><td>&lt; 7.6 kB</td><td>&lt; 10.7 kB</td><td>&lt; 11.4 kB</td><td>&lt; 7.4 kB</td>
-*   <td>&lt; 9.2 kB</td><td>&lt; 9.8 kB</td><td>&lt; 10.9 kB</td><td>&lt; 11.9 kB</td><td>&lt; 14.8 kB</td></tr>
-*  <tr align="center"><td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.4 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.4 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB</td></tr>
-*  <tr align="center"><td rowspan=2>DMA</td><td rowspan=2>CTRL_MUX</td><td>Flash:</td><td>&lt; 7.9 kB</td><td>&lt; 11.3 kB</td><td>&lt; 12.1 kB</td><td>&lt; 8.0 kB</td><td>&lt; 9.8 kB</td><td>&lt; 10.4 kB</td><td>&lt; 11.5 kB</td><td>&lt; 12.0 kB</td><td>&lt; 15.4 kB</td></tr>
-*  <tr align="center"><td>SRAM:</td><td>&lt; 1.4 kB</td><td>&lt; 1.6 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.7 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB</td></tr>
-*  <tr align="center"><td rowspan=2>5th Gen Low Power</td><td rowspan=2>LP-AOS</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 7.5 kB</td><td>&lt; 10.8 kB</td><td>&lt; 11.3 kB</td><td>&lt; 7.4 kB</td>
-*   <td>&lt; 9.2 kB</td><td>&lt; 9.6 kB</td><td>&lt; 11.1 kB</td><td>&lt; 11.3 kB</td><td>&lt; 14.4 kB</td></tr>
-*  <tr align="center"><td>SRAM:</td><td>&lt; 1.4 kB</td><td>&lt; 1.6 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 5.1 kB</td></tr>
+*  <tr align="center"><td rowspan=2>4th Gen</td><td rowspan=2>IntDrv</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 6.1 kB</td><td>&lt; 8.7 kB</td><td>&lt; 11.8 kB</td><td>&lt; 5.6 kB</td><td>&lt; 6.3 kB</td><td>&lt; 8.0 kB</td><td>&lt; 9.2 kB</td><td>&lt; 9.6 kB</td><td>&lt; 19.2 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 0.6 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.9 kB</td><td>&lt; 0.8 kB</td><td>&lt; 0.8 kB</td><td>&lt; 1.1 kB</td><td>&lt; 1.8 kB</td><td>&lt; 0.7 kB</td><td>&lt; 2.5 kB</td></tr>
+*  <tr align="center"><td rowspan=6>5th Gen</td><td rowspan=4>IntDrv</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 8.2 kB</td><td>&lt; 11.0 kB</td><td>&lt; 12.4 kB</td><td>&lt; 8.2 kB</td><td>&lt; 9.6 kB</td><td>&lt; 10.7 kB</td><td>&lt; 11.8 kB</td><td>&lt; 12.6 kB</td><td>&lt; 16.3 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 1.1 kB</td><td>&lt; 1.2 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 2.3 kB</td><td>&lt; 1.7 kB</td><td>&lt; 3.3 kB</td></tr>
+*  <tr align="center"><td rowspan=2>CTRL_MUX</td><td>Flash:</td><td>&lt; 7.9 kB</td><td>&lt; 10.9 kB</td><td>&lt; 12.0 kB</td><td>&lt; 7.8 kB</td><td>&lt; 9.7 kB</td><td>&lt; 10.3 kB</td><td>&lt; 11.4 kB</td><td>&lt; 12.4 kB</td><td>&lt; 16.0 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 1.3 kB</td><td>&lt; 1.5 kB</td><td>&lt; 1.5 kB</td><td>&lt; 1.2 kB</td><td>&lt; 1.2 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB</td></tr>
+*  <tr align="center"><td rowspan=2>DMA</td><td rowspan=2>CTRL_MUX</td><td>Flash:</td><td>&lt; 8.7 kB</td><td>&lt; 11.7 kB</td><td>&lt; 13.0 kB</td><td>&lt; 8.6 kB</td><td>&lt; 10.4 kB</td><td>&lt; 11.0 kB</td><td>&lt; 12.1 kB</td><td>&lt; 13.1 kB</td><td>&lt; 16.7 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 1.3 kB</td><td>&lt; 1.5 kB</td><td>&lt; 1.5 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.2 kB</td><td>&lt; 2.6 kB</td><td>&lt; 3.3 kB</td><td>&lt; 2.1 kB</td><td>&lt; 5.4 kB</td></tr>
+*  <tr align="center"><td rowspan=2>5th Gen Low Power</td><td rowspan=2>LP-AOS</td><td rowspan=2>AMUX</td><td>Flash:</td><td>&lt; 7.9 kB</td><td>&lt; 11.8 kB</td><td>&lt; 12.9 kB</td><td>&lt; 7.7 kB</td><td>&lt; 10.1 kB</td><td>&lt; 10.2 kB</td><td>&lt; 11.6 kB</td><td>&lt; 12.2 kB</td><td>&lt; 15.8 kB</td></tr>
+*  <tr align="center"><td>SRAM:</td><td>&lt; 1.2 kB</td><td>&lt; 1.4 kB</td><td>&lt; 1.5 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.1 kB</td><td>&lt; 2.5 kB</td><td>&lt; 3.2 kB</td><td>&lt; 1.5 kB</td><td>&lt; 4.8 kB</td></tr>
 *  <tr><th colspan=13>Widgets</th></tr>
 *  <tr><td colspan=4>CSD Button</td><td>3(10 sensors)</td><td>3(10 sensors)</td><td>3(10 sensors)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>1(1 sensor)</td><td>1(1 sensor)</td></tr>
 *  <tr><td colspan=4>CSD Matrix Buttons</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -415,6 +424,7 @@
 * </table>
 *
 * \note
+* Configuration considerations:
 * * To select values for the Scan mode and Sensor connection method parameters (for the fifth-generation of the CAPSENSE&trade; HW)
 * navigate to the Advanced tab in the CAPSENSE&trade; Configurator tool, and then select the General settings sub-tab.
 *
@@ -659,6 +669,21 @@
 *            with the CY_CAPSENSE_INIT_SW_RES_HIGH value.
 *     </td>
 *   </tr>
+*   <tr>
+*     <td>17158</td>
+*     <td>
+*         ISX scan followed by BIST measurement or with other sensing methods
+*         CSD & CSX introduces drift in raw count. This impacts the
+*         performance and accuracy of the ISX scanning.
+*     </td>
+*     <td>
+*         There are several possible workarounds:
+*         1. Use ISX in standalone mode (without other sensing methods)
+*         2. Use ISX without built-in self-test (BIST)
+*         3. Configure Inactive sensor connection parameter to High-Z
+*         4. Introduce a dummy scan before ISX.
+*     </td>
+*   </tr>
 * </table>
 *
 * \note Refer to the "Errata" section of the device datasheet to get information
@@ -671,10 +696,91 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="9">6.10.0</td>
+*     <td colspan="2"><i><b>
+*       This version is compatible to the v5.0, 
+*       however due to switching to MTB 3.4, new Device-DB, PDL,
+*       compiler versions, etc. a migration of projects created with 
+*       past version might be not possible. In this case a project should be newly created.
+*       Also, if you use the CAPSENSE&trade; middleware v6.10.0, you must use
+*       the CAPSENSE&trade Configurator v7.10.0 tool or later. This MW version is not
+*       compatible with the previous Configurator tool versions.
+*     </b></i>
+*   </tr>
+*   <tr>
+*     <td> Added Liquid level sensing method for fifth-generation low power device.
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   </tr>
+*   <tr>
+*     <td> Added Inductive sensing method for fifth-generation low power device.
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Added auto-tuning for Inductive sensing widgets. The ISX auto-tuning
+*       feature is at the Beta readiness level. It is not fully validated and
+*       might not work as expected. Use it to start working on the ISX tuning.
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Added Common mode filter.
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Added Multi-pin Selection option for fifth-generation low power device.
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*       Increased supported sensor capacitance range to 275pF and total 
+*       Shield electrode capacitance range to 1160pF (CAPSENSE&trade; fifth-generation low power device).
+*     </td>
+*     <td>
+*         Feature enhancement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Fixed some non-functional MISRA violations.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Fixed documentation.
+*     </td>
+*     <td>
+*         User experience improvement.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>6.0.0</td>
+*     <td colspan="2"><i><b>
+*       This release is for internal purpose.
+*     </b></i>
+*     </td>
+*   </tr>
+*   <tr>
 *     <td rowspan="13">5.0</td>
 *     <td colspan="2"><i><b>
 *       This version is not backward compatible with the
-*       previous version due to re-designed CDAC Auto-calibration.
+*       previous version due to re-designed CDAC auto-calibration.
 *       We tried to keep the established API, but your design may need to be
 *       updated to operate with CAPSENSE&trade; middleware v5.0.
 *       Also, if you use the CAPSENSE&trade middleware v5.0, you must use
@@ -685,7 +791,7 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Re-designed CDAC Auto-calibration algorithm for the fifth-generation
+*         Re-designed CDAC auto-calibration algorithm for the fifth-generation
 *         LP devices
 *     </td>
 *     <td>
@@ -694,8 +800,8 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Added auto selection mode of CIC2 decimation rate for the
-*         fifth-generation LP devices
+*         Added auto-selection mode of CIC2 decimation rate for the
+*         fifth-generation low power devices
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -703,8 +809,8 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Added Auto-selection mode of CDAC Dither scale value for the
-*         fifth-generation and fifth-generation LP devices
+*         Added auto-selection mode of CDAC Dither scale value for the
+*         fifth-generation and fifth-generation low power devices
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -714,7 +820,7 @@
 *     <td>
 *         Added the HW IIR Filter initialization function
 *         Cy_CapSense_ScanInitializeHwIirAllSlots() and
-*         Cy_CapSense_ScanInitializeHwIirSlots() for fifth-generation LP devices
+*         Cy_CapSense_ScanInitializeHwIirSlots() for fifth-generation low power devices
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -749,7 +855,7 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Hidden a Multi-phase Self feature for fifth-generation LP devices
+*         Hidden a Multi-phase Self feature for fifth-generation low power devices
 *     </td>
 *     <td>
 *         Defect fixing
@@ -793,7 +899,7 @@
 *     <td rowspan="17" >4.0</td>
 *     <td colspan="2"><i><b>
 *       This version is not backward compatible with the
-*       previous version due to fifth-generation LP devices support
+*       previous version due to fifth-generation low power devices support
 *       implementation and defect fixes.
 *       We tried to keep the established API, but your design may need to be
 *       updated to operate with CAPSENSE&trade; middleware v4.0.
@@ -802,7 +908,7 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Added CAPSENSE&trade; fifth-generation LP device support
+*         Added CAPSENSE&trade; fifth-generation low power device support
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -827,7 +933,7 @@
 *   </tr>
 *   <tr>
 *     <td>
-*         Added Multi-phase Self support for fifth-generation LP devices
+*         Added Multi-phase Self support for fifth-generation low power devices
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -836,7 +942,7 @@
 *   <tr>
 *     <td>
 *         Updated the CIC2 functionality for the fifth-generation devices
-*         to be consistent with the fifth-generation LP devices.
+*         to be consistent with the fifth-generation low power devices.
 *     </td>
 *     <td>
 *         Feature enhancement
@@ -884,7 +990,7 @@
 *         Renamed cy_stc_msc_channel_config_t to cy_stc_capsense_channel_config_t, updated field names
 *     </td>
 *     <td>
-*         Following naming convention. Updated for consistency between fifth-generation and fifth-generation LP devices
+*         Following naming convention. Updated for consistency between fifth-generation and fifth-generation low power devices
 *     </td>
 *   </tr>
 *   <tr>
@@ -937,6 +1043,16 @@
 *     </td>
 *     <td>
 *         Feature enhancement
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>3.0.1</td>
+*     <td>
+*       Fixed calls of Cy_DMAC_Descriptor_SetDstAddress() and Cy_DMAC_Descriptor_SetSrcAddress()
+*       accordingly to changes in DMAC v1.20 mtb-pdl-cat2 driver.
+*     </td>
+*     <td>
+*         Defect fixing
 *     </td>
 *   </tr>
 *   <tr>
@@ -1179,7 +1295,7 @@
 *   * <a href="https:/\/www.infineon.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade;
 *   CAPSENSE&trade; Tuner Tool Guide</b></a>
 *
-*   * <a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSoC_4_and_PSoC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661">
+*   * <a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSOC_4_and_PSOC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661">
 *   <b>CAPSENSE&trade; Design Guide</b></a>
 *
 * * ModusToolbox&trade; Overview:
@@ -1194,16 +1310,16 @@
 * * Infineon Technologies Kits and Code Examples:
 *
 *   * <a href="https:/\/github.com/Infineon/mbed-os-example-capsense">
-*   <b>CAPSENSE&trade; buttons and slider for PSoC&trade; 6 MCU with Mbed OS</b></a>
+*   <b>CAPSENSE&trade; buttons and slider for PSOC&trade; 6 MCU with Mbed OS</b></a>
 *
 *   * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider-freertos">
 *   <b>CAPSENSE&trade; Middleware Code Example for FreeRTOS</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx">
-*   <b>CY8CKIT-145-40XX PSoC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a>
+*   <b>CY8CKIT-145-40XX PSOC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149">
-*   <b>CY8CKIT-149 PSoC&trade; 4100S Plus Prototyping Kit</b></a>
+*   <b>CY8CKIT-149 PSOC&trade; 4100S Plus Prototyping Kit</b></a>
 *
 * * General Information:
 *
@@ -1214,22 +1330,22 @@
 *   <b>CAT2 PDL API Reference</b></a>
 *
 *   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
-*   PSoC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
+*   PSOC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
 *
-*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads"><b>AN215671 PSoC&trade; 6 MCU
+*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads"><b>AN215671 PSOC&trade; 6 MCU
 *   firmware design for BLE applications</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">
-*   <b>PSoC&trade; 6 Technical Reference Manual</b></a>
+*   <b>PSOC&trade; 6 Technical Reference Manual</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204000S%20TRM&view=downloads">
-*   <b>PSoC&trade; 4000S Family: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
+*   <b>PSOC&trade; 4000S Family: PSOC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%204100S%20TRM&view=downloads">
-*   <b>PSoC&trade; 4100S and PSoC&trade; 4100S Plus: PSoC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
+*   <b>PSOC&trade; 4100S and PSOC&trade; 4100S Plus: PSOC&trade; 4 Architecture Technical Reference Manual (TRM)</b></a>
 *
-*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=PSoC%2063%20datasheet&view=downloads">
-*   <b>PSoC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a>
+*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=PSOC%2063%20datasheet&view=downloads">
+*   <b>PSOC&trade; 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a>
 *
 *   * <a href="https:/\/github.com/Infineon"><b> Infineon Technologies GitHub</b></a>
 *

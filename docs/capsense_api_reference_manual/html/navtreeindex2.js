@@ -1,5 +1,9 @@
 var NAVTREEINDEX2 =
 {
+"group__group__capsense__macros__touch.html#ga26736659b0a4f78ffb1dce945b232c04":[10,4,6,12],
+"group__group__capsense__macros__touch.html#ga357d64c36840893809b9fa325f9ad6d5":[10,4,6,17],
+"group__group__capsense__macros__touch.html#ga3858658519030890061b252946477cd8":[10,4,6,6],
+"group__group__capsense__macros__touch.html#ga3d55593bb10be928a44a179df5338cf1":[10,4,6,7],
 "group__group__capsense__macros__touch.html#ga41f9db75b066c5d862d822bea199fe2f":[10,4,6,10],
 "group__group__capsense__macros__touch.html#ga4841683021756c1260950771ed54c841":[10,4,6,5],
 "group__group__capsense__macros__touch.html#ga7178f206572f3066be919024efcd824f":[10,4,6,18],
@@ -23,11 +27,12 @@ var NAVTREEINDEX2 =
 "group__group__capsense__structures.html#gaeebeea548d4c2235b14aba63f1dd4bcf":[10,2,0,34],
 "index.html":[],
 "index.html#group_capsense_quick_start":[1],
-"index.html#group_capsense_quick_start_mbed":[1,4],
-"index.html#group_capsense_quick_start_modus":[1,3],
+"index.html#group_capsense_quick_start_mbed":[1,5],
+"index.html#group_capsense_quick_start_modus":[1,4],
 "index.html#group_capsense_quick_start_psoc4_csd_ces":[1,0],
 "index.html#group_capsense_quick_start_psoc4_msc_ces":[1,1],
-"index.html#group_capsense_quick_start_psoc6_csd_ces":[1,2],
+"index.html#group_capsense_quick_start_psoc4_msclp_ces":[1,2],
+"index.html#group_capsense_quick_start_psoc6_csd_ces":[1,3],
 "index.html#section_capsense_changelog":[8],
 "index.html#section_capsense_configuration":[2],
 "index.html#section_capsense_errata":[7],
@@ -244,10 +249,5 @@ var NAVTREEINDEX2 =
 "structcy__stc__capsense__common__config__t.html#a0c80e26b5fe28518248152c5c9c6681a":[10,2,0,23,43],
 "structcy__stc__capsense__common__config__t.html#a12e0de779c3a1f759e349210dbd3d2a4":[10,2,0,23,75],
 "structcy__stc__capsense__common__config__t.html#a16001bf367c6118143ff1ec3511646fb":[10,2,0,23,34],
-"structcy__stc__capsense__common__config__t.html#a1894d1621d3d0b85dcecb541580086b2":[10,2,0,23,56],
-"structcy__stc__capsense__common__config__t.html#a192101f96101897abb7ab8a0767532ad":[10,2,0,23,87],
-"structcy__stc__capsense__common__config__t.html#a1a7933f4724093478a9434d5a7442aac":[10,2,0,23,84],
-"structcy__stc__capsense__common__config__t.html#a2086ec7840bcff2a38a1f4dbc96297ee":[10,2,0,23,66],
-"structcy__stc__capsense__common__config__t.html#a21d3bc1dab9651fed220ebdfead85453":[10,2,0,23,17],
-"structcy__stc__capsense__common__config__t.html#a24b0f48c3101f30ea3981e496cf3bf20":[10,2,0,23,12]
+"structcy__stc__capsense__common__config__t.html#a1894d1621d3d0b85dcecb541580086b2":[10,2,0,23,56]
 };

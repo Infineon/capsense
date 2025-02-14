@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -228,21 +228,6 @@ cy_capsense_status_t Cy_CapSense_GeneratePinFunctionConfig(
         #endif /* CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_TX_ENABLED */
     #endif /* CY_CAPSENSE_CSX_EN */
 
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
-        ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ISX_RX] = idCounter;
-        idCounter++;
-        ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ISX_LX] = idCounter;
-        idCounter++;
-
-        /* Set ISX inactive sensor connection (only High-Z) if it is not assigned already */
-        if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED ==
-                ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z])
-        {
-            ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z] = idCounter;
-            idCounter++;
-        }
-    #endif /* CY_CAPSENSE_ISX_EN */
-
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
         ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_CSD_SNS] = idCounter;
         idCounter++;
@@ -258,7 +243,7 @@ cy_capsense_status_t Cy_CapSense_GeneratePinFunctionConfig(
                 }
                 break;
             case CY_CAPSENSE_SNS_CONNECTION_GROUND:
-                if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED == ptrMapping[CY_CAPSENSE_CTRLMUX_PIN_STATE_GND])
+                if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED == ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND])
                 {
                     ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND] = idCounter;
                     idCounter++;
@@ -299,6 +284,51 @@ cy_capsense_status_t Cy_CapSense_GeneratePinFunctionConfig(
             #endif
         #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED) */
     #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+        ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ISX_RX] = idCounter;
+        idCounter++;
+        ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ISX_LX] = idCounter;
+        idCounter++;
+
+        /* Set ISX inactive sensor connection if it is not assigned already */
+        switch (context->ptrInternalContext->intrIsxInactSnsConn)
+        {
+            case CY_CAPSENSE_SNS_CONNECTION_HIGHZ:
+                if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED == ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z])
+                {
+                    ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z] = idCounter;
+                    idCounter++;
+                }
+                break;
+            case CY_CAPSENSE_SNS_CONNECTION_GROUND:
+                if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED == ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND])
+                {
+                    ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND] = idCounter;
+                    idCounter++;
+                }
+                break;
+            default:
+                /* No action */
+                break;
+        }
+
+        #if (((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) && \
+              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)) || \
+              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN))
+
+            if ((CY_CAPSENSE_SNS_CONNECTION_SHIELD == context->ptrInternalContext->intrCsdInactSnsConn) || 
+                (CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2 == context->ptrInternalContext->intrCsxInactSnsConn))
+            {
+                if (CY_CAPSENSE_PIN_STATE_IDX_UNDEFINED == ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND])
+                {
+                    ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND] = idCounter;
+                    idCounter++;
+                }
+            }
+        #endif
+
+    #endif /* CY_CAPSENSE_ISX_EN */
 
     context->ptrInternalContext->numFunc = idCounter;
 
@@ -745,13 +775,20 @@ void Cy_CapSense_GenerateAllSensorConfig(
     uint8_t * ptrMapping = &context->ptrInternalContext->mapPinState[0u];
     uint32_t snsMethod;
     uint32_t snsMaskInactive = 0u;
-    uint32_t snsFuncState;
-    uint32_t snsFuncStateSelfCap;
-    uint32_t snsFuncStateMutualCap;
-    uint32_t snsFuncStateInductive;
+    uint32_t snsFuncState = 0u;
     uint32_t wdIndex;
     const cy_stc_capsense_widget_config_t * ptrWdCfg;
     const cy_stc_capsense_scan_slot_t * ptrScanSlots;
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+        uint32_t snsFuncStateSelfCap;
+    #endif
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+        uint32_t snsFuncStateMutualCap;
+    #endif
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)  
+        uint32_t snsFuncStateInductive;
+    #endif
 
     uint32_t i = 0u;
     uint32_t snsMask = 0u;
@@ -765,9 +802,11 @@ void Cy_CapSense_GenerateAllSensorConfig(
     #endif
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
-        uint32_t snsMaskInactiveIsx = 0u;
-        uint32_t numEltd;
-        uint32_t eltdIndex;
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN))
+            uint32_t snsMaskInactiveIsx = 0u;
+            uint32_t numEltd;
+            uint32_t eltdIndex;
+        #endif
     #endif
 
     /* Create mask for all project electrodes */
@@ -791,63 +830,79 @@ void Cy_CapSense_GenerateAllSensorConfig(
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
         /* Create separate inactive mask of ISX pins only */
-        for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
-        {
-            ptrWdCfg = &context->ptrWdConfig[wdIndex];
-            snsMethod = ptrWdCfg->senseMethod;
-
-            if (CY_CAPSENSE_ISX_GROUP == snsMethod)
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN))
+            for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
             {
-                numEltd = (uint32_t)ptrWdCfg->numRows + ptrWdCfg->numCols;
-                eltdPinCfg = ptrWdCfg->ptrEltdConfig;
+                ptrWdCfg = &context->ptrWdConfig[wdIndex];
+                snsMethod = ptrWdCfg->senseMethod;
 
-                for (eltdIndex = 0u; eltdIndex < numEltd; eltdIndex++)
+                if (CY_CAPSENSE_ISX_GROUP == snsMethod)
                 {
-                    /* Loop through all pads for this electrode (ganged sensor) */
-                    for (i = 0u; i < eltdPinCfg->numPins; i++)
+                    numEltd = (uint32_t)ptrWdCfg->numRows + ptrWdCfg->numCols;
+                    eltdPinCfg = ptrWdCfg->ptrEltdConfig;
+
+                    for (eltdIndex = 0u; eltdIndex < numEltd; eltdIndex++)
                     {
-                        snsMaskInactiveIsx |= (0x01uL << eltdPinCfg->ptrPin[i].padNumber);
+                        /* Loop through all pads for this electrode (ganged sensor) */
+                        for (i = 0u; i < eltdPinCfg->numPins; i++)
+                        {
+                            snsMaskInactiveIsx |= (0x01uL << eltdPinCfg->ptrPin[i].padNumber);
+                        }
+                        eltdPinCfg++;
                     }
-                    eltdPinCfg++;
                 }
             }
-        }
+        #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)) */
     #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
 
-    /* Define inactive pin state for CSX scans */
-    switch (context->ptrInternalContext->intrCsxInactSnsConn)
-    {
-        case CY_CAPSENSE_SNS_CONNECTION_HIGHZ:
-            snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
-            break;
-        case CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2:
-            snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2];
-            break;
-        default:
-            snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND];
-            break;
-    }
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+        /* Define inactive pin state for CSX scans */
+        switch (context->ptrInternalContext->intrCsxInactSnsConn)
+        {
+            case CY_CAPSENSE_SNS_CONNECTION_HIGHZ:
+                snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
+                break;
+            case CY_CAPSENSE_SNS_CONNECTION_VDDA_BY_2:
+                snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2];
+                break;
+            default:
+                snsFuncStateMutualCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND];
+                break;
+        }
+    #endif
 
-    /* Define inactive pin state for ISX scans */
-    snsFuncStateInductive = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+        /* Define inactive pin state for ISX scans */
+        switch (context->ptrInternalContext->intrIsxInactSnsConn)
+        {
+            case CY_CAPSENSE_SNS_CONNECTION_GROUND:
+                snsFuncStateInductive = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND];
+                break;
+            default:
+                snsFuncStateInductive = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
+                break;
+        }
+    #endif
 
-    /* Define inactive pin state for CSD scans */
-    switch (context->ptrInternalContext->intrCsdInactSnsConn)
-    {
-        case CY_CAPSENSE_SNS_CONNECTION_HIGHZ:
-            snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
-            break;
-        case CY_CAPSENSE_SNS_CONNECTION_SHIELD:
-            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SHIELD_PASSIVE_EN)
-                snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD];
-            #else
-                snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ACT_SHIELD];
-            #endif
-            break;
-        default:
-            snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND];
-            break;
-    }
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+        /* Define inactive pin state for CSD scans */
+        switch (context->ptrInternalContext->intrCsdInactSnsConn)
+        {
+            case CY_CAPSENSE_SNS_CONNECTION_HIGHZ:
+                snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_HIGH_Z];
+                break;
+            case CY_CAPSENSE_SNS_CONNECTION_SHIELD:
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SHIELD_PASSIVE_EN)
+                    snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD];
+                #else
+                    snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ACT_SHIELD];
+                #endif
+                break;
+            default:
+                snsFuncStateSelfCap = ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND];
+                break;
+        }
+    #endif
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
         if (CY_CAPSENSE_SNS_FRAME_LOW_POWER == snsFrameType)
@@ -877,17 +932,26 @@ void Cy_CapSense_GenerateAllSensorConfig(
         ptrWdCfg = &context->ptrWdConfig[wdIndex];
         snsMethod = ptrWdCfg->senseMethod;
 
-        if (CY_CAPSENSE_CSD_GROUP == snsMethod)
+        switch(snsMethod)
         {
-            snsFuncState = snsFuncStateSelfCap;
-        }
-        else if (CY_CAPSENSE_CSX_GROUP == snsMethod)
-        {
-            snsFuncState = snsFuncStateMutualCap;
-        }
-        else
-        {
-            snsFuncState = snsFuncStateInductive;
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+                case CY_CAPSENSE_CSD_GROUP:
+                    snsFuncState = snsFuncStateSelfCap;
+                    break;
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+                case CY_CAPSENSE_CSX_GROUP:
+                    snsFuncState = snsFuncStateMutualCap;
+                    break;
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+                case CY_CAPSENSE_ISX_GROUP:
+                    snsFuncState = snsFuncStateInductive;
+                    break;
+            #endif
+                default:
+                    /* Do nothing */
+                    break;
         }
 
         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
@@ -897,11 +961,23 @@ void Cy_CapSense_GenerateAllSensorConfig(
             }
         #endif
 
-        /* INACTIVE SENSORS */
+        /* INACTIVE SENSORS */ 
         Cy_CapSense_CalculateMaskRegisters(snsMaskInactive, snsFuncState, ptrSensorCfgLoc);
 
         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
-            Cy_CapSense_CalculateMaskRegisters(snsMaskInactiveIsx, snsFuncStateInductive, ptrSensorCfgLoc);
+            /* 
+            * The previous call of Cy_CapSense_CalculateMaskRegisters() configures all pins to ISC. 
+            * This call overwrites previous configuration for ISX electrodes since they can support only High-Z state. 
+            */
+            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN))
+                if (((CY_CAPSENSE_CSX_GROUP == snsMethod) && (ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_CSX_VDDA2] == (uint8_t)snsFuncState)) ||
+                    ((CY_CAPSENSE_CSD_GROUP == snsMethod) && 
+                    ((ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_PAS_SHIELD] == (uint8_t)snsFuncState) ||
+                     (ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_ACT_SHIELD] == (uint8_t)snsFuncState))))
+                {
+                    Cy_CapSense_CalculateMaskRegisters(snsMaskInactiveIsx, ptrMapping[CY_CAPSENSE_PIN_STATE_IDX_GND], ptrSensorCfgLoc);
+                }
+            #endif
         #endif
 
         /* SHIELD ELECTRODE */
@@ -1151,9 +1227,24 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
                          _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_FL_MODE, 1uL); /* the same as it was for msc */
     }
 
-    if (0u == (CY_CAPSENSE_MW_STATE_CALIBRATION_SINGLE_MASK & context->ptrCommonContext->status))
+    #if (0u != CY_CAPSENSE_LIQUID_LEVEL_EN)
+        /* Uses configuration from Configurator for LLW if tuning is complete */
+        if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) &&
+            (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK)))
+        {
+            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN)
+                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN)
+                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[snsIndex].cdacComp);
+            #endif
+        }
+    #endif
+    /* Ref CDAC Code setup */
+    if ((CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS)) ||
+        (0u != (CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK & context->ptrCommonContext->status)))
     {
-        /* Ref CDAC Code setup */
         if ((CY_CAPSENSE_CSD_GROUP == senseMethod) &&
             (ptrWdCfg->numCols <= snsIndex))
         {
@@ -1163,10 +1254,14 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
         {
             snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
         }
-        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
-             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
-             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN))
-            /* Ref CDAC Code setup */
+    }
+
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN))
+        /* Ref-Fine CDAC Code setup */
+        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS))
+        {
             if ((CY_CAPSENSE_CSD_GROUP == senseMethod) &&
                 (ptrWdCfg->numCols <= snsIndex))
             {
@@ -1176,11 +1271,14 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
             {
                 snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
             }
-        #endif
+        }
+    #endif
 
-        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN) || \
-             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN) || \
-             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN))
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN) || \
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN) || \
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN))
+        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_COMP_MODE_MASK) >> CY_CAPSENSE_CDAC_COMP_MODE_POS))
+        {
             switch (senseMethod)
             {
                 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN)
@@ -1198,8 +1296,8 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
                     /* No action for other methods */
                     break;
             }
-        #endif
-    }
+        }
+    #endif
 
     ptrSensorCfg[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] = snsCdacCtlReg;
 

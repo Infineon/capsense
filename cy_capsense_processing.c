@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -37,8 +37,8 @@
 /* Raw data normalization and scaling */
 #define CY_CAPSENSE_SCALING_SHIFT              (15)
 #define CY_CAPSENSE_MAX_TX_PATTERN_NUM         (32)
-
-/** \} \endcond */
+#define CY_CAPSENSE_LLW_NOT_VALID_DATA         (0xFFFFu)
+#define CY_CAPSENSE_RAW_COUNT_MAX_VALUE        CY_CAPSENSE_LLW_NOT_VALID_DATA
 
 
 /*******************************************************************************
@@ -203,12 +203,20 @@ void Cy_CapSense_InitializeWidgetStatus(
                     }
                     break;
             #endif
-            #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_PROXIMITY_EN)
                 case (uint8_t)CY_CAPSENSE_WD_PROXIMITY_E:
                     /* Proximity widgets have 2 debounce counters per sensor (for touch and prox detection) */
                     (void)memset(ptrWdCfg->ptrDebounceArr, (int32_t)ptrWdCxt->onDebounce, (size_t)(snsNumber << 1u));
                     break;
             #endif
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
+                case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
+                    ptrWdCfg->ptrWdContext->wdTouch.numPosition = 1u;
+                    ptrWdCfg->ptrWdContext->status |= (uint8_t)CY_CAPSENSE_WD_ACTIVE_MASK;
+                    break;
+            #endif
+
             default:
                 /* No other widget types */
                 break;
@@ -442,6 +450,8 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
 * - Update Baselines.
 * - Update Differences.
 * The same process is applied to all the sensors of the specified widget.
+* For liquid level widget is applied only filtering, updating baseline and 
+* differences are skipped.
 *
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
@@ -463,9 +473,7 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
 {
     uint32_t result = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t snsIndex;
-    uint32_t snsHistorySize;
     uint32_t freqChIndex;
-    uint16_t * ptrHistorySns;
     uint16_t * ptrBslnInvSns;
     uint8_t * ptrHistoryLowSns = NULL;
     cy_stc_capsense_sensor_context_t * ptrSnsCxtSns;
@@ -473,18 +481,35 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
 
     ptrWdCfg = &context->ptrWdConfig[widgetId];
 
-    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && \
-         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN))
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
+        uint32_t snsHistorySize;
+        uint16_t * ptrHistorySns;
+    #endif
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
         cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;
     #endif
 
-    snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
+    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
+        snsHistorySize = (uint32_t)ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK;
+    #endif
 
     for (freqChIndex = 0u; freqChIndex < CY_CAPSENSE_CONFIGURED_FREQ_NUM; freqChIndex++)
     {
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+            if (0u != (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_CM_EN_MASK))
+            {
+                /* Runs common mode filter */
+                Cy_CapSense_CommonModeFilter_Lib(ptrWdCfg->cmfThreshold, ptrWdCfg->numSns,
+                        (uint16_t *)ptrWdCfg->ptrSnsContext);
+            }
+        #endif
+
         ptrSnsCxtSns = &ptrWdCfg->ptrSnsContext[freqChIndex * context->ptrCommonConfig->numSns];
         ptrBslnInvSns = &ptrWdCfg->ptrBslnInv[freqChIndex * context->ptrCommonConfig->numSns];
-        ptrHistorySns = &ptrWdCfg->ptrRawFilterHistory[freqChIndex * (CY_CAPSENSE_RAW_HISTORY_SIZE / CY_CAPSENSE_CONFIGURED_FREQ_NUM)];
+        #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
+            ptrHistorySns = &ptrWdCfg->ptrRawFilterHistory[freqChIndex * (CY_CAPSENSE_RAW_HISTORY_SIZE / CY_CAPSENSE_CONFIGURED_FREQ_NUM)];
+        #endif
         if (CY_CAPSENSE_IIR_FILTER_PERFORMANCE == (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_IIR_MODE_MASK))
         {
             ptrHistoryLowSns = &ptrWdCfg->ptrRawFilterHistoryLow[freqChIndex *
@@ -498,9 +523,10 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
             #endif
 
             /* Run auto-tuning activities */
-            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN))
-                if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
+                if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdCfg->wdType) && ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)) &&
+                   (((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+                    ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
                 {
                     Cy_CapSense_RunNoiseEnvelope_Lib(ptrSnsCxtSns->raw, ptrWdCfg->ptrWdContext->sigPFC, ptrNEHistory);
                     Cy_CapSense_DpUpdateThresholds(ptrWdCfg->ptrWdContext, ptrNEHistory, snsIndex);
@@ -516,12 +542,29 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
                 }
             #endif
 
-            result |= Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
-            Cy_CapSense_DpUpdateDifferences(ptrWdCfg->ptrWdContext, ptrSnsCxtSns);
+            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
+            {
+                result |= Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
+
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+                    if (0u != (ptrWdCfg->rawFilterConfig & CY_CAPSENSE_RC_FILTER_CM_EN_MASK))
+                    {
+                        Cy_CapSense_DpUpdateDifferencesCmf(ptrSnsCxtSns);
+                    }
+                    else
+                    {
+                        Cy_CapSense_DpUpdateDifferences(ptrWdCfg->ptrWdContext, ptrSnsCxtSns);
+                    }
+                #else
+                    Cy_CapSense_DpUpdateDifferences(ptrWdCfg->ptrWdContext, ptrSnsCxtSns);
+                #endif
+            }
 
             ptrSnsCxtSns++;
             ptrBslnInvSns++;
-            ptrHistorySns += snsHistorySize;
+            #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
+                ptrHistorySns += snsHistorySize;
+            #endif
             if (NULL != ptrHistoryLowSns)
             {
                 ptrHistoryLowSns++;
@@ -617,12 +660,19 @@ void Cy_CapSense_DpProcessCsxWidgetStatus(
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS          - The operation is performed successfully.
+* - CY_CAPSENSE_STATUS_LLW_BAD_CONFIG   - Liquid level configuration is not valid 
+*                                         or calculation fail.
 *******************************************************************************/
-void Cy_CapSense_DpProcessCsdWidgetStatus(
+cy_capsense_status_t Cy_CapSense_DpProcessCsdWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_context_t * context)
 {
     (void)context;
+    cy_capsense_status_t status = CY_CAPSENSE_STATUS_SUCCESS;
+
     switch (ptrWdConfig->wdType)
     {
         #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_BUTTON_EN)
@@ -656,10 +706,18 @@ void Cy_CapSense_DpProcessCsdWidgetStatus(
                 break;
         #endif
 
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
+            case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
+                status = Cy_CapSense_DpProcessLiquidLevel(ptrWdConfig, context);
+                break;
+        #endif
+
         default:
             /* No other widget types */
             break;
     }
+
+    return status;
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
 
@@ -740,6 +798,10 @@ void Cy_CapSense_DpProcessIsxWidgetStatus(
 * - CY_CAPSENSE_PROCESS_FILTER     (0x01) Run Firmware Filter
 * - CY_CAPSENSE_PROCESS_BASELINE   (0x02) Update Baselines
 * - CY_CAPSENSE_PROCESS_DIFFCOUNTS (0x04) Update Difference Counts
+* - CY_CAPSENSE_PROCESS_CALC_NOISE (0x08) Calculate the noise
+*                   (only in full auto-tuning mode)
+* - CY_CAPSENSE_PROCESS_THRESHOLDS (0x10) Update the thresholds
+*                   (only in full auto-tuning mode)
 * - CY_CAPSENSE_PROCESS_ALL               Execute all tasks
 *
 * \param ptrSnsBslnInv
@@ -768,6 +830,10 @@ uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
     uint32_t  result = CY_CAPSENSE_STATUS_SUCCESS;
     cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
 
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
+        cy_stc_capsense_smartsense_csd_noise_envelope_t * ptrNEHistory = ptrWdConfig->ptrNoiseEnvelope;
+    #endif
+
     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
         if (0u != (mode & CY_CAPSENSE_PROCESS_FILTER))
         {
@@ -779,13 +845,45 @@ uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
         (void)ptrSnsRawHistoryLow;
     #endif
 
-    if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
+    /* Run auto-tuning activities */
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
+        if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdConfig->wdType) && ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType)) &&
+           (((CY_CAPSENSE_CSD_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+            ((CY_CAPSENSE_ISX_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
+        {
+            Cy_CapSense_RunNoiseEnvelope_Lib(ptrSnsContext->raw, ptrWdCxt->sigPFC, ptrNEHistory);
+            Cy_CapSense_DpUpdateThresholds(ptrWdCxt, ptrNEHistory, 0u);
+            #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN)
+                if ((uint8_t)CY_CAPSENSE_WD_PROXIMITY_E == ptrWdConfig->wdType)
+                {
+                    ptrWdCxt->proxTh = ptrWdCxt->fingerTh;
+                    ptrWdCxt->fingerTh = (uint16_t)(((uint32_t)ptrWdCxt->fingerTh *
+                        context->ptrCommonConfig->proxTouchCoeff) / CY_CAPSENSE_PERCENTAGE_100);
+                }
+            #endif
+            ptrNEHistory++;
+        }
+    #endif
+
+    if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType)
     {
-        result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, ptrSnsBslnInv, context);
-    }
-    if (0u != (mode & CY_CAPSENSE_PROCESS_DIFFCOUNTS))
-    {
-        Cy_CapSense_DpUpdateDifferences(ptrWdCxt, ptrSnsContext);
+        if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
+        {
+            result = Cy_CapSense_FtUpdateBaseline(ptrWdCxt, ptrSnsContext, ptrSnsBslnInv, context);
+        }
+        if (0u != (mode & CY_CAPSENSE_PROCESS_DIFFCOUNTS))
+        {
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+                if (0u != (ptrWdConfig->rawFilterConfig & CY_CAPSENSE_RC_FILTER_CM_EN_MASK))
+                {
+                    Cy_CapSense_DpUpdateDifferencesCmf(ptrSnsContext);
+                }
+                else
+            #endif
+            {
+                Cy_CapSense_DpUpdateDifferences(ptrWdCxt, ptrSnsContext);
+            }
+        }
     }
 
     return result;
@@ -860,6 +958,33 @@ void Cy_CapSense_DpUpdateDifferences(
 }
 
 
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_DpUpdateDifferencesCmf
+****************************************************************************//**
+*
+* Calculates new difference values.
+*
+* This function calculates the difference between the baseline and raw counts.
+* If the difference is positive (raw > baseline), it is saved into the data
+* structure for further processing. Otherwise the difference is set to zero.
+*
+* \param ptrSnsContext
+* The pointer to the sensor context structure.
+*
+*******************************************************************************/
+void Cy_CapSense_DpUpdateDifferencesCmf(
+                cy_stc_capsense_sensor_context_t * ptrSnsContext)
+{
+    ptrSnsContext->diff = 0u;
+    if ((uint32_t)ptrSnsContext->raw > (uint32_t)ptrSnsContext->bsln)
+    {
+        ptrSnsContext->diff = ptrSnsContext->raw - ptrSnsContext->bsln;
+    }
+}
+#endif
+
+
 #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpProcessButton
@@ -881,9 +1006,9 @@ void Cy_CapSense_DpProcessButton(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig)
 {
     uint32_t snsIndex;
-    uint32_t activeCount = 0u;
     uint32_t touchTh;
     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN)
+        uint32_t activeCount = 0u;
         uint32_t startIndex = 0u;
     #endif
 
@@ -919,8 +1044,8 @@ void Cy_CapSense_DpProcessButton(
         if (0u == (*ptrDebounceCnt))
         {
             ptrSnsCxt->status = CY_CAPSENSE_SNS_TOUCH_STATUS_MASK;
-            activeCount++;
             #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN)
+                activeCount++;
                 startIndex = snsIndex;
             #endif
         }
@@ -956,8 +1081,8 @@ void Cy_CapSense_DpProcessButton(
 *
 * Processes the status of the Proximity widget.
 *
-* This function processes the status of the CSD Proximity widget. It applies the
-* hysteresis and debounce algorithm to each sensor difference value.
+* This function processes the status of the CSD/ISX Proximity widget. It applies
+* the hysteresis and debounce algorithm to each sensor difference value.
 * The proximity and touch events are considered independently so debounce and
 * hysteresis are also applied independently.
 *
@@ -1168,6 +1293,95 @@ void Cy_CapSense_DpProcessSlider(
     }
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) */
+
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_DpProcessLiquidLevel
+****************************************************************************//**
+*
+* Processes the status of the liquid level widget.
+*
+* \param ptrWdConfig
+* The pointer to the widget configuration structure.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS          - The operation is performed successfully.
+* - CY_CAPSENSE_STATUS_LLW_BAD_CONFIG   - Liquid level configuration is not valid 
+*                                         or calculation fail.
+*
+*******************************************************************************/
+cy_capsense_status_t Cy_CapSense_DpProcessLiquidLevel(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                cy_stc_capsense_context_t * context)
+{
+    (void) context;
+    uint32_t liquidLevel;
+    cy_capsense_status_t status = CY_CAPSENSE_STATUS_SUCCESS;
+    cy_stc_capsense_position_t newPosition[CY_CAPSENSE_MAX_CENTROIDS];
+    cy_stc_capsense_touch_t newTouch = {&newPosition[0u], CY_CAPSENSE_POSITION_ONE};
+    uint32_t scalingFactor = (1uL << CY_CAPSENSE_LLW_RESULT_SHIFT);
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
+        uint16_t foamCorrection;
+    #endif
+
+    const void * ptrLlwContext = ptrWdConfig->ptrSnsContext;
+
+    liquidLevel = Cy_CapSense_GetLiquidLevel_Lib(ptrWdConfig->ptrDiplexTable, (const uint16_t *)ptrLlwContext);
+
+    /* Check liquid level validity */
+    if (CY_CAPSENSE_LLW_NOT_VALID_DATA != liquidLevel)
+    {
+        /* Apply resolution scaling */
+        liquidLevel = (((liquidLevel * ptrWdConfig->xResolution) + (scalingFactor >> 1u)) >> CY_CAPSENSE_LLW_RESULT_SHIFT);
+
+        newTouch.ptrPosition->x = (uint16_t)liquidLevel;
+
+        #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN)
+            /* Position filtering */
+            if (0u != (ptrWdConfig->posFilterConfig & CY_CAPSENSE_POSITION_FILTERS_MASK))
+            {
+                Cy_CapSense_ProcessPositionFilters(&newTouch, ptrWdConfig);
+            }
+        #endif
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
+            if (0u != (ptrWdConfig->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
+            {
+                /* Apply level correction factor */
+                foamCorrection = 0u;
+                if (((ptrWdConfig - 1u)->ptrWdContext->wdTouch.ptrPosition->x) > newTouch.ptrPosition->x)
+                {
+                    foamCorrection = (ptrWdConfig - 1u)->ptrWdContext->wdTouch.ptrPosition->x - newTouch.ptrPosition->x;
+                }
+                foamCorrection = (uint16_t)(((uint32_t)foamCorrection * (uint32_t)ptrWdConfig->ptrWdContext->proxTh) >> 8u);
+
+                if (foamCorrection >= newTouch.ptrPosition->x)
+                {
+                    newTouch.ptrPosition->x = 0u;
+                }
+                else
+                {
+                    newTouch.ptrPosition->x = newTouch.ptrPosition->x - foamCorrection;
+                }
+            } 
+        #endif
+
+        ptrWdConfig->ptrWdContext->wdTouch.ptrPosition->x = newTouch.ptrPosition->x;
+    }
+    else
+    {
+        status = CY_CAPSENSE_STATUS_LLW_BAD_CONFIG;
+    }
+
+    return status;
+}
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN) */
 
 
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN)
@@ -1548,7 +1762,7 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context)
 {
-    const cy_stc_capsense_widget_config_t * ptrWdCfg;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
     uint32_t idx;
     uint32_t sumIdx;
     uint32_t rotIdx;
@@ -1565,12 +1779,15 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
         int32_t accum_raw[CY_CAPSENSE_MPSC_MAX_ORDER];
-        int32_t diff_buff[CY_CAPSENSE_MPSC_MAX_ORDER];
+        uint32_t maxCount = ptrWdCfg->ptrWdContext->maxRawCount;
+        int32_t diff;
         int32_t min_diff;
+        uint16_t min_diff_second;
         int32_t sign;
+        uint32_t rawDataShift = (uint32_t)((maxCount * context->ptrCommonConfig->csdRawTarget) / CY_CAPSENSE_PERCENTAGE_100);
+        int32_t averBsln;
     #endif
 
-    ptrWdCfg = &context->ptrWdConfig[widgetId];
     mpOrderLocal = ptrWdCfg->mpOrder;
     ptrMpTable = ptrWdCfg->ptrMpTable;
 
@@ -1674,27 +1891,43 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
                  #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED)
                     if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
                     {
-                        /* Calculate diff counts */
-                        for (idx = 0u; idx < mpOrderLocal; idx++)
-                        {
-                            diff_buff[idx] = accum_raw[idx+snsIdx] - (int32_t)ptrWdCfg->ptrSnsContext[idx+snsIdx].bsln;
-                        }
-
-                        /* Find the lowest diff value */
-                        min_diff = diff_buff[0u];
+                        min_diff = accum_raw[0u+snsIdx] - (int32_t)ptrWdCfg->ptrSnsContext[0u+snsIdx].bsln;
+                        averBsln = (int32_t)ptrWdCfg->ptrSnsContext[0u+snsIdx].bsln;
                         for (idx = 1u; idx < mpOrderLocal; idx++)
                         {
-                            if (min_diff > diff_buff[idx])
+                            /* Find the lowest diff value */
+                            diff = accum_raw[idx+snsIdx] - (int32_t)ptrWdCfg->ptrSnsContext[idx+snsIdx].bsln;
+                            if (min_diff > diff)
                             {
-                                min_diff = diff_buff[idx];
+                                min_diff = diff;
                             }
+
+                            /* Calculate sum of baselines in the pattern */
+                            averBsln += (int32_t)ptrWdCfg->ptrSnsContext[idx+snsIdx].bsln;
                         }
 
-                        /* Apply multi-phase sum0 alignment */
+                        /* Calculate average baseline */
+                        averBsln += (averBsln > 0) ? ((int32_t)mpOrderLocal / 2) : (-(int32_t)mpOrderLocal / 2);
+                        averBsln /= (int32_t)mpOrderLocal;
+
+                        /* Calculate total shift */
+                        min_diff = (int32_t)rawDataShift - min_diff - averBsln;
+                        if (min_diff > (int32_t)CY_CAPSENSE_RAW_COUNT_MAX_VALUE)
+                        {
+                            min_diff_second = CY_CAPSENSE_RAW_COUNT_MAX_VALUE;
+                        } else if (min_diff < 0)
+                        {
+                            min_diff_second = 0u;
+                        }
+                        else
+                        {
+                            min_diff_second = (uint16_t)min_diff;                  
+                        }
+
+                        /* Apply aligning algorithm */
                         for (idx = 0u; idx < mpOrderLocal; idx++)
                         {
-                            accum_raw[idx+snsIdx] -= min_diff;
-                            ptrWdCfg->ptrSnsContext[idx+snsIdx].raw = (uint16_t)accum_raw[idx+snsIdx];
+                            ptrWdCfg->ptrSnsContext[idx+snsIdx].raw = ((uint16_t)accum_raw[idx+snsIdx] + min_diff_second);
                         }
                     }
                  #endif

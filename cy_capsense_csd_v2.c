@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csd_v2.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file defines the data structure global variables and provides
@@ -10,7 +10,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -208,7 +208,7 @@ void Cy_CapSense_CSDDisableShieldElectrodes(const cy_stc_capsense_context_t * co
 * 8) Configures IDAC and connect to CSDBUS-A (to drive CMOD);
 * 9) Configures ModClk;
 * 10) Configure SnsClk source;
-* 11) Sets other CSD configurations (Csd Auto Zero time,
+* 11) Sets other CSD configurations (Csd auto zero time,
 * Sample Init period, interrupts,
 * CMOD and Csh_tank/shield initialization switch resistance).
 *
@@ -1020,7 +1020,7 @@ void Cy_CapSense_CSDClearSensors(const cy_stc_capsense_context_t * context)
                 for (pinIndex = 0u; pinIndex < ptrSnsCfg->numPins; pinIndex++)
                 {
                     /* Set CSD pin default state */
-                    Cy_CapSense_CSDDisconnectSns(ptrSnsCfg->ptrPin, context);
+                    Cy_CapSense_CSDDisconnectSns(ptrPin, context);
                     ptrPin++;
                 }
                 ptrSnsCfg++;
@@ -1087,9 +1087,9 @@ void Cy_CapSense_CSDSetWidgetSenseClkSrc(const cy_stc_capsense_widget_config_t *
 * Function Name: Cy_CapSense_CSDCalcPrsSize
 ****************************************************************************//**
 *
-* The function finds PRS polynomial size when clock source is set to Auto mode.
+* The function finds PRS polynomial size when clock source is set to auto mode.
 *
-* The PRS polynomial size in the Auto mode is found based on the following
+* The PRS polynomial size in the auto mode is found based on the following
 * requirements:
 * - at least one full spread spectrum polynomial should pass during scan time.
 *

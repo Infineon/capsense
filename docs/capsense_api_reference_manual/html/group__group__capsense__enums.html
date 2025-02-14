@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 5.0: Enumerated Types</title>
+<title>CAPSENSE™ Middleware Library 6.10.0: Enumerated Types</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 6.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -122,7 +122,11 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79ad8519bacd62326f448283dacbf43ac5e">CY_CAPSENSE_TU_CMD_COMM_EN_E</a> = 9u, 
 <br />
-&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c">CY_CAPSENSE_TU_CMD_RESTART_ONLY_E</a> = 10u
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c">CY_CAPSENSE_TU_CMD_RESTART_ONLY_E</a> = 10u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6">CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E</a> = 11u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92">CY_CAPSENSE_TU_CMD_LAST_E</a> = 12u
 <br />
  }<tr class="memdesc:ga049118d05a2bdf4f2d37d7b75c511f79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the Tuner command codes.  <a href="group__group__capsense__enums.html#ga049118d05a2bdf4f2d37d7b75c511f79">More...</a><br /></td></tr>
 </td></tr>
@@ -140,7 +144,11 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c">CY_CAPSENSE_WD_PROXIMITY_E</a> = 0x06u, 
 <br />
-&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aef4c95b7c358505b7e5b110dfc26a97e">CY_CAPSENSE_WD_LOW_POWER_E</a> = 0x07u
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aef4c95b7c358505b7e5b110dfc26a97e">CY_CAPSENSE_WD_LOW_POWER_E</a> = 0x07u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a38aad4c1ae85f0ae30809cc81213fe37">CY_CAPSENSE_WD_LIQUID_LEVEL_E</a> = 0x08u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aa1a94f20439cdb63ef15d44df9832798">CY_CAPSENSE_WD_LIQUID_DETECTION_E</a> = 0x09u
 <br />
  }<tr class="memdesc:ga855d894b24929f0d7d2774dfc4266d60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines widget types.  <a href="group__group__capsense__enums.html#ga855d894b24929f0d7d2774dfc4266d60">More...</a><br /></td></tr>
 </td></tr>
@@ -341,6 +349,10 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c"></a>CY_CAPSENSE_TU_CMD_RESTART_ONLY_E&#160;</td><td class="fielddoc"><p>Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6"></a>CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E&#160;</td><td class="fielddoc"><p>Sets duty cycle and executes one scan (used only when foam-rejection is enabled for LLW) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92"></a>CY_CAPSENSE_TU_CMD_LAST_E&#160;</td><td class="fielddoc"><p>The last command. </p>
+</td></tr>
 </table>
 
 </div>
@@ -373,6 +385,10 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga855d894b24929f0d7d2774dfc4266d60aef4c95b7c358505b7e5b110dfc26a97e"></a>CY_CAPSENSE_WD_LOW_POWER_E&#160;</td><td class="fielddoc"><p>Low Power widget, used in the fifth-generation low power CAPSENSE&trade; only. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga855d894b24929f0d7d2774dfc4266d60a38aad4c1ae85f0ae30809cc81213fe37"></a>CY_CAPSENSE_WD_LIQUID_LEVEL_E&#160;</td><td class="fielddoc"><p>Liquid level widget, used in the fifth-generation low power CAPSENSE&trade; only. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga855d894b24929f0d7d2774dfc4266d60aa1a94f20439cdb63ef15d44df9832798"></a>CY_CAPSENSE_WD_LIQUID_DETECTION_E&#160;</td><td class="fielddoc"><p>Liquid detection widget, used in the fifth-generation low power CAPSENSE&trade; only. </p>
+</td></tr>
 </table>
 
 </div>
@@ -395,11 +411,11 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11ae2fbf89a3a3b2871d0a0e5e5d3d8c1e3"></a>CY_CAPSENSE_BAD_PARAM_E&#160;</td><td class="fielddoc"><p>One or more invalid input parameters. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11abb6a9f4b907a0729c96d87544d6e1c09"></a>CY_CAPSENSE_HW_LOCKED_E&#160;</td><td class="fielddoc"><p>The CSD HW block is captured by another middleware. </p>
+<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11abb6a9f4b907a0729c96d87544d6e1c09"></a>CY_CAPSENSE_HW_LOCKED_E&#160;</td><td class="fielddoc"><p>The sensing HW block is captured by another middleware. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11a862eaeca0dacb3f3eb6d3209ed7f9fe1"></a>CY_CAPSENSE_HW_BUSY_E&#160;</td><td class="fielddoc"><p>The CSD HW block is busy by previous operation. </p>
+<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11a862eaeca0dacb3f3eb6d3209ed7f9fe1"></a>CY_CAPSENSE_HW_BUSY_E&#160;</td><td class="fielddoc"><p>The sensing HW block is busy by previous operation. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11a98e6cd62cd72566bbd7025c1c4d9995c"></a>CY_CAPSENSE_TIMEOUT_E&#160;</td><td class="fielddoc"><p>The CSD HW block operation was not finished correctly. </p>
+<tr><td class="fieldname"><a id="ggaa96ebe173a9a3ec24f7461f696482b11a98e6cd62cd72566bbd7025c1c4d9995c"></a>CY_CAPSENSE_TIMEOUT_E&#160;</td><td class="fielddoc"><p>The sensing HW block operation was not finished correctly. </p>
 </td></tr>
 </table>
 
@@ -652,7 +668,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 6.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

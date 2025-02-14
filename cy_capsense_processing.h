@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -11,7 +11,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -117,6 +117,12 @@ void Cy_CapSense_InitializeWidgetStatus(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
 
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
+    cy_capsense_status_t Cy_CapSense_DpProcessLiquidLevel(
+                    const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                    cy_stc_capsense_context_t * context);
+#endif
+
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN)
     void Cy_CapSense_DpProcessCsdMatrix(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
@@ -127,7 +133,7 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
                     const cy_stc_capsense_context_t * context);
 
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
-void Cy_CapSense_DpProcessCsdWidgetStatus(
+cy_capsense_status_t Cy_CapSense_DpProcessCsdWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_context_t * context);
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) */
@@ -154,6 +160,10 @@ uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
 void Cy_CapSense_DpUpdateDifferences(
                 const cy_stc_capsense_widget_context_t * ptrWdContext,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext);
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
+    void Cy_CapSense_DpUpdateDifferencesCmf(
+                    cy_stc_capsense_sensor_context_t * ptrSnsContext);
+#endif
 
 void Cy_CapSense_DpUpdateThresholds(
                 cy_stc_capsense_widget_context_t * ptrWdContext,
@@ -190,6 +200,7 @@ void Cy_CapSense_PreProcessSensorLimitRaw(
                 const cy_stc_capsense_context_t * context);
 
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN || CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
+
 /** \} \endcond */
 
 #if defined(__cplusplus)

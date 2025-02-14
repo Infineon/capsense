@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"structcy__stc__capsense__common__config__t.html#a192101f96101897abb7ab8a0767532ad":[10,2,0,23,87],
+"structcy__stc__capsense__common__config__t.html#a1a7933f4724093478a9434d5a7442aac":[10,2,0,23,84],
+"structcy__stc__capsense__common__config__t.html#a2086ec7840bcff2a38a1f4dbc96297ee":[10,2,0,23,66],
+"structcy__stc__capsense__common__config__t.html#a21d3bc1dab9651fed220ebdfead85453":[10,2,0,23,17],
+"structcy__stc__capsense__common__config__t.html#a24b0f48c3101f30ea3981e496cf3bf20":[10,2,0,23,12],
 "structcy__stc__capsense__common__config__t.html#a25a6e1ee6c1b95b92f69b56471e90198":[10,2,0,23,27],
 "structcy__stc__capsense__common__config__t.html#a2f0d703959ecf591d93fead29797ef0b":[10,2,0,23,22],
 "structcy__stc__capsense__common__config__t.html#a3023ed9a75800748f3af86571b42a5b0":[10,2,0,23,19],
@@ -244,10 +249,5 @@ var NAVTREEINDEX3 =
 "structcy__stc__capsense__internal__context__t.html#a5bad8ea68a0732df97e5dc22504cc04b":[10,2,0,27,57],
 "structcy__stc__capsense__internal__context__t.html#a60ad882d18e3b4c5ce1137b158ad3676":[10,2,0,27,19],
 "structcy__stc__capsense__internal__context__t.html#a616c1452d2ed85c13614910d63a9a513":[10,2,0,27,0],
-"structcy__stc__capsense__internal__context__t.html#a67205084e46e007d0a6d4c8811047845":[10,2,0,27,20],
-"structcy__stc__capsense__internal__context__t.html#a686901c142a968b7e0cc0299839fefef":[10,2,0,27,4],
-"structcy__stc__capsense__internal__context__t.html#a697bbc45d7428255dcf5c3d4a8652939":[10,2,0,27,62],
-"structcy__stc__capsense__internal__context__t.html#a69a75b1f9b0b9ee96d91fec2150e0b2e":[10,2,0,27,22],
-"structcy__stc__capsense__internal__context__t.html#a6af1dd5754837d8be8da11a72241cc15":[10,2,0,27,26],
-"structcy__stc__capsense__internal__context__t.html#a6c28b93814ffaa55e6fb872700b4ca39":[10,2,0,27,13]
+"structcy__stc__capsense__internal__context__t.html#a67205084e46e007d0a6d4c8811047845":[10,2,0,27,20]
 };

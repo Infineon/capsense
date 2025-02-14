@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -28,8 +28,7 @@
 #include "cycfg_capsense_defines.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN))
-
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LIQUID_LEVEL_EN))
 
 /*******************************************************************************
 * Local definition
@@ -488,7 +487,6 @@ void Cy_CapSense_DpCentroidTouchpad(
         /***********************************************************************
         * X Axis (Cols)
         ***********************************************************************/
-        sum = 0u;
         maxSum = 0u;
         maxDiff = 0u;
         /* Find maximum signal */
@@ -557,7 +555,6 @@ void Cy_CapSense_DpCentroidTouchpad(
             /***********************************************************************
             * Y Axis (Rows)
             ***********************************************************************/
-            sum = 0u;
             maxSum = 0u;
             maxDiff = 0u;
             maxIndex = CY_CAPSENSE_NO_LOCAL_MAX;
@@ -2331,8 +2328,10 @@ void Cy_CapSense_ProcessPositionFilters(
     /* Finally, copy number of positions */
     ptrWdConfig->ptrPosFilterHistory->numPosition = (uint8_t)numPos;
 }
-#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN) */
-#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN)) */
+
+#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LIQUID_LEVEL_EN)) */
 #endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
+
+#endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN) */
 
 /* [] END OF FILE */

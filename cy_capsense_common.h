@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -106,11 +106,13 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MW_VERSION_MAJOR                    (5)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                    (6)
 /** Middleware minor version */
-#define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
+#define CY_CAPSENSE_MW_VERSION_MINOR                    (10)
+/** Middleware patch version */
+#define CY_CAPSENSE_MW_VERSION_PATCH                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (500)
+#define CY_CAPSENSE_MW_VERSION                          (610)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */
@@ -390,16 +392,6 @@ extern "C" {
 /** Number of CTRLMUX Pin State MASK registers */
 #define CY_CAPSENSE_CTRLMUX_PIN_STATE_MASK_NUMBER       (3u)
 
-/* Smart sensing algorithm modes */
-/** Manual tuning mode */
-#define CY_CAPSENSE_CSD_SS_DIS                          (0x00u)
-/** Hardware auto-tune mask */
-#define CY_CAPSENSE_CSD_SS_HW_EN                        (0x01u)
-/** Threshold auto-tune mask */
-#define CY_CAPSENSE_CSD_SS_TH_EN                        (0x02u)
-/** Full auto-tune is enabled */
-#define CY_CAPSENSE_CSD_SS_HWTH_EN                      (CY_CAPSENSE_CSD_SS_HW_EN | CY_CAPSENSE_CSD_SS_TH_EN)
-
 /* MFS macros */
 /** Number of multi-frequency scan channels */
 #define CY_CAPSENSE_MAX_SUPPORTED_FREQ_NUM              (3u)
@@ -651,6 +643,8 @@ extern "C" {
 #define CY_CAPSENSE_RC_FILTER_AVERAGE_MODE_OFFSET        (11u)
 /** Offset of raw count HW IIR filter enable mask */
 #define CY_CAPSENSE_RC_HW_IIR_FILTER_EN_OFFSET           (13u)
+/** Offset of raw count CM filter enable mask */
+#define CY_CAPSENSE_RC_FILTER_CM_EN_OFFSET               (14u)
 
 /** Mask of raw count filter history size */
 #define CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_MASK     ((uint16_t)((uint16_t)0x000Fu << CY_CAPSENSE_RC_FILTER_SNS_HISTORY_SIZE_OFFSET))
@@ -668,6 +662,8 @@ extern "C" {
 #define CY_CAPSENSE_RC_FILTER_AVERAGE_MODE_MASK         ((uint16_t)((uint16_t)0x0003u << CY_CAPSENSE_RC_FILTER_AVERAGE_MODE_OFFSET))
 /** Raw count HW IIR filter enable mask */
 #define CY_CAPSENSE_RC_HW_IIR_FILTER_EN_MASK            ((uint16_t)((uint16_t)0x0001u << CY_CAPSENSE_RC_HW_IIR_FILTER_EN_OFFSET))
+/** Raw count CM filter enable mask */
+#define CY_CAPSENSE_RC_FILTER_CM_EN_MASK                ((uint16_t)((uint16_t)0x0001u << CY_CAPSENSE_RC_FILTER_CM_EN_OFFSET))
 /** All raw count filters enable mask */
 #define CY_CAPSENSE_RC_FILTER_ALL_EN_MASK               (CY_CAPSENSE_RC_FILTER_MEDIAN_EN_MASK |\
                                                          CY_CAPSENSE_RC_FILTER_IIR_EN_MASK |\
@@ -709,6 +705,10 @@ extern "C" {
 *   worse accuracy in general [MaxPosition / (numSns - 1u)]
 */
 #define CY_CAPSENSE_CALC_METHOD_MASK                    (0x0100u)
+/** Liquid level foam sub-widget enable mask */
+#define CY_CAPSENSE_LLW_FOAM_EN_MASK                    (0x0010u)
+/** Liquid level tuning completed mask */
+#define CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK           (0x0200u)
 
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_touch *//** \{ */
@@ -1040,8 +1040,8 @@ extern "C" {
 *   other sense method sensors are located in the same frame
 */
 #define CY_CAPSENSE_STATUS_MIXED_SENSORS                (0x4000u)
-/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Unknown */
-#define CY_CAPSENSE_STATUS_UNKNOWN                      (0x80000000u)
+/** Return status \ref cy_capsense_status_t of CAPSENSE&trade; operation: Bad config for LLW */
+#define CY_CAPSENSE_STATUS_LLW_BAD_CONFIG               (0x8000u)
 
 /** State of Low Power sensor processing mask */
 #define CY_CAPSENSE_LP_PROCESS_ENABLED_MASK             (0x1uL)

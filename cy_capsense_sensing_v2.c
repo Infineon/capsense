@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v2.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file contains the source of functions common for different sensing
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -170,11 +170,10 @@ void Cy_CapSense_ClrBusyFlags(cy_stc_capsense_context_t * context)
 * Returns the status of the widget setting up operation:
 * - CY_CAPSENSE_STATUS_SUCCESS       - The operation is successfully completed.
 * - CY_CAPSENSE_STATUS_BAD_PARAM     - The widget is invalid or if the specified widget is
-*                          disabled.
+*                                      disabled.
 * - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and
-*                          the CSD HW block is busy.
-* - CY_CAPSENSE_STATUS_UNKNOWN       - An unknown sensing method is used by the widget or
-*                          any other spurious error occurred.
+*                                      the CSD HW block is busy.
+*                                      any other spurious error occurred.
 *
 **********************************************************************************/
 cy_capsense_status_t Cy_CapSense_SetupWidget(
@@ -260,7 +259,9 @@ cy_capsense_status_t Cy_CapSense_SetupWidget(
 * - CY_CAPSENSE_STATUS_SUCCESS       - Scanning is successfully started.
 * - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scan is not completed and
 *                          the CSD HW block is busy.
-* - CY_CAPSENSE_STATUS_UNKNOWN       - An unknown sensing method is used by the widget.
+* - CY_CAPSENSE_STATUS_BAD_CONFIG    - The function does not suppose to be
+*                                      called with the current CAPSENSE&trade;
+*                                      configuration.
 *
 ********************************************************************************/
 cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
@@ -290,7 +291,7 @@ cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
             #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
 
             default:
-                scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
+                scanStatus = CY_CAPSENSE_STATUS_BAD_CONFIG;
                 break;
         }
     }
@@ -328,7 +329,11 @@ cy_capsense_status_t Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
 * - CY_CAPSENSE_STATUS_SUCCESS       - Scanning is successfully started.
 * - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scan is not completed and
 *                                      the CSD HW block is busy.
-* - CY_CAPSENSE_STATUS_UNKNOWN       - An unknown sensing method is used by the widget.
+* - CY_CAPSENSE_STATUS_BAD_PARAM     - The widget is invalid or if the specified widget is
+*                                      disabled.
+* - CY_CAPSENSE_STATUS_BAD_CONFIG    - The function does not suppose to be
+*                                      called with the current CAPSENSE&trade;
+*                                      configuration.
 *
 ********************************************************************************/
 cy_capsense_status_t Cy_CapSense_ScanWidget_V2(uint32_t widgetId, cy_stc_capsense_context_t * context)
@@ -496,6 +501,12 @@ cy_capsense_status_t Cy_CapSense_SetupWidgetExt(
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS       - Scanning is successfully started.
+* - CY_CAPSENSE_STATUS_BAD_CONFIG       - The function does not suppose to be
+*                                         called with the current CAPSENSE&trade;
+*                                         configuration.
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
 {
@@ -524,7 +535,7 @@ cy_capsense_status_t Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
             #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
 
             default:
-                scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
+                scanStatus = CY_CAPSENSE_STATUS_BAD_CONFIG;
                 break;
         }
     }
@@ -623,14 +634,13 @@ cy_capsense_status_t Cy_CapSense_ScanSensor_V2(
 * - CY_CAPSENSE_STATUS_BAD_PARAM     - All the widgets are disabled.
 * - CY_CAPSENSE_STATUS_INVALID_STATE - The previous scanning is not completed and the
 *                          CSD HW block is busy.
-* - CY_CAPSENSE_STATUS_UNKNOWN       - There are unknown errors.
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_ScanAllWidgets_V2(cy_stc_capsense_context_t * context)
 {
     uint32_t wdgtIndex;
     cy_stc_capsense_active_scan_sns_t * ptrActive = context->ptrActiveScanSns;
-    cy_capsense_status_t scanStatus = CY_CAPSENSE_STATUS_UNKNOWN;
+    cy_capsense_status_t scanStatus = CY_CAPSENSE_STATUS_SUCCESS;
 
     if (CY_CAPSENSE_BUSY == Cy_CapSense_IsBusy(context))
     {
@@ -1402,9 +1412,9 @@ cy_capsense_status_t Cy_CapSense_SetPinState_V2(
 * \return status
 * Returns the operation status:
 * - CY_CAPSENSE_SUCCESS_E   - Indicates the successful mode switching or
-*                             the CSD HW block is in the same mode as desired.
-* - CY_CAPSENSE_HW_BUSY_E   - The CSD HW block is busy with previous operation.
-* - CY_CAPSENSE_HW_LOCKED_E - The CSD HW block is captured by another middleware.
+*                             the sensing HW block is in the same mode as desired.
+* - CY_CAPSENSE_HW_BUSY_E   - The sensing HW block is busy with previous operation.
+* - CY_CAPSENSE_HW_LOCKED_E - The sensing HW block is captured by another middleware.
 *
 *******************************************************************************/
 cy_en_capsense_return_status_t Cy_CapSense_SwitchSensingMode(uint8_t mode, cy_stc_capsense_context_t * context)
@@ -1969,8 +1979,7 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_
 #endif
 
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_SsAutoTune
 ****************************************************************************//**
@@ -2092,7 +2101,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTuneWidget(
 
     /* Initialize auto-tuning configuration structure */
     autoTuneConfig.snsClkInputClock = (uint16_t)inputSnsClk;
-    autoTuneConfig.snsClkConstantR = context->ptrCommonConfig->csdRConst;
+    autoTuneConfig.snsClkConstantR = CY_CAPSENSE_SMARTSENSE_CSD_RESISTANCE_CONST;
     autoTuneConfig.vRef = context->ptrInternalContext->csdVrefVoltageMv;
     autoTuneConfig.fingerCap = ptrWdCxt->fingerCap;
     autoTuneConfig.sigPFC = &(ptrWdCxt->sigPFC);

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -307,15 +307,16 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_PROXIMITY_EN) */
 
 
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
-     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
-     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN))
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TOUCHPAD_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MATRIX_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SLIDER_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_GetTouchInfo
 ****************************************************************************//**
 *
 * Reports the details of touch position detected on the specified touchpad,
-* matrix buttons or slider widgets.
+* matrix buttons, slider or liquid level widgets.
 *
 * This function does not process widget data but extracts previously processed
 * results from the \ref group_capsense_structures.
@@ -350,6 +351,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
             case (uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E:
             case (uint8_t)CY_CAPSENSE_WD_LINEAR_SLIDER_E:
             case (uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E:
+            case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
                 ptrTouch = &ptrWdCfg->ptrWdContext->wdTouch;
                 break;
 
@@ -361,9 +363,10 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
 
     return ptrTouch;
 }
-#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) ||\
-           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_MATRIX_EN) ||\
-           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN)) */
+#endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_TOUCHPAD_EN) || \
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MATRIX_EN) || \
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SLIDER_EN) || \
+           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)) */
 
 
 /*******************************************************************************
@@ -470,10 +473,10 @@ uint16_t Cy_CapSense_GetCRC(const uint8_t *ptrData, uint32_t len)
 *   data from corresponding fields of the \ref cy_stc_capsense_widget_context_t.
 * - Executes the Cy_CapSense_GetCRC() routine for full
 *   \ref cy_stc_capsense_widget_crc_data_t, structure, including padding.
-* If the CSD tuning mode is set to smart sensing algorithm (Full Auto-Tune)
+* If the tuning mode is set to smart sensing algorithm (full auto-tune)
 * then the fields of the \ref cy_stc_capsense_widget_context_t that changing
 * it's value in the run-time will be excluded from CRC calculation for the
-* CSD widgets.
+* CSD and ISX widgets.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -495,9 +498,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
     uint16_t crcValue;
     const cy_stc_capsense_widget_context_t * ptrWdCxt;
     cy_stc_capsense_widget_crc_data_t crcDataVal;
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
-        const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
-    #endif
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
 
     /* Get a pointer to the specified widget context structure */
     ptrWdCxt = &context->ptrWdContext[widgetId];
@@ -515,16 +516,22 @@ uint16_t Cy_CapSense_GetCrcWidget(
     crcDataVal.maxRawCountRowVal = ptrWdCxt->maxRawCountRow;
     crcDataVal.bslnCoeffVal = ptrWdCxt->bslnCoeff;
 
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN)
-        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MPSC_EN)
-            if ((CY_CAPSENSE_CSD_GROUP != ptrWdCfg->senseMethod) ||
-                ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
-                (ptrWdCfg->mpOrder >= CY_CAPSENSE_MPSC_MIN_ORDER))
-        #else
-            if ((CY_CAPSENSE_CSD_GROUP != ptrWdCfg->senseMethod) ||
-                ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType))
-        #endif
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MPSC_EN)
+        if (ptrWdCfg->mpOrder >= CY_CAPSENSE_MPSC_MIN_ORDER)
+        {
+            crcDataVal.fingerThVal = ptrWdCxt->fingerTh;
+            crcDataVal.proxThVal = ptrWdCxt->proxTh;
+            crcDataVal.noiseThVal = ptrWdCxt->noiseTh;
+            crcDataVal.nNoiseThVal = ptrWdCxt->nNoiseTh;
+            crcDataVal.hysteresisVal = ptrWdCxt->hysteresis;
+        }
     #endif
+
+    if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
+        ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
+        ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+        ((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+        ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN)))
     {
         crcDataVal.fingerThVal = ptrWdCxt->fingerTh;
         crcDataVal.proxThVal = ptrWdCxt->proxTh;

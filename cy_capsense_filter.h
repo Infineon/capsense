@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file contains the definitions for all the filters implementation.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -43,9 +43,9 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context);
-void Cy_CapSense_InitializeWidgetBaseline(uint32_t widgetId, cy_stc_capsense_context_t * context);
-void Cy_CapSense_InitializeSensorBaseline(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InitializeWidgetBaseline(uint32_t widgetId, cy_stc_capsense_context_t * context);
+cy_capsense_status_t Cy_CapSense_InitializeSensorBaseline(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_RAWCOUNT_FILTER_EN)
     void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context);

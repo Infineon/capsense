@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.h
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the function prototypes specific to the register
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -1490,8 +1490,8 @@ uint32_t Cy_CapSense_AdjustSnsClkDivider(
 
 /** \cond SECTION_CAPSENSE_INTERNAL */
     /** The Sensor Frame types, to be used with \ref Cy_CapSense_GenerateSensorConfig and \ref Cy_CapSense_GenerateAllSensorConfig */
-    #define CY_CAPSENSE_SNS_FRAME_ACTIVE     (0uL) /**<  - Sensor frame for Active slot    */
-    #define CY_CAPSENSE_SNS_FRAME_LOW_POWER  (1uL) /**<  - Sensor frame for Low Power slot */
+    #define CY_CAPSENSE_SNS_FRAME_ACTIVE     (0u) /**<  - Sensor frame for Active slot    */
+    #define CY_CAPSENSE_SNS_FRAME_LOW_POWER  (1u) /**<  - Sensor frame for Low Power slot */
 /** \endcond */
 
 #if defined(__cplusplus)

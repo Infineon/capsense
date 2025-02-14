@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 5.0: Structures</title>
+<title>CAPSENSE™ Middleware Library 6.10.0: Structures</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 5.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 6.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -102,16 +102,16 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares position structure that keep information of a single touch.  <a href="structcy__stc__capsense__position__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__touch__t.html">cy_stc_capsense_touch_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares touch structure used to store positions of Touchpad, Matrix buttons and Slider widgets.  <a href="structcy__stc__capsense__touch__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares touch structure used to store positions of Touchpad, Matrix buttons, Slider and Liquid Level widgets.  <a href="structcy__stc__capsense__touch__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__auto__tune__config__t.html">cy_stc_capsense_auto_tune_config_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares HW smart sensing algorithm data structure for CSD widgets for fourth-generation CAPSENSE&trade;.  <a href="structcy__stc__capsense__auto__tune__config__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares HW smart sensing algorithm data structure for fourth-generation CAPSENSE&trade;.  <a href="structcy__stc__capsense__auto__tune__config__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__hw__smartsense__config__t.html">cy_stc_capsense_hw_smartsense_config_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares HW smart sensing algorithm data structure for CSD widgets for fifth-generation CAPSENSE&trade;.  <a href="structcy__stc__capsense__hw__smartsense__config__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares HW smart sensing algorithm data structure for fifth-generation CAPSENSE&trade; and fifth-generation low power CAPSENSE&trade;.  <a href="structcy__stc__capsense__hw__smartsense__config__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__smartsense__csd__noise__envelope__t.html">cy_stc_capsense_smartsense_csd_noise_envelope_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares Noise envelope data structure for CSD widgets when smart sensing algorithm is enabled.  <a href="structcy__stc__capsense__smartsense__csd__noise__envelope__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares Noise envelope data structure when smart sensing algorithm is enabled.  <a href="structcy__stc__capsense__smartsense__csd__noise__envelope__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__smartsense__update__thresholds__t.html">cy_stc_capsense_smartsense_update_thresholds_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares Update Thresholds structure.  <a href="structcy__stc__capsense__smartsense__update__thresholds__t.html#details">More...</a><br /></td></tr>
@@ -234,8 +234,7 @@ typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <li>CY_CAPSENSE_STATUS_INVALID_STATE</li>
 <li>CY_CAPSENSE_STATUS_BAD_CONFIG</li>
 <li>CY_CAPSENSE_STATUS_CONFIG_OVERFLOW</li>
-<li>CY_CAPSENSE_STATUS_HW_BUSY</li>
-<li>CY_CAPSENSE_STATUS_UNKNOWN </li>
+<li>CY_CAPSENSE_STATUS_HW_BUSY </li>
 </ul>
 
 </div>
@@ -321,7 +320,7 @@ typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 5.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 6.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

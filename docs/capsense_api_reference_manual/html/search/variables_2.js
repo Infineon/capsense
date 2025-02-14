@@ -29,6 +29,7 @@ var searchData=
   ['clickdistancemax',['clickDistanceMax',['../structcy__stc__capsense__gesture__config__t.html#a4bce321bd5bc00feafad1e32f35c6c0b',1,'cy_stc_capsense_gesture_config_t']]],
   ['clicktimeoutmax',['clickTimeoutMax',['../structcy__stc__capsense__gesture__config__t.html#a3b1107f255188a2b7ad34f2445d45ca7',1,'cy_stc_capsense_gesture_config_t']]],
   ['clicktimeoutmin',['clickTimeoutMin',['../structcy__stc__capsense__gesture__config__t.html#a3fd78e04e45942e2780ed93e8bfabcf2',1,'cy_stc_capsense_gesture_config_t']]],
+  ['cmfthreshold',['cmfThreshold',['../structcy__stc__capsense__widget__config__t.html#af30581269d29471c11870fb1c024cf1f',1,'cy_stc_capsense_widget_config_t']]],
   ['cmod01cap',['cMod01Cap',['../structcy__stc__capsense__bist__context__t.html#a854d0baeb01828a8d2e21a30c99bf93a',1,'cy_stc_capsense_bist_context_t']]],
   ['cmod02cap',['cMod02Cap',['../structcy__stc__capsense__bist__context__t.html#af730e190820fe159e3fd59854c670a2e',1,'cy_stc_capsense_bist_context_t']]],
   ['cmod03cap',['cMod03Cap',['../structcy__stc__capsense__bist__context__t.html#a9433cb008fb99dca3add9a67b2019920',1,'cy_stc_capsense_bist_context_t']]],

@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -200,6 +200,12 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
         uint32_t sendDataFlag = 1u;
     #endif
 
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
+        const cy_stc_capsense_widget_config_t * ptrWdCfg;
+        uint32_t widgetId;
+        uint16_t duty_cycle = 0u;
+    #endif
+
     do
     {
         /*
@@ -329,6 +335,37 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
                     break;
             #endif
 
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
+                case (uint16_t)CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E:
+                    tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_ONE_SCAN;
+                    updateFlag = 0u;
+                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                        sendDataFlag = 0u;
+                    #endif
+
+                    cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
+                    if (2u == cmdSize)
+                    {
+                        duty_cycle = (((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u]) << 8u) |
+                                      ((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u]);
+                    }
+
+                    for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
+                    {
+                        ptrWdCfg = &context->ptrWdConfig[widgetId];
+
+                        if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType)
+                        {
+                            if (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
+                            {
+                                ptrWdCfg->ptrWdContext->sigPFC = duty_cycle;
+                            }
+                        }
+                    }
+
+                    break;
+            #endif
+
             default:
                 /* No action on other commands */
                 break;
@@ -437,7 +474,7 @@ uint32_t Cy_CapSense_CheckTunerCmdIntegrity(const uint8_t * commandPacket)
     {
         cmdCheckStatus = CY_CAPSENSE_WRONG_TAIL;
     }
-    else if (((uint8_t)CY_CAPSENSE_TU_CMD_RESTART_ONLY_E) < commandPacket[CY_CAPSENSE_COMMAND_CODE_0_IDX])
+    else if (((uint8_t)CY_CAPSENSE_TU_CMD_LAST_E - 1u) < commandPacket[CY_CAPSENSE_COMMAND_CODE_0_IDX])
     {
         cmdCheckStatus = CY_CAPSENSE_WRONG_CODE;
     }

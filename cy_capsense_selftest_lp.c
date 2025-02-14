@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -52,7 +52,7 @@
 #define CY_CAPSENSE_BIST_SENSE_MODE_CONFIG_NUMBER               (2u)
 #define CY_CAPSENSE_BIST_ELTD_CAP_MODCLK_DIV_DEFAULT            (1u)
 #define CY_CAPSENSE_BIST_ELTD_CAP_MAX_MODCLK                    (48000000u)
-#define CY_CAPSENSE_BIST_ELTD_CAP_SNSCLK_DIV_DEFAULT            (256u)
+#define CY_CAPSENSE_BIST_ELTD_CAP_SNSCLK_DIV_DEFAULT            (512u)
 #define CY_CAPSENSE_BIST_SHIELD_CAP_SNSCLK_DIV_DEFAULT          (1024u)
 #define CY_CAPSENSE_BIST_SNS_CLK_MIN_DIVIDER                    (4u)
 #define CY_CAPSENSE_BIST_SNS_CLK_MAX_DIVIDER                    (4096u)
@@ -64,8 +64,8 @@
 #define CY_CAPSENSE_BIST_CAP_MEAS_WDT_CYCLES_PER_LOOP           (5u)
 #define CY_CAPSENSE_BIST_V3_ELTD_CAP_CYCLES_NUM                 (1u)
 #define CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000          (8860u)
-#define CY_CAPSENSE_BIST_CP_MAX_VALUE                           (200000u)
-#define CY_CAPSENSE_BIST_CSH_MAX_VALUE                          (1600000u)
+#define CY_CAPSENSE_BIST_CP_MAX_VALUE                           (275000u)
+#define CY_CAPSENSE_BIST_CSH_MAX_VALUE                          (1160000u)
 #define CY_CAPSENSE_BIST_PROMILLE_FACTOR                        (1000u)
 #define CY_CAPSENSE_BIST_ELTD_CAP_NUM_EPI_CYCLES                (2u)
 
@@ -685,7 +685,10 @@ void Cy_CapSense_UpdateAllWidgetCrc(cy_stc_capsense_context_t * context)
 * Cy_CapSense_CheckIntegritySensorRawcount() function.
 *
 * \note
-* This function is available only for the fifth-generation CAPSENSE&trade;.
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \note
+* This function does not support Liquid Level widget.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -717,6 +720,8 @@ void Cy_CapSense_UpdateAllWidgetCrc(cy_stc_capsense_context_t * context)
 *                                         copy or is out of the specified limits.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
 *                                         The test was not executed.
+* - CY_CAPSENSE_BIST_FEATURE_DISABLED_E - The selected widget is not supported.
+*                                         The test was not executed.
 *
 *******************************************************************************/
 cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
@@ -737,26 +742,33 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
         if ((context->ptrCommonConfig->numWd > widgetId) &&
             (context->ptrWdConfig[widgetId].numSns > sensorId))
         {
-            /* Get a pointer to the specified widget configuration structure */
-            ptrWdgtCfg = &context->ptrWdConfig[widgetId];
-            /* Get a pointer to the specified sensor context structure */
-            ptrSnsCxt = &ptrWdgtCfg->ptrSnsContext[sensorId];
-
-            /* Check baselines */
-
-            cxtOffset = sensorId;
-            bslnInv = (uint16_t)(~(ptrWdgtCfg->ptrBslnInv[cxtOffset]));
-            if ((ptrSnsCxt->bsln != bslnInv) ||
-                (ptrSnsCxt->bsln > baselineHighLimit) ||
-                (ptrSnsCxt->bsln < baselineLowLimit))
+            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType)
             {
-                context->ptrBistContext->testResultMask |= CY_CAPSENSE_BIST_BSLN_INTEGRITY_MASK;
-                result = CY_CAPSENSE_BIST_FAIL_E;
+                /* Get a pointer to the specified widget configuration structure */
+                ptrWdgtCfg = &context->ptrWdConfig[widgetId];
+                /* Get a pointer to the specified sensor context structure */
+                ptrSnsCxt = &ptrWdgtCfg->ptrSnsContext[sensorId];
+
+                /* Check baselines */
+
+                cxtOffset = sensorId;
+                bslnInv = (uint16_t)(~(ptrWdgtCfg->ptrBslnInv[cxtOffset]));
+                if ((ptrSnsCxt->bsln != bslnInv) ||
+                    (ptrSnsCxt->bsln > baselineHighLimit) ||
+                    (ptrSnsCxt->bsln < baselineLowLimit))
+                {
+                    context->ptrBistContext->testResultMask |= CY_CAPSENSE_BIST_BSLN_INTEGRITY_MASK;
+                    result = CY_CAPSENSE_BIST_FAIL_E;
+                }
+
+                if (CY_CAPSENSE_BIST_FAIL_E != result)
+                {
+                    result = CY_CAPSENSE_BIST_SUCCESS_E;
+                }
             }
-
-            if (CY_CAPSENSE_BIST_FAIL_E != result)
+            else
             {
-                result = CY_CAPSENSE_BIST_SUCCESS_E;
+                result = CY_CAPSENSE_BIST_FEATURE_DISABLED_E;
             }
         }
     }
@@ -790,7 +802,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
 * Cy_CapSense_CheckIntegritySensorBaseline() function.
 *
 * \note
-* This function is available only for the fifth-generation CAPSENSE&trade;.
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \note
+* This function does not support Liquid Level widget.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -821,6 +836,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
 *                                         of the specified limits.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
 *                                         The test was not executed.
+* - CY_CAPSENSE_BIST_FEATURE_DISABLED_E - The selected widget is not supported.
+*                                         The test was not executed.
 *
 *******************************************************************************/
 cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(
@@ -839,21 +856,28 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(
         if ((context->ptrCommonConfig->numWd > widgetId) &&
             (context->ptrWdConfig[widgetId].numSns > sensorId))
         {
-            /* Find a pointer to the specified widget configuration structure */
-            ptrWdgtCfg = &context->ptrWdConfig[widgetId];
-            /* Find a pointer to the specified sensor context structure */
-            ptrSnsCxt = &ptrWdgtCfg->ptrSnsContext[sensorId];
-            /* Check raw counts */
-            if ((ptrSnsCxt->raw  > rawcountHighLimit) ||
-                (ptrSnsCxt->raw  < rawcountLowLimit))
+            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType)
             {
-                context->ptrBistContext->testResultMask |= CY_CAPSENSE_BIST_RAW_INTEGRITY_MASK;
-                result = CY_CAPSENSE_BIST_FAIL_E;
-            }
+                /* Find a pointer to the specified widget configuration structure */
+                ptrWdgtCfg = &context->ptrWdConfig[widgetId];
+                /* Find a pointer to the specified sensor context structure */
+                ptrSnsCxt = &ptrWdgtCfg->ptrSnsContext[sensorId];
+                /* Check raw counts */
+                if ((ptrSnsCxt->raw  > rawcountHighLimit) ||
+                    (ptrSnsCxt->raw  < rawcountLowLimit))
+                {
+                    context->ptrBistContext->testResultMask |= CY_CAPSENSE_BIST_RAW_INTEGRITY_MASK;
+                    result = CY_CAPSENSE_BIST_FAIL_E;
+                }
 
-            if (CY_CAPSENSE_BIST_FAIL_E != result)
+                if (CY_CAPSENSE_BIST_FAIL_E != result)
+                {
+                    result = CY_CAPSENSE_BIST_SUCCESS_E;
+                }
+            }
+            else
             {
-                result = CY_CAPSENSE_BIST_SUCCESS_E;
+                result = CY_CAPSENSE_BIST_FEATURE_DISABLED_E;
             }
         }
     }
@@ -1685,16 +1709,16 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * * Rawcount is the measured raw count value.
 *
 * The minimum measurable input by this function is 1pF and the
-* maximum is either 200pF or limited by the RC time constant
-* (Cs < 1 / (2*5*SnsClk*R), where R is the total sensor series
+* maximum is either 275pF or limited by the RC time constant
+* (Cs < 1 / (4*5*SnsClk*R), where R is the total sensor series
 * resistance that includes on-chip GPIO resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30% and
 * is defined by the RefCDAC tolerance.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2018,7 +2042,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * Compensation CDAC is disabled during the BIST scan.
 * Another default scanning parameters are the following:
 * * NumConv (100) is the number of sub-conversions.
-* * SnsClk divider (256) is the divider for the sensor clock frequency.
+* * SnsClk divider (512) is the divider for the sensor clock frequency.
 *
 * The raw count is converted into capacitance using the following equation:
 *
@@ -2031,15 +2055,15 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * * The second divider of 2 is used only for CSX sensors.
 *
 * The minimum measurable input by this function is 0.5 pF and the
-* maximum is either 200pF or limited by the RC time constant
-* (Cs < 1 / (2*10*SnsClk*R), where R is the total sensor series
+* maximum is either 275pF or limited by the RC time constant
+* (Cs < 1 / (4*5*SnsClk*R), where R is the total sensor series
 * resistance that includes on-chip pin resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30%.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2147,10 +2171,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(
 * resistance that includes on-chip pin resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30%.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2339,7 +2363,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensorsInternal(
 * The function measures Cp of a certain electrode (CSD sensor or CSX
 * Rx/Tx electrode) by using CSD FW mode and defined scan configuration,
 * sense clock frequency and resolution.
-* The range for sensor measuring is 1 to 200 pF.
+* The range for sensor measuring is 1 to 275 pF.
 * The function performs the CSD scan with the fixed CDAC value. This provides
 * a possibility of classical raw counts formula usage for the capacitance
 * calculation. The function stores the Cp value
@@ -2423,7 +2447,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
     /* Check for timeout and if no, then calculate capacitance and store the value to the data structure */
     if (CY_CAPSENSE_BIST_SUCCESS_E == result)
     {
-        cp = CY_CAPSENSE_REF_CDAC_LSB_X100 * rawCountTmp;
+        cp = rawCountTmp * CY_CAPSENSE_REF_CDAC_LSB_X100;
         cp /= context->ptrBistContext->eltdCapSubConvNum;
         cp *= context->ptrBistContext->eltdCapRefCdac;
         cp /= CY_CAPSENSE_CONVERSION_HECTO;
@@ -2454,8 +2478,8 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
 *
 * The function measures Cp of a certain CSD sensor or shield
 * or Cm of a certain CSX sensor by using the predefined scan configuration.
-* The range for sensor measuring is 1 to 200 pF for CSD/CSX sensors and
-* 1600 pF for shield electrodes.
+* The range for sensor measuring is 1 to 275 pF for CSD/CSX sensors and
+* 1160 pF for shield electrodes.
 * The function performs the CSD or CSX scan with fixed reference CDAC values
 * (100u and 50u respectively) and 200u for shield electrodes' capacitance
 * measurements. The function stores the Cp or Cm value
@@ -2778,6 +2802,15 @@ static void Cy_CapSense_BistGenerateSensorConfig(
     const cy_stc_capsense_electrode_config_t * ptrEltdCfg;
     const cy_stc_capsense_pin_config_t * ptrPinCfg = context->ptrPinConfig;
 
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+        uint32_t padMaskIsx = 0u;
+        uint32_t numEltd;
+        uint32_t eltdIndex;
+        uint32_t wdIndex;
+        uint32_t snsMethod;
+        cy_stc_capsense_electrode_config_t const * eltdPinCfg;
+    #endif
+
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
         ptrScanSlots = (snsFrameType == CY_CAPSENSE_SNS_FRAME_ACTIVE) ? (context->ptrScanSlots) : (context->ptrLpScanSlots);
     #else
@@ -2799,14 +2832,36 @@ static void Cy_CapSense_BistGenerateSensorConfig(
             (_VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, context->ptrBistContext->eltdCapRefCdac) |
              (CY_CAPSENSE_SM_REG_SNS_SNS_CDAC_CTL_FLD_CLOCK_REF_RATE << MSCLP_SNS_SNS_CDAC_CTL_CLOCK_REF_RATE_Pos));
 
-    if ((CY_CAPSENSE_BIST_CAP_ELTD_SCAN == context->ptrBistContext->eltdCapScanMode) ||
-        (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod))
+    if (CY_CAPSENSE_BIST_CAP_ELTD_SCAN == context->ptrBistContext->eltdCapScanMode)
     {
         modeSel = CY_CAPSENSE_REG_MODE_CSD;
     }
     else
     {
-        modeSel = CY_CAPSENSE_REG_MODE_CSX;
+        switch (ptrWdCfg->senseMethod)
+        {
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN)
+                case CY_CAPSENSE_CSD_GROUP:
+                    modeSel = CY_CAPSENSE_REG_MODE_CSD;
+                    break;
+            #endif
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+                case CY_CAPSENSE_CSX_GROUP:
+                    modeSel = CY_CAPSENSE_REG_MODE_CSX;
+                    break;
+            #endif
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+                case CY_CAPSENSE_ISX_GROUP:
+                    modeSel = CY_CAPSENSE_REG_MODE_ISX;
+                    break;
+            #endif
+
+            default:
+                modeSel = CY_CAPSENSE_REG_MODE_CSD;
+                break;
+        }
     }
 
     snsClkVal = context->ptrBistContext->eltdCapSnsClk;
@@ -2838,6 +2893,31 @@ static void Cy_CapSense_BistGenerateSensorConfig(
         }
     #endif /*  (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN) */
 
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+        /* Create separate inactive mask of ISX pins only */
+        for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
+        {
+            ptrWdCfg = &context->ptrWdConfig[wdIndex];
+            snsMethod = ptrWdCfg->senseMethod;
+
+            if (CY_CAPSENSE_ISX_GROUP == snsMethod)
+            {
+                numEltd = (uint32_t)ptrWdCfg->numRows + ptrWdCfg->numCols;
+                eltdPinCfg = ptrWdCfg->ptrEltdConfig;
+
+                for (eltdIndex = 0u; eltdIndex < numEltd; eltdIndex++)
+                {
+                    /* Loop through all pads for this electrode (ganged sensor) */
+                    for (i = 0u; i < eltdPinCfg->numPins; i++)
+                    {
+                        padMaskIsx |= (0x01uL << eltdPinCfg->ptrPin[i].padNumber);
+                    }
+                    eltdPinCfg++;
+                }
+            }
+        }
+    #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
+
     /* Change the control switch function depending on the current inactive sensor connection */
     switch (context->ptrBistContext->currentISC)
     {
@@ -2862,6 +2942,11 @@ static void Cy_CapSense_BistGenerateSensorConfig(
 
     /* Set the control mux switch registers for inactive pins */
     Cy_CapSense_CalculateMaskRegisters(padMask, cswFuncNum, ptrSensorCfg);
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+        Cy_CapSense_CalculateMaskRegisters(padMaskIsx, cswFuncNum, ptrSensorCfg);
+    #endif
+
     /* Initializes an active sensor (including ganged sensors) by SNS sensor state */
     if (CY_CAPSENSE_BIST_CAP_SHIELD_SCAN == context->ptrBistContext->eltdCapScanMode)
     {
@@ -2988,8 +3073,10 @@ static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
 * against pre-determined capacitance for the shield electrode to
 * detect a hardware fault.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 * When the inactive sensor (electrode) connection is set
@@ -3005,6 +3092,7 @@ static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
 * \note
 * This function is available only for the fifth-generation low power
 * CAPSENSE&trade;.
+* ISX widgets are excluded from measuring.
 *
 * \param skipChMask
 * Specifies the mask to skip some channels during the shield electrode

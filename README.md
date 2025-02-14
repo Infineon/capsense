@@ -1,7 +1,7 @@
 # CAPSENSE™ Middleware Library
 
 ### Overview
-CAPSENSE™ is CYPRESS™ capacitive sensing solution from Infineon Technologies AG. Capacitive sensing can be used in a variety of applications and products where 
+CAPSENSE™ is Cypress capacitive sensing solution from Infineon Technologies AG. Capacitive sensing can be used in a variety of applications and products where 
 conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. 
 These include home appliances, automotive, IoT, and industrial applications. CAPSENSE™ supports multiple interfaces (widgets) using the Self-Capacitance (CSD), 
 Mutual-Capacitance (CSX), and Inductive sensing (ISX) sensing methods with robust performance.
@@ -13,7 +13,6 @@ robust performance in harsh environmental conditions and rejection of a wide ran
 Use CAPSENSE™ for:
 * Touch and gesture detection for various interfaces
 * Proximity detection for innovative user experiences and low-power optimization
-* Contactless liquid-level sensing in a variety of applications
 * Touch-free operations in hazardous materials
 
 ### Features
@@ -28,7 +27,7 @@ Use CAPSENSE™ for:
 * Supports one-finger and two-finger gestures
 
 ### Quick start
-The [ModusToolbox™ CAPSENSE™ Configurator User Guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_CAPSENSE_Configurator_5.0_User_Guide-UserManual-v01_00-EN.pdf?fileId=8ac78c8c8386267f0183a960b36a598c) instructs step-by-step  
+The [ModusToolbox™ CAPSENSE™ Configurator User Guide](www.infineon.com/ModusToolboxCapSenseConfig) instructs step-by-step  
 how to configure and launch the CAPSENSE™ Configurator in [ModusToolbox™](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software). 
 The CAPSENSE™ Configurator can be launched in the ModusToolbox™ IDE from the CSD, MSC or MSCLP personality and as a stand-alone tool. Refer to [ModusToolbox™ Software Environment, Quick Start Guide, Documentation, and Videos](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/).
 
@@ -52,23 +51,23 @@ For more information, refer to:
 * Infineon Technologies AG Kits and Code Examples:
   * [CAPSENSE™ Middleware Code Example for MBED OS](https://github.com/Infineon/mbed-os-example-capsense)
   * [CAPSENSE™ Middleware Code Example for FreeRTOS](https://github.com/Infineon/mtb-example-psoc6-emwin-eink-freertos)
-  * [CY8CKIT-145-40XX PSoC™ 4000S CAPSENSE™ Prototyping Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx/)
-  * [CY8CKIT-149 PSoC™ 4100S Plus Prototyping Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149/)
-  * [CY8CKIT-041-40XX PSoC™ 4 S-Series Pioneer Kit](https://www.infineon.com/dgdl/Infineon-CY8CKIT-041-40XX_PSoC_4_S-Series_Pioneer_Kit_Quick_Start_Guide-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0efc44781263)
-  * [CY8CKIT-041-41XX PSoC™ 4100S CAPSENSE™ Pioneer Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-041-41xx/)
-  * [CY8CKIT-040T PSoC™ 4000T CAPSENSE™ Evaluation Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-040t/)
+  * [CY8CKIT-145-40XX PSOC™ 4000S CAPSENSE™ Prototyping Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx/)
+  * [CY8CKIT-149 PSOC™ 4100S Plus Prototyping Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149/)
+  * [CY8CKIT-041-40XX PSOC™ 4 S-Series Pioneer Kit](https://www.infineon.com/dgdl/Infineon-CY8CKIT-041-40XX_PSoC_4_S-Series_Pioneer_Kit_Quick_Start_Guide-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0efc44781263)
+  * [CY8CKIT-041-41XX PSOC™ 4100S CAPSENSE™ Pioneer Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-041-41xx/)
+  * [CY8CKIT-040T PSOC™ 4000T CAPSENSE™ Evaluation Kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-040t/)
 
 * General Information:
-  * [AN210781 Getting Started with PSoC™ 6 MCU with Bluetooth Low Energy (BLE) Connectivity](https://www.infineon.com/dgdl/Infineon-AN210781_Getting_Started_with_PSoC_6_MCU_with_Bluetooth_Low_Energy_(BLE)_Connectivity_on_PSoC_Creator-ApplicationNotes-v05_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d311f536528)
-  * [AN215671 PSoC&trade; 6 MCU firmware design for BLE applications](https://www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads)
-  * [PSoC™ 6 Technical Reference Manual](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Architecture_Technical_Reference_Manual-AdditionalTechnicalInformation-v11_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f946fea01ca)
-  * [PSoC™ 63 with BLE Datasheet Programmable System-on-Chip datasheet](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Datasheet_Programmable_System-on-Chip_(PSoC)-DataSheet-v16_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0ee4efe46c37)
+  * [AN210781 Getting Started with PSOC™ 6 MCU with Bluetooth Low Energy (BLE) Connectivity](https://www.infineon.com/dgdl/Infineon-AN210781_Getting_Started_with_PSoC_6_MCU_with_Bluetooth_Low_Energy_(BLE)_Connectivity_on_PSoC_Creator-ApplicationNotes-v05_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d311f536528)
+  * [AN215671 PSOC&trade; 6 MCU firmware design for BLE applications](https://www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads)
+  * [PSOC™ 6 Technical Reference Manual](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Architecture_Technical_Reference_Manual-AdditionalTechnicalInformation-v11_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f946fea01ca)
+  * [PSOC™ 63 with BLE Datasheet Programmable System-on-Chip datasheet](https://www.infineon.com/dgdl/Infineon-PSoC_6_MCU_PSoC_63_with_BLE_Datasheet_Programmable_System-on-Chip_(PSoC)-DataSheet-v16_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0ee4efe46c37)
   * [CAT1 PDL API Reference](https://infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/index.html)
   * [CAT2 PDL API Reference](https://infineon.github.io/mtb-pdl-cat2/pdl_api_reference_manual/html/index.html)
-  * [PSoC™ 4000S Family: PSoC™ 4 Architecture Technical Reference Manual (TRM)](https://www.infineon.com/dgdl/Infineon-PSoC_4000S_Family_PSoC_4_Architecture_Technical_Reference_Manual_(TRM)-AdditionalTechnicalInformation-v04_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f915c737eb7)
-  * [PSoC™ 4100S and PSoC™ 4100S Plus: PSoC™ 4 Architecture Technical Reference Manual (TRM)](https://www.infineon.com/dgdl/Infineon-PSoC_4100S_and_PSoC_4100S_Plus_PSoC_4_Architecture_TRM-AdditionalTechnicalInformation-v12_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f9433460188)
+  * [PSOC™ 4000S Family: PSOC™ 4 Architecture Technical Reference Manual (TRM)](https://www.infineon.com/dgdl/Infineon-PSoC_4000S_Family_PSoC_4_Architecture_Technical_Reference_Manual_(TRM)-AdditionalTechnicalInformation-v04_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f915c737eb7)
+  * [PSOC™ 4100S and PSOC™ 4100S Plus: PSOC™ 4 Architecture Technical Reference Manual (TRM)](https://www.infineon.com/dgdl/Infineon-PSoC_4100S_and_PSoC_4100S_Plus_PSoC_4_Architecture_TRM-AdditionalTechnicalInformation-v12_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f9433460188)
   * [Infineon Technologies GitHub](https://github.com/Infineon)
   * [Infineon Technologies](http://www.infineon.com)
 
 ---
-CYPRESS™ Semiconductor Corporation, 2019-2024.
+Cypress Semiconductor Corporation, 2019-2025.

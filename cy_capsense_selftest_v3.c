@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v3.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -1851,10 +1851,10 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * external series resistance). The measurement accuracy is about 30% and
 * is defined by the RefCDAC tolerance.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -2147,10 +2147,10 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * resistance that includes on-chip pin resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30%.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -3292,8 +3292,10 @@ static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
 * against pre-determined capacitance for the shield electrode to
 * detect a hardware fault.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 * When the inactive sensor (electrode) connection is set

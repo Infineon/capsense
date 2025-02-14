@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -126,8 +126,7 @@ uint32_t Cy_CapSense_RunSSCAuto(
 
 uint32_t Cy_CapSense_GetPolySize(uint32_t lfsrPoly);
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
 void Cy_CapSense_SsAutoTuneScanDurationAlignment(
                 uint64_t widgetMask,
                 uint32_t clockDivider,
@@ -4571,8 +4570,8 @@ cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(const cy_stc_capsense_
                 /*
                 * Execute the LFSR range auto-selection functionality when the
                 * Sense Clock source parameter is configured with the SSC or
-                * SSC-Auto option, and the LFSR range parameter is configured with
-                * the Auto option.
+                * SSC-auto option, and the LFSR range parameter is configured with
+                * the auto option.
                 */
                 ptrWdCxt->lfsrBits = (uint8_t)Cy_CapSense_GetLfsrBitsAuto(ptrWdCfg, context);
             }
@@ -4846,7 +4845,7 @@ uint32_t Cy_CapSense_GetClkSrcSSCAuto(
                                     snsClkDivMin, ditherLimitPercents, lfsrScale);
 
     /*
-    * Execute the SSC-Auto selection routine. This routine validates all the
+    * Execute the SSC-auto selection routine. This routine validates all the
     * criteria, that are required for good SSC performance are met.
     * The CY_CAPSENSE_CLK_SOURCE_SSC will be returned if all the criteria are met,
     * the CY_CAPSENSE_CLK_SOURCE_DIRECT will be returned if not.
@@ -4856,7 +4855,7 @@ uint32_t Cy_CapSense_GetClkSrcSSCAuto(
 
     #if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_MATRIX_EN) ||\
         (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN))
-        /* Repeat the SSC-Auto selection routine for the row of two-dimension CSD
+        /* Repeat the SSC-auto selection routine for the row of two-dimension CSD
          * widget.
          */
         if ((CY_CAPSENSE_CSD_GROUP == ptrWdConfig->senseMethod) &&
@@ -5214,8 +5213,7 @@ uint32_t Cy_CapSense_GetLfsrDitherLimit(
 }
 
 
-#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_FULL_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_HW_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_EN)
 /*******************************************************************************
 * Function Name: Cy_CapSense_SsAutoTune
 ****************************************************************************//**
@@ -5226,7 +5224,6 @@ uint32_t Cy_CapSense_GetLfsrDitherLimit(
 * This function performs the following tasks:
 * - Tune the Sense Clock optimal value.
 * - Calculate the number of sub-conversions for the optimal finger capacitance.
-* - Calibrate Reference and Compensation CDACs.
 *
 * \note
 * The function supposes final auto-calibration is called right after this
@@ -5280,14 +5277,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
     {
         if (CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod)
         {
-            /*
-            * Set the Sense Clock source set to Direct.
-            * Since the Number of Epilogue cycles is a common parameter, it is required
-            * to configure the Sense Clock source to Direct for all widgets (including CSX)
-            * in order to have correct number of Epilogue cycles for operation with
-            * the Direct clock.The setup of the Epilogue cycles number is the part of
-            * the Cy_CapSense_InitializeSourceSenseClk() routine.
-            */
+            /* Initializes SmartSense scan configuration */
             ptrWdCxt = ptrWdCfg->ptrWdContext;
             ptrWdCxt->snsClkSource <<= CY_CAPSENSE_CLK_SOURCE_SMARTSENSE_POS;
             ptrWdCxt->numSubConversions = CY_CAPSENSE_SMARTSENSE_PRELIMINARY_SCAN_NSUB;
@@ -5336,7 +5326,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
      * serial resistances, and finger capacitances for each sensor
      */
     autoTuneConfig.modClock = ptrCommonCfg->periClkHz / context->ptrInternalContext->modClk;
-    autoTuneConfig.snsResistance = ptrCommonCfg->csdRConst;
+    autoTuneConfig.snsResistance = CY_CAPSENSE_SMARTSENSE_CSD_RESISTANCE_CONST;
     autoTuneConfig.correctionCoeff = CY_CAPSENSE_SENSOR_CONNECTION_MODE;
 
     ptrWdCfg = context->ptrWdConfig;
@@ -5461,7 +5451,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
             loopFlag = 0u;
             for (j = 0u; j < CY_CAPSENSE_TOTAL_CH_NUMBER; j++)
             {
-                if (wdIndex[j] < CY_CAPSENSE_SLOT_SHIELD_ONLY)
+                if (wdIndex[j] < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
                 {
                     if (0u != (wdIdMask & (1uLL << wdIndex[j])))
                     {
@@ -5485,7 +5475,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
             /* Process new slot with the widget group */
             for (j = 0u; j < CY_CAPSENSE_TOTAL_CH_NUMBER; j++)
             {
-                if (wdIndex[j] < CY_CAPSENSE_SLOT_SHIELD_ONLY)
+                if (wdIndex[j] < CY_CAPSENSE_TOTAL_WIDGET_COUNT)
                 {
                     /* Adds widget to a group */
                     wdIdMask |= 1uLL << wdIndex[j];

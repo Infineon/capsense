@@ -10,5 +10,6 @@ var searchData=
   ['firstslotid',['firstSlotId',['../structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63',1,'cy_stc_capsense_widget_config_t']]],
   ['firstvalidslot',['firstValidSlot',['../structcy__stc__capsense__internal__context__t.html#a95099e48d0b656b0583b626150f18c0a',1,'cy_stc_capsense_internal_context_t']]],
   ['flickdistancemin',['flickDistanceMin',['../structcy__stc__capsense__gesture__config__t.html#a4368430ad62e713cfa9c91275ffcceda',1,'cy_stc_capsense_gesture_config_t']]],
-  ['flicktimeoutmax',['flickTimeoutMax',['../structcy__stc__capsense__gesture__config__t.html#ac6379bfa4aa94d4031692bc31eeee6e1',1,'cy_stc_capsense_gesture_config_t']]]
+  ['flicktimeoutmax',['flickTimeoutMax',['../structcy__stc__capsense__gesture__config__t.html#ac6379bfa4aa94d4031692bc31eeee6e1',1,'cy_stc_capsense_gesture_config_t']]],
+  ['foamcoefficient',['foamCoefficient',['../structcy__stc__capsense__widget__config__t.html#a0b7c2929e9128c81c59b4c494a71a744',1,'cy_stc_capsense_widget_config_t']]]
 ];

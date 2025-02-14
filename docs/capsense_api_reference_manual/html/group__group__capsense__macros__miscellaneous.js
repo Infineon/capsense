@@ -19,5 +19,6 @@ var group__group__capsense__macros__miscellaneous =
     [ "CY_CAPSENSE_HW_CONFIG_MPSC_SCANNING", "group__group__capsense__macros__miscellaneous.html#ga51013b0c9ad8f3654fab6d072f87cf36", null ],
     [ "CY_CAPSENSE_HW_CONFIG_CHANNEL_SATURATION", "group__group__capsense__macros__miscellaneous.html#ga7646d160437751a3d0e8b9dd451ad159", null ],
     [ "CY_CAPSENSE_HW_CONFIG_SMARTSENSE", "group__group__capsense__macros__miscellaneous.html#ga87bfc7c259f4cadcc86c73004bb367db", null ],
-    [ "CY_CAPSENSE_HW_CONFIG_AUTO_DITHERING", "group__group__capsense__macros__miscellaneous.html#ga674a1bf68d2af3d882a229f14ae13b92", null ]
+    [ "CY_CAPSENSE_HW_CONFIG_AUTO_DITHERING", "group__group__capsense__macros__miscellaneous.html#ga674a1bf68d2af3d882a229f14ae13b92", null ],
+    [ "CY_CAPSENSE_LLW_RESULT_SHIFT", "group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b", null ]
 ];

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.c
-* \version 5.0
+* \version 6.10.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company)
+* Copyright 2021-2025, Cypress Semiconductor Corporation (an Infineon company)
 * or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
@@ -80,6 +80,15 @@
 * * Cy_CapSense_MeasureCapacitanceShieldElectrode()
 * * Cy_CapSense_MeasureCapacitanceCap()
 * * Cy_CapSense_MeasureVdda()
+*
+* \note
+*  Cy_CapSense_CheckIntegritySensorPins(),
+*  Cy_CapSense_MeasureCapacitanceSensorElectrode(), and
+*  Cy_CapSense_MeasureCapacitanceSlotSensors() are not supported for
+*  ISX sensing method yet.
+*
+* \note
+* This function is available when self-test library is enabled.
 *
 * Refer to these functions descriptions for detail information
 * on the corresponding test.
@@ -184,6 +193,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_RunSelfTest(
 * For details of the used CRC algorithm, refer to the Cy_CapSense_GetCRC()
 * function.
 *
+* \note
+* This function is available when self-test library is enabled.
+*
 * \param widgetId
 * Specifies the ID number of the widget.
 * A macro for the widget ID can be found in the
@@ -259,6 +271,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 * call the function before processing since processing changes sensor
 * baselines.
 *
+* \note
+* This function is available when self-test library is enabled.
+*
+* \note
+* This function does not support Liquid Level widget.
+*
 * \param widgetId
 * Specifies the ID number of the widget.
 * A macro for the widget ID can be found in the
@@ -288,6 +306,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckCRCWidget(
 *                                         is not binary inverted to its inverse
 *                                         copy or is out of the specified limits.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
+*                                         The test was not executed.
+* - CY_CAPSENSE_BIST_FEATURE_DISABLED_E - The selected widget is not supported.
 *                                         The test was not executed.
 *
 *******************************************************************************/
@@ -343,6 +363,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 * call the function before processing since processing changes sensor
 * raw counts.
 *
+* \note
+* This function is available when self-test library is enabled.
+*
+* \note
+* This function does not support Liquid Level widget.
+*
 * \param widgetId
 * Specifies the ID number of the widget.
 * A macro for the widget ID can be found in the
@@ -371,6 +397,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline(
 * - CY_CAPSENSE_BIST_FAIL_E             - The test failed and raw count is out
 *                                         of the specified limits.
 * - CY_CAPSENSE_BIST_BAD_PARAM_E        - The input parameter is invalid.
+*                                         The test was not executed.
+* - CY_CAPSENSE_BIST_FEATURE_DISABLED_E - The selected widget is not supported.
 *                                         The test was not executed.
 *
 *******************************************************************************/
@@ -482,6 +510,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount(
 * Rx/Lx electrodes for ISX widgets are excluded from the test as 
 * they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
 * for such widgets is returned.
+*
+* \note
+* This function is available when self-test library is enabled.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -627,6 +658,9 @@ void Cy_CapSense_BistDsInitialize(cy_stc_capsense_context_t * context)
 * This function is available for the fourth-generation and fifth-generation
 * low power CAPSENSE&trade;.
 *
+* \note
+* This function is available when self-test library is enabled.
+*
 * \param integrationCapId
 * Indexes of external capacitors to measure their capacitance.
 * There are the enumeration list /ref cy_en_capsense_bist_external_cap_id_t
@@ -733,6 +767,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap(
 * This function is available only for the fourth-generation and fifth
 * generation low power CAPSENSE&trade;.
 *
+* \note
+* This function is available when self-test library is enabled.
+*
 * \param ptrValue
 * The pointer to the uint32_t to store measured VDDA voltage value.
 * If the ptrValue parameter is NULL then VDDA voltage value is not returned
@@ -824,15 +861,17 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
 *
 * The minimum measurable input by this function is 1pF and the
 * maximum is either 200pF or limited by the RC time constant
-* (Cs < 1 / (2*5*SnsClk*R), where R is the total sensor series
+* (Cs < 1 / (2*5*SnsClk*R) (275pF or limited by the RC time constant
+* (Cs < 1 / (4*5*SnsClk*R) for fifth-generation
+* low power CAPSENSE&trade;), where R is the total sensor series
 * resistance that includes on-chip GPIO resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30% and
 * is defined by the RefCDAC tolerance.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -851,6 +890,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
 * Rx/Lx electrodes for ISX widgets are excluded from the test as 
 * they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
 * for such widgets is returned.
+*
+* \note
+* This function is available when self-test library is enabled.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -952,16 +994,18 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
 * * The first divider of 2 is determined by the divided ref_clk frequency usage.
 * * The second divider of 2 is used only for CSX sensors.
 *
-* The minimum measurable input by this function is 0.5 pF and the
+* The minimum measurable input by this function is 1pF and the
 * maximum is either 200pF or limited by the RC time constant
-* (Cs < 1 / (2*10*SnsClk*R), where R is the total sensor series
+* (Cs < 1 / (2*5*SnsClk*R) (275pF or limited by the RC time constant
+* (Cs < 1 / (4*5*SnsClk*R) for fifth-generation
+* low power CAPSENSE&trade;), where R is the total sensor series
 * resistance that includes on-chip pin resistance ~500 Ohm and
 * external series resistance). The measurement accuracy is about 30%.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* are set to a corresponding Inactive sensor connection parameter matching
-* configuration used for a specified sensing method. Shield electrodes are
-* also matching the CSD Inactive sensor connection parameter.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 *
@@ -985,6 +1029,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
 * Rx/Lx electrodes for ISX widgets are excluded from the test as 
 * they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result 
 * for such widgets is returned.
+*
+* \note
+* This function is available when self-test library is enabled.
 *
 * \param slotId
 * Specifies the ID number of the slot to measure sensor capacitance.
@@ -1067,8 +1114,10 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
 * against pre-determined capacitance for the shield electrode to
 * detect a hardware fault.
 *
-* By default, all CAPSENSE&trade; sensors (electrodes) that are not being
-* measured are set to the GND state.
+* By default, all CAPSENSE&trade; sensors (electrodes) inherit regular
+* scanning configuration. For example if the Inactive sensor
+* connection parameter of the CSD sensing method is set to GND,
+* sensors that are not being measured are set to the GND state.
 * The inactive state can be changed in run-time by using
 * the Cy_CapSense_SetInactiveElectrodeState() function.
 * When the inactive sensor (electrode) connection is set
@@ -1084,6 +1133,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors(
 * \note
 * This function is available for the fifth-generation and fifth-generation
 * low power CAPSENSE&trade;.
+*
+* \note
+* This function is available when self-test library is enabled.
 *
 * \param skipChMask
 * Specifies the mask to skip some channels during the shield electrode

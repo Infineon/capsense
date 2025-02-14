@@ -1,13 +1,14 @@
 var NAVTREE =
 [
-  [ "CAPSENSE™ Middleware Library 5.0", "index.html", [
+  [ "CAPSENSE™ Middleware Library 6.10.0", "index.html", [
     [ "General Description", "index.html#section_capsense_general", [
       [ "Features", "index.html#subsection_capsense_features", null ]
     ] ],
     [ "Quick Start Guide", "index.html#group_capsense_quick_start", [
-      [ "Code Examples for PSoC™ 4 Devices with fourth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc4_csd_ces", null ],
-      [ "Code Examples for PSoC™ 4 Devices with fifth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc4_msc_ces", null ],
-      [ "Code Examples for PSoC™ 6 Devices with fourth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc6_csd_ces", null ],
+      [ "Code Examples for PSOC™ 4 Devices with fourth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc4_csd_ces", null ],
+      [ "Code Examples for PSOC™ 4 Devices with fifth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc4_msc_ces", null ],
+      [ "Code Examples for PSOC™ 4 Devices with fifth-generation low power CAPSENSE™", "index.html#group_capsense_quick_start_psoc4_msclp_ces", null ],
+      [ "Code Examples for PSOC™ 6 Devices with fourth-generation CAPSENSE™", "index.html#group_capsense_quick_start_psoc6_csd_ces", null ],
       [ "ModusToolbox™ Configuration Considerations", "index.html#group_capsense_quick_start_modus", null ],
       [ "MBED OS Configuration Considerations", "index.html#group_capsense_quick_start_mbed", null ]
     ] ],
@@ -29,11 +30,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__group__capsense__callbacks.html",
-"group__group__capsense__macros__gesture.html#gaf63cf60202ba76967617fe828214e71f",
-"group__group__capsense__macros__touch.html#ga41f9db75b066c5d862d822bea199fe2f",
-"structcy__stc__capsense__common__config__t.html#a25a6e1ee6c1b95b92f69b56471e90198",
-"structcy__stc__capsense__internal__context__t.html#a76b775ea247ac23160c1286fa965adb3",
-"structcy__stc__capsense__widget__crc__data__t.html#aed1891221adb2937e8de946ef4b2d02d"
+"group__group__capsense__macros__gesture.html#gad81547dd95beb218449d8d209d6f2d90",
+"group__group__capsense__macros__touch.html#ga26736659b0a4f78ffb1dce945b232c04",
+"structcy__stc__capsense__common__config__t.html#a192101f96101897abb7ab8a0767532ad",
+"structcy__stc__capsense__internal__context__t.html#a686901c142a968b7e0cc0299839fefef",
+"structcy__stc__capsense__widget__crc__data__t.html#a8e0385e6387e58cdedfb31ea60628420"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
