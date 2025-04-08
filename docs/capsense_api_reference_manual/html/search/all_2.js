@@ -15,6 +15,7 @@ var searchData=
   ['cdacdithervalueval',['cdacDitherValueVal',['../structcy__stc__capsense__widget__crc__data__t.html#a67a43432646d3be68235648c58c75342',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['cdacref',['cdacRef',['../structcy__stc__capsense__widget__context__t.html#a1ca9544ef549d7fc214f7703efc596c7',1,'cy_stc_capsense_widget_context_t']]],
   ['cdacrefval',['cdacRefVal',['../structcy__stc__capsense__widget__crc__data__t.html#a983f64526f1f5a4c14e83e17ad4e23ad',1,'cy_stc_capsense_widget_crc_data_t']]],
+  ['cdactrimcoefficient',['cdacTrimCoefficient',['../structcy__stc__capsense__common__context__t.html#a012b30f6b332ffbe63a850d7b106ce70',1,'cy_stc_capsense_common_context_t']]],
   ['centroidconfig',['centroidConfig',['../structcy__stc__capsense__widget__config__t.html#ad2825a42c272b5c46dbcb15a21ec913f',1,'cy_stc_capsense_widget_config_t']]],
   ['channeloffset',['channelOffset',['../structcy__stc__capsense__common__config__t.html#af4ae13ecd0378411c29e1c611f7a1adc',1,'cy_stc_capsense_common_config_t']]],
   ['chid',['chId',['../structcy__stc__capsense__pin__config__t.html#aa174ebb6a2d3ef3b8918b1065320599b',1,'cy_stc_capsense_pin_config_t::chId()'],['../structcy__stc__capsense__electrode__config__t.html#a05da24520b2abe15d7d03d63f0590650',1,'cy_stc_capsense_electrode_config_t::chId()']]],

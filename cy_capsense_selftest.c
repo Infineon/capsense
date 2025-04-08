@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -845,7 +845,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureVdda(
 * The default scanning parameters are the following:
 * * SnsClk divider (256) is the divider for the sensor clock frequency.
 * * NumConv (100) is the number of sub-conversions.
-* * The reference CDAC capacitance (886 fF) is equivalent to CDAC Code of 100u.
+* * The reference CDAC capacitance (887 fF) is equivalent to CDAC Code of 100u.
 * * The compensation CDAC is disabled.
 * * The CIC2 filter is disabled.
 * * The dithering is disabled.
@@ -977,7 +977,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode(
 * configuration. For the capacitance measurement, the BIST specific scan
 * parameters are used. They can be found in the Electrode capacitance measurement
 * macros group.
-* The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF
+* The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF
 * of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF).
 * Compensation CDAC is disabled during the BIST scan.
 * Another default scanning parameters are the following:

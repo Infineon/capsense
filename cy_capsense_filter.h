@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file contains the definitions for all the filters implementation.

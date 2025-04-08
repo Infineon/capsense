@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -1837,10 +1837,13 @@ typedef struct
     uint16_t configId;                                          /**< 16-bit CRC calculated by the CAPSENSE&trade; Configurator tool for the CAPSENSE&trade; configuration.
                                                                    * Used by the CAPSENSE&trade; Tuner tool to identify if the FW corresponds to the specific user configuration. */
     uint16_t tunerCmd;                                          /**< Tuner Command Register \ref cy_en_capsense_tuner_cmd_t.
-                                                                   * Used for the communication between the CAPSENSE&trade; Tuner tool and the middleware */
+                                                                  * Used for the communication between the CAPSENSE&trade; Tuner tool and the middleware */
+    uint8_t mwVersionMajor;                                     /**< Specifies MW major version */
+    uint8_t mwVersionMinor;                                     /**< Specifies MW minor version */
     uint16_t scanCounter;                                       /**< This counter increments after each scan of active widgets. */
     uint8_t tunerSt;                                            /**< State of CAPSENSE&trade; middleware tuner module. \ref cy_en_capsense_tuner_state_t */
     uint8_t initDone;                                           /**< Keep information whether initialization was done or not */
+    uint16_t misc;                                              /**< Specifies miscellaneous feature configuration (internal usage) */
     volatile uint32_t status;                                   /**< Middleware status information:
                                                                   * * Bit[0-3] - The set [x] bit of the result means that the previously initiated scan for the [x] channel is in progress.
                                                                   *              For MSCv3 each bit shows a busyness of a corresponding sensing channel. 
@@ -1880,6 +1883,9 @@ typedef struct
     uint8_t tunerCnt;                                           /**< Command counter of CAPSENSE&trade; middleware tuner module */
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint16_t cdacTrimCoefficient;                            /**< CDAC trimming coefficient.
+                                                                  * \note This field is available only for the fifth-generation low power CAPSENSE&trade;.
+                                                                  */
         uint16_t lpDataSt;                                       /**< State of Low Power data processing:
                                                                   * * Bit[0] = 0 (Default) - data is not copied and cannot be transmitted to Tuner
                                                                   * * Bit[0] = 1 - data copied by CAPSENSE&trade; and transmitted to Tuner.

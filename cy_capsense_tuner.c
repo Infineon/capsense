@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
@@ -337,32 +337,34 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
                 case (uint16_t)CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E:
-                    tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_ONE_SCAN;
-                    updateFlag = 0u;
-                    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
-                        sendDataFlag = 0u;
-                    #endif
-
-                    cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
-                    if (2u == cmdSize)
+                    if (NULL != commandPacket)
                     {
-                        duty_cycle = (((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u]) << 8u) |
-                                      ((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u]);
-                    }
+                        tunerState = (uint8_t)CY_CAPSENSE_TU_FSM_ONE_SCAN;
+                        updateFlag = 0u;
+                        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                            sendDataFlag = 0u;
+                        #endif
 
-                    for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
-                    {
-                        ptrWdCfg = &context->ptrWdConfig[widgetId];
-
-                        if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType)
+                        cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
+                        if (2u == cmdSize)
                         {
-                            if (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
+                            duty_cycle = (((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u]) << 8u) |
+                                        ((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 3u]);
+                        }
+
+                        for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
+                        {
+                            ptrWdCfg = &context->ptrWdConfig[widgetId];
+
+                            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType)
                             {
-                                ptrWdCfg->ptrWdContext->sigPFC = duty_cycle;
+                                if (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
+                                {
+                                    ptrWdCfg->ptrWdContext->sigPFC = duty_cycle;
+                                }
                             }
                         }
                     }
-
                     break;
             #endif
 

@@ -1,14 +1,12 @@
-# CAPSENSE™ Middleware Library 6.10.0
+# CAPSENSE™ Middleware Library 7.0.0
 
 ### What is Included?
 For a complete description of the CAPSENSE™ middleware, refer to [README.md](./README.md) and [API Reference Guide](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html).
 The revision history of the CAPSENSE™ middleware is also available at [API Reference Guide Changelog](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_changelog).
 The new support added in this release:
-* Added Liquid level sensing method for fifth-generation low power device.
-* Added Inductive sensing method for fifth-generation low power device.
-* Added auto-tuning for Inductive sensing widgets. The ISX auto-tuning feature is at the Beta readiness level. It is not fully validated and might not work as expected. Use it to start working on the ISX tuning.
-* Added Common mode filter.
-* Added Multi-pin Selection option for fifth-generation low power device.
+* Added support of PSOC™ 4100T Plus device family.
+* Added scaling to CDAC codes in the manual mode for the CSD sensing method by using trim registers.
+* Added scaling to measured sensor, electrode and shield capacitances in built-in self-test library.
 
 ### Known issues
 For a complete description of the known issues and possible workarounds, refer to the [API Reference Guide - Errata section](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_errata).
@@ -18,16 +16,16 @@ This version of the CAPSENSE™ middleware was validated for compatibility with 
 
 | Software and tools                                                                                | Version |
 | :---                                                                                              | :----:  |
-| ModusToolbox™ Software Environment                                                                | 3.4.0   |
-| - ModusToolbox™ Device Configurator                                                               | 5.20    |
+| ModusToolbox™ Software Environment                                                                | 3.5.0   |
+| - ModusToolbox™ Device Configurator                                                               | 5.30    |
 | - ModusToolbox™ MSC Superblock Personality for PSOC™ 4 devices in the Device Configurator         | 1.0     |
 | - ModusToolbox™ MSCLP Personality for PSOC™ 4 devices in the Device Configurator                  | 3.0     |
 | - ModusToolbox™ MSC Personality for PSOC™ 4 devices in the Device Configurator                    | 1.1     |
 | - ModusToolbox™ CSD Personality for PSOC™ 4 devices in the Device Configurator                    | 2.0     |
 | - ModusToolbox™ CSD Personality for PSOC™ 6 devices in the Device Configurator                    | 3.0     |
-| - ModusToolbox™ CAPSENSE™ Configurator / Tuner                                                    | 7.10.0  |
-| CAT1 Peripheral Driver Library (PDL)                                                              | 3.14.0  |
-| CAT2 Peripheral Driver Library (PDL)                                                              | 2.15.0  |
+| - ModusToolbox™ CAPSENSE™ Configurator / Tuner                                                    | 8.0.0   |
+| CAT1 Peripheral Driver Library (PDL)                                                              | 3.16.0  |
+| CAT2 Peripheral Driver Library (PDL)                                                              | 2.16.0  |
 | GCC Compiler                                                                                      | 11.3.1  |
 | IAR Compiler                                                                                      | 9.50.2  |
 | ARM Compiler 6                                                                                    | 6.22.0  |

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 6.10.0
+* \version 6.20.0
 *
 * \brief
 * This file defines the data structure global variables and provides the

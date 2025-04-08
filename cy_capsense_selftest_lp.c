@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -63,7 +63,7 @@
 #define CY_CAPSENSE_BIST_WATCHDOG_MARGIN_COEFF                  (3u)
 #define CY_CAPSENSE_BIST_CAP_MEAS_WDT_CYCLES_PER_LOOP           (5u)
 #define CY_CAPSENSE_BIST_V3_ELTD_CAP_CYCLES_NUM                 (1u)
-#define CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000          (8860u)
+#define CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000          (8870u)
 #define CY_CAPSENSE_BIST_CP_MAX_VALUE                           (275000u)
 #define CY_CAPSENSE_BIST_CSH_MAX_VALUE                          (1160000u)
 #define CY_CAPSENSE_BIST_PROMILLE_FACTOR                        (1000u)
@@ -75,14 +75,14 @@
 
 #define CY_CAPSENSE_BIST_EXT_CAP_REF_CDAC_DEFAULT                               (250u)
 #define CY_CAPSENSE_BIST_EXT_CAP_NUM_SUB_DEFAULT                                (8u)
-#define CY_CAPSENSE_BIST_EXT_CAP_IMO_CLK_MHZ                                    (25u)
+#define CY_CAPSENSE_BIST_EXT_CAP_IMO_CLK_MHZ                                    (12u)
 #define CY_CAPSENSE_BIST_EXT_CAP_WDT_FACTOR                                     (5u)
 #define CY_CAPSENSE_BIST_EXT_CAP_ACCURACY_FACTOR                                (1150u)
 #define CY_CAPSENSE_BIST_EXT_CAP_DISCHARGE_FACTOR                               (2u)
 #define CY_CAPSENSE_BIST_EXT_CAP_RESULT_FACTOR                                  ((123uL * CY_CAPSENSE_REF_CDAC_LSB_X100 *\
                                                                                   CY_CAPSENSE_BIST_EXT_CAP_REF_CDAC_DEFAULT) /\
-                                                                                 CY_CAPSENSE_CONVERSION_HECTO)
-#define CY_CAPSENSE_BIST_EXT_CAP_RESULT_DIVIDER                                 (CY_CAPSENSE_CONVERSION_KILO *\
+                                                                                  CY_CAPSENSE_CONVERSION_KILO)
+#define CY_CAPSENSE_BIST_EXT_CAP_RESULT_DIVIDER                                 (CY_CAPSENSE_CONVERSION_HECTO *\
                                                                                  CY_CAPSENSE_CONVERSION_HECTO)
 #define CY_CAPSENSE_BIST_EXT_CAP_MAX_CAP                                        (25u)
 #define CY_CAPSENSE_BIST_EXT_CAP_CMOD_MAX_VALUE                                 (5u)
@@ -1694,7 +1694,7 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * The default scanning parameters are the following:
 * * SnsClk divider (256) is the divider for the sensor clock frequency.
 * * NumConv (100) is the number of sub-conversions.
-* * The reference CDAC capacitance (886 fF) is equivalent to CDAC Code of 100u.
+* * The reference CDAC capacitance (887 fF) is equivalent to CDAC Code of 100u.
 * * The compensation CDAC is disabled.
 * * The CIC2 filter is disabled.
 * * The dithering is disabled.
@@ -2037,7 +2037,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * configuration. For the capacitance measurement, the BIST specific scan
 * parameters are used. They can be found in the Electrode capacitance measurement
 * macros group.
-* The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF
+* The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF
 * of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF).
 * Compensation CDAC is disabled during the BIST scan.
 * Another default scanning parameters are the following:
@@ -2148,7 +2148,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(
 * configuration. For the capacitance measurement, the BIST specific scan
 * parameters are used. They can be found in the Electrode capacitance measurement
 * macros group.
-* The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF
+* The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF
 * of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF).
 * Compensation CDAC is disabled during the BIST scan.
 * Another default scanning parameters are the following:
@@ -2408,6 +2408,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
     MSCLP_Type * ptrHwBase = ptrCommonCfg->ptrChConfig->ptrHwBase;
     uint32_t rawCountTmp;
     uint32_t watchdog;
+    uint32_t cdacTrim;
     uint32_t sensorFrame[CY_MSCLP_6_SNS_REGS];
 
     /* Setup scan parameters: Ref CDAC code for Cp measurement */
@@ -2451,6 +2452,22 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSensor(
         cp /= context->ptrBistContext->eltdCapSubConvNum;
         cp *= context->ptrBistContext->eltdCapRefCdac;
         cp /= CY_CAPSENSE_CONVERSION_HECTO;
+
+        /* Adds CDAC trimming */
+        if (0u != context->ptrCommonContext->cdacTrimCoefficient)
+        {
+            cdacTrim = context->ptrCommonContext->cdacTrimCoefficient;
+
+            if (0u != cdacTrim)
+            {
+                /* Scales result with decreased resolution to avoid overflow */
+                cp = (uint32_t)(cp << (CY_CAPSENSE_CDAC_TRIM_OFFSET - CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET));
+                /* Rounding to the nearest */
+                cp += cdacTrim >> (CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET + 1u);
+                cp /= cdacTrim >> CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET;
+            }
+        }
+
         if (((uint32_t)CY_CAPSENSE_BIST_CP_MAX_VALUE) < cp)
         {
             cp = (uint32_t)CY_CAPSENSE_BIST_CP_MAX_VALUE;
@@ -2538,6 +2555,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSlot(
     uint32_t rawCountTmp;
     uint32_t wdIndex;
     uint32_t snsIndex;
+    uint32_t cdacTrim;
     uint32_t sensorFrame[CY_MSCLP_6_SNS_REGS];
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
         ptrScanSlots = (snsFrameType == CY_CAPSENSE_SNS_FRAME_ACTIVE) ? (context->ptrScanSlots) : (context->ptrLpScanSlots);
@@ -2602,6 +2620,21 @@ static cy_en_capsense_bist_status_t Cy_CapSense_BistMeasureCapacitanceSlot(
         cp /= context->ptrBistContext->eltdCapSubConvNum;
         cp *= context->ptrBistContext->eltdCapRefCdac;
         cp /= CY_CAPSENSE_CONVERSION_HECTO;
+
+        /* Adds CDAC trimming */
+        if (0u != context->ptrCommonContext->cdacTrimCoefficient)
+        {
+            cdacTrim = context->ptrCommonContext->cdacTrimCoefficient;
+
+            if (0u != cdacTrim)
+            {
+                /* Scales result with decreased resolution to avoid overflow */
+                cp = (uint32_t)(cp << (CY_CAPSENSE_CDAC_TRIM_OFFSET - CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET));
+                /* Rounding to the nearest */
+                cp += cdacTrim >> (CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET + 1u);
+                cp /= cdacTrim >> CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET;
+            }
+        }
 
         /* Store the Cp value in the appropriate structure */
         if ((CY_CAPSENSE_BIST_CAP_SHIELD_SCAN != context->ptrBistContext->eltdCapScanMode))
@@ -2832,7 +2865,8 @@ static void Cy_CapSense_BistGenerateSensorConfig(
             (_VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, context->ptrBistContext->eltdCapRefCdac) |
              (CY_CAPSENSE_SM_REG_SNS_SNS_CDAC_CTL_FLD_CLOCK_REF_RATE << MSCLP_SNS_SNS_CDAC_CTL_CLOCK_REF_RATE_Pos));
 
-    if (CY_CAPSENSE_BIST_CAP_ELTD_SCAN == context->ptrBistContext->eltdCapScanMode)
+    if ((CY_CAPSENSE_BIST_CAP_ELTD_SCAN == context->ptrBistContext->eltdCapScanMode) ||
+        (CY_CAPSENSE_BIST_CAP_SHIELD_SCAN == context->ptrBistContext->eltdCapScanMode))
     {
         modeSel = CY_CAPSENSE_REG_MODE_CSD;
     }
@@ -2897,12 +2931,10 @@ static void Cy_CapSense_BistGenerateSensorConfig(
         /* Create separate inactive mask of ISX pins only */
         for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
         {
-            ptrWdCfg = &context->ptrWdConfig[wdIndex];
-            snsMethod = ptrWdCfg->senseMethod;
-
+            snsMethod = context->ptrWdConfig[wdIndex].senseMethod;
             if (CY_CAPSENSE_ISX_GROUP == snsMethod)
             {
-                numEltd = (uint32_t)ptrWdCfg->numRows + ptrWdCfg->numCols;
+                numEltd = (uint32_t)context->ptrWdConfig[wdIndex].numRows + context->ptrWdConfig[wdIndex].numCols;
                 eltdPinCfg = ptrWdCfg->ptrEltdConfig;
 
                 for (eltdIndex = 0u; eltdIndex < numEltd; eltdIndex++)
@@ -3310,7 +3342,7 @@ static void Cy_CapSense_BistGenerateBaseCmodConfig(cy_stc_capsense_context_t * c
         ptrHwBase->PUMP_CTL = MSCLP_PUMP_CTL_PUMP_MODE_Msk;
     #endif
 
-    /* Use 25 MHz IMO frequency for Cmod measurements */
+    /* Use 46 MHz IMO frequency with 4 as divider for Cmod measurements */
     ptrHwBase->IMO_CTL =
             ((CY_CAPSENSE_BIST_CMOD_VDDA_MEAS_IMO_CTL_FREQ          << MSCLP_IMO_CTL_FREQ_Pos)                    |
              (CY_CAPSENSE_BIST_CMOD_VDDA_MEAS_IMO_CTL_CLOCK_MSC_DIV << MSCLP_IMO_CTL_CLOCK_MSC_DIV_Pos));
@@ -3479,6 +3511,7 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap_V3Lp(
     uint16_t * ptrResult = NULL;
     uint32_t nSub;
     uint32_t maxRaw;
+    uint32_t cdacTrim;
     cy_en_capsense_bist_status_t bistStatus = CY_CAPSENSE_BIST_SUCCESS_E;
 
     if ((NULL == context) || (CY_CAPSENSE_BIST_EXT_CAP_MAX_CAP < maxCapacitance) || (0u == maxCapacitance) ||
@@ -3518,14 +3551,12 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap_V3Lp(
             if (CY_CAPSENSE_BIST_SUCCESS_E == bistStatus)
             {
                 /* Generate the MSC base configuration for BIST scan and send it to the MSC HW block */
-                Cy_CapSense_BistSwitchHwConfig(CY_CAPSENSE_BIST_HW_EXTERNAL_CAP_E, CY_CAPSENSE_UNDEFINED_GROUP, 0u,
-                                               context);
+                Cy_CapSense_BistSwitchHwConfig(CY_CAPSENSE_BIST_HW_EXTERNAL_CAP_E, CY_CAPSENSE_UNDEFINED_GROUP, 0u, context);
 
                 /* Discharge the specified capacitor */
                 context->ptrBistContext->extCapDischargeTime = (uint16_t)((CY_CAPSENSE_BIST_EXT_CAP_DISCHARGE_FACTOR *
-                                                                           maxCapacitance *
-                                                                           CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE) /
-                                                                          CY_CAPSENSE_CONVERSION_KILO);
+                    maxCapacitance * CY_CAPSENSE_BIST_EXT_CAP_SERIAL_RESISTANCE) / CY_CAPSENSE_CONVERSION_KILO);
+
                 if (0u == context->ptrBistContext->extCapDischargeTime)
                 {
                     context->ptrBistContext->extCapDischargeTime = 1u;
@@ -3539,11 +3570,15 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap_V3Lp(
                           CY_CAPSENSE_CONVERSION_KILO) / CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000;
 
                 /* Calculate a corresponding number of sub-conversions for the measurement */
-                nSub = (maxRaw / ((uint32_t)MSCLP_SNS_SNS_CTL_SENSE_DIV_Msk >> MSCLP_SNS_SNS_CTL_SENSE_DIV_Pos))
-                            + 1u;
+                nSub = maxRaw / (((uint32_t)MSCLP_SNS_SNS_CTL_SENSE_DIV_Msk >> MSCLP_SNS_SNS_CTL_SENSE_DIV_Pos) + 1u);
+
                 if (CY_CAPSENSE_14_BIT_MASK < nSub)
                 {
                     nSub = CY_CAPSENSE_14_BIT_MASK;
+                }
+                if (0u == nSub)
+                {
+                    nSub = 1u;
                 }
 
                 /* Number of sub-conversions variable initialization in BIST data structure */
@@ -3564,9 +3599,33 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceCap_V3Lp(
 
                 if (CY_CAPSENSE_BIST_SUCCESS_E == bistStatus)
                 {
-                    /* Calculate the capacitance value in pF */
-                    *ptrResult = (uint16_t)((rawCounts * CY_CAPSENSE_BIST_EXT_CAP_RESULT_FACTOR) /
-                                            CY_CAPSENSE_BIST_EXT_CAP_RESULT_DIVIDER);
+                    /* Calculates the capacitance value in pF */
+                    rawCounts *= CY_CAPSENSE_BIST_EXT_CAP_RESULT_FACTOR;
+                    rawCounts += CY_CAPSENSE_BIST_EXT_CAP_RESULT_DIVIDER / 2u;
+                    rawCounts /= CY_CAPSENSE_BIST_EXT_CAP_RESULT_DIVIDER;
+
+                    /* Adds CDAC trimming */
+                    if (0u != context->ptrCommonContext->cdacTrimCoefficient)
+                    {
+                        cdacTrim = context->ptrCommonContext->cdacTrimCoefficient;
+
+                        if (0u != cdacTrim)
+                        {
+                            /* Scales result */
+                            rawCounts = (uint32_t)(rawCounts << CY_CAPSENSE_CDAC_TRIM_OFFSET);
+                            /* Rounding to the nearest */
+                            rawCounts += (cdacTrim >> 0x1u);
+                            rawCounts /= cdacTrim;
+                        }
+                    }
+
+                    if (CY_CAPSENSE_16_BIT_MASK < rawCounts)
+                    {
+                        rawCounts = CY_CAPSENSE_16_BIT_MASK;
+                    }
+
+                    *ptrResult = (uint16_t)rawCounts;
+
                     if (NULL != ptrValue)
                     {
                         *ptrValue = *ptrResult;

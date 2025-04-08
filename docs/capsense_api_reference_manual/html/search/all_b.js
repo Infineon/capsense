@@ -16,11 +16,14 @@ var searchData=
   ['mfsconfig',['mfsConfig',['../structcy__stc__capsense__widget__config__t.html#aa3e4f9fe91ed0dd44f74246ea10ad98e',1,'cy_stc_capsense_widget_config_t']]],
   ['mink',['minK',['../structcy__stc__capsense__adaptive__filter__config__t.html#a8202d5f56b17bd01a1957a05bea2f489',1,'cy_stc_capsense_adaptive_filter_config_t']]],
   ['minsmap',['minsMap',['../structcy__stc__capsense__csx__touch__buffer__t.html#a4478e1addf6cd6f858c74a742a76f79f',1,'cy_stc_capsense_csx_touch_buffer_t']]],
+  ['misc',['misc',['../structcy__stc__capsense__common__context__t.html#a55ced6447bd03535d456958f7fbe9cc3',1,'cy_stc_capsense_common_context_t']]],
   ['modclk',['modClk',['../structcy__stc__capsense__bist__custom__parameters__t.html#aafb50e8ce6fad46c3a8b0224ce1714b6',1,'cy_stc_capsense_bist_custom_parameters_t::modClk()'],['../structcy__stc__capsense__internal__context__t.html#a1042ee9d26a41ca6f44e82c64dbac146',1,'cy_stc_capsense_internal_context_t::modClk()']]],
   ['modclock',['modClock',['../structcy__stc__capsense__hw__smartsense__config__t.html#a79876e7ae4c8fd5941ba81d55f5dbcf1',1,'cy_stc_capsense_hw_smartsense_config_t']]],
   ['modcsdclk',['modCsdClk',['../structcy__stc__capsense__common__context__t.html#a867653a126683191970d79f8b6005926',1,'cy_stc_capsense_common_context_t']]],
   ['modcsxclk',['modCsxClk',['../structcy__stc__capsense__common__context__t.html#a7284658d282945e1ed7f624683677829',1,'cy_stc_capsense_common_context_t']]],
   ['mporder',['mpOrder',['../structcy__stc__capsense__widget__config__t.html#a21293dcc98bc6e3c1b487fc17df83b61',1,'cy_stc_capsense_widget_config_t']]],
   ['mporderrows',['mpOrderRows',['../structcy__stc__capsense__widget__config__t.html#a38fbf3d32168a0cb2acfa29ca7605b2e',1,'cy_stc_capsense_widget_config_t']]],
-  ['mrssstateafterscan',['mrssStateAfterScan',['../structcy__stc__capsense__internal__context__t.html#a77b0f978e588d9a90b05c2ff127e7f21',1,'cy_stc_capsense_internal_context_t']]]
+  ['mrssstateafterscan',['mrssStateAfterScan',['../structcy__stc__capsense__internal__context__t.html#a77b0f978e588d9a90b05c2ff127e7f21',1,'cy_stc_capsense_internal_context_t']]],
+  ['mwversionmajor',['mwVersionMajor',['../structcy__stc__capsense__common__context__t.html#a68468dfa23c656bab73e6e367f8cb143',1,'cy_stc_capsense_common_context_t']]],
+  ['mwversionminor',['mwVersionMinor',['../structcy__stc__capsense__common__context__t.html#a2442d4c9af6d954e558f20e63ac66fd3',1,'cy_stc_capsense_common_context_t']]]
 ];

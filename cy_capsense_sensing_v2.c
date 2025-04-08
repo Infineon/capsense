@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v2.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file contains the source of functions common for different sensing

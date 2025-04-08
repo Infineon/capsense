@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the function prototypes of the Control module.
@@ -28,6 +28,11 @@
 extern "C" {
 #endif
 
+/*******************************************************************************
+* Scaling Macros
+*******************************************************************************/
+#define CY_CAPSENSE_CDAC_TRIM_CORRECTION_NUMERATOR                        (9u)
+#define CY_CAPSENSE_CDAC_TRIM_CORRECTION_DENOMINATOR                      (10u)
 
 /*******************************************************************************
 * Function Prototypes

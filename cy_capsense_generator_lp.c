@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -28,7 +28,6 @@
 #endif
 
 #if (defined(CY_IP_M0S8MSCV3LP))
-
 
 /*******************************************************************************
 * Internal function prototypes
@@ -1208,11 +1207,20 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
     cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t compDiv;
     uint32_t wdIndex = ptrScanSlot->wdId;
-    uint32_t snsIndex = ptrScanSlot->snsId;
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[wdIndex];
     uint32_t snsCdacCtlReg = MSCLP_SNS_SNS_CDAC_CTL_CLOCK_REF_RATE_Msk;
     uint8_t senseMethod = ptrWdCfg->senseMethod;
     cy_stc_capsense_internal_context_t * ptrIntCxt = context->ptrInternalContext;
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && (CY_CAPSENSE_DISABLE == CY_CAPSENSE_SMARTSENSE_CSD_EN))
+        uint32_t cdacTrim;
+        uint32_t cdacCode;
+    #endif
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && \
+         (CY_CAPSENSE_DISABLE == CY_CAPSENSE_SMARTSENSE_CSD_EN) && \
+         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN))
+        uint32_t cdacFineCode;
+        uint32_t cdacTotal;
+    #endif
 
     /* Compensation CDAC Divider */
     compDiv = context->ptrWdContext[wdIndex].cdacCompDivider;
@@ -1227,7 +1235,7 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
                          _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_FL_MODE, 1uL); /* the same as it was for msc */
     }
 
-    #if (0u != CY_CAPSENSE_LIQUID_LEVEL_EN)
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
         /* Uses configuration from Configurator for LLW if tuning is complete */
         if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) &&
             (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK)))
@@ -1237,67 +1245,210 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
                 snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
             #endif
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN)
-                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[snsIndex].cdacComp);
+                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[ptrScanSlot->snsId].cdacComp);
             #endif
         }
-    #endif
-    /* Ref CDAC Code setup */
-    if ((CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS)) ||
-        (0u != (CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK & context->ptrCommonContext->status)))
-    {
-        if ((CY_CAPSENSE_CSD_GROUP == senseMethod) &&
-            (ptrWdCfg->numCols <= snsIndex))
-        {
-            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->rowCdacRef);
-        }
         else
-        {
-            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
-        }
-    }
-
-    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
-         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
-         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN))
-        /* Ref-Fine CDAC Code setup */
-        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS))
-        {
-            if ((CY_CAPSENSE_CSD_GROUP == senseMethod) &&
-                (ptrWdCfg->numCols <= snsIndex))
-            {
-                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->rowCdacFine);
-            }
-            else
-            {
-                snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
-            }
-        }
     #endif
-
-    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN) || \
-         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN) || \
-         (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN))
-        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_COMP_MODE_MASK) >> CY_CAPSENSE_CDAC_COMP_MODE_POS))
         {
-            switch (senseMethod)
-            {
-                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_EN)
-                    case CY_CAPSENSE_CSD_GROUP :
-                #endif /* CY_CAPSENSE_CSD_CDAC_COMP_EN */
-                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_EN)
-                    case CY_CAPSENSE_CSX_GROUP :
-                #endif /* CY_CAPSENSE_CSX_CDAC_COMP_EN */
-                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_EN)
-                    case CY_CAPSENSE_ISX_GROUP :
-                #endif /* CY_CAPSENSE_ISX_CDAC_COMP_EN */
-                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[snsIndex].cdacComp);
-                        break;
-                default:
-                    /* No action for other methods */
-                    break;
-            }
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+                if (CY_CAPSENSE_CSX_GROUP == senseMethod)
+                {
+                    if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS))
+                    {
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
+                    }
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN)
+                        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS))
+                        {
+                            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
+                        }
+                    #endif
+                    if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_COMP_MODE_MASK) >> CY_CAPSENSE_CDAC_COMP_MODE_POS))
+                    {
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[ptrScanSlot->snsId].cdacComp);
+                    }
+                }
+            #endif
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
+                if (CY_CAPSENSE_ISX_GROUP == senseMethod)
+                {
+                    if ((CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS)) ||
+                            (0u != (CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK & context->ptrCommonContext->status)))
+                    {
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
+                    }
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN)
+                        if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS))
+                        {
+                            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCfg->ptrWdContext->cdacFine);
+                        }
+                    #endif
+                    if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_COMP_MODE_MASK) >> CY_CAPSENSE_CDAC_COMP_MODE_POS))
+                    {
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrWdCfg->ptrSnsContext[ptrScanSlot->snsId].cdacComp);
+                    }
+                }
+            #endif
+            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_EN))
+                if ((CY_CAPSENSE_CSD_GROUP == senseMethod) && (0u != (CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK & context->ptrCommonContext->status)))
+                {
+                    snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);
+                    if (ptrWdCfg->numCols <= ptrScanSlot->snsId)
+                    {
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->rowCdacRef);
+                    }
+                }
+            #endif
+
+            /* Adds CDAC scaling to CSD widget only in manual mode.
+             * If MPN is not trimmed scaling is omitted however manual CDAC codes
+             * are still stored.
+             */
+            #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) && (CY_CAPSENSE_DISABLE == CY_CAPSENSE_SMARTSENSE_CSD_EN))
+                if (CY_CAPSENSE_CSD_GROUP == senseMethod)
+                {
+                    #if (0u == CY_CAPSENSE_CDAC_TRIM_EN)
+                        cdacTrim = 0u;
+                    #else
+                        cdacTrim = context->ptrCommonContext->cdacTrimCoefficient;
+                    #endif
+                    if (0u == cdacTrim)
+                    {
+                        /* Performs no corrections if parts are not trimmed */
+                        cdacTrim = (uint32_t)(0x01uL << CY_CAPSENSE_CDAC_TRIM_OFFSET);
+                    }
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN)
+                        /* Ref+Fine CDAC manual mode only */
+                        if ((CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS)) &&
+                            (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS)))
+                        {
+                            cdacCode = ptrWdCfg->ptrWdContext->cdacRef;
+                            cdacFineCode = ptrWdCfg->ptrWdContext->cdacFine;
+                            if (ptrWdCfg->numCols <= ptrScanSlot->snsId)
+                            {
+                                cdacCode = ptrWdCfg->ptrWdContext->rowCdacRef;
+                                cdacFineCode = ptrWdCfg->ptrWdContext->rowCdacFine;
+                            }
+
+                            cdacTotal = cdacCode * CY_CAPSENSE_REF_CDAC_LSB_X100;
+                            cdacTotal += cdacFineCode * CY_CAPSENSE_CDAC_FINE_LSB_X100;
+
+                            /* Max value for now is 234245.
+                            * To avoid overflow reduce trim accuracy for two bits for total CDAC capacitance.
+                            */
+                            cdacTotal *= (cdacTrim >> 2u);
+                            cdacTotal += (uint32_t)(0x01uL << (CY_CAPSENSE_CDAC_TRIM_OFFSET - 3u));
+                            cdacTotal >>= (CY_CAPSENSE_CDAC_TRIM_OFFSET - 2u);
+                            /* Max value for now is 234245.
+                            * To avoid overflow reduce trim accuracy for one bit for Cref trim.
+                            */
+                            cdacCode *= (cdacTrim >> 1u);
+                            cdacCode >>= (CY_CAPSENSE_CDAC_TRIM_OFFSET - 1u);
+
+                            if (CY_CAPSENSE_CDAC_REF_MAX_VALUE < cdacCode)
+                            {
+                                cdacCode = CY_CAPSENSE_CDAC_REF_MAX_VALUE;
+                            }
+
+                            cdacFineCode = cdacTotal - (cdacCode * CY_CAPSENSE_REF_CDAC_LSB_X100);
+                            cdacFineCode += (CY_CAPSENSE_CDAC_FINE_LSB_X100 >> 0x01u);
+                            cdacFineCode /= CY_CAPSENSE_CDAC_FINE_LSB_X100;
+
+                            while ((CY_CAPSENSE_CDAC_FINE_MAX_VALUE < cdacFineCode) && (CY_CAPSENSE_CDAC_REF_MAX_VALUE > cdacCode))
+                            {
+                                cdacCode++;
+                                if (CY_CAPSENSE_CDAC_REF_MAX_VALUE < cdacCode)
+                                {
+                                    cdacCode = CY_CAPSENSE_CDAC_REF_MAX_VALUE;
+                                }
+
+                                if (cdacTotal < (cdacCode * CY_CAPSENSE_REF_CDAC_LSB_X100))
+                                {
+                                    cdacFineCode = 0u;
+                                    break;
+                                }
+
+                                cdacFineCode = cdacTotal - (cdacCode * CY_CAPSENSE_REF_CDAC_LSB_X100);
+                                cdacFineCode += (CY_CAPSENSE_CDAC_FINE_LSB_X100 >> 0x01u);
+                                cdacFineCode /= CY_CAPSENSE_CDAC_FINE_LSB_X100;
+                            }
+
+                            if (CY_CAPSENSE_CDAC_FINE_MAX_VALUE < cdacFineCode)
+                            {
+                                cdacFineCode = CY_CAPSENSE_CDAC_FINE_MAX_VALUE;
+                            }
+
+                            if (0u == (cdacCode + cdacFineCode))
+                            {
+                                cdacFineCode = 1u;
+                            }
+                            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, cdacCode);
+                            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, cdacFineCode);
+                        }
+                        /* Fine CDAC manual mode only */
+                        else if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_FINE_MODE_MASK) >> CY_CAPSENSE_CDAC_FINE_MODE_POS))
+                        {
+                            cdacCode = ptrWdCfg->ptrWdContext->cdacFine;
+                            if (ptrWdCfg->numCols <= ptrScanSlot->snsId)
+                            {
+                                cdacCode = ptrWdCfg->ptrWdContext->rowCdacFine;
+                            }
+                            cdacCode *= cdacTrim;
+                            cdacCode += CY_CAPSENSE_CDAC_TRIM_ROUND;
+                            cdacCode >>= CY_CAPSENSE_CDAC_TRIM_OFFSET;
+                            if (CY_CAPSENSE_CDAC_FINE_MAX_VALUE < cdacCode)
+                            {
+                                cdacCode = CY_CAPSENSE_CDAC_FINE_MAX_VALUE;
+                            }
+                            if (CY_CAPSENSE_CDAC_FINE_MIN_VALUE > cdacCode)
+                            {
+                                cdacCode = CY_CAPSENSE_CDAC_FINE_MIN_VALUE;
+                            }
+                            snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, cdacCode);
+                        }
+                        else
+                    #endif
+                    /* Ref CDAC manual mode only */
+                    if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_REF_MODE_MASK) >> CY_CAPSENSE_CDAC_REF_MODE_POS))
+                    {
+                        cdacCode = ptrWdCfg->ptrWdContext->cdacRef;
+                        if (ptrWdCfg->numCols <= ptrScanSlot->snsId)
+                        {
+                            cdacCode = ptrWdCfg->ptrWdContext->rowCdacRef;
+                        }
+                        cdacCode *= cdacTrim;
+                        cdacCode += CY_CAPSENSE_CDAC_TRIM_ROUND;
+                        cdacCode >>= CY_CAPSENSE_CDAC_TRIM_OFFSET;
+                        if (CY_CAPSENSE_CDAC_REF_MAX_VALUE < cdacCode)
+                        {
+                            cdacCode = CY_CAPSENSE_CDAC_REF_MAX_VALUE;
+                        }
+                        if (CY_CAPSENSE_CDAC_REF_MIN_VALUE > cdacCode)
+                        {
+                            cdacCode = CY_CAPSENSE_CDAC_REF_MIN_VALUE;
+                        }
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, cdacCode);
+                    }
+                    else
+                    {
+                        /* Nothing to do. No valid configuration */
+                    }
+                    if (CY_CAPSENSE_CDAC_MODE_MANUAL == ((ptrWdCfg->cdacConfig & CY_CAPSENSE_CDAC_COMP_MODE_MASK) >> CY_CAPSENSE_CDAC_COMP_MODE_POS))
+                    {
+                        cdacCode = ptrWdCfg->ptrSnsContext[ptrScanSlot->snsId].cdacComp;
+                        cdacCode *= cdacTrim;
+                        cdacCode += CY_CAPSENSE_CDAC_TRIM_ROUND;
+                        cdacCode >>= CY_CAPSENSE_CDAC_TRIM_OFFSET;
+                        if (CY_CAPSENSE_CDAC_COMP_MAX_VALUE < cdacCode)
+                        {
+                            cdacCode = CY_CAPSENSE_CDAC_COMP_MAX_VALUE;
+                        }
+                        snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, cdacCode);
+                    }
+                }
+            #endif
         }
-    #endif
 
     ptrSensorCfg[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] = snsCdacCtlReg;
 

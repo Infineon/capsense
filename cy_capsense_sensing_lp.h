@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
@@ -188,9 +188,6 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
 cy_capsense_status_t Cy_CapSense_VerifyCalibration(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
-cy_capsense_status_t Cy_CapSense_VerifyReferenceCdac(
-                uint32_t widgetId,
-                cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets_V3Lp(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_CalibrateAllSlots_V3Lp(
@@ -293,7 +290,7 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
 
 #define CY_CAPSENSE_CDAC_MAX_CODE                               (0xFFu)
 #define CY_CAPSENSE_CAL_REF_CDAC_MIN_CODE                       (0x7u)
-#define CY_CAPSENSE_REF_CDAC_LSB_X100                           (886u)
+#define CY_CAPSENSE_REF_CDAC_LSB_X100                           (887u)
 #define CY_CAPSENSE_MULTIPLIER_TWO                              (2u)
 
 #define CY_CAPSENSE_CAL_REF_CDAC_MIDDLE_CODE                    (0x80u)

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the function prototypes for the centroid calculation

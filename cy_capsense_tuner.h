@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides CAPSENSE&trade; MW Tuner module function prototypes.

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the function prototypes specific to the register
@@ -103,6 +103,22 @@ uint32_t Cy_CapSense_AdjustSnsClkDivider(
 #define CY_CAPSENSE_SNS_CDAC_CTL_INDEX                                          (4u)
 #define CY_CAPSENSE_SNS_CTL_INDEX                                               (5u)
 #define CY_CAPSENSE_SNS_HW_IIR_INDEX                                            (6u)
+
+
+/*******************************************************************************
+* Scaling Macros
+*******************************************************************************/
+#define CY_CAPSENSE_CDAC_REF_MAX_VALUE                                          (255u)
+#define CY_CAPSENSE_CDAC_FINE_MAX_VALUE                                         (31u)
+#define CY_CAPSENSE_CDAC_COMP_MAX_VALUE                                         (255u)
+#define CY_CAPSENSE_CDAC_REF_MIN_VALUE                                          (1u)
+#define CY_CAPSENSE_CDAC_FINE_MIN_VALUE                                         (1u)
+#define CY_CAPSENSE_CDAC_COMP_MIN_VALUE                                         (0u)
+#define CY_CAPSENSE_CDAC_TRIM_MIDDLE_POINT                                      (32768u)
+#define CY_CAPSENSE_CDAC_TRIM_ROUND                                             (16384u)
+#define CY_CAPSENSE_CDAC_TRIM_OFFSET                                            (15u)
+#define CY_CAPSENSE_CDAC_TRIM_OVERFLOW_OFFSET                                   (6u)
+#define CY_CAPSENSE_CDAC_FINE_LSB_X100                                          (260u)
 
 
 /*******************************************************************************

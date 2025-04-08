@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 6.10.0: Low-level Functions</title>
+<title>CAPSENSE™ Middleware Library 7.0.0: Low-level Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 6.10.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 7.0.0</div>
   </td>
  </tr>
  </tbody>
@@ -1579,7 +1579,7 @@ This function is available when self-test library is enabled.</dd></dl>
 <p>The sensor capacitance is measured independently of the sensor scan configuration. For the capacitance measurement, the CSD sensing method is used. The default scanning parameters are the following:</p><ul>
 <li>SnsClk divider (256) is the divider for the sensor clock frequency.</li>
 <li>NumConv (100) is the number of sub-conversions.</li>
-<li>The reference CDAC capacitance (886 fF) is equivalent to CDAC Code of 100u.</li>
+<li>The reference CDAC capacitance (887 fF) is equivalent to CDAC Code of 100u.</li>
 <li>The compensation CDAC is disabled.</li>
 <li>The CIC2 filter is disabled.</li>
 <li>The dithering is disabled.</li>
@@ -1662,7 +1662,7 @@ This function is available when self-test library is enabled.</dd></dl>
 <p>The function measures the Cp capacitance for CSD widgets and the Cm capacitance for CSX widgets.</p>
 <p>This function performs BIST slot scan with predefined parameters, back-calculates the slot sensor capacitances (Cp for CSD and Cm for CSX) by using the raw-count equation, stores the calculated capacitances to the sensor context structure, and returns the measurement status. If the specified slot has a ganged sensor, the capacitance is measured for all the pins ganged together that belong to this sensor.</p>
 <p>Besides the sensor capacitance measuring, this function could be used to identify various fault conditions with sensors such as electrically-opened or -shorted sensors. For example, the PCB track is broken or shorted to other nodes in the system - in all of these conditions, the function returns changed capacitance which can be compared against predetermined capacitance for the sensor to detect a fault condition.</p>
-<p>The sensor capacitance is measured independently of the sensor regular scan configuration. For the capacitance measurement, the BIST specific scan parameters are used. They can be found in the Electrode capacitance measurement macros group. The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF). Compensation CDAC is disabled during the BIST scan. Another default scanning parameters are the following:</p><ul>
+<p>The sensor capacitance is measured independently of the sensor regular scan configuration. For the capacitance measurement, the BIST specific scan parameters are used. They can be found in the Electrode capacitance measurement macros group. The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF). Compensation CDAC is disabled during the BIST scan. Another default scanning parameters are the following:</p><ul>
 <li>NumConv (100) is the number of sub-conversions.</li>
 <li>SnsClk divider (256) is the divider for the sensor clock frequency.</li>
 </ul>
@@ -1784,7 +1784,7 @@ This function is available when self-test library is enabled.</dd></dl>
 <p>The function measures the Cp capacitance for CSD widgets and the Cm capacitance for CSX widgets.</p>
 <p>This function performs BIST slot scan with predefined parameters, back-calculates the slot sensor capacitances (Cp for CSD and Cm for CSX) by using the raw-count equation, stores the calculated capacitances to the sensor context structure, and returns the measurement status. If the specified slot has a ganged sensor, the capacitance is measured for all the pins ganged together that belong to this sensor.</p>
 <p>Besides the sensor capacitance measuring, this function could be used to identify various fault conditions with sensors such as electrically-opened or -shorted sensors. For example, the PCB track is broken or shorted to other nodes in the system - in all of these conditions, the function returns changed capacitance which can be compared against predetermined capacitance for the sensor to detect a fault condition.</p>
-<p>The sensor capacitance is measured independently of the sensor regular scan configuration. For the capacitance measurement, the BIST specific scan parameters are used. They can be found in the Electrode capacitance measurement macros group. The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF). Compensation CDAC is disabled during the BIST scan. Another default scanning parameters are the following:</p><ul>
+<p>The sensor capacitance is measured independently of the sensor regular scan configuration. For the capacitance measurement, the BIST specific scan parameters are used. They can be found in the Electrode capacitance measurement macros group. The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF). Compensation CDAC is disabled during the BIST scan. Another default scanning parameters are the following:</p><ul>
 <li>NumConv (100) is the number of sub-conversions.</li>
 <li>SnsClk divider (256) is the divider for the sensor clock frequency.</li>
 </ul>
@@ -3160,7 +3160,7 @@ The International Conference on Dependable Systems and Networks, DSN-2004"</p>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 6.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 7.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

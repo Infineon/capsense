@@ -1,5 +1,9 @@
 var NAVTREEINDEX5 =
 {
+"structcy__stc__capsense__widget__crc__data__t.html#a7377454579441d2f33c2d96b458e5bba":[10,2,0,28,16],
+"structcy__stc__capsense__widget__crc__data__t.html#a74ffdaa191f9c9bd3d17ff3170200bac":[10,2,0,28,4],
+"structcy__stc__capsense__widget__crc__data__t.html#a8625b276567604972258ec921d837709":[10,2,0,28,22],
+"structcy__stc__capsense__widget__crc__data__t.html#a888a88ed2d857e30e18b5240731fafb7":[10,2,0,28,6],
 "structcy__stc__capsense__widget__crc__data__t.html#a8e0385e6387e58cdedfb31ea60628420":[10,2,0,28,8],
 "structcy__stc__capsense__widget__crc__data__t.html#a983f64526f1f5a4c14e83e17ad4e23ad":[10,2,0,28,23],
 "structcy__stc__capsense__widget__crc__data__t.html#aae98a5a5cc46be38eaceea712d506ae5":[10,2,0,28,20],

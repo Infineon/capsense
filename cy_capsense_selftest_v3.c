@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v3.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -64,7 +64,7 @@
 #define CY_CAPSENSE_BIST_WATCHDOG_MARGIN_COEFF                  (3u)
 #define CY_CAPSENSE_BIST_CAP_MEAS_WDT_CYCLES_PER_LOOP           (5u)
 #define CY_CAPSENSE_BIST_V3_ELTD_CAP_CYCLES_NUM                 (1u)
-#define CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000          (8860u)
+#define CY_CAPSENSE_BIST_CAP_MEAS_CDAC_LSB_FF_DIV_1000          (8870u)
 #define CY_CAPSENSE_BIST_CP_MAX_VALUE                           (200000u)
 #define CY_CAPSENSE_BIST_CSH_MAX_VALUE                          (1600000u)
 #define CY_CAPSENSE_BIST_PROMILLE_FACTOR                        (1000u)
@@ -1830,7 +1830,7 @@ void Cy_CapSense_BistSetAllCmodPinsState(
 * The default scanning parameters are the following:
 * * SnsClk divider (256) is the divider for the sensor clock frequency.
 * * NumConv (100) is the number of sub-conversions.
-* * The reference CDAC capacitance (886 fF) is equivalent to CDAC Code of 100u.
+* * The reference CDAC capacitance (887 fF) is equivalent to CDAC Code of 100u.
 * * The compensation CDAC is disabled.
 * * The CIC2 filter is disabled.
 * * The dithering is disabled.
@@ -2124,7 +2124,7 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
 * configuration. For the capacitance measurement, the BIST specific scan
 * parameters are used. They can be found in the Electrode capacitance measurement
 * macros group.
-* The CDAC code for the CSD sensors is 100u and that provides about 0.886 pF
+* The CDAC code for the CSD sensors is 100u and that provides about 0.887 pF
 * of the CDAC value and for CSX sensors the CDAC code is 50u (0.443 pF).
 * Compensation CDAC is disabled during the BIST scan.
 * Another default scanning parameters are the following:
@@ -2302,8 +2302,11 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensors_V3(
                             }
                             else if (CY_CAPSENSE_BIST_IO_SHIELD_E == context->ptrBistContext->currentISC)
                             {
-                                context->ptrInternalContext->csdInactiveSnsDm = CY_CAPSENSE_DM_GPIO_STRONG_IN_OFF;
                                 context->ptrInternalContext->csdInactiveSnsHsiom = CY_CAPSENSE_HSIOM_SEL_CSD_SHIELD;
+                                if (CY_CAPSENSE_SHIELD_PASSIVE == context->ptrCommonConfig->csdShieldMode)
+                                {
+                                    context->ptrInternalContext->csdInactiveSnsDm = CY_CAPSENSE_DM_GPIO_STRONG_IN_OFF;
+                                }
                             }
                             else
                             {

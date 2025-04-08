@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
@@ -267,11 +267,11 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>3.4.0</td>
+*     <td>3.5.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator tool</td>
-*     <td>5.20</td>
+*     <td>5.30</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; MSC Superblock Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
@@ -295,19 +295,19 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>7.10.0</td>
+*     <td>8.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>7.10.0</td>
+*     <td>8.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
-*     <td>3.14.0</td>
+*     <td>3.16.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>2.15.0</td>
+*     <td>2.16.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
@@ -696,6 +696,78 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="9">7.0.0</td>
+*     <td colspan="2"><i><b>
+*       This version is compatible to the v6.10.0,
+*       however due to switching to MTB 3.5, new Device-DB, PDL, etc.
+*       a migration of projects created with past version might be
+*       not possible. In this case a project should be newly created.
+*       Also, if you use the CAPSENSE&trade; middleware v7.0.0, you must use
+*       the CAPSENSE&trade; Configurator v8.0.0 tool or later. This MW version
+*       is not compatible with the previous Configurator tool versions.
+*     </b></i>
+*   </tr>
+*   <tr>
+*     <td> Added support of PSOC&trade; 4100T Plus device family.
+*     </td>
+*     <td>
+*         New device support.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Added scaling to CDAC codes in the manual mode for the CSD sensing
+*       method by using trim registers.
+*     </td>
+*     <td>
+*         New feature support, improved manufacturing tolerance.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Added scaling to measured sensor, electrode and shield capacitances
+*       in built-in self-test library.
+*     </td>
+*     <td>
+*         New feature support, improved manufacturing tolerance.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Redefined CDAC LSB from 8.86fF to 8.87fF.
+*     </td>
+*     <td>
+*         Improved accuracy.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Fixed Shield electrode capacitance measurement inside built-in self-test
+*       library. Wrong measurement happens when the first sensor in the configuration
+*       does not belong to CSD sensing method.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Removed intermediate verification of CDAC auto-calibration status.
+*     </td>
+*     <td>
+*         Supporting customer specific use cases.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Fixed CDAC auto-calibration corner case when auto and manual modes are combined for the fifth-generation low power CAPSENSE&trade;.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> Fixed HW configuration for inactive sensor connection set to active shield in built-in self-test library for sensor capacitance measurement for fifth-generation CAPSENSE&trade;.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
 *     <td rowspan="9">6.10.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible to the v5.0, 
@@ -703,7 +775,7 @@
 *       compiler versions, etc. a migration of projects created with 
 *       past version might be not possible. In this case a project should be newly created.
 *       Also, if you use the CAPSENSE&trade; middleware v6.10.0, you must use
-*       the CAPSENSE&trade Configurator v7.10.0 tool or later. This MW version is not
+*       the CAPSENSE&trade; Configurator v7.10.0 tool or later. This MW version is not
 *       compatible with the previous Configurator tool versions.
 *     </b></i>
 *   </tr>
@@ -783,8 +855,8 @@
 *       previous version due to re-designed CDAC auto-calibration.
 *       We tried to keep the established API, but your design may need to be
 *       updated to operate with CAPSENSE&trade; middleware v5.0.
-*       Also, if you use the CAPSENSE&trade middleware v5.0, you must use
-*       the CAPSENSE&trade Configurator v6.20 tool or later. This MW version is not
+*       Also, if you use the CAPSENSE&trade; middleware v5.0, you must use
+*       the CAPSENSE&trade; Configurator v6.20 tool or later. This MW version is not
 *       compatible with the previous Configurator tool versions.
 *     </b></i>
 *     </td>

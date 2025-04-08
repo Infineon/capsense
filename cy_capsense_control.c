@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 6.10.0
+* \version 7.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -126,12 +126,19 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
     uint32_t wdIndex;
     cy_stc_capsense_widget_context_t * ptrWdCxt;
 
+    #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint32_t cdacTrimCoeff;
+    #endif
+
     #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP))
         const cy_stc_capsense_common_config_t * ptrCommonCfg;
     #endif
 
     if (NULL != context)
     {
+        context->ptrCommonContext->mwVersionMajor = CY_CAPSENSE_MW_VERSION_MAJOR;
+        context->ptrCommonContext->mwVersionMinor = CY_CAPSENSE_MW_VERSION_MINOR;
+
         ptrInternalCxt = context->ptrInternalContext;
         ptrInternalCxt->intrCsdInactSnsConn = CY_CAPSENSE_SNS_CONNECTION_UNDEFINED;
         ptrInternalCxt->intrCsxInactSnsConn = CY_CAPSENSE_SNS_CONNECTION_UNDEFINED;
@@ -216,6 +223,16 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
                 ptrInternalCxt->iirCoeffLp = CY_CAPSENSE_IIR_COEFF_LP;
                 ptrInternalCxt->wotScanInterval = CY_CAPSENSE_WOT_SCAN_INTERVAL;
                 ptrInternalCxt->wotTimeout = CY_CAPSENSE_WOT_TIMEOUT;
+
+                /* Set CDAC trim coefficient */
+                cdacTrimCoeff = (uint16_t)((((uint16_t)(((SFLASH_Type *) SFLASH)->CREF_COEFF1)) << 8u) | 
+                                            ((uint16_t)(((SFLASH_Type *) SFLASH)->CREF_COEFF0)));
+                /* Adding correction to 90% */
+                cdacTrimCoeff *= CY_CAPSENSE_CDAC_TRIM_CORRECTION_NUMERATOR;
+                cdacTrimCoeff += (CY_CAPSENSE_CDAC_TRIM_CORRECTION_DENOMINATOR >> 1u);
+                cdacTrimCoeff /= CY_CAPSENSE_CDAC_TRIM_CORRECTION_DENOMINATOR;
+
+                context->ptrCommonContext->cdacTrimCoefficient = (uint16_t)cdacTrimCoeff;
             #endif
 
             result = Cy_CapSense_SwitchHwConfiguration(CY_CAPSENSE_HW_CONFIG_UNDEFINED, context);
