@@ -69,5 +69,6 @@ var searchData=
   ['cy_5fcapsense_5fwd_5fmatrix_5fbutton_5fe',['CY_CAPSENSE_WD_MATRIX_BUTTON_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a49a619428a7d70767032000b70d3c5d5',1,'cy_capsense_structure.h']]],
   ['cy_5fcapsense_5fwd_5fproximity_5fe',['CY_CAPSENSE_WD_PROXIMITY_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c',1,'cy_capsense_structure.h']]],
   ['cy_5fcapsense_5fwd_5fradial_5fslider_5fe',['CY_CAPSENSE_WD_RADIAL_SLIDER_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a50cac3d4ee616bbc7e0c9ed9dced309e',1,'cy_capsense_structure.h']]],
-  ['cy_5fcapsense_5fwd_5ftouchpad_5fe',['CY_CAPSENSE_WD_TOUCHPAD_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a71ed340a3d5c1ec96169c5a7d4ee91df',1,'cy_capsense_structure.h']]]
+  ['cy_5fcapsense_5fwd_5ftouchpad_5fe',['CY_CAPSENSE_WD_TOUCHPAD_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a71ed340a3d5c1ec96169c5a7d4ee91df',1,'cy_capsense_structure.h']]],
+  ['cy_5fcapsense_5fwd_5fwheatstone_5fbridge_5fe',['CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E',['../group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aced1dcaec772b671e6895ae6300c5f8d',1,'cy_capsense_structure.h']]]
 ];

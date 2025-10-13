@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -4343,7 +4343,12 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3(
     uint32_t mask;
     uint32_t * ptrSnsFrm;
     cy_capsense_status_t capStatus = CY_CAPSENSE_STATUS_BAD_CONFIG;
-
+    
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+        uint32_t idCounter;
+        uint32_t wdIndex;
+    #endif
+    
     mask = 0u;
     ptrSnsFrm = &context->ptrSensorFrameContext[(((uint32_t)ptrEltdCfg->chId * CY_CAPSENSE_SLOT_COUNT) + slotId) *
                                                 CY_MSC_6_SNS_REGS];
@@ -4362,6 +4367,30 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3(
             ptrSnsFrm[i] |= mask;
         }
     }
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
+        wdIndex = context->ptrScanSlots[slotId].wdId;
+        if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[wdIndex].senseMethod)
+        {
+            if (CY_CAPSENSE_CTRLMUX_PIN_STATE_VDDA2 == pinState)
+            {
+                idCounter = context->ptrInternalContext->mapSenseMethod[CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX];
+                if (CY_CAPSENSE_ENABLE == context->ptrWdContext[wdIndex].cdacDitherEn)
+                {
+                    /* Shift sense mode to cdac dither enabled modes */
+                    idCounter = context->ptrInternalContext->mapSenseMethod[CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX + CY_CAPSENSE_REG_MODE_DITHERING];
+                }        
+                /* Close the reference to filter switch */
+                context->ptrBaseFrameContext->mode[idCounter].swSelTop |= MSC_MODE_SW_SEL_TOP_RMF_Msk;
+                #if (CY_CAPSENSE_SENSOR_CONNECTION_MODE == CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD)
+                    context->ptrBaseFrameContext->mode[idCounter].swSelSh = CY_CAPSENSE_FW_CSX_VDDA2_AMUX_MODE_SW_SEL_SH_VALUE;
+                #else
+                    context->ptrBaseFrameContext->mode[idCounter].swSelSh = CY_CAPSENSE_FW_CSX_VDDA2_CTLMUX_MODE_SW_SEL_SH_VALUE;
+                #endif
+                (void)Cy_CapSense_SwitchHwConfiguration(CY_CAPSENSE_HW_CONFIG_UNDEFINED, context);
+            }
+        }
+    #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) */
 
     /* Set undefined value to initiate frame re-configuration in Cy_CapSense_ScanSlots() function */
     context->ptrInternalContext->currentSlotIndex = CY_CAPSENSE_SLOT_COUNT_MAX_VALUE;

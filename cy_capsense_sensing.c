@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file consists of common parts for different supported platforms
@@ -222,6 +222,8 @@ cy_capsense_status_t Cy_CapSense_ScanSensor(
 * - CY_CAPSENSE_STATUS_SUCCESS          - The operation is performed successfully.
 * - CY_CAPSENSE_STATUS_BAD_PARAM        - The input parameter is invalid.
 * - CY_CAPSENSE_STATUS_HW_BUSY          - The HW is busy with the previous scan.
+* - CY_CAPSENSE_STATUS_MIXED_SENSORS    - The requested sensors types can't be scanned
+*                                         in one frame (in autonomous mode).
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_ScanAllSlots(
@@ -341,6 +343,8 @@ cy_capsense_status_t Cy_CapSense_ScanAllSlots(
 * - CY_CAPSENSE_STATUS_SUCCESS          - The operation is performed successfully.
 * - CY_CAPSENSE_STATUS_BAD_PARAM        - The input parameter is invalid.
 * - CY_CAPSENSE_STATUS_HW_BUSY          - The HW is busy with the previous scan.
+* - CY_CAPSENSE_STATUS_MIXED_SENSORS    - The requested sensors types can't be scanned
+*                                         in one frame (in autonomous mode).
 *
 *******************************************************************************/
 cy_capsense_status_t Cy_CapSense_ScanSlots(
@@ -702,7 +706,8 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 #if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) && \
      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
       (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
-      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN)))
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) || \
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN)))
 /*******************************************************************************
 * Function Name: Cy_CapSense_CalibrateAllSlots
 ****************************************************************************//**
@@ -763,7 +768,13 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(cy_stc_capsense_context_t * context)
 {
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        return Cy_CapSense_CalibrateAllSlots_V3(context);
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
+            return Cy_CapSense_CalibrateAllSlots_V3(context);
+        #else
+            (void)context;
+            return CY_CAPSENSE_STATUS_BAD_PARAM;
+        #endif    
     #else
         return Cy_CapSense_CalibrateAllSlots_V3Lp(context);
     #endif
@@ -818,7 +829,15 @@ cy_capsense_status_t Cy_CapSense_SetCalibrationTarget(
                 cy_stc_capsense_context_t * context)
 {
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
-        return Cy_CapSense_SetCalibrationTarget_V3(calibrTarget, snsMethod, context);
+        #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+             (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
+            return Cy_CapSense_SetCalibrationTarget_V3(calibrTarget, snsMethod, context);
+        #else
+            (void)calibrTarget;
+            (void)snsMethod;
+            (void)context;
+            return CY_CAPSENSE_STATUS_BAD_PARAM;
+        #endif
     #else
         return Cy_CapSense_SetCalibrationTarget_V3Lp(calibrTarget, snsMethod, context);
     #endif
@@ -1192,6 +1211,7 @@ cy_capsense_status_t Cy_CapSense_SlotPinState(
 * - CY_CAPSENSE_CSD_GROUP
 * - CY_CAPSENSE_CSX_GROUP
 * - CY_CAPSENSE_ISX_GROUP
+* - CY_CAPSENSE_WBX_GROUP
 * - CY_CAPSENSE_BIST_CSD_GROUP
 * - CY_CAPSENSE_BIST_CSX_GROUP
 * - CY_CAPSENSE_BIST_SHIELD_GROUP
@@ -1381,6 +1401,20 @@ cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
             }
         #endif
 
+        #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN))
+            if ((CY_CAPSENSE_WBX_GROUP == sensingGroup) &&
+                ((CY_CAPSENSE_SNS_CONNECTION_GROUND == inactiveState) ||
+                (CY_CAPSENSE_SNS_CONNECTION_HIGHZ == inactiveState)))
+            {
+                capStatus = CY_CAPSENSE_STATUS_SUCCESS;
+                if (context->ptrInternalContext->intrWbxInactSnsConn != (uint8_t)inactiveState)
+                {
+                    context->ptrInternalContext->intrWbxInactSnsConn = (uint8_t)inactiveState;
+                    capStatus = Cy_CapSense_GeneratePinFunctionConfig(context);
+                }
+            }
+        #endif
+
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN)
             for (curChIndex = 0u; curChIndex < CY_CAPSENSE_TOTAL_CH_NUMBER; curChIndex++)
             {
@@ -1406,22 +1440,23 @@ cy_capsense_status_t Cy_CapSense_SetInactiveElectrodeState(
                 {
                     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_EN)
                         case CY_CAPSENSE_CSD_GROUP:
-                    #endif /* CY_CAPSENSE_CSD_EN */
+                    #endif
                     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_EN)
                         case CY_CAPSENSE_CSX_GROUP:
-                    #endif /* CY_CAPSENSE_CSX_EN */
+                    #endif
                     #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ISX_EN)
                         case CY_CAPSENSE_ISX_GROUP:
-                    #endif /* CY_CAPSENSE_ISX_EN */
+                    #endif
+                    #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_WBX_EN)
+                        case CY_CAPSENSE_WBX_GROUP:
+                    #endif
+                        Cy_CapSense_GenerateAllSensorConfig(CY_CAPSENSE_SNS_FRAME_ACTIVE, context);
 
-                            Cy_CapSense_GenerateAllSensorConfig(CY_CAPSENSE_SNS_FRAME_ACTIVE, context);
+                        #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LP_EN)
+                            Cy_CapSense_GenerateAllSensorConfig(CY_CAPSENSE_SNS_FRAME_LOW_POWER, context);
+                        #endif /* CY_CAPSENSE_LP_EN */
 
-                            #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LP_EN)
-                                Cy_CapSense_GenerateAllSensorConfig(CY_CAPSENSE_SNS_FRAME_LOW_POWER, context);
-                            #endif /* CY_CAPSENSE_LP_EN */
-
-                            break;
-
+                        break;
                     default:
                         /* Do nothing */
                         break;
@@ -1723,6 +1758,11 @@ cy_capsense_status_t Cy_CapSense_InitializeMaxRaw(
 * * CY_CAPSENSE_ISX_LX_PIN - ISX Lx electrode
 * * CY_CAPSENSE_HIGHZ - Unconnected (High-Z)
 * * CY_CAPSENSE_VDDA2 - Connected to VDDA/2.
+* The desired pins state for WBX widget electrodes could be:
+* * CY_CAPSENSE_PIN_STATE_WBX_NODE_A - Node A electrode.
+* * CY_CAPSENSE_PIN_STATE_WBX_NODE_B - Node B electrode.
+* * CY_CAPSENSE_HIGHZ - Unconnected (high-z).
+* * CY_CAPSENSE_GROUND - Grounded.
 *
 * \param convertedPinState
 * The pointer to the converted pins state value.
@@ -1811,6 +1851,18 @@ cy_capsense_status_t Cy_CapSense_ConvertPinState(
                     result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
                 break;
         #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+            case CY_CAPSENSE_PIN_STATE_WBX_NODE_A:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_WBX_NODE_A;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+
+            case CY_CAPSENSE_PIN_STATE_WBX_NODE_B:
+                    *convertedPinState = CY_CAPSENSE_PIN_STATE_WBX_NODE_B;
+                    result = (uint32_t)CY_CAPSENSE_SUCCESS_E;
+                break;
+        #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) */
 
             default:
                 /* No action on other sensor states */

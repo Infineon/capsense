@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 7.0.0: cy_stc_capsense_widget_config_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 8.0.0: cy_stc_capsense_widget_config_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 7.0.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 8.0.0</div>
   </td>
  </tr>
  </tbody>
@@ -225,6 +225,14 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a0b7c2929e9128c81c59b4c494a71a744"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a0b7c2929e9128c81c59b4c494a71a744">foamCoefficient</a></td></tr>
 <tr class="memdesc:a0b7c2929e9128c81c59b4c494a71a744"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foam rejection coefficient.  <a href="#a0b7c2929e9128c81c59b4c494a71a744">More...</a><br /></td></tr>
 <tr class="separator:a0b7c2929e9128c81c59b4c494a71a744"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c81adf7c1ef9ca5fd778cb242a300e7"><td class="memItemLeft" align="right" valign="top"><a id="a9c81adf7c1ef9ca5fd778cb242a300e7"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a9c81adf7c1ef9ca5fd778cb242a300e7">wbxResistorBridge</a></td></tr>
+<tr class="memdesc:a9c81adf7c1ef9ca5fd778cb242a300e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of the fixed resistor (R1=R4) in ohm used in wheatstone bridge. <br /></td></tr>
+<tr class="separator:a9c81adf7c1ef9ca5fd778cb242a300e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0d272156da01340efe050205be43ac8"><td class="memItemLeft" align="right" valign="top"><a id="ac0d272156da01340efe050205be43ac8"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ac0d272156da01340efe050205be43ac8">wbxResistorSeries</a></td></tr>
+<tr class="memdesc:ac0d272156da01340efe050205be43ac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of the series load resistance (RL1=RL2) in ohm. <br /></td></tr>
+<tr class="separator:ac0d272156da01340efe050205be43ac8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63">firstSlotId</a></td></tr>
 <tr class="memdesc:a87a81dc03b7e5a64d58ed7286765bd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">The slot ID in the widget to start scan from.  <a href="#a87a81dc03b7e5a64d58ed7286765bd63">More...</a><br /></td></tr>
 <tr class="separator:a87a81dc03b7e5a64d58ed7286765bd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,6 +273,10 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="memitem:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f">iirCoeffHw</a></td></tr>
 <tr class="memdesc:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw count HW IIR filter coefficient.  <a href="#a7d45ff7ce8f45fd9a26fac8ae98ec60f">More...</a><br /></td></tr>
 <tr class="separator:a7d45ff7ce8f45fd9a26fac8ae98ec60f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada23d4220601b06f83220c334f7e4082"><td class="memItemLeft" align="right" valign="top"><a id="ada23d4220601b06f83220c334f7e4082"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__config__t.html#ada23d4220601b06f83220c334f7e4082">wbxCorrectionEn</a></td></tr>
+<tr class="memdesc:ada23d4220601b06f83220c334f7e4082"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables sensitivity correction to address the sensitivity variation across part to part. <br /></td></tr>
+<tr class="separator:ada23d4220601b06f83220c334f7e4082"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a id="a872610c19b274d4daa48c9d29990f7cc"></a>
@@ -519,7 +531,8 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <li>0 - UNDEFINED (CY_CAPSENSE_UNDEFINED_GROUP)</li>
 <li>1 - CSD (CY_CAPSENSE_CSD_GROUP)</li>
 <li>2 - CSX (CY_CAPSENSE_CSX_GROUP)</li>
-<li>3 - ISX (CY_CAPSENSE_ISX_GROUP) </li>
+<li>3 - ISX (CY_CAPSENSE_ISX_GROUP)</li>
+<li>4 - ISX (CY_CAPSENSE_WBX_GROUP) </li>
 </ul>
 
 </div>
@@ -707,7 +720,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 7.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 8.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v3.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes of the BIST module.

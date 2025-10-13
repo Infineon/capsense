@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes specific to the register
@@ -208,10 +208,26 @@ void Cy_CapSense_CalculateMaskRegisters(
  (CY_CAPSENSE_SM_FULL_WAVE_CTRL_MUX_REG_SW_SEL_CSW6_FLD_ENABLED  << MSC_SW_SEL_CSW_ENABLED_Pos)) \
 
 
+/* CSD Regular Measurement */
 #define CY_CAPSENSE_CSD_RM_SENSING_METHOD_INDEX         (0u)
+/* CSX Regular Measurement */
 #define CY_CAPSENSE_CSX_RM_SENSING_METHOD_INDEX         (1u)
+/* CSD with Dithering */
 #define CY_CAPSENSE_CSD_DITHERING_SENSING_METHOD_INDEX  (2u)
+/* CSX with Dithering */
 #define CY_CAPSENSE_CSX_DITHERING_SENSING_METHOD_INDEX  (3u)
+/** Sensing mode undefined */
+#define CY_CAPSENSE_REG_MODE_UNDEFINED                  (255u)
+/** CSD sense mode configuration index */
+#define CY_CAPSENSE_REG_MODE_CSD                        (0u)
+/** CSX sense mode configuration index */
+#define CY_CAPSENSE_REG_MODE_CSX                        (1u)
+/** CSD sense mode configuration index with CapDAC dithering enabled */
+#define CY_CAPSENSE_REG_MODE_CSD_DITHERING              (2u)
+/** CSX sense mode configuration index with CapDAC dithering enabled */
+#define CY_CAPSENSE_REG_MODE_CSX_DITHERING              (3u)
+/** First mode index with CapDAC dithering enabled */
+#define CY_CAPSENSE_REG_MODE_DITHERING                  (CY_CAPSENSE_REG_MODE_CSD_DITHERING)
 
 
 /** Initialization of sensing method template variable */

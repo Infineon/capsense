@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sm_base_full_wave_lp.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file lists a set of macros for each register bit-field for the specified
@@ -335,6 +335,7 @@ extern "C" {
 * * MODE12: CMOD/VDDA BIST Balancing Phase. Balancing to VDDA/2
 * * MODE13: ISX RM (internal VDDA/2)
 * * MODE14: ISX RM with CapDAC dithering (internal VDDA/2)
+* * MODE15: Wheatstone bridge
 *******************************************************************************/
 
 /********************************* CSD RM *************************************/
@@ -1255,7 +1256,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN          (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL          (0x0uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CDAC_FL: Flatspot/Dither CAPDAC Switch Control */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CDAC_FL: Flatspot/Dither CAPDAC Switch Control */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CDAC_FL_FLD_SW_FLTCA                (0x3uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CDAC_FL_FLD_SW_FLCB                 (0x2uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CDAC_FL_FLD_SW_FLTV                 (0x0uL)
@@ -1264,7 +1265,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CDAC_FL_FLD_SW_FLBG                 (0x7uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE         (0x0uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_TOP: Top Level Switch Control */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_TOP: Top Level Switch Control */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_TOP_FLD_CACB                        (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_TOP_FLD_CACC                        (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_TOP_FLD_CBCD                        (0x0uL)
@@ -1277,7 +1278,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_TOP_FLD_RMF                         (0x1uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_TOP_FLD_MBF                         (0x0uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_COMP: MSC Comparator Switch Control */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_COMP: MSC Comparator Switch Control */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_COMP_FLD_CPCS1                      (0x1uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_COMP_FLD_CPCS3                      (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_COMP_FLD_CPMA                       (0x0uL)
@@ -1292,7 +1293,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_COMP_FLD_CMF                        (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_COMP_FLD_HALF_WAVE_EN               (0x0uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_SH: Shielding Switch Control */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_SH: Shielding Switch Control */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_SH_FLD_SOMB                         (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_SH_FLD_CBSO                         (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_SH_FLD_SPCS1                        (0x0uL)
@@ -1301,7 +1302,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_SH_FLD_BUF_SEL                      (0x7uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_SH_FLD_BUF_EN                       (0x1uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CMOD1: CMOD Switch Control 1 */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CMOD1: CMOD Switch Control 1 */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD1_FLD_SW_AMUXA                  (0x1uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD1_FLD_SW_C1CA                   (0x1uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD1_FLD_SW_C1CC                   (0x1uL)
@@ -1311,7 +1312,7 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD1_FLD_REF_MODE                  (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD1_FLD_DDRV_EN                   (0x0uL)
 
-/*  CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CMOD2: CMOD Switch Control 2 */
+/* CSD MPSC-C or CSD MPSC-D w/dither - MODE11_SW_SEL_CMOD2: CMOD Switch Control 2 */
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD2_FLD_SW_AMUXA                  (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD2_FLD_SW_AMUXB                  (0x1uL)
 #define CY_CAPSENSE_SM_REG_MODE11_SW_SEL_CMOD2_FLD_SW_C2CB                   (0x1uL)
@@ -1540,6 +1541,88 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_MODE14_SW_SEL_CMOD2_FLD_REF_MODE                  (0x0uL)
 #define CY_CAPSENSE_SM_REG_MODE14_SW_SEL_CMOD2_FLD_DDRV_EN                   (0x0uL)
 
+/************************ Wheatstone bridge ******/
+
+/* WBX - MODE15_SENSE_DUTY_CTL: Sense Clock Duty Cycle Control */
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0_EN        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1_EN        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH2_EN        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH3_EN        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH0_EN    (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_FS2_PH1_EN    (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PH_GAP_2CYCLE_EN        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH0X_EN       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_GAP_PH1X_EN       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHX_GAP_2CYCLE_EN       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_EN          (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SENSE_DUTY_CTL_FLD_PHASE_MODE_SEL          (0x0uL)
+
+/* WBX - MODE15_SW_SEL_CDAC_FL: Flatspot/Dither CAPDAC Switch Control */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLTCA                (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLCB                 (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLTV                 (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLTG                 (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLBV                 (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_SW_FLBG                 (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CDAC_FL_FLD_ACTIVATION_MODE         (0x0uL)
+
+/* WBX - MODE15_SW_SEL_TOP: Top Level Switch Control */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_CACB                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_CACC                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_CBCD                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_AYA_CTL                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_AYA_EN                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_AYB_CTL                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_AYB_EN                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_BYB                         (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_BGRF                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_RMF                         (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_TOP_FLD_MBF                         (0x0uL)
+
+/* WBX - MODE15_SW_SEL_COMP: MSC Comparator Switch Control */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPCS1                      (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPCS3                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPMA                       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPCA                       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPCB                       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMCB                       (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CPF                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMCS2                      (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMCS4                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMV                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMG                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_CMF                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_COMP_FLD_HALF_WAVE_EN               (0x0uL)
+
+/* WBX - MODE15_SW_SEL_SH: Shielding Switch Control */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_SOMB                         (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_CBSO                         (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_SPCS1                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_SPCS3                        (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_FSP                          (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_BUF_SEL                      (0x7uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_SH_FLD_BUF_EN                       (0x1uL)
+
+/* WBX - MODE15_SW_SEL_CMOD1: CMOD Switch Control 1 */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_AMUXA                  (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_C1CA                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_C1CC                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_AMUXB                  (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_PU                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_SW_PD                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_REF_MODE                  (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD1_FLD_DDRV_EN                   (0x0uL)
+
+/* WBX - MODE15_SW_SEL_CMOD2: CMOD Switch Control 2 */
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_AMUXA                  (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_AMUXB                  (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_C2CB                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_C2CD                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_PU                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_SW_PD                     (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_REF_MODE                  (0x0uL)
+#define CY_CAPSENSE_SM_REG_MODE15_SW_SEL_CMOD2_FLD_DDRV_EN                   (0x0uL)
+
 /*******************************************************
 * Pin state specific registers. One register per state:
 * * CSW_FUNC0: GND
@@ -1556,9 +1639,8 @@ extern "C" {
 * * CSW_FUNC11: MPSC CSP
 * * CSW_FUNC12: MPSC CSN
 * * CSW_FUNC13: MPSC CSZ
-* * CSW_FUNC14: ISX RX (two-pin cfg, internal VDDA/2)
-* * CSW_FUNC15: ISX RX (one-pin cfg, external VDDA/2)
-* * CSW_FUNC16: ISX RX (one-pin cfg, internal VDDA/2)
+* * CSW_FUNC14: Node A Wheatstone
+* * CSW_FUNC15: Node B Wheatstone
 *
 ************************************************************************/
 
@@ -1674,30 +1756,21 @@ extern "C" {
 #define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC13_FLD_REF_MODE                   (0x0uL)
 #define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC13_FLD_DDRV_EN                    (0x0uL)
 
-/*********** SW_SEL_CSW_FUNC14: ISX RX (two-pin cfg, internal VDDA/2) */
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_AMUXA                    (0xAuL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_AMUXB                    (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_PU                       (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_PD                       (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_REF_MODE                    (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_DDRV_EN                     (0x0uL)
+/*********** SW_SEL_CSW_FUNC14: Node A Wheatstone */
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_AMUXA                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_AMUXB                   (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_PU                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_SW_PD                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_REF_MODE                   (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC14_FLD_DDRV_EN                    (0x1uL)
 
-/*********** SW_SEL_CSW_FUNC15: ISX RX (one-pin cfg, external VDDA/2) */
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_AMUXA                    (0x6uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_AMUXB                    (0x3uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_PU                       (0x4uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_PD                       (0x2uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_REF_MODE                    (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_DDRV_EN                     (0x0uL)
-
-/*********** SW_SEL_CSW_FUNC16: ISX RX (one-pin cfg, internal VDDA/2) */
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_SW_AMUXA                    (0xAuL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_SW_AMUXB                    (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_SW_PU                       (0x4uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_SW_PD                       (0x2uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_REF_MODE                    (0x0uL)
-#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC16_FLD_DDRV_EN                     (0x0uL)
-
+/*********** SW_SEL_CSW_FUNC15: Node B Wheatstone */
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_AMUXA                   (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_AMUXB                   (0x1uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_PU                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_SW_PD                      (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_REF_MODE                   (0x0uL)
+#define CY_CAPSENSE_SM_REG_SW_SEL_CSW_FUNC15_FLD_DDRV_EN                    (0x1uL)
 
 #if defined(__cplusplus)
 }

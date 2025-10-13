@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes of the Control module.
@@ -33,6 +33,14 @@ extern "C" {
 *******************************************************************************/
 #define CY_CAPSENSE_CDAC_TRIM_CORRECTION_NUMERATOR                        (9u)
 #define CY_CAPSENSE_CDAC_TRIM_CORRECTION_DENOMINATOR                      (10u)
+
+/*******************************************************************************
+* CDAC offset Macros
+*******************************************************************************/
+#define CY_CAPSENSE_CDAC_CREF_OFFSET                                      (0u)
+#define CY_CAPSENSE_CDAC_CFINE_OFFSET                                     (1u)
+#define CY_CAPSENSE_CDAC_CCOMP_DIV_OFFSET                                 (2u)
+#define CY_CAPSENSE_CDAC_CCOMP_OFFSET                                     (4u)
 
 /*******************************************************************************
 * Function Prototypes
@@ -77,8 +85,6 @@ cy_capsense_status_t Cy_CapSense_RegisterCallback(
 cy_capsense_status_t Cy_CapSense_UnRegisterCallback(
                 cy_en_capsense_callback_event_t callbackType,
                 cy_stc_capsense_context_t * context);
-
-
 /** \} */
 
 /******************************************************************************/
@@ -94,6 +100,26 @@ cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                 uint32_t sensorId, 
                 uint32_t mode, 
                 const cy_stc_capsense_context_t * context);
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+void Cy_CapSense_ReadWidgetCdacParam(
+                uint8_t * ptrBuffer,
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_WriteWidgetCdacParam(
+                uint8_t * ptrBuffer,
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+void Cy_CapSense_SetWidgetCalibrationState(
+                uint32_t widgetId, 
+                uint32_t state,
+                cy_stc_capsense_context_t * context);
+#endif
+
+#if (CY_CAPSENSE_LIQUID_LEVEL_EN)
+uint8_t Cy_CapSense_IsLlwCalibrationValid (
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context);
+#endif
 /** \} */
 
 /******************************************************************************/

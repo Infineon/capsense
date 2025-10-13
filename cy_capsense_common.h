@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
@@ -22,6 +22,9 @@
 #include "cy_sysint.h"
 #include "cycfg_capsense_defines.h"
 
+#if !defined (CY_CAPSENSE_WBX_CALIBRATION_EN)
+#define CY_CAPSENSE_WBX_CALIBRATION_EN (1u)
+#endif
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
@@ -106,13 +109,13 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MW_VERSION_MAJOR                    (7)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                    (8)
 /** Middleware minor version */
 #define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
 /** Middleware patch version */
 #define CY_CAPSENSE_MW_VERSION_PATCH                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (700)
+#define CY_CAPSENSE_MW_VERSION                          (800)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */
@@ -212,6 +215,11 @@ extern "C" {
 #define CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK               (0x08u)
 /** Widget row maximum raw count calculation enable mask */
 #define CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK           (0x10u)
+/** Widget compensation CDAC direction mask: direct (like CSD) or inverse */
+#define CY_CAPSENSE_WD_WBX_COMPENSATION_DIRECTION_MASK  (0x20u)
+/** Widget calibration mask: performs CDAC auto-calibration even 
+  * CY_CAPSENSE_TUNING_COMPLETED_MASK is set */
+#define CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK         (0x40u)
 /** \} */
 
 /******************************************************************************/
@@ -320,9 +328,18 @@ extern "C" {
 #define CY_CAPSENSE_ISX_GROUP                           (10u)
 /** MPSC-D sensing group */
 #define CY_CAPSENSE_MPSC_GROUP                          (11u)
+/** Wheatstone bridge sensing group */
+#define CY_CAPSENSE_WBX_GROUP                           (12u)
 
-/** Total number of mode templates */
-#define CY_CAPSENSE_REG_MODE_NUMBER                     (6u)
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    /** Total number of mode templates */
+    #define CY_CAPSENSE_REG_MODE_NUMBER                 (7u)
+    /** Total number of mode templates used  in lookup table */
+    #define CY_CAPSENSE_REG_MODE_ARRAY_NUMBER           (4u)
+#else /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN */
+    /** Total number of mode templates */
+    #define CY_CAPSENSE_REG_MODE_NUMBER                 (4u)
+#endif
 
 /* The values of these macros should be not changed due to CY_ID374670 */
 
@@ -379,9 +396,13 @@ extern "C" {
 #define CY_CAPSENSE_PIN_STATE_IDX_MPSC_CSN              (12u)
 /** Pin function is MPSC CSZ connection */
 #define CY_CAPSENSE_PIN_STATE_IDX_MPSC_CSZ              (13u)
+/** Pin function is WBX Node A connection */
+#define CY_CAPSENSE_PIN_STATE_WBX_NODE_A                (14u)
+/** Pin function is WBX Node B connection */
+#define CY_CAPSENSE_PIN_STATE_WBX_NODE_B                (15u)
 
 /** Number of CTRLMUX Pin States for LP */
-#define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (14u)
+#define CY_CAPSENSE_CTRLMUX_PIN_STATE_NUMBER            (16u)
 
 #else /* All the rest platforms */
 
@@ -709,6 +730,11 @@ extern "C" {
 #define CY_CAPSENSE_LLW_FOAM_EN_MASK                    (0x0010u)
 /** Liquid level tuning completed mask */
 #define CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK           (0x0200u)
+/** Liquid level machine learning complete mask */
+#define CY_CAPSENSE_LLW_LEARNING_COMPLETED_MASK         (0x0400u)
+/** Liquid level tuning and machine learning complete mask */
+#define CY_CAPSENSE_LLW_READY_MASK                      ((CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK) | \
+                                                         (CY_CAPSENSE_LLW_LEARNING_COMPLETED_MASK))
 
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_touch *//** \{ */
@@ -898,6 +924,8 @@ extern "C" {
 #define CY_CAPSENSE_HW_CONFIG_SMARTSENSE                (6u)
 /** CAPSENSE&trade; related HW is configured to execute a scan to define CDAC dither parameters */
 #define CY_CAPSENSE_HW_CONFIG_AUTO_DITHERING            (7u)
+/** CAPSENSE&trade; related HW is configured to the WBX scanning */
+#define CY_CAPSENSE_HW_CONFIG_WBX_SCANNING              (8u)
 
 /** \} */
 

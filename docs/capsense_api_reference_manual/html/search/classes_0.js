@@ -44,6 +44,7 @@ var searchData=
   ['cy_5fstc_5fcapsense_5ftfsl_5fcontext_5ft',['cy_stc_capsense_tfsl_context_t',['../structcy__stc__capsense__tfsl__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5ftfzm_5fcontext_5ft',['cy_stc_capsense_tfzm_context_t',['../structcy__stc__capsense__tfzm__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5ftouch_5ft',['cy_stc_capsense_touch_t',['../structcy__stc__capsense__touch__t.html',1,'']]],
+  ['cy_5fstc_5fcapsense_5fwbx_5fprofile_5ft',['cy_stc_capsense_wbx_profile_t',['../structcy__stc__capsense__wbx__profile__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fconfig_5ft',['cy_stc_capsense_widget_config_t',['../structcy__stc__capsense__widget__config__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fcontext_5ft',['cy_stc_capsense_widget_context_t',['../structcy__stc__capsense__widget__context__t.html',1,'']]],
   ['cy_5fstc_5fcapsense_5fwidget_5fcrc_5fdata_5ft',['cy_stc_capsense_widget_crc_data_t',['../structcy__stc__capsense__widget__crc__data__t.html',1,'']]]

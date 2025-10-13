@@ -29,7 +29,8 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_WD_PROXIMITY_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a840f00e988ee5ed8d1b0ca0a6f91fe2c", null ],
       [ "CY_CAPSENSE_WD_LOW_POWER_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aef4c95b7c358505b7e5b110dfc26a97e", null ],
       [ "CY_CAPSENSE_WD_LIQUID_LEVEL_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60a38aad4c1ae85f0ae30809cc81213fe37", null ],
-      [ "CY_CAPSENSE_WD_LIQUID_DETECTION_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aa1a94f20439cdb63ef15d44df9832798", null ]
+      [ "CY_CAPSENSE_WD_LIQUID_DETECTION_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aa1a94f20439cdb63ef15d44df9832798", null ],
+      [ "CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E", "group__group__capsense__enums.html#gga855d894b24929f0d7d2774dfc4266d60aced1dcaec772b671e6895ae6300c5f8d", null ]
     ] ],
     [ "cy_en_capsense_return_status_t", "group__group__capsense__enums.html#gaa96ebe173a9a3ec24f7461f696482b11", [
       [ "CY_CAPSENSE_SUCCESS_E", "group__group__capsense__enums.html#ggaa96ebe173a9a3ec24f7461f696482b11a3ddd2a0c59c25f817f852c4d899784c3", null ],

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -28,22 +28,6 @@
 #endif
 
 #if (defined(CY_IP_M0S8MSCV3))
-
-/*******************************************************************************
-* Local definitions
-*******************************************************************************/
-/** Sensing mode undefined */
-#define CY_CAPSENSE_REG_MODE_UNDEFINED                  (255u)
-/** CSD sense mode configuration index */
-#define CY_CAPSENSE_REG_MODE_CSD                        (0u)
-/** CSX sense mode configuration index */
-#define CY_CAPSENSE_REG_MODE_CSX                        (1u)
-/** CSD sense mode configuration index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_CSD_DITHERING              (2u)
-/** CSX sense mode configuration index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_CSX_DITHERING              (3u)
-/** First mode index with CapDAC dithering enabled */
-#define CY_CAPSENSE_REG_MODE_DITHERING                  (CY_CAPSENSE_REG_MODE_CSD_DITHERING)
 
 /*******************************************************************************
 * Internal function prototypes

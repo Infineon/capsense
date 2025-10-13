@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_centroid.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the source code for the centroid calculation methods
@@ -28,7 +28,6 @@
 #include "cycfg_capsense_defines.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LIQUID_LEVEL_EN))
 
 /*******************************************************************************
 * Local definition
@@ -37,9 +36,7 @@
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_PREVIOUS      (0u)
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_CENTER        (1u)
 #define CY_CAPSENSE_CSX_TOUCHPAD_CENTROID_NEXT          (2u)
-#define CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT         (3u)
-#define CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT          (3u)
-#define CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT          (3u)
+#define CY_CAPSENSE_LINEAR_SLIDER_MIN_SNS_COUNT         (2u)
 
 /* Minimum valid age */
 #define CY_CAPSENSE_CSX_TOUCHPAD_AGE_START              (0x0100u)
@@ -47,6 +44,8 @@
 #define CY_CAPSENSE_CSX_TOUCHPAD_BYTE_SHIFT             (8u)
 #define CY_CAPSENSE_CENTROID_ROUND_VALUE                (0x7Fu)
 #define CY_CAPSENSE_NO_LOCAL_MAX                        (0xFFFFu)
+
+#define CY_CAPSENSE_TOUCHPAD_MIN_SNS_NUMBER             (2u) 
 
 /*******************************************************************************
 * Function Prototypes
@@ -472,14 +471,14 @@ void Cy_CapSense_DpCentroidTouchpad(
     uint32_t multiplier;
     uint32_t offset;
 
-    if (CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT > colCount)
+    if (CY_CAPSENSE_TOUCHPAD_MIN_SNS_NUMBER > colCount)
     {
-        colCount = CY_CAPSENSE_TOUCHPAD_MIN_COL_SNS_COUNT;
+        colCount = CY_CAPSENSE_TOUCHPAD_MIN_SNS_NUMBER;
     }
 
-    if (CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT > rowCount)
+    if (CY_CAPSENSE_TOUCHPAD_MIN_SNS_NUMBER > rowCount)
     {
-        rowCount = CY_CAPSENSE_TOUCHPAD_MIN_ROW_SNS_COUNT;
+        rowCount = CY_CAPSENSE_TOUCHPAD_MIN_SNS_NUMBER;
     }
 
     if (1u == (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_NUMBER_MASK))
@@ -2329,9 +2328,8 @@ void Cy_CapSense_ProcessPositionFilters(
     ptrWdConfig->ptrPosFilterHistory->numPosition = (uint8_t)numPos;
 }
 
-#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_SLIDER_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_TOUCHPAD_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_LIQUID_LEVEL_EN)) */
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
-
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_POSITION_FILTER_EN) */
+
+#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 /* [] END OF FILE */

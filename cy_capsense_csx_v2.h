@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csx_v2.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes specific to the CSX sensing

@@ -2,6 +2,7 @@ var searchData=
 [
   ['caltarget',['calTarget',['../structcy__stc__capsense__auto__tune__config__t.html#a48acefee1f92f23853cc7d58511327a2',1,'cy_stc_capsense_auto_tune_config_t']]],
   ['capacitorsettlingtime',['capacitorSettlingTime',['../structcy__stc__capsense__bist__context__t.html#a2adb7abe65479371b8474bed393b719b',1,'cy_stc_capsense_bist_context_t']]],
+  ['ccorr',['cCorr',['../structcy__stc__capsense__wbx__profile__t.html#a053d7ead9f41636e0ebdc9e617916a7a',1,'cy_stc_capsense_wbx_profile_t']]],
   ['cdaccomp',['cdacComp',['../structcy__stc__capsense__sensor__context__t.html#ae79c13f9386a3a7e995dc63857eaa63c',1,'cy_stc_capsense_sensor_context_t']]],
   ['cdaccompdivider',['cdacCompDivider',['../structcy__stc__capsense__widget__context__t.html#a9af84926eb2b426096323ccb6bea68f8',1,'cy_stc_capsense_widget_context_t']]],
   ['cdaccompdividerval',['cdacCompDividerVal',['../structcy__stc__capsense__widget__crc__data__t.html#a8625b276567604972258ec921d837709',1,'cy_stc_capsense_widget_crc_data_t']]],

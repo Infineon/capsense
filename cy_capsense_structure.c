@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 6.20.0
+* \version 8.0.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -531,7 +531,8 @@ uint16_t Cy_CapSense_GetCrcWidget(
         ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
         ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
         ((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
-        ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN)))
+        ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN)) ||
+        (CY_CAPSENSE_WBX_GROUP == ptrWdCfg->senseMethod))
     {
         crcDataVal.fingerThVal = ptrWdCxt->fingerTh;
         crcDataVal.proxThVal = ptrWdCxt->proxTh;
@@ -574,7 +575,8 @@ uint16_t Cy_CapSense_GetCrcWidget(
     #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
          ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
           (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
-          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN)))
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN) || \
+          (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_FINE_EN)))
         crcDataVal.cdacFineVal = ptrWdCxt->cdacFine;
         crcDataVal.rowCdacFineVal = ptrWdCxt->rowCdacFine;
     #endif

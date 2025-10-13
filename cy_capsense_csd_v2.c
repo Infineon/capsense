@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_csd_v2.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file defines the data structure global variables and provides

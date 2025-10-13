@@ -2,6 +2,7 @@ var searchData=
 [
   ['raw',['raw',['../structcy__stc__capsense__hw__smartsense__config__t.html#a1bd2b732a41c3fc740cc0ec395e7da69',1,'cy_stc_capsense_hw_smartsense_config_t::raw()'],['../structcy__stc__capsense__sensor__context__t.html#a54bbaaded1ac1a6857ce84a996224ccc',1,'cy_stc_capsense_sensor_context_t::raw()']]],
   ['rawfilterconfig',['rawFilterConfig',['../structcy__stc__capsense__widget__config__t.html#a67d55b8afd94b5ff3de3587a4241c628',1,'cy_stc_capsense_widget_config_t']]],
+  ['rbridge',['rBridge',['../structcy__stc__capsense__wbx__profile__t.html#ab97330a73d02ceb48a167c8267819fb5',1,'cy_stc_capsense_wbx_profile_t']]],
   ['refcdac',['refCdac',['../structcy__stc__capsense__hw__smartsense__config__t.html#a8112761c4d7f4e5b9b9ff988013a5b7c',1,'cy_stc_capsense_hw_smartsense_config_t']]],
   ['regambuf',['regAmbuf',['../structcy__stc__capsense__bist__context__t.html#ae8f8770f51182beb960139917bceb6e3',1,'cy_stc_capsense_bist_context_t']]],
   ['regambufshield',['regAmbufShield',['../structcy__stc__capsense__bist__context__t.html#a2ab8cac868956282420db3b54a7e0978',1,'cy_stc_capsense_bist_context_t']]],
@@ -33,6 +34,7 @@ var searchData=
   ['resolutionval',['resolutionVal',['../structcy__stc__capsense__widget__crc__data__t.html#a74ffdaa191f9c9bd3d17ff3170200bac',1,'cy_stc_capsense_widget_crc_data_t']]],
   ['resolutionx',['resolutionX',['../structcy__stc__capsense__gesture__config__t.html#abcdafc8f4ecbb01e2202dee3ed252364',1,'cy_stc_capsense_gesture_config_t::resolutionX()'],['../structcy__stc__capsense__advanced__centroid__config__t.html#af68f4b04172c275b6be6e12768dc7991',1,'cy_stc_capsense_advanced_centroid_config_t::resolutionX()']]],
   ['resolutiony',['resolutionY',['../structcy__stc__capsense__gesture__config__t.html#ac418cd1cf76d0dcfe90232450954eb82',1,'cy_stc_capsense_gesture_config_t::resolutionY()'],['../structcy__stc__capsense__advanced__centroid__config__t.html#a41e2b2272353ff198fca4fbe4397d9bd',1,'cy_stc_capsense_advanced_centroid_config_t::resolutionY()']]],
+  ['rload',['rLoad',['../structcy__stc__capsense__wbx__profile__t.html#ad9d9c89ac6d60a4f7ad7b59e46ad1e48',1,'cy_stc_capsense_wbx_profile_t']]],
   ['rotatedebounce',['rotateDebounce',['../structcy__stc__capsense__gesture__config__t.html#aeebc2692f6432fa15394678fb0278a9b',1,'cy_stc_capsense_gesture_config_t']]],
   ['rotatedistancemin',['rotateDistanceMin',['../structcy__stc__capsense__gesture__config__t.html#adf604320c16786aa9e89b5f02f02a643',1,'cy_stc_capsense_gesture_config_t']]],
   ['rowcdacref',['rowCdacRef',['../structcy__stc__capsense__widget__context__t.html#a86df00e59d6d922a0e229694d24f7288',1,'cy_stc_capsense_widget_context_t']]],
@@ -44,5 +46,6 @@ var searchData=
   ['rowmap',['rowMap',['../structcy__stc__capsense__csx__touch__buffer__t.html#a2235820c150af3e6594730e9031066de',1,'cy_stc_capsense_csx_touch_buffer_t']]],
   ['rowsnsclk',['rowSnsClk',['../structcy__stc__capsense__widget__context__t.html#a2dd4e90d01407e1c2a0ed33f637e3b4f',1,'cy_stc_capsense_widget_context_t']]],
   ['rowsnsclkval',['rowSnsClkVal',['../structcy__stc__capsense__widget__crc__data__t.html#af9f145585e1986461ae4ba26927bbe3c',1,'cy_stc_capsense_widget_crc_data_t']]],
+  ['rref',['rRef',['../structcy__stc__capsense__wbx__profile__t.html#ace8dfd53ab339e923acaf5b9be8fdf75',1,'cy_stc_capsense_wbx_profile_t']]],
   ['rxindex',['rxIndex',['../structcy__stc__capsense__active__scan__sns__t.html#abc72adb11dbe72c7ba58289f605b2e35',1,'cy_stc_capsense_active_scan_sns_t']]]
 ];

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the common function prototypes for different supported
@@ -66,7 +66,8 @@ cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets(
 #if (((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) && \
      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
       (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
-      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN)))
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) || \
+      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN)))
 cy_capsense_status_t Cy_CapSense_CalibrateAllSlots(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_SetCalibrationTarget(

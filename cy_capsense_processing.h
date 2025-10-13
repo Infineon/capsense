@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -90,8 +90,9 @@ void Cy_CapSense_InitializeWidgetStatus(
 /** \cond SECTION_CAPSENSE_INTERNAL */
 /** \addtogroup group_capsense_internal *//** \{ */
 /******************************************************************************/
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) ||\
-    (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN))
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || \
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN) || \
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_WBX_BUTTON_EN))
     void Cy_CapSense_DpProcessButton(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif
@@ -107,7 +108,7 @@ void Cy_CapSense_InitializeWidgetStatus(
 #endif
 
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
-    void Cy_CapSense_DpProcessCsdTouchpad(
+    cy_capsense_status_t Cy_CapSense_DpProcessCsdTouchpad(
                     const cy_stc_capsense_widget_config_t * ptrWdConfig,
                     const cy_stc_capsense_context_t * context);
 #endif
@@ -148,6 +149,11 @@ void Cy_CapSense_DpProcessIsxWidgetStatus(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig);
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
 
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+void Cy_CapSense_DpProcessWbxWidgetStatus(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig);
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) */
+
 uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 cy_stc_capsense_sensor_context_t * ptrSnsContext,
@@ -163,6 +169,13 @@ void Cy_CapSense_DpUpdateDifferences(
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_REGULAR_RC_CMF_FILTER_EN)
     void Cy_CapSense_DpUpdateDifferencesCmf(
                     cy_stc_capsense_sensor_context_t * ptrSnsContext);
+#endif
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+void Cy_CapSense_ProcessWbxCorrection(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context);
+void Cy_CapSense_WbxCorrectionProfile(
+                volatile cy_stc_capsense_wbx_profile_t * ptrProfile);
 #endif
 
 void Cy_CapSense_DpUpdateThresholds(

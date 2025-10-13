@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 7.0.0: High-level Functions</title>
+<title>CAPSENSE™ Middleware Library 8.0.0: High-level Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 7.0.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 8.0.0</div>
   </td>
  </tr>
  </tbody>
@@ -940,7 +940,8 @@ This function is available when self-test library is enabled.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns the status of the operation:<ul>
 <li>CY_CAPSENSE_STATUS_SUCCESS - The operation is performed successfully.</li>
 <li>CY_CAPSENSE_STATUS_BAD_PARAM - The input parameter is invalid.</li>
-<li>CY_CAPSENSE_STATUS_HW_BUSY - The HW is busy with the previous scan. </li>
+<li>CY_CAPSENSE_STATUS_HW_BUSY - The HW is busy with the previous scan.</li>
+<li>CY_CAPSENSE_STATUS_MIXED_SENSORS - The requested sensors types can't be scanned in one frame (in autonomous mode). </li>
 </ul>
 </dd></dl>
 
@@ -1006,7 +1007,8 @@ This function is available when self-test library is enabled.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns the status of the operation:<ul>
 <li>CY_CAPSENSE_STATUS_SUCCESS - The operation is performed successfully.</li>
 <li>CY_CAPSENSE_STATUS_BAD_PARAM - The input parameter is invalid.</li>
-<li>CY_CAPSENSE_STATUS_HW_BUSY - The HW is busy with the previous scan. </li>
+<li>CY_CAPSENSE_STATUS_HW_BUSY - The HW is busy with the previous scan.</li>
+<li>CY_CAPSENSE_STATUS_MIXED_SENSORS - The requested sensors types can't be scanned in one frame (in autonomous mode). </li>
 </ul>
 </dd></dl>
 
@@ -1949,7 +1951,7 @@ This function is available only for the fifth-generation low power CAPSENSE&trad
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 7.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 8.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

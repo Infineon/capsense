@@ -2,6 +2,10 @@ var group__group__capsense__low__level =
 [
     [ "Cy_CapSense_ProcessWidgetExt", "group__group__capsense__low__level.html#gafbfe743a98bd2c24a623a2c734c03f0e", null ],
     [ "Cy_CapSense_ProcessSensorExt", "group__group__capsense__low__level.html#ga05d3f6e7d7fbef845ab4eb575e653dec", null ],
+    [ "Cy_CapSense_ReadWidgetCdacParam", "group__group__capsense__low__level.html#ga9282e8184026228ec7b8e1cf22829e55", null ],
+    [ "Cy_CapSense_WriteWidgetCdacParam", "group__group__capsense__low__level.html#ga95c9816b8cb62a2c555ee3398558cf38", null ],
+    [ "Cy_CapSense_SetWidgetCalibrationState", "group__group__capsense__low__level.html#ga2b6d787bf68eea9a889d8c7eec40af78", null ],
+    [ "Cy_CapSense_IsLlwCalibrationValid", "group__group__capsense__low__level.html#ga3b8f58a0d6db406bca0c7caf94379854", null ],
     [ "Cy_CapSense_InitializeAllBaselines", "group__group__capsense__low__level.html#gaa35b107fb94a8c8ff6d53463c62d0481", null ],
     [ "Cy_CapSense_InitializeWidgetBaseline", "group__group__capsense__low__level.html#ga6dd0e7c6db3f269948623d2e0fa0c2d7", null ],
     [ "Cy_CapSense_InitializeSensorBaseline", "group__group__capsense__low__level.html#ga723aa8ba790fcc07ca42611aba99fb88", null ],

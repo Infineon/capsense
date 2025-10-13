@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -969,9 +969,9 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(
 *
 * \note
 * This function is available only for the fifth-generation low power CAPSENSE&trade;.
-* Rx/Lx electrodes for ISX widgets are excluded from the test as
-* they are electrically shorted to GND and the CY_CAPSENSE_BIST_BAD_PARAM_E result
-* for such widgets is returned.
+* Rx/Lx electrodes for ISX widgets
+* are excluded from the test as they are electrically shorted to GND and 
+* the CY_CAPSENSE_BIST_BAD_PARAM_E result for such widgets is returned.
 *
 * \param widgetId
 * Specifies the ID number of the widget.
@@ -1023,7 +1023,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorPins_V3Lp(
     {
         if (context->ptrCommonConfig->numWd > widgetId)
         {
-            if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+            if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) &&
+                (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
             {
                 /* Get a total number of the widget elements: for CSX it is numRows + numCols, for CSD it is totalNumSns */
                 if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod)
@@ -1318,6 +1319,9 @@ static void Cy_CapSense_SnsShortUpdateTestResult(
 * sensor (not electrode) by using the Cy_CapSense_SnsShortCheckSensor() function.
 * The function is called by the Cy_CapSense_RunSelfTest() function.
 *
+* \note
+* Rx/Lx electrodes for ISX widgets are excluded from measuring.
+*
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
@@ -1325,7 +1329,9 @@ static void Cy_CapSense_SnsShortUpdateTestResult(
 * Returns the status of the test processing:
 * - CY_CAPSENSE_BIST_SUCCESS_E if test passed successfully;
 * - CY_CAPSENSE_BIST_FAIL_E if any sensor of any widget is
-*   shorted to VDD or GND.
+*   shorted to VDD or GND;
+* - CY_CAPSENSE_BIST_BAD_PARAM_E if current sense method is
+*   not supported.
 *
 *******************************************************************************/
 static cy_en_capsense_bist_status_t Cy_CapSense_SnsShortCheckAllSensors(
@@ -1352,7 +1358,8 @@ static cy_en_capsense_bist_status_t Cy_CapSense_SnsShortCheckAllSensors(
 
     for (widgetId = 0u; widgetId < context->ptrCommonConfig->numWd; widgetId++)
     {
-        if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+        if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) && 
+            (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
         {
             /* Get a total number of the widget elements: for CSX it is numRows + numCols, for CSD it is totalNumSns */
             if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod)
@@ -1375,39 +1382,47 @@ static cy_en_capsense_bist_status_t Cy_CapSense_SnsShortCheckAllSensors(
                 }
             }
         }
-    }
-
-    Cy_CapSense_BistSwitchAllSnsPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
-    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
-        Cy_CapSense_BistSwitchAllShieldPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
-    #endif
-    Cy_CapSense_BistSwitchAllExternalCapPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
-
-    /* Wait for the maximum possible external capacitor charging time */
-    Cy_SysLib_DelayUs(context->ptrBistContext->snsIntgShortSettlingTime);
-
-    for (widgetId = 0u; widgetId < context->ptrCommonConfig->numWd; widgetId++)
-    {
-        /* Get a total number of the widget elements: for CSX it is numRows + numCols, for CSD it is totalNumSns */
-        if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod)
-        {
-            /* For the CSX widgets, get the index of the Rx electrode */
-            numWdgtElectrodes = context->ptrWdConfig[widgetId].numRows +
-                      (uint32_t)context->ptrWdConfig[widgetId].numCols;
-        }
         else
         {
-            numWdgtElectrodes = context->ptrWdConfig[widgetId].numSns;
+            result = CY_CAPSENSE_BIST_BAD_PARAM_E;
         }
+    }
 
-        for (sensorId = 0u; sensorId < numWdgtElectrodes; sensorId++)
+    if (CY_CAPSENSE_BIST_SUCCESS_E == result)
+    {
+        Cy_CapSense_BistSwitchAllSnsPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_SHIELD_EN)
+            Cy_CapSense_BistSwitchAllShieldPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
+        #endif
+        Cy_CapSense_BistSwitchAllExternalCapPinState(CY_CAPSENSE_BIST_IO_STRONG_E, context);
+
+        /* Wait for the maximum possible external capacitor charging time */
+        Cy_SysLib_DelayUs(context->ptrBistContext->snsIntgShortSettlingTime);
+
+        for (widgetId = 0u; widgetId < context->ptrCommonConfig->numWd; widgetId++)
         {
-            if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+            /* Get a total number of the widget elements: for CSX it is numRows + numCols, for CSD it is totalNumSns */
+            if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod)
             {
-                if (CY_CAPSENSE_BIST_SUCCESS_E != Cy_CapSense_SnsShortCheckSensor(widgetId, sensorId, CY_CAPSENSE_BIST_DR_PIN2GND, context))
+                /* For the CSX widgets, get the index of the Rx electrode */
+                numWdgtElectrodes = context->ptrWdConfig[widgetId].numRows +
+                        (uint32_t)context->ptrWdConfig[widgetId].numCols;
+            }
+            else
+            {
+                numWdgtElectrodes = context->ptrWdConfig[widgetId].numSns;
+            }
+
+            for (sensorId = 0u; sensorId < numWdgtElectrodes; sensorId++)
+            {
+                if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) &&
+                    (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
                 {
-                    result = CY_CAPSENSE_BIST_FAIL_E;
-                    break;
+                    if (CY_CAPSENSE_BIST_SUCCESS_E != Cy_CapSense_SnsShortCheckSensor(widgetId, sensorId, CY_CAPSENSE_BIST_DR_PIN2GND, context))
+                    {
+                        result = CY_CAPSENSE_BIST_FAIL_E;
+                        break;
+                    }
                 }
             }
         }
@@ -1810,6 +1825,11 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode_V3Lp(
                     case CY_CAPSENSE_ISX_GROUP:
                         /* exit with CY_CAPSENSE_BIST_BAD_PARAM_E */
                 #endif
+
+                #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                    case CY_CAPSENSE_WBX_GROUP:
+                        /* exit with CY_CAPSENSE_BIST_BAD_PARAM_E */
+                #endif
                 default:
                     /* Do nothing */
                     break;
@@ -1883,6 +1903,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSensorElectrode_V3Lp(
 * Returns the status of the measuring process:
 * - CY_CAPSENSE_BIST_SUCCESS_E if all the measurements passed successfully.
 * - CY_CAPSENSE_BIST_FAIL_E if any measurement was failed.
+* - CY_CAPSENSE_BIST_BAD_PARAM_E if current sense method is
+*   not supported.
 *
 *******************************************************************************/
 static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllSensors(
@@ -1901,7 +1923,8 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllSensors(
     for (slotId = 0u; slotId < CY_CAPSENSE_SLOT_COUNT; slotId++)
     {
         widgetId = ptrScanSlots[slotId].wdId;
-        if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+        if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) &&
+            (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
         {
             if (CY_CAPSENSE_BIST_SUCCESS_E != Cy_CapSense_MeasureCapacitanceSlotSensors_V3Lp(slotId, 0u, context))
             {
@@ -1911,13 +1934,18 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllSensors(
                 }
             }
         }
+        else
+        {
+            result = CY_CAPSENSE_BIST_BAD_PARAM_E;
+        }
     }
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
         for (slotId = 0u; slotId < CY_CAPSENSE_SLOT_LP_COUNT; slotId++)
         {
             widgetId = ptrLpScanSlots[slotId].wdId;
-            if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+            if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) &&
+                (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
             {
                 if (CY_CAPSENSE_BIST_SUCCESS_E != Cy_CapSense_MeasureCapacitanceLpSlotSensors(slotId, context))
                 {
@@ -1962,6 +1990,8 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllSensors(
 * Returns the status of the measuring process:
 * - CY_CAPSENSE_BIST_SUCCESS_E if all the measurements passed successfully.
 * - CY_CAPSENSE_BIST_FAIL_E if any measurement was failed.
+* - CY_CAPSENSE_BIST_BAD_PARAM_E if current sense method is
+*   not supported.
 *
 *******************************************************************************/
 static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
@@ -1975,7 +2005,8 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
     /* Loop through all the widgets */
     for (widgetId = 0u; widgetId < context->ptrCommonConfig->numWd; widgetId++)
     {
-        if (CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod)
+        if ((CY_CAPSENSE_ISX_GROUP != context->ptrWdConfig[widgetId].senseMethod) &&
+            (CY_CAPSENSE_WBX_GROUP != context->ptrWdConfig[widgetId].senseMethod))
         {
             /* Get a total number of the widget elements: for CSX, it is numRows + numCols, for CSD, it is totalNumSns */
             if (CY_CAPSENSE_CSX_GROUP == context->ptrWdConfig[widgetId].senseMethod)
@@ -1998,6 +2029,10 @@ static cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceAllElectrodes(
                     }
                 }
             }
+        }
+        else
+        {
+            result = CY_CAPSENSE_BIST_BAD_PARAM_E;
         }
     }
 
@@ -2322,6 +2357,11 @@ cy_en_capsense_bist_status_t Cy_CapSense_MeasureCapacitanceSlotSensorsInternal(
 
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
                         case CY_CAPSENSE_ISX_GROUP:
+                            /* exit with CY_CAPSENSE_BIST_BAD_PARAM_E */
+                    #endif
+
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                        case CY_CAPSENSE_WBX_GROUP:
                             /* exit with CY_CAPSENSE_BIST_BAD_PARAM_E */
                     #endif
                     default:
@@ -2760,6 +2800,7 @@ static void Cy_CapSense_BistGenerateBaseConfig(
     ptrTemplateCfg->mode[CY_CAPSENSE_REG_MODE_CSD] = modeArr[CY_CAPSENSE_REG_MODE_CSD];
     ptrTemplateCfg->mode[CY_CAPSENSE_REG_MODE_CSX] = modeArr[CY_CAPSENSE_REG_MODE_CSX];
     ptrTemplateCfg->mode[CY_CAPSENSE_REG_MODE_ISX] = modeArr[CY_CAPSENSE_REG_MODE_ISX];
+    
     if (CY_CAPSENSE_BIST_IO_VDDA2_E == context->ptrBistContext->currentISC)
     {
         if ((CY_CAPSENSE_BIST_CAP_ELTD_SCAN == context->ptrBistContext->eltdCapScanMode) ||
@@ -2770,7 +2811,7 @@ static void Cy_CapSense_BistGenerateBaseConfig(
         }
         else
         {
-            /* Close the reference to filter switch for CSD sensing mode */
+            /* Close the reference to filter switch for CSX sensing mode */
             ptrTemplateCfg->mode[CY_CAPSENSE_REG_MODE_CSX].swSelSh |= MSCLP_MODE_SW_SEL_SH_SOMB_Msk;
         }
     }
@@ -2837,6 +2878,13 @@ static void Cy_CapSense_BistGenerateSensorConfig(
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
         uint32_t padMaskIsx = 0u;
+    #endif
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+        uint32_t padMaskWbx = 0u;
+    #endif
+
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN))
         uint32_t numEltd;
         uint32_t eltdIndex;
         uint32_t wdIndex;
@@ -2889,6 +2937,12 @@ static void Cy_CapSense_BistGenerateSensorConfig(
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
                 case CY_CAPSENSE_ISX_GROUP:
                     modeSel = CY_CAPSENSE_REG_MODE_ISX;
+                    break;
+            #endif
+
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                case CY_CAPSENSE_WBX_GROUP:
+                    modeSel = CY_CAPSENSE_REG_MODE_WBX;
                     break;
             #endif
 
@@ -2950,6 +3004,29 @@ static void Cy_CapSense_BistGenerateSensorConfig(
         }
     #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
 
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+    /* Create separate inactive mask of WBX pins only */
+    for (wdIndex = 0u; wdIndex < context->ptrCommonConfig->numWd; wdIndex++)
+    {
+        snsMethod = context->ptrWdConfig[wdIndex].senseMethod;
+        if (CY_CAPSENSE_WBX_GROUP == snsMethod)
+        {
+            numEltd = (uint32_t)context->ptrWdConfig[wdIndex].numRows + context->ptrWdConfig[wdIndex].numCols;
+            eltdPinCfg = ptrWdCfg->ptrEltdConfig;
+
+            for (eltdIndex = 0u; eltdIndex < numEltd; eltdIndex++)
+            {
+                /* Loop through all pads for this electrode (ganged sensor) */
+                for (i = 0u; i < eltdPinCfg->numPins; i++)
+                {
+                    padMaskWbx |= (0x01uL << eltdPinCfg->ptrPin[i].padNumber);
+                }
+                eltdPinCfg++;
+            }
+        }
+    }
+    #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) */
+
     /* Change the control switch function depending on the current inactive sensor connection */
     switch (context->ptrBistContext->currentISC)
     {
@@ -2977,6 +3054,10 @@ static void Cy_CapSense_BistGenerateSensorConfig(
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
         Cy_CapSense_CalculateMaskRegisters(padMaskIsx, cswFuncNum, ptrSensorCfg);
+    #endif
+
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+        Cy_CapSense_CalculateMaskRegisters(padMaskWbx, cswFuncNum, ptrSensorCfg);
     #endif
 
     /* Initializes an active sensor (including ganged sensors) by SNS sensor state */
@@ -3011,7 +3092,7 @@ static void Cy_CapSense_BistGenerateSensorConfig(
             cswFuncNum = CY_CAPSENSE_CTRLMUX_PIN_STATE_SNS;
             Cy_CapSense_BistGenerateSnsCfgMaskReg(ptrEltdCfg, ptrSensorCfg, cswFuncNum);
         }
-        else
+        else if (CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod)
         {
             /* RX ELECTRODE */
             cswFuncNum = CY_CAPSENSE_CTRLMUX_PIN_STATE_RX;
@@ -3022,6 +3103,10 @@ static void Cy_CapSense_BistGenerateSensorConfig(
             cswFuncNum = CY_CAPSENSE_CTRLMUX_PIN_STATE_TX;
             ptrEltdCfg =  &ptrWdCfg->ptrEltdConfig[ptrWdCfg->numCols + (slotStcSnsIdx % ptrWdCfg->numRows)];
             Cy_CapSense_BistGenerateSnsCfgMaskReg(ptrEltdCfg, ptrSensorCfg, cswFuncNum);
+        }
+        else
+        {
+            /* Do nothing */
         }
     }
 }
@@ -3124,7 +3209,6 @@ static void Cy_CapSense_BistGenerateSnsCfgMaskReg(
 * \note
 * This function is available only for the fifth-generation low power
 * CAPSENSE&trade;.
-* ISX widgets are excluded from measuring.
 *
 * \param skipChMask
 * Specifies the mask to skip some channels during the shield electrode

@@ -129,6 +129,15 @@ var group__group__capsense__structures =
       [ "newPeakNumber", "structcy__stc__capsense__csx__touch__buffer__t.html#a497b8e96e84f765fc258f34f071aa999", null ],
       [ "newActiveIdsMask", "structcy__stc__capsense__csx__touch__buffer__t.html#a9267df7cd343b44ee9dddfdf64a4e210", null ]
     ] ],
+    [ "cy_stc_capsense_wbx_profile_t", "structcy__stc__capsense__wbx__profile__t.html", [
+      [ "rRef", "structcy__stc__capsense__wbx__profile__t.html#ace8dfd53ab339e923acaf5b9be8fdf75", null ],
+      [ "kCut", "structcy__stc__capsense__wbx__profile__t.html#a36c33d4d9b144b757eb553790547548b", null ],
+      [ "dc", "structcy__stc__capsense__wbx__profile__t.html#a356904ec3d27138c1140b946ce6f8cba", null ],
+      [ "rLoad", "structcy__stc__capsense__wbx__profile__t.html#ad9d9c89ac6d60a4f7ad7b59e46ad1e48", null ],
+      [ "rBridge", "structcy__stc__capsense__wbx__profile__t.html#ab97330a73d02ceb48a167c8267819fb5", null ],
+      [ "cCorr", "structcy__stc__capsense__wbx__profile__t.html#a053d7ead9f41636e0ebdc9e617916a7a", null ],
+      [ "dCorr", "structcy__stc__capsense__wbx__profile__t.html#acc252eebbb5464d9e2067dd4736f0f7b", null ]
+    ] ],
     [ "cy_stc_capsense_widget_context_t", "structcy__stc__capsense__widget__context__t.html", [
       [ "fingerCap", "structcy__stc__capsense__widget__context__t.html#aaddfea3cc416d040629708d1723c12f6", null ],
       [ "sigPFC", "structcy__stc__capsense__widget__context__t.html#a818a66cb212ab10f9e4fb4f25a5b8a14", null ],
@@ -228,6 +237,8 @@ var group__group__capsense__structures =
       [ "cmfThreshold", "structcy__stc__capsense__widget__config__t.html#af30581269d29471c11870fb1c024cf1f", null ],
       [ "cdacConfig", "structcy__stc__capsense__widget__config__t.html#ab76c9c7585fcdee65af8c7b13ea27233", null ],
       [ "foamCoefficient", "structcy__stc__capsense__widget__config__t.html#a0b7c2929e9128c81c59b4c494a71a744", null ],
+      [ "wbxResistorBridge", "structcy__stc__capsense__widget__config__t.html#a9c81adf7c1ef9ca5fd778cb242a300e7", null ],
+      [ "wbxResistorSeries", "structcy__stc__capsense__widget__config__t.html#ac0d272156da01340efe050205be43ac8", null ],
       [ "firstSlotId", "structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63", null ],
       [ "numSlots", "structcy__stc__capsense__widget__config__t.html#a474207c2ce55e017800877298895cf53", null ],
       [ "senseMethod", "structcy__stc__capsense__widget__config__t.html#a417a8786dfe62d3940fd7d5e265b9e2e", null ],
@@ -240,7 +251,8 @@ var group__group__capsense__structures =
       [ "mfsConfig", "structcy__stc__capsense__widget__config__t.html#aa3e4f9fe91ed0dd44f74246ea10ad98e", null ],
       [ "cdacDitherScaleMode", "structcy__stc__capsense__widget__config__t.html#a42fdde812a30b3ff8021af651413076f", null ],
       [ "cicRateMode", "structcy__stc__capsense__widget__config__t.html#a5364d6f63b077b1ef9b9b4f38822fb59", null ],
-      [ "iirCoeffHw", "structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f", null ]
+      [ "iirCoeffHw", "structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f", null ],
+      [ "wbxCorrectionEn", "structcy__stc__capsense__widget__config__t.html#ada23d4220601b06f83220c334f7e4082", null ]
     ] ],
     [ "cy_stc_capsense_idac_gain_table_t", "structcy__stc__capsense__idac__gain__table__t.html", [
       [ "gainReg", "structcy__stc__capsense__idac__gain__table__t.html#ad44c7d56219cb4db0e7aaaba7821fb40", null ],
@@ -296,6 +308,8 @@ var group__group__capsense__structures =
       [ "numProWaitKrefDelay", "structcy__stc__capsense__common__config__t.html#a25a6e1ee6c1b95b92f69b56471e90198", null ],
       [ "numEpiKrefDelayPrs", "structcy__stc__capsense__common__config__t.html#aa58ffcf4a7ca63e1ffad0b1333ab88dc", null ],
       [ "numEpiKrefDelay", "structcy__stc__capsense__common__config__t.html#ae0b1f3c3189864d5677433b4ba6eb8a8", null ],
+      [ "wbxInactiveSnsConnection", "structcy__stc__capsense__common__config__t.html#a88e73dea786f85cd2fb8a3002f0a83a9", null ],
+      [ "wbxCalibrationError", "structcy__stc__capsense__common__config__t.html#a4a5aab525e786369854885bb2a8eaef4", null ],
       [ "numWd", "structcy__stc__capsense__common__config__t.html#a4b2745560f410d1a0dc70797aeec3fab", null ],
       [ "periDividerType", "structcy__stc__capsense__common__config__t.html#ab1171e77b08743ec9cb1a0751f3a8a24", null ],
       [ "periDividerIndex", "structcy__stc__capsense__common__config__t.html#af4c7933702ebe6de8d7a51ead347f8dc", null ],
@@ -343,6 +357,7 @@ var group__group__capsense__structures =
       [ "csxMfsDividerOffsetF2", "structcy__stc__capsense__common__config__t.html#a9b7eca3dd5ff0f135ce8785fa3fd4f2f", null ],
       [ "isxRawTarget", "structcy__stc__capsense__common__config__t.html#a12e0de779c3a1f759e349210dbd3d2a4", null ],
       [ "isxCalibrationError", "structcy__stc__capsense__common__config__t.html#a51d97e88c598f8f2f9caf844d652b2cc", null ],
+      [ "wbxRawTarget", "structcy__stc__capsense__common__config__t.html#a19b562e5172cb479a45e04ddd3f42d6e", null ],
       [ "csdShieldMode", "structcy__stc__capsense__common__config__t.html#abb79c58604dc20c98dcebda8ae1d9a1e", null ],
       [ "numProOffsetCycles", "structcy__stc__capsense__common__config__t.html#a4bf21a13ce2b0961682f6c4a27e2cab8", null ],
       [ "proOffsetCdacComp", "structcy__stc__capsense__common__config__t.html#ac54e06d38473566cafcf6e7a735eafe4", null ],
@@ -540,6 +555,7 @@ var group__group__capsense__structures =
       [ "numSlots", "structcy__stc__capsense__internal__context__t.html#a130a4884573606854b3ab9f4e058bdc4", null ],
       [ "startSlotIndex", "structcy__stc__capsense__internal__context__t.html#a4c80111bcf1b064751cab5bede20f5c3", null ],
       [ "wotTimeout", "structcy__stc__capsense__internal__context__t.html#a993f2acd1b9057055fcf4f57c2e27dc1", null ],
+      [ "intrWbxInactSnsConn", "structcy__stc__capsense__internal__context__t.html#a472bed11e404249e58d6ea1775bde8de", null ],
       [ "intrIsxInactSnsConn", "structcy__stc__capsense__internal__context__t.html#a697bbc45d7428255dcf5c3d4a8652939", null ],
       [ "numFineInitCycles", "structcy__stc__capsense__internal__context__t.html#a03dd212f3b8b5e14fbc8f240697aed7d", null ],
       [ "lfsrScale", "structcy__stc__capsense__internal__context__t.html#a969a1a9e22bc4b4677deec9e05dca02f", null ],
@@ -554,6 +570,7 @@ var group__group__capsense__structures =
       [ "intrCsdRawTarget", "structcy__stc__capsense__internal__context__t.html#a3e4d3c24280c56169f481c91db5928e7", null ],
       [ "intrCsxRawTarget", "structcy__stc__capsense__internal__context__t.html#aa567c9166072174f081d982b47246c47", null ],
       [ "intrIsxRawTarget", "structcy__stc__capsense__internal__context__t.html#a76b775ea247ac23160c1286fa965adb3", null ],
+      [ "intrWbxRawTarget", "structcy__stc__capsense__internal__context__t.html#a8c3c9e57a6f115d1f98721c59c5ba634", null ],
       [ "numSenseMethod", "structcy__stc__capsense__internal__context__t.html#a97d29c46669cb5004cdb5d468a8bee61", null ],
       [ "mapSenseMethod", "structcy__stc__capsense__internal__context__t.html#a399b90e9f0e47a18b2fa5ea534490669", null ],
       [ "csdCdacDitherEn", "structcy__stc__capsense__internal__context__t.html#a318a0a33ee0d535a2297a0bf36e858af", null ],

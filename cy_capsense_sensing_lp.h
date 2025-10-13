@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.
@@ -164,14 +164,11 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
 
 #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
-     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN))
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN))
+
 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_REF_AUTO_EN)
     cy_capsense_status_t Cy_CapSense_CalibrateRefCdac(
-                    uint32_t widgetId,
-                    cy_stc_capsense_context_t * context);
-#endif
-#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_FINE_AUTO_EN)
-    cy_capsense_status_t Cy_CapSense_CalibrateFineCdac(
                     uint32_t widgetId,
                     cy_stc_capsense_context_t * context);
 #endif
@@ -188,6 +185,23 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
 cy_capsense_status_t Cy_CapSense_VerifyCalibration(
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
+#endif
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_COMP_AUTO_EN) && \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN))
+    cy_capsense_status_t Cy_CapSense_CalibrateCompCdacWbx(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
+
+#if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) || \
+     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CDAC_FINE_AUTO_EN)
+    cy_capsense_status_t Cy_CapSense_CalibrateFineCdac(
+                    uint32_t widgetId,
+                    cy_stc_capsense_context_t * context);
+#endif
 cy_capsense_status_t Cy_CapSense_CalibrateAllWidgets_V3Lp(
                 cy_stc_capsense_context_t * context);
 cy_capsense_status_t Cy_CapSense_CalibrateAllSlots_V3Lp(
@@ -500,7 +514,7 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_COMP_DIV_AUTO_EN))
 #define CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN))
-#define CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE &&\
+#define CY_CAPSENSE_CSD_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_CSD_CDAC_CALIBRATION_USAGE) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_REF_AUTO_EN))
 #define CY_CAPSENSE_CSD_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN))
@@ -515,7 +529,7 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_COMP_DIV_AUTO_EN))
 #define CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN))
-#define CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE &&\
+#define CY_CAPSENSE_CSX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_CSX_CDAC_CALIBRATION_USAGE) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_REF_AUTO_EN))
 #define CY_CAPSENSE_CSX_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN))
@@ -530,10 +544,25 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_COMP_DIV_AUTO_EN))
 #define CY_CAPSENSE_ISX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN))
-#define CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE         (CY_CAPSENSE_ISX_CDAC_CALIBRATION_USAGE &&\
+#define CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_ISX_CDAC_CALIBRATION_USAGE) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_REF_AUTO_EN))
 #define CY_CAPSENSE_ISX_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) &&\
                                                      (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN))
+
+#define CY_CAPSENSE_WBX_CDAC_COMP_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_COMP_EN))
+#define CY_CAPSENSE_WBX_CDAC_COMP_AUTO_USAGE        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_COMP_EN))
+#define CY_CAPSENSE_WBX_CDAC_COMP_DIV_AUTO_USAGE    ((CY_CAPSENSE_WBX_CDAC_COMP_USAGE) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_COMP_DIV_AUTO_EN))
+#define CY_CAPSENSE_WBX_CDAC_CALIBRATION_USAGE      ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN))
+#define CY_CAPSENSE_WBX_CDAC_REF_AUTO_USAGE         ((CY_CAPSENSE_WBX_CDAC_CALIBRATION_USAGE) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_REF_AUTO_EN))
+#define CY_CAPSENSE_WBX_CDAC_FINE_USAGE             ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) &&\
+                                                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_FINE_EN))
 
 #define CY_CAPSENSE_CDAC_COMP_USAGE                 ((CY_CAPSENSE_CSD_CDAC_COMP_USAGE) ||\
                                                      (CY_CAPSENSE_CSX_CDAC_COMP_USAGE) ||\
@@ -549,7 +578,8 @@ uint32_t Cy_CapSense_GetScanWatchdogTime(
                                                      (CY_CAPSENSE_ISX_CDAC_REF_AUTO_USAGE))
 #define CY_CAPSENSE_CDAC_FINE_USAGE                 ((CY_CAPSENSE_CSD_CDAC_FINE_USAGE) ||\
                                                      (CY_CAPSENSE_CSX_CDAC_FINE_USAGE) ||\
-                                                     (CY_CAPSENSE_ISX_CDAC_FINE_USAGE))
+                                                     (CY_CAPSENSE_ISX_CDAC_FINE_USAGE) ||\
+                                                     (CY_CAPSENSE_WBX_CDAC_FINE_USAGE))
 
 #define CY_CAPSENSE_CALIBRATION_EN_POS               (0u)
 #define CY_CAPSENSE_CDAC_COMP_USAGE_POS              (1u)

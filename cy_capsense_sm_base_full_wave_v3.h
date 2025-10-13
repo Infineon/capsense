@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sm_base_full_wave_v3.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file lists a set of macros for each register bit-field for the specified

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -142,6 +142,9 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
         ptrInternalCxt = context->ptrInternalContext;
         ptrInternalCxt->intrCsdInactSnsConn = CY_CAPSENSE_SNS_CONNECTION_UNDEFINED;
         ptrInternalCxt->intrCsxInactSnsConn = CY_CAPSENSE_SNS_CONNECTION_UNDEFINED;
+        #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+            ptrInternalCxt->intrWbxInactSnsConn = CY_CAPSENSE_SNS_CONNECTION_UNDEFINED;
+        #endif
 
         ptrInternalCxt->ptrSSCallback = NULL;
         ptrInternalCxt->ptrEOSCallback = NULL;
@@ -169,6 +172,7 @@ cy_capsense_status_t Cy_CapSense_Init(cy_stc_capsense_context_t * context)
             ptrInternalCxt->intrCsdRawTarget = ptrCommonCfg->csdRawTarget;
             ptrInternalCxt->intrCsxRawTarget = ptrCommonCfg->csxRawTarget;
             ptrInternalCxt->intrIsxRawTarget = ptrCommonCfg->isxRawTarget;
+            ptrInternalCxt->intrWbxRawTarget = ptrCommonCfg->wbxRawTarget;
             ptrInternalCxt->numCoarseInitChargeCycles = ptrCommonCfg->numCoarseInitChargeCycles;
             ptrInternalCxt->numCoarseInitSettleCycles = ptrCommonCfg->numCoarseInitSettleCycles;
             ptrInternalCxt->numProOffsetCycles = ptrCommonCfg->numProOffsetCycles;
@@ -374,7 +378,8 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
             #endif
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CALIBRATION_EN) || \
                  (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CALIBRATION_EN) || \
-                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN))
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CALIBRATION_EN) || \
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CALIBRATION_EN))
                 {
                     result |= Cy_CapSense_CalibrateAllSlots(context);
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
@@ -387,24 +392,20 @@ cy_capsense_status_t Cy_CapSense_Enable(cy_stc_capsense_context_t * context)
         /* Scan each widget separately if the MPSC is enabled */
         #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
             #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED) || \
-                (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN))
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN) || \
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN))
                 for (widgetId = 0u; widgetId < CY_CAPSENSE_TOTAL_WIDGET_COUNT; widgetId++)
                 {
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LP_EN)
                         if ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType)
-                        {
-                            result |= Cy_CapSense_ScanSlots(context->ptrWdConfig[widgetId].firstSlotId,
-                                                            context->ptrWdConfig[widgetId].numSlots, context);
-                        }
-                    #else
-                        result |= Cy_CapSense_ScanSlots(context->ptrWdConfig[widgetId].firstSlotId,
-                                                        context->ptrWdConfig[widgetId].numSlots, context);
                     #endif
-
-                    result |= Cy_CapSense_WaitEndScan(1000000uL, context);  /* 1sec timeout */
+                    {
+                        result |= Cy_CapSense_ScanWidget(widgetId, context);
+                    }
+                    result |= Cy_CapSense_WaitEndScan(1000000uL, context);  /* 1sec timeout per widget */
                 }
             #else
-                result |= Cy_CapSense_ScanAllSlots(context);
+                result |= Cy_CapSense_ScanAllWidgets(context);
             #endif /* CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_PHASE_SELF_ENABLED */
         #else
             result |= Cy_CapSense_ScanAllWidgets(context);
@@ -806,6 +807,12 @@ cy_capsense_status_t Cy_CapSense_ProcessWidget(
                     break;
             #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
 
+            #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                case CY_CAPSENSE_WBX_GROUP:
+                    Cy_CapSense_DpProcessWbxWidgetStatus(ptrWdCfg);
+                    break;
+            #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) */
+
             default:
                 result |= CY_CAPSENSE_STATUS_BAD_PARAM;
                 break;
@@ -995,7 +1002,8 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                  ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)))
                 if ((0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK)) &&
                     (0u == (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)) &&
-                    ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType))
+                    ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                    ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType))
                 {
                     if (0u != (mode & CY_CAPSENSE_PROCESS_MFS_FILTER))
                     {
@@ -1023,6 +1031,12 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
                         case CY_CAPSENSE_ISX_GROUP:
                             Cy_CapSense_DpProcessIsxWidgetStatus(ptrWdCfg);
+                            break;
+                    #endif
+
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                        case CY_CAPSENSE_WBX_GROUP:
+                            Cy_CapSense_DpProcessWbxWidgetStatus(ptrWdCfg);
                             break;
                     #endif
 
@@ -1167,8 +1181,9 @@ cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                 }
                 #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
-                    /* Disable filtering for liquid level widgets */
-                    if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
+                    /* Disable filtering for liquid level and wheatstone bridge widgets */
+                    if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                        ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType))
                     {
                         ptrSnsCxt = ptrWdCfg->ptrSnsContext;
                         Cy_CapSense_RunMfsFiltering(ptrSnsCxt, context);
@@ -2098,6 +2113,250 @@ cy_capsense_status_t Cy_CapSense_UnRegisterCallback(
     return retVal;
 
 }
+
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+/*******************************************************************************
+* Function Name: Cy_CapSense_ReadWidgetCdacParam
+****************************************************************************//**
+*
+* Reads the CDAC parameters of the widget and writes them into the buffer.
+*
+* Reads CDAC parameters from CAPSENSE&trade; Data Structure and writes received 
+* values into the provided buffer. 
+* This function must be called after Cy_CapSense_Enable(). 
+* In case of run-time usage make sure you have updated all statuses, baselines, 
+* history of filtering, etc.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param ptrBuffer
+* Buffer to store the CDAC parameters.
+*
+* \param widgetId
+* Specifies the ID number of the widget. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \funcusage
+*
+* The function is used for one-time calibration. Full example:
+*
+* -# Add EEPROM configuration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_ConfigEmulatedEEPROM
+*
+* -# Add EEPROM initialization:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_InitEmulatedEEPROM
+*
+* -# Liquid level one-time calibration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_LiquidLevelOneTimeCalibration
+*
+* -# Add API to get buffer posiiton in EEPROM:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_GetBufferPositionEEPROM
+*
+*******************************************************************************/
+void Cy_CapSense_ReadWidgetCdacParam(
+                uint8_t * ptrBuffer,
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint32_t i;
+
+    /* Copy CDAC codes from CAPSENSE&trade; to user's buffer */
+    ptrBuffer[CY_CAPSENSE_CDAC_CREF_OFFSET] = context->ptrWdContext[widgetId].cdacRef;
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
+        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_FINE_EN)))
+        ptrBuffer[CY_CAPSENSE_CDAC_CFINE_OFFSET] = context->ptrWdContext[widgetId].cdacFine;
+    #endif
+    ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_DIV_OFFSET] = (uint8_t)(context->ptrWdContext[widgetId].cdacCompDivider & 0xFFu);
+    ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_DIV_OFFSET + 1u] = (uint8_t)((context->ptrWdContext[widgetId].cdacCompDivider >> 8u) & 0xFFu);
+    for (i = 0u; i < context->ptrWdConfig[widgetId].numSns; i++)
+    {
+        ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_OFFSET + i] = context->ptrWdConfig[widgetId].ptrSnsContext[i].cdacComp;
+    }
+}
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_WriteWidgetCdacParam
+****************************************************************************//**
+*
+* Parse buffer as CDAC parameters and writes them into a CAPSENSE&trade; Data Structure.
+*
+* Reads a provided buffer content and writes received values into CAPSENSE&trade; Data Structure. 
+* This function must be called before Cy_CapSense_Enable() and after Cy_CapSense_Init(). 
+* In case of run-time usage make sure you have updated all statuses, baselines, 
+* history of filtering, etc.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param ptrBuffer
+* Buffer to store the CDAC parameters.
+*
+* \param widgetId
+* Specifies the ID number of the widget. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \funcusage
+*
+* The function is used for one-time calibration. Full example:
+*
+* -# Add EEPROM configuration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_ConfigEmulatedEEPROM
+*
+* -# Add EEPROM initialization:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_InitEmulatedEEPROM
+*
+* -# Liquid level one-time calibration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_LiquidLevelOneTimeCalibration
+*
+* -# Add API to get buffer posiiton in EEPROM:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_GetBufferPositionEEPROM
+*
+*******************************************************************************/
+void Cy_CapSense_WriteWidgetCdacParam(
+                uint8_t * ptrBuffer,
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint32_t i;
+
+    /* Copy CDAC codes from user's buffer into CapSense Data Structure */
+    context->ptrWdContext[widgetId].cdacRef = ptrBuffer[CY_CAPSENSE_CDAC_CREF_OFFSET];
+    #if ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) && \
+        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSD_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_CDAC_FINE_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_CDAC_FINE_EN)))
+        context->ptrWdContext[widgetId].cdacFine = ptrBuffer[CY_CAPSENSE_CDAC_CFINE_OFFSET];
+    #endif
+    context->ptrWdContext[widgetId].cdacCompDivider = 
+        (uint16_t)ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_DIV_OFFSET] + ((uint16_t)ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_DIV_OFFSET + 1u] << 8u);
+    for (i = 0u; i < context->ptrWdConfig[widgetId].numSns; i++)
+    {
+        context->ptrWdConfig[widgetId].ptrSnsContext[i].cdacComp = ptrBuffer[CY_CAPSENSE_CDAC_CCOMP_OFFSET + i];
+    }
+}
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_SetWidgetCalibrationState
+****************************************************************************//**
+*
+* Sets widget calibration state.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param widgetId
+* Specifies the ID number of the widget. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param state
+* The calibration state to set for the widget.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \funcusage
+*
+* The function is used for one-time calibration. Full example:
+*
+* -# Add EEPROM configuration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_ConfigEmulatedEEPROM
+*
+* -# Add EEPROM initialization:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_InitEmulatedEEPROM
+*
+* -# Liquid level one-time calibration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_LiquidLevelOneTimeCalibration
+*
+* -# Add API to get buffer posiiton in EEPROM:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_GetBufferPositionEEPROM
+*
+*******************************************************************************/
+void Cy_CapSense_SetWidgetCalibrationState(
+                uint32_t widgetId, 
+                uint32_t state,
+                cy_stc_capsense_context_t * context)
+{
+
+    if (0u == state)
+    {
+        context->ptrWdContext[widgetId].status &= (uint8_t)(~(uint8_t)CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK);
+    }
+    else
+    {
+        context->ptrWdContext[widgetId].status |= (uint8_t)CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK;
+    }
+}
+
+#endif
+
+#if (CY_CAPSENSE_LIQUID_LEVEL_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsLlwCalibrationValid
+****************************************************************************//**
+*
+* Returns the status of the liquid level calibration the widget, 
+* by validating the one-time calibration and the liquid level calibration states.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param widgetId
+* Specifies the ID number of the widget. A macro for the widget ID can be found
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+* \return
+* Returns the status of the calibration.
+*
+* \funcusage
+*
+* The function is used for one-time calibration. Full example:
+*
+* -# Add EEPROM configuration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_ConfigEmulatedEEPROM
+*
+* -# Add EEPROM initialization:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_InitEmulatedEEPROM
+*
+* -# Liquid level one-time calibration:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_LiquidLevelOneTimeCalibration
+*
+* -# Add API to get buffer posiiton in EEPROM:
+*    \snippet capsense/snippet/main.c snippet_Cy_CapSense_GetBufferPositionEEPROM
+*
+*******************************************************************************/
+uint8_t Cy_CapSense_IsLlwCalibrationValid (
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint8_t result;
+
+    if (0u != (context->ptrWdConfig[widgetId].centroidConfig & CY_CAPSENSE_LLW_READY_MASK))
+    {
+        result = 1u; /* Calibration is valid */
+    }
+    else
+    {
+        result = 0u; /* Calibration is not valid */
+    }
+
+    return result;
+}
+#endif
+
 
 #endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 

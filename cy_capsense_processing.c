@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -31,15 +31,36 @@
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
 
+
 /*******************************************************************************
 * Local definition
 *******************************************************************************/
 /* Raw data normalization and scaling */
-#define CY_CAPSENSE_SCALING_SHIFT              (15)
-#define CY_CAPSENSE_MAX_TX_PATTERN_NUM         (32)
-#define CY_CAPSENSE_LLW_NOT_VALID_DATA         (0xFFFFu)
-#define CY_CAPSENSE_RAW_COUNT_MAX_VALUE        CY_CAPSENSE_LLW_NOT_VALID_DATA
+#define CY_CAPSENSE_SCALING_SHIFT               (15)
+#define CY_CAPSENSE_MAX_TX_PATTERN_NUM          (32)
+#define CY_CAPSENSE_LLW_NOT_VALID_DATA          (0xFFFFu)
+#define CY_CAPSENSE_RAW_COUNT_MAX_VALUE         (CY_CAPSENSE_LLW_NOT_VALID_DATA)
 
+/* CDAC LSB in 10^-15 F */
+#define CY_CAPSENSE_REF_CDAC_LSB                (8870u)
+#define CY_CAPSENSE_FINE_CDAC_LSB               (2600u)
+
+/* Scaling Coefficients */
+#define CY_CAPSENSE_SCALE_10                    (10)
+#define CY_CAPSENSE_SCALE_100                   (100)
+#define CY_CAPSENSE_SCALE_1000                  (1000)
+#define CY_CAPSENSE_SCALE_10E4                  (10000)
+#define CY_CAPSENSE_SCALE_10E6                  (1000000)
+#define CY_CAPSENSE_SCALE_10E9                  (1000000000)
+
+/* Limitation Numbers */
+#define CY_CAPSENSE_HI_LIMIT_NOM                (20000000)
+#define CY_CAPSENSE_LO_LIMIT_NOM                (200000000)
+#define CY_CAPSENSE_HI_LIMIT_DEN                (20000000)
+#define CY_CAPSENSE_LO_LIMIT_DEN                (2000000)
+#define CY_CAPSENSE_LO_LIMIT                    (20000)
+
+#define CY_CAPSENSE_ADV_TOUCHPAD_MIN_SNS_NUMBER (3u) 
 
 /*******************************************************************************
 * Function Name: Cy_CapSense_InitializeAllStatuses
@@ -193,6 +214,12 @@ void Cy_CapSense_InitializeWidgetStatus(
 
                         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)
                             case CY_CAPSENSE_ISX_GROUP:
+                                *(ptrWdCfg->ptrDebounceArr) = ptrWdCxt->onDebounce;
+                                break;
+                        #endif
+
+                        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+                            case CY_CAPSENSE_WBX_GROUP:
                                 *(ptrWdCfg->ptrDebounceArr) = ptrWdCxt->onDebounce;
                                 break;
                         #endif
@@ -696,7 +723,7 @@ cy_capsense_status_t Cy_CapSense_DpProcessCsdWidgetStatus(
 
         #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN)
             case (uint8_t)CY_CAPSENSE_WD_TOUCHPAD_E:
-                Cy_CapSense_DpProcessCsdTouchpad(ptrWdConfig, context);
+                status = Cy_CapSense_DpProcessCsdTouchpad(ptrWdConfig, context);
                 break;
         #endif
 
@@ -768,6 +795,40 @@ void Cy_CapSense_DpProcessIsxWidgetStatus(
     }
 }
 #endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN) */
+
+
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_DpProcessWbxWidgetStatus
+****************************************************************************//**
+*
+* Updates the status of the WBX widget in the Data Structure.
+*
+* This function determines the type of widget and runs the appropriate function
+* that implements the status update algorithm for this type of widget.
+*
+* When the widget-specific processing completes this function updates the
+* sensor and widget status registers in the data structure.
+*
+* \param ptrWdConfig
+* The pointer to the widget configuration structure.
+*
+*******************************************************************************/
+void Cy_CapSense_DpProcessWbxWidgetStatus(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig)
+{
+    switch (ptrWdConfig->wdType)
+    {
+        case (uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E:
+            Cy_CapSense_DpProcessButton(ptrWdConfig);
+            break;
+
+        default:
+            /* No other widget types */
+            break;
+    }
+}
+#endif /* (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN) */
 
 
 /*******************************************************************************
@@ -985,7 +1046,253 @@ void Cy_CapSense_DpUpdateDifferencesCmf(
 #endif
 
 
-#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN))
+#if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_ProcessWbxCorrection
+****************************************************************************//**
+*
+* Executes Wheatstone bridge raw count correction to compensate 
+* sensor-to-sensor variation.
+*
+* \param ptrWdConfig
+* The pointer to the widget configuration structure.
+*
+* \param context
+* The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+void Cy_CapSense_ProcessWbxCorrection(
+                const cy_stc_capsense_widget_config_t * ptrWdConfig,
+                const cy_stc_capsense_context_t * context)
+{
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = ptrWdConfig;
+    cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdCfg->ptrWdContext;
+
+    cy_stc_capsense_wbx_profile_t profile;
+
+    int32_t cCorrZero;
+    int32_t cCorrClbr;
+    int32_t cCorrRaw;
+
+    profile.rLoad = ptrWdCfg->wbxResistorSeries;
+    profile.rBridge = ptrWdCfg->wbxResistorBridge;
+
+    /* Ideal equation: R_REF = 1 / (REF_CDAC * LSB_CDAC * F_MOD)
+     * REF_CDAC = [1..255]
+     * F_MOD = [1M..46M]
+     * LSB_CDAC = 8870*10^-18
+     * scale = 1
+     * Range = [9.6k to 113M] * scale */
+    profile.rRef = CY_CAPSENSE_SCALE_10E9 / CY_CAPSENSE_REF_CDAC_LSB;
+    profile.rRef *= CY_CAPSENSE_SCALE_1000;
+    profile.rRef /= ptrWdCxt->cdacRef;
+    profile.rRef *= context->ptrInternalContext->modClk;
+    profile.rRef /= CY_CAPSENSE_MOD_CLOCK_MHZ;
+
+    /* Ideal equation: K_CUT = 2 * COMP_CDAC / REF_CDAC / COMP_DIV
+     * COMP_DIV = [3..240]
+     * Scale = 1000000
+     * Range = [-170 to +170] * scale */
+    profile.kCut = (int32_t)CY_CAPSENSE_SCALE_10E6 * 2;
+    profile.kCut *= ptrWdCfg->ptrSnsContext->cdacComp;
+    profile.kCut /= ((int32_t)ptrWdCxt->cdacCompDivider * ptrWdCxt->cdacRef);
+    if (0u == (CY_CAPSENSE_WD_WBX_COMPENSATION_DIRECTION_MASK & ptrWdCfg->ptrWdContext->status))
+    {
+        /* Adds sign based on direction: Direct = -1 */
+        profile.kCut *= -1;
+    }
+
+    /* Profile #1: Zero */
+    profile.dc = 0;
+    Cy_CapSense_WbxCorrectionProfile(&profile);
+    cCorrZero = profile.cCorr;
+
+    /* Profile #2: Calibration */
+    /* Ideal equation: DC = CALIBRATION_RAW / MAX_RAW
+     * Scale = 1000000
+     * Range = [0 to 1] * scale */
+    profile.dc = (int32_t)ptrWdCxt->maxRawCountRow * CY_CAPSENSE_SCALE_10E6;
+    profile.dc /= ptrWdCxt->maxRawCount;
+    Cy_CapSense_WbxCorrectionProfile(&profile);
+
+    cCorrClbr = cCorrZero * profile.cCorr;
+    cCorrClbr /= CY_CAPSENSE_SCALE_10E4;
+    cCorrClbr *= profile.dCorr;
+    cCorrClbr /= CY_CAPSENSE_SCALE_10E4;
+    cCorrClbr = CY_CAPSENSE_SCALE_10E4 - cCorrClbr;
+    cCorrClbr *= (int32_t)ptrWdCxt->maxRawCountRow;
+    cCorrClbr /= CY_CAPSENSE_SCALE_10E4;
+
+    /* Profile #3: Rawcounts */
+    /* Ideal equation: DC = RAW / MAX_RAW
+     * Scale = 1000000
+     * Range = [0 to 1] * scale */
+    profile.dc = (int32_t)ptrWdCfg->ptrSnsContext->raw * CY_CAPSENSE_SCALE_10E6;
+    profile.dc /= ptrWdCxt->maxRawCount;
+    Cy_CapSense_WbxCorrectionProfile(&profile);
+
+    cCorrRaw = cCorrZero * profile.cCorr;
+    cCorrRaw /= CY_CAPSENSE_SCALE_10E4;
+    cCorrRaw *= profile.dCorr;
+    cCorrRaw /= CY_CAPSENSE_SCALE_10E4;
+    cCorrRaw *= (int32_t)ptrWdCfg->ptrSnsContext->raw;
+    cCorrRaw /= CY_CAPSENSE_SCALE_10E4;
+    cCorrRaw += cCorrClbr;
+
+    if (0 > cCorrRaw)
+    {
+        ptrWdCfg->ptrSnsContext->raw = 0u;
+    }
+    else if ((int32_t)ptrWdCxt->maxRawCount < cCorrRaw)
+    {
+        ptrWdCfg->ptrSnsContext->raw = ptrWdCxt->maxRawCount;
+    }
+    else
+    {
+        ptrWdCfg->ptrSnsContext->raw = (uint16_t)cCorrRaw;
+    }
+}
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_WbxCorrectionProfile
+****************************************************************************//**
+*
+* Executes correction coefficient calculation for Wheatstone bridge widget
+* to compensate sensor-to-sensor variation.
+*
+* The function assumes input arguments already scaled as follows:
+* R_REF, R_BRIDGE and R_LOAD without scaling
+* K_CUT and DC scaled to 10^6 (means real value is for 1M smaller)
+* Results: D_COEFF and C_COEFF scaled to 10^4
+*
+* \param ptrProfile
+* The pointer to the CAPSENSE&trade; structure \ref cy_stc_capsense_wbx_profile_t.
+*
+*******************************************************************************/
+
+void Cy_CapSense_WbxCorrectionProfile(volatile cy_stc_capsense_wbx_profile_t * ptrProfile)
+{
+    int32_t bCoeff;
+    int32_t bCoeff_den;
+    int32_t rxCoeff;
+    int32_t rxCoeff_den;
+    int32_t cCoeff_den;
+    int32_t scale;
+    int32_t i;
+
+    /* B_COEFF = R_REF / (K_CUT - DC)
+     * Scale = [Run-time defined]
+     * Range = [NA] * 10^scale */
+    scale = 6;
+    bCoeff = ptrProfile->rRef;
+    if ((uint32_t)CY_CAPSENSE_HI_LIMIT_NOM > ptrProfile->rRef)
+    {
+        bCoeff *= CY_CAPSENSE_SCALE_1000;
+        scale -= 3;
+    }
+    if ((uint32_t)CY_CAPSENSE_LO_LIMIT_NOM > ptrProfile->rRef)
+    {
+        bCoeff *= CY_CAPSENSE_SCALE_10;
+        scale--;
+    }
+
+    bCoeff_den = ptrProfile->kCut - ptrProfile->dc;
+    if ((CY_CAPSENSE_HI_LIMIT_DEN < bCoeff_den) || 
+       (-CY_CAPSENSE_HI_LIMIT_DEN > bCoeff_den))
+    {
+        bCoeff_den /= CY_CAPSENSE_SCALE_1000;
+        scale -= 3;
+    }
+    if ((CY_CAPSENSE_LO_LIMIT_DEN < bCoeff_den) || 
+       (-CY_CAPSENSE_LO_LIMIT_DEN > bCoeff_den))
+    {
+        bCoeff_den /= CY_CAPSENSE_SCALE_10;
+        scale--;
+    }
+
+    if (0 == bCoeff_den)
+    {
+        rxCoeff = (int32_t)ptrProfile->rBridge;
+    }
+    else
+    {
+        bCoeff /= bCoeff_den;
+
+        /* Ideal equation: RX_COEFF = R_BRIDGE * (B_COEFF - R_LOAD) / (R_BRIDGE + B_COEFF + R_LOAD)
+         * Scale = 0
+         * Range = [NA] * 10^scale */
+        while ((0 > scale) && (CY_CAPSENSE_LO_LIMIT_DEN < bCoeff))
+        {
+            bCoeff /= CY_CAPSENSE_SCALE_10;
+            scale++;
+        }
+        while ((0 < scale) && ((CY_CAPSENSE_LO_LIMIT_DEN / CY_CAPSENSE_SCALE_10) > bCoeff))
+        {
+            bCoeff *= CY_CAPSENSE_SCALE_10;
+            scale--;
+        }
+        rxCoeff = (int32_t)ptrProfile->rLoad;
+        rxCoeff_den = (int32_t)ptrProfile->rBridge + ptrProfile->rLoad;
+        i = scale;
+        while (0 < i)
+        {
+            rxCoeff /= CY_CAPSENSE_SCALE_10;
+            rxCoeff_den /= CY_CAPSENSE_SCALE_10;
+            i--;
+        }
+        while (0 > i)
+        {
+            rxCoeff *= CY_CAPSENSE_SCALE_10;
+            rxCoeff_den *= CY_CAPSENSE_SCALE_10;
+            i++;
+        }
+        rxCoeff_den += bCoeff;
+        if (0 != rxCoeff_den)
+        {
+            rxCoeff = bCoeff - rxCoeff;
+            scale = 0;
+            while ((CY_CAPSENSE_LO_LIMIT < rxCoeff) ||
+                  (-CY_CAPSENSE_LO_LIMIT > rxCoeff))
+            {
+                rxCoeff /= CY_CAPSENSE_SCALE_10;
+                scale++;
+            }
+
+            rxCoeff *= ptrProfile->rBridge;
+            rxCoeff /= rxCoeff_den;
+            while (0 < scale)
+            {
+                rxCoeff *= CY_CAPSENSE_SCALE_10;
+                scale--;
+            }
+        }
+        else 
+        {
+            rxCoeff = -CY_CAPSENSE_SCALE_10E9;
+        }
+    }
+
+    /* Ideal equation: D_COEFF = R_BRIDGE / RX_COEFF
+     * Scale = 10000
+     * Range = [0..2] * scale */
+    ptrProfile->dCorr = ((int32_t)ptrProfile->rBridge * CY_CAPSENSE_SCALE_10E4) / rxCoeff;
+
+    /* Ideal equation: C_COEFF = (RX_COEFF + R_BRIDGE) / (2 * R_BRIDGE) + (RX_COEFF - R_BRIDGE) / (4 * R_SERIES + 2 * R_BRIDGE)
+     * Scale = 10000
+     * Range = [0..2] * scale */
+    cCoeff_den = (int32_t)ptrProfile->rBridge * 2;
+    ptrProfile->cCorr = (rxCoeff + ptrProfile->rBridge);
+    ptrProfile->cCorr *= CY_CAPSENSE_SCALE_10E4;
+    ptrProfile->cCorr /= cCoeff_den;
+    cCoeff_den += ((int32_t)ptrProfile->rLoad * 4);
+    ptrProfile->cCorr += (((rxCoeff - ptrProfile->rBridge) * CY_CAPSENSE_SCALE_10E4) / cCoeff_den);
+}
+#endif
+
+
+#if ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || \
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN) || \
+     (CY_CAPSENSE_DISABLE != CY_CAPSENSE_WBX_BUTTON_EN))
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpProcessButton
 ****************************************************************************//**
@@ -1071,8 +1378,9 @@ void Cy_CapSense_DpProcessButton(
         }
     #endif
 }
-#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN)) */
-
+#endif /* ((CY_CAPSENSE_DISABLE != CY_CAPSENSE_BUTTON_EN) || 
+           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSX_MATRIX_EN) ||
+           (CY_CAPSENSE_DISABLE != CY_CAPSENSE_WBX_BUTTON_EN)) */
 
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_PROXIMITY_EN)
 /*******************************************************************************
@@ -1523,11 +1831,19 @@ void Cy_CapSense_DpProcessCsdMatrix(
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
+* \return
+* Returns the status of the operation:
+* - CY_CAPSENSE_STATUS_SUCCESS          - The operation is performed successfully.
+* - CY_CAPSENSE_STATUS_BAD_CONFIG       - The function does not suppose to be
+*                                         called with the current CAPSENSE&trade;
+*                                         configuration.
+*
 *******************************************************************************/
-void Cy_CapSense_DpProcessCsdTouchpad(
+cy_capsense_status_t Cy_CapSense_DpProcessCsdTouchpad(
                 const cy_stc_capsense_widget_config_t * ptrWdConfig,
                 const cy_stc_capsense_context_t * context)
 {
+    cy_capsense_status_t status = CY_CAPSENSE_STATUS_SUCCESS;
     uint32_t snsIndex;
     uint32_t touchTh;
     uint32_t wdActiveCol = 0uL;
@@ -1605,11 +1921,19 @@ void Cy_CapSense_DpProcessCsdTouchpad(
             Cy_CapSense_DpCentroidTouchpad(&newTouch, ptrWdConfig);
         }
         #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_ADVANCED_CENTROID_5X5_EN)
-            /* 5x5 Advanced CSD Touchpad processing */
-            if (0u != (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_5X5_MASK))
+            if ((CY_CAPSENSE_ADV_TOUCHPAD_MIN_SNS_NUMBER > colNumber) || (CY_CAPSENSE_ADV_TOUCHPAD_MIN_SNS_NUMBER > rowNumber))
             {
-                /* Centroid processing */
-                Cy_CapSense_DpAdvancedCentroidTouchpad(&newTouch, ptrWdConfig);
+                /* 2x2 CSD Touchpad does not support advanced centroid algorithm */
+                status = CY_CAPSENSE_STATUS_BAD_CONFIG; 
+            }
+            else 
+            {
+                /* 5x5 Advanced CSD Touchpad processing */
+                if (0u != (ptrWdConfig->centroidConfig & CY_CAPSENSE_CENTROID_5X5_MASK))
+                {
+                    /* Centroid processing */
+                    Cy_CapSense_DpAdvancedCentroidTouchpad(&newTouch, ptrWdConfig);
+                }
             }
         #endif
     }
@@ -1648,6 +1972,8 @@ void Cy_CapSense_DpProcessCsdTouchpad(
     #else
         (void)context;
     #endif
+
+    return status;
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CSD_TOUCHPAD_EN) */
 
@@ -1992,7 +2318,7 @@ void Cy_CapSense_PreProcessWidget(
 
         #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) ||\
              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN))
-            /* Inverts raw count for CSX widgets */
+            /* Inverts raw count for CSX and ISX widgets */
             if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
                 (CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod))
             {
@@ -2000,6 +2326,15 @@ void Cy_CapSense_PreProcessWidget(
             }
         #endif /* ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
                    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN)) */
+
+        #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_WBX_EN)
+            if (((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E == ptrWdCfg->wdType) &&
+                (0u != ptrWdCfg->wbxCorrectionEn) &&
+                (0u == (context->ptrCommonContext->status & CY_CAPSENSE_MW_STATE_INITIALIZATION_MASK)))
+            {
+                Cy_CapSense_ProcessWbxCorrection(ptrWdCfg, context);
+            }
+        #endif
     }
 }
 
@@ -2060,7 +2395,7 @@ void Cy_CapSense_PreProcessSensor(
 
         #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN) ||\
              (CY_CAPSENSE_ENABLE == CY_CAPSENSE_ISX_EN))
-            /* Inverts raw count for CSX widgets */
+            /* Inverts raw count for CSX and ISX widgets */
             if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
                 (CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod))
             {

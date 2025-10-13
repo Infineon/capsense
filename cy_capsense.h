@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 7.0
+* \version 8.0.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
@@ -103,6 +103,7 @@
 * * Offers best-in-class signal-to-noise ratio (SNR)
 * * Supports Self-Capacitance (CSD) and Mutual-Capacitance (CSX) sensing methods
 * * Inductive sensing method (ISX) available for fifth-generation low power CAPSENSE&trade;
+* * Liquid Level widget is available for the fifth-generation low power CAPSENSE&trade;
 * * Fifth-generation low power CAPSENSE&trade; supports autonomous scanning in Deep Sleep
 *   power mode
 * * Supports various Widgets, such as Buttons, Matrix Buttons, Sliders,
@@ -267,11 +268,11 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>3.5.0</td>
+*     <td>3.6.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator tool</td>
-*     <td>5.30</td>
+*     <td>5.50</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; MSC Superblock Personality for PSOC&trade; 4 devices in the Device Configurator tool</td>
@@ -295,23 +296,23 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>8.0.0</td>
+*     <td>9.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>8.0.0</td>
+*     <td>9.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
-*     <td>3.16.0</td>
+*     <td>3.17.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>2.16.0</td>
+*     <td>2.16.2</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
-*     <td>11.3.1</td>
+*     <td>14.2</td>
 *   </tr>
 *   <tr>
 *     <td>IAR Compiler</td>
@@ -695,6 +696,53 @@
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="6">8.0.0</td>
+*     <td colspan="2"><i><b>
+*       This version is compatible to the v7.0.0,
+*       however due to switching to MTB 3.6, new Device-DB, PDL, etc.
+*     </b></i>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added support of Enable/Disable Auto calibration from application level.
+*     </td>
+*     <td>
+*         New feature support, improved manufacturing tolerance.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added support of LLS with three electrodes.
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added LLS Linearity Improvement feature.
+*     </td>
+*     <td>
+*         New feature support, improved manufacturing tolerance.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added WBX Rawcount Correction.
+*     </td>
+*     <td>
+*         New feature support, improved manufacturing tolerance.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added supporting of CDS/CSX touchpad 2x2 and 2 electrodes linear slider.
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   </tr>
 *   <tr>
 *     <td rowspan="9">7.0.0</td>
 *     <td colspan="2"><i><b>
