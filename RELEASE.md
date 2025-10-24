@@ -1,13 +1,10 @@
-# CAPSENSE™ Middleware Library 8.0.0
+# CAPSENSE™ Middleware Library 8.10.0
 
 ### What is Included?
 For a complete description of the CAPSENSE™ middleware, refer to [README.md](./README.md) and [API Reference Guide](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html).
 The revision history of the CAPSENSE™ middleware is also available at [API Reference Guide Changelog](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_changelog).
 The new support added in this release:
-* Added support of enable/disable LLW auto-calibration for manufacturing.
-* Extended number of supported LLW segments to three.
-* Improved LLW algorithm calculation.
-* Extended supported range of sensor number 3 to 2 for sliders and touchpads. 
+* Fixed defect inside Cy_CapSense_IsLlwCalibrationValid function.
 
 ### Known issues
 For a complete description of the known issues and possible workarounds, refer to the [API Reference Guide - Errata section](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_errata).

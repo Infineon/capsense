@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.c
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file contains the source of functions common for different scanning

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
@@ -635,6 +635,17 @@
 * <table class="doxtable">
 *   <tr><th>ID</th><th>Known Issue</th><th>Workaround</th></tr>
 *   <tr>
+*     <td>27253</td>
+*     <td>
+*         In this pack, for the Liquid Level sensing, CAPSENSE™ middleware 
+*         has the Beta Version of “Foam Rejection". 
+*         Foam rejection feature might have an impact on the performance.
+*     </td>
+*     <td>
+*         No Workaround.
+*     </td>
+*   </tr>
+*   <tr>
 *     <td>319100</td>
 *     <td>
 *         GPIO simultaneous operation with unrestricted strength and frequency
@@ -697,10 +708,24 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td>8.10.0</td>
+*     <td> 
+*         Fixed defect inside Cy_CapSense_IsLlwCalibrationValid function.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
 *     <td rowspan="6">8.0.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible to the v7.0.0,
 *       however due to switching to MTB 3.6, new Device-DB, PDL, etc.
+*       a migration of projects created with past version might be
+*       not possible. In this case a project should be newly created.
+*       Also, if you use the CAPSENSE&trade; middleware v8.0.0, you must use
+*       the CAPSENSE&trade; Configurator v9.0.0 tool or later. This MW version
+*       is not compatible with the previous Configurator tool versions.
 *     </b></i>
 *   </tr>
 *   <tr>

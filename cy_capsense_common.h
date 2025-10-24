@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
@@ -111,11 +111,11 @@ extern "C" {
 /** Middleware major version */
 #define CY_CAPSENSE_MW_VERSION_MAJOR                    (8)
 /** Middleware minor version */
-#define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
+#define CY_CAPSENSE_MW_VERSION_MINOR                    (10)
 /** Middleware patch version */
 #define CY_CAPSENSE_MW_VERSION_PATCH                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (800)
+#define CY_CAPSENSE_MW_VERSION                          (810)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */

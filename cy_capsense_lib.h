@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * The file contains application programming interface to the CAPSENSE&trade; library.

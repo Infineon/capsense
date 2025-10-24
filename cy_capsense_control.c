@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -2344,7 +2344,7 @@ uint8_t Cy_CapSense_IsLlwCalibrationValid (
 {
     uint8_t result;
 
-    if (0u != (context->ptrWdConfig[widgetId].centroidConfig & CY_CAPSENSE_LLW_READY_MASK))
+    if (CY_CAPSENSE_LLW_READY_MASK == (context->ptrWdConfig[widgetId].centroidConfig & CY_CAPSENSE_LLW_READY_MASK))
     {
         result = 1u; /* Calibration is valid */
     }

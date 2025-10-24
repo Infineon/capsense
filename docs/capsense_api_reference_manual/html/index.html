@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 8.0.0: Main Page</title>
+<title>CAPSENSE™ Middleware Library 8.10.0: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 8.0.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 8.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -81,7 +81,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">CAPSENSE™ Middleware Library 8.0.0 Documentation</div>  </div>
+<div class="title">CAPSENSE™ Middleware Library 8.10.0 Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from Infineon. Capacitive sensing can be used in a variety of applications and products where conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. These include home appliances, and automotive, IoT, and industrial applications. CAPSENSE&trade; supports multiple interfaces (widgets) using CSD, CSX, and ISX sensing methods with robust performance.</p>
@@ -409,6 +409,8 @@ Errata</h1>
 <tr>
 <th>ID</th><th>Known Issue</th><th>Workaround </th></tr>
 <tr>
+<td>27253 </td><td>In this pack, for the Liquid Level sensing, CAPSENSE™ middleware has the Beta Version of “Foam Rejection". Foam rejection feature might have an impact on the performance.  </td><td>No Workaround.   </td></tr>
+<tr>
 <td>319100 </td><td>GPIO simultaneous operation with unrestricted strength and frequency creates noise that can affect CAPSENSE&trade; operation. This issue is applicable for the fourth CAPSENSE&trade; generation devices.  </td><td>For detail, refer to the errata section of the device datasheet.   </td></tr>
 <tr>
 <td>3159 </td><td>Scanning a sensor with low capacitance (about 8pF and less) with low frequency (around 300kHz and less) might lead to raw count variation from scan to scan. This issue is applicable for the fourth CAPSENSE&trade; generation devices.  </td><td>There are several possible workarounds:<ol type="1">
@@ -436,7 +438,9 @@ Changelog</h1>
 <tr>
 <th>Version</th><th>Changes</th><th>Reason for Change </th></tr>
 <tr>
-<td rowspan="6">8.0.0 </td><td colspan="2"><em><b> This version is compatible to the v7.0.0, however due to switching to MTB 3.6, new Device-DB, PDL, etc. </b></em>  </td></tr>
+<td>8.10.0 </td><td>Fixed defect inside Cy_CapSense_IsLlwCalibrationValid function.  </td><td>Defect fixing.   </td></tr>
+<tr>
+<td rowspan="6">8.0.0 </td><td colspan="2"><em><b> This version is compatible to the v7.0.0, however due to switching to MTB 3.6, new Device-DB, PDL, etc. a migration of projects created with past version might be not possible. In this case a project should be newly created. Also, if you use the CAPSENSE&trade; middleware v8.0.0, you must use the CAPSENSE&trade; Configurator v9.0.0 tool or later. This MW version is not compatible with the previous Configurator tool versions. </b></em>  </td></tr>
 <tr>
 <td>Added support of Enable/Disable Auto calibration from application level.  </td><td>New feature support, improved manufacturing tolerance.   </td></tr>
 <tr>
@@ -718,7 +722,7 @@ More Information</h1>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 8.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 8.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_v2.c
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file contains the source of functions common for register map

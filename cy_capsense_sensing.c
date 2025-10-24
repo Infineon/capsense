@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.c
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file consists of common parts for different supported platforms

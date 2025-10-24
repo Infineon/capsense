@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 8.0.0
+* \version 8.10.0
 *
 * \brief
 * This file provides the function prototypes of the Control module.
