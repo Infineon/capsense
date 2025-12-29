@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file defines the data structure global variables and provides the
@@ -352,6 +352,7 @@ cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(
             case (uint8_t)CY_CAPSENSE_WD_LINEAR_SLIDER_E:
             case (uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E:
             case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
+            case (uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E:
                 ptrTouch = &ptrWdCfg->ptrWdContext->wdTouch;
                 break;
 
@@ -530,6 +531,7 @@ uint16_t Cy_CapSense_GetCrcWidget(
     if ((CY_CAPSENSE_CSX_GROUP == ptrWdCfg->senseMethod) ||
         ((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E == ptrWdCfg->wdType) ||
         ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+        ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType) ||
         ((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
         ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE != CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN)) ||
         (CY_CAPSENSE_WBX_GROUP == ptrWdCfg->senseMethod))
@@ -1115,6 +1117,31 @@ uint32_t Cy_CapSense_IsSlotEnabled(
         }
     }
     return capStatus;
+}
+#endif
+
+#if (CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN)
+/*******************************************************************************
+* Function Name: Cy_CapSense_IsTankRemoved
+****************************************************************************//**
+*
+* Returns the presence or absence status of a physical tank connected to the device.
+*
+* \note
+* This function is available only for the fifth-generation low power CAPSENSE&trade;.
+*
+* \param ptrWdContext
+* The pointer to the widget context structure.
+*
+* \return
+* Returns the presence or absence status of a physical tank:
+* - 1 - Tank is detected (present).
+* - 0 - Tank is not detected (absent).
+*
+*******************************************************************************/
+uint8_t Cy_CapSense_IsTankRemoved(cy_stc_capsense_widget_context_t * ptrWdContext)
+{
+    return (0u != (ptrWdContext->status & CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK)) ? 1u : 0u;
 }
 #endif
 

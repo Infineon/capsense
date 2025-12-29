@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 8.10.0: cy_stc_capsense_widget_context_t Struct Reference</title>
+<title>CAPSENSE™ Middleware Library 9.0.0: cy_stc_capsense_widget_context_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 8.10.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 9.0.0</div>
   </td>
  </tr>
  </tbody>
@@ -111,7 +111,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="separator:a8539aedfd64eb185aa738e8f7db03547"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1730b817a861922f4375527d7a1d3b4"><td class="memItemLeft" align="right" valign="top"><a id="ab1730b817a861922f4375527d7a1d3b4"></a>
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#ab1730b817a861922f4375527d7a1d3b4">fingerTh</a></td></tr>
-<tr class="memdesc:ab1730b817a861922f4375527d7a1d3b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widget Finger Threshold. <br /></td></tr>
+<tr class="memdesc:ab1730b817a861922f4375527d7a1d3b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widget Finger Threshold or Precense Threshold for Liquid Presence widget. <br /></td></tr>
 <tr class="separator:ab1730b817a861922f4375527d7a1d3b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac28a8ad287f401bde36886e1995ebd5d"><td class="memItemLeft" align="right" valign="top"><a id="ac28a8ad287f401bde36886e1995ebd5d"></a>
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#ac28a8ad287f401bde36886e1995ebd5d">proxTh</a></td></tr>
@@ -127,14 +127,14 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a2dd4e90d01407e1c2a0ed33f637e3b4f">rowSnsClk</a></td></tr>
 <tr class="memdesc:a2dd4e90d01407e1c2a0ed33f637e3b4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Row Sense Clock Divider for the Matrix Buttons and Touchpad widgets. <br /></td></tr>
 <tr class="separator:a2dd4e90d01407e1c2a0ed33f637e3b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1abcf6d1b22d6cc09006eb81576f81f6"><td class="memItemLeft" align="right" valign="top"><a id="a1abcf6d1b22d6cc09006eb81576f81f6"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a1abcf6d1b22d6cc09006eb81576f81f6">gestureDetected</a></td></tr>
-<tr class="memdesc:a1abcf6d1b22d6cc09006eb81576f81f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of detected gestures. <br /></td></tr>
-<tr class="separator:a1abcf6d1b22d6cc09006eb81576f81f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bd21ada41343af3e4102b85ab62edab"><td class="memItemLeft" align="right" valign="top"><a id="a1bd21ada41343af3e4102b85ab62edab"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a1bd21ada41343af3e4102b85ab62edab">gestureDirection</a></td></tr>
-<tr class="memdesc:a1bd21ada41343af3e4102b85ab62edab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of directions of detected gestures. <br /></td></tr>
-<tr class="separator:a1bd21ada41343af3e4102b85ab62edab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab878610e7cece170d2c3f5e7433bf185"><td class="memItemLeft" align="right" valign="top"><a id="ab878610e7cece170d2c3f5e7433bf185"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#ab878610e7cece170d2c3f5e7433bf185">gestureDetected</a></td></tr>
+<tr class="memdesc:ab878610e7cece170d2c3f5e7433bf185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of detected gestures. <br /></td></tr>
+<tr class="separator:ab878610e7cece170d2c3f5e7433bf185"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ae5624633c568847cf38b329ffcb745"><td class="memItemLeft" align="right" valign="top"><a id="a8ae5624633c568847cf38b329ffcb745"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a8ae5624633c568847cf38b329ffcb745">gestureDirection</a></td></tr>
+<tr class="memdesc:a8ae5624633c568847cf38b329ffcb745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of directions of detected gestures. <br /></td></tr>
+<tr class="separator:a8ae5624633c568847cf38b329ffcb745"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a723b1a11630c801ad30546fd35cec715"><td class="memItemLeft" align="right" valign="top"><a id="a723b1a11630c801ad30546fd35cec715"></a>
 int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a723b1a11630c801ad30546fd35cec715">xDelta</a></td></tr>
 <tr class="memdesc:a723b1a11630c801ad30546fd35cec715"><td class="mdescLeft">&#160;</td><td class="mdescRight">The filtered by Ballistic Multiplier X-displacement. <br /></td></tr>
@@ -213,6 +213,10 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a14509b3dff9d39405dcde5ec86babaf6"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a14509b3dff9d39405dcde5ec86babaf6">rowCicShift</a></td></tr>
 <tr class="memdesc:a14509b3dff9d39405dcde5ec86babaf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the right shift value applied to CIC2 accumulator to form rawcounts when CIC2 is enabled.  <a href="#a14509b3dff9d39405dcde5ec86babaf6">More...</a><br /></td></tr>
 <tr class="separator:a14509b3dff9d39405dcde5ec86babaf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a468083abf3fbe16d3cc19b6888942461"><td class="memItemLeft" align="right" valign="top"><a id="a468083abf3fbe16d3cc19b6888942461"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcy__stc__capsense__widget__context__t.html#a468083abf3fbe16d3cc19b6888942461">reserved0</a></td></tr>
+<tr class="memdesc:a468083abf3fbe16d3cc19b6888942461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserved for internal usage. <br /></td></tr>
+<tr class="separator:a468083abf3fbe16d3cc19b6888942461"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a id="aaddfea3cc416d040629708d1723c12f6"></a>
@@ -432,7 +436,8 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>bit[3] - Widget maximum raw count calculation enabled (CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK)</li>
 <li>bit[4] - Widget row maximum raw count calculation enable (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK)</li>
 <li>bit[5] - Widget compensation CDAC direction: direct (like CSD) or inverse (CY_CAPSENSE_WD_WBX_COMPENSATION_DIRECTION_MASK)</li>
-<li>bit[6] - Widget calibration mask: performs CDAC auto-calibration enable (CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK) </li>
+<li>bit[6] - Widget calibration mask: performs CDAC auto-calibration enable (CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK)</li>
+<li>bit[7] - Tank removal detection mask: detects the presence or absence of a physical tank connected to the device (CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK) </li>
 </ul>
 
 </div>
@@ -630,7 +635,7 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 8.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 9.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

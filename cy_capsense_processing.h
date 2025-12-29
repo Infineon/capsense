@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.
@@ -43,7 +43,7 @@ extern "C" {
 /** \addtogroup group_capsense_high_level *//** \{ */
 /******************************************************************************/
 #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN)
-    uint32_t Cy_CapSense_DecodeWidgetGestures(
+    void Cy_CapSense_DecodeWidgetGestures(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context);
 #endif

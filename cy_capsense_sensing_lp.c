@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -550,7 +550,7 @@ cy_capsense_status_t Cy_CapSense_MixedSensorsCheck(uint32_t startSlotId,
 * - CY_CAPSENSE_STATUS_CONFIG_OVERFLOW  - The numberSlots parameter exceeds
 *                                         the maximum number of sensor configurations
 *                                         which is possible to be loaded into the
-*                                         internal buffer of the CAPSENSE&trade HW block.
+*                                         internal buffer of the CAPSENSE&trade; HW block.
 * - CY_CAPSENSE_STATUS_HW_BUSY          - The HW is busy with the previous scan.
 * - CY_CAPSENSE_STATUS_HW_LOCKED        - The MSCLP HW block is captured by another
 *                                         middleware.
@@ -1898,7 +1898,8 @@ cy_capsense_status_t Cy_CapSense_CalibrateWidget_V3Lp(
     {
         ptrWdCfg = &context->ptrWdConfig[widgetId];
 
-        if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType)
+        if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+            ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType))
         {
             if (0u != (ptrWdCfg->ptrWdContext->status & CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK))
             {
@@ -4681,7 +4682,7 @@ cy_capsense_status_t Cy_CapSense_SlotPinState_V3Lp(
 * CAPSENSE&trade;. For the fifth-generation (only for
 * CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) and fifth-generation low power
 * CAPSENSE&trade; Active slots use Cy_CapSense_SlotPinState(). For fourth-generation
-* CAPSENSE&trade and fifth-generation CAPSENSE&trade with
+* CAPSENSE&trade; and fifth-generation CAPSENSE&trade; with
 * CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD use Cy_CapSense_SetPinState().
 *
 * \param lpSlotId
@@ -5041,9 +5042,10 @@ cy_capsense_status_t Cy_CapSense_InitializeSourceSenseClk(const cy_stc_capsense_
         #endif
 
         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
-            if ((((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) &&
-                (0u != ((ptrWdCfg + 1u)->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))) ||
-                (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK)))
+            if (((((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+                  ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType)) &&
+                   (0u != ((ptrWdCfg + 1u)->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))) ||
+                   (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK)))
             {
                 /* 
                 * Set direct clock source for liquid level widget and
@@ -5795,7 +5797,8 @@ cy_capsense_status_t Cy_CapSense_IsSmarSenseWidgetValid(
 
     /* Skip auto-tuning for Liquid level widgets */
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
-        if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdConfig->wdType)
+        if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdConfig->wdType) &&
+            ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdConfig->wdType))
         {
             autoTuneStatus = CY_CAPSENSE_STATUS_BAD_CONFIG;
         }
@@ -7705,7 +7708,7 @@ void Cy_CapSense_ConfigureSaturationMode(
 * - CY_CAPSENSE_STATUS_CONFIG_OVERFLOW  - The numberSlots parameter exceeds
 *                                         the maximum number of sensor configurations
 *                                         which is possible to be loaded into the
-*                                         internal buffer of the CAPSENSE&trade HW block.
+*                                         internal buffer of the CAPSENSE&trade; HW block.
 * - CY_CAPSENSE_STATUS_BAD_CONFIG       - The function does not suppose to be
 *                                         called with the current CAPSENSE&trade;
 *                                         configuration.
@@ -7948,6 +7951,7 @@ static cy_capsense_status_t Cy_CapSense_CdacDitherScaleCalc(
         {
             if ((CY_CAPSENSE_CDAC_DITHERING_MODE_AUTO == ptrWdCfg->cdacDitherScaleMode) &&
                 ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType) &&
                 ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType))
             {
                 /* Handle only CSD and CSX widgets */
@@ -8184,8 +8188,9 @@ static cy_capsense_status_t Cy_CapSense_ShortIntegration(
         snsIndex = ptrScanSlots[curSlotIndex].snsId;
         ptrWdCfg = &context->ptrWdConfig[wdIndex];
 
-        if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) &&
-                (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK)))
+        if ((((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+             ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType)) &&
+              (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK)))
         {
             irregularWdCnt++;
         }

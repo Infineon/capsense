@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the function prototypes of the Control module.
@@ -120,6 +120,7 @@ uint8_t Cy_CapSense_IsLlwCalibrationValid (
                 uint32_t widgetId,
                 cy_stc_capsense_context_t * context);
 #endif
+
 /** \} */
 
 /******************************************************************************/

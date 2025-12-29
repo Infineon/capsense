@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the source code for the Data Processing module functions.
@@ -38,8 +38,7 @@
 /* Raw data normalization and scaling */
 #define CY_CAPSENSE_SCALING_SHIFT               (15)
 #define CY_CAPSENSE_MAX_TX_PATTERN_NUM          (32)
-#define CY_CAPSENSE_LLW_NOT_VALID_DATA          (0xFFFFu)
-#define CY_CAPSENSE_RAW_COUNT_MAX_VALUE         (CY_CAPSENSE_LLW_NOT_VALID_DATA)
+#define CY_CAPSENSE_RAW_COUNT_MAX_VALUE         (0xFFFFu)
 
 /* CDAC LSB in 10^-15 F */
 #define CY_CAPSENSE_REF_CDAC_LSB                (8870u)
@@ -240,7 +239,6 @@ void Cy_CapSense_InitializeWidgetStatus(
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
                 case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
                     ptrWdCfg->ptrWdContext->wdTouch.numPosition = 1u;
-                    ptrWdCfg->ptrWdContext->status |= (uint8_t)CY_CAPSENSE_WD_ACTIVE_MASK;
                     break;
             #endif
 
@@ -379,33 +377,6 @@ void Cy_CapSense_InitializeWidgetGestures(
 * \param context
 * The pointer to the CAPSENSE&trade; context structure \ref cy_stc_capsense_context_t.
 *
-* \return
-* Returns the detected Gesture mask and direction of detected gestures.
-* The same information is stored in ptrWdContext->gestureDetected and
-* ptrWdContext->gestureDirection registers. Corresponding macros could be found
-* \ref group_capsense_macros_gesture.
-* * bit[0..15] - detected gesture masks gesture
-*   * bit[0] - one-finger single click gesture
-*   * bit[1] - one-finger double click gesture
-*   * bit[2] - one-finger click and drag gesture
-*   * bit[3] - two-finger single click gesture
-*   * bit[4] - one-finger scroll gesture
-*   * bit[5] - two-finger scroll gesture
-*   * bit[6] - one-finger edge swipe
-*   * bit[7] - one-finger flick
-*   * bit[8] - one-finger rotate
-*   * bit[9] - two-finger zoom
-*   * bit[10] - one-finger long press
-*   * bit[13] - touchdown event
-*   * bit[14] - liftoff event
-* * bit[16..31] - gesture direction if detected
-*    * bit[0..1] - direction of one-finger scroll gesture
-*    * bit[2..3] - direction of two-finger scroll gesture
-*    * bit[4..5] - direction of one-finger edge swipe gesture
-*    * bit[6] - direction of one-finger rotate gesture
-*    * bit[7] - direction of two-finger zoom gesture
-*    * bit[8..10] - direction of one-finger flick gesture
-*
 * \funcusage
 *
 * An example of gesture decoding:
@@ -415,11 +386,10 @@ void Cy_CapSense_InitializeWidgetGestures(
 * \snippet capsense/snippet/main.c snippet_Cy_CapSense_Gesture_Macro
 *
 *******************************************************************************/
-uint32_t Cy_CapSense_DecodeWidgetGestures(
+void Cy_CapSense_DecodeWidgetGestures(
                 uint32_t widgetId,
                 const cy_stc_capsense_context_t * context)
 {
-    uint32_t gestureStatus = 0u;
     uint32_t posIndex;
     uint32_t positionNum;
     const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
@@ -431,7 +401,8 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
         if (0u != (ptrWdCfg->ptrGestureConfig->gestureEnableMask & CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK))
         {
             if (((uint8_t)CY_CAPSENSE_WD_BUTTON_E == ptrWdCfg->wdType) ||
-                ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType))
+                ((uint8_t)CY_CAPSENSE_WD_MATRIX_BUTTON_E == ptrWdCfg->wdType) ||
+                ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E == ptrWdCfg->wdType))
             {
                 positionNum = (uint32_t)ptrWdCxt->status & CY_CAPSENSE_WD_ACTIVE_MASK;
                 for (posIndex = 0u; posIndex < positionNum; posIndex++)
@@ -457,11 +428,8 @@ uint32_t Cy_CapSense_DecodeWidgetGestures(
                     &position[0u], ptrWdCfg->ptrGestureConfig, ptrWdCfg->ptrGestureContext);
             ptrWdCxt->gestureDetected = ptrWdCfg->ptrGestureContext->detected;
             ptrWdCxt->gestureDirection = ptrWdCfg->ptrGestureContext->direction;
-            gestureStatus = (uint32_t)ptrWdCxt->gestureDetected | ((uint32_t)ptrWdCxt->gestureDirection << CY_CAPSENSE_GESTURE_DIRECTION_OFFSET);
         }
     }
-
-    return gestureStatus;
 }
 #endif /* (CY_CAPSENSE_DISABLE != CY_CAPSENSE_GESTURE_EN) */
 
@@ -551,9 +519,11 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
 
             /* Run auto-tuning activities */
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
-                if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdCfg->wdType) && ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)) &&
-                   (((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
-                    ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
+                if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdCfg->wdType) && 
+                     ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                     ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType)) &&
+                    (((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+                     ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
                 {
                     Cy_CapSense_RunNoiseEnvelope_Lib(ptrSnsCxtSns->raw, ptrWdCfg->ptrWdContext->sigPFC, ptrNEHistory);
                     Cy_CapSense_DpUpdateThresholds(ptrWdCfg->ptrWdContext, ptrNEHistory, snsIndex);
@@ -569,7 +539,8 @@ uint32_t Cy_CapSense_DpProcessWidgetRawCounts(
                 }
             #endif
 
-            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
+            if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType))
             {
                 result |= Cy_CapSense_FtUpdateBaseline(ptrWdCfg->ptrWdContext, ptrSnsCxtSns, ptrBslnInvSns, context);
 
@@ -735,6 +706,7 @@ cy_capsense_status_t Cy_CapSense_DpProcessCsdWidgetStatus(
 
         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
             case (uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E:
+            case (uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E:
                 status = Cy_CapSense_DpProcessLiquidLevel(ptrWdConfig, context);
                 break;
         #endif
@@ -908,9 +880,11 @@ uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
 
     /* Run auto-tuning activities */
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
-        if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdConfig->wdType) && ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType)) &&
-           (((CY_CAPSENSE_CSD_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
-            ((CY_CAPSENSE_ISX_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
+        if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdConfig->wdType) &&
+             ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType)) &&
+            (((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdConfig->wdType)) &&
+            (((CY_CAPSENSE_CSD_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+             ((CY_CAPSENSE_ISX_GROUP == ptrWdConfig->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
         {
             Cy_CapSense_RunNoiseEnvelope_Lib(ptrSnsContext->raw, ptrWdCxt->sigPFC, ptrNEHistory);
             Cy_CapSense_DpUpdateThresholds(ptrWdCxt, ptrNEHistory, 0u);
@@ -926,7 +900,8 @@ uint32_t Cy_CapSense_DpProcessSensorRawCountsExt(
         }
     #endif
 
-    if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType)
+    if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdConfig->wdType) &&
+        ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdConfig->wdType))
     {
         if (0u != (mode & CY_CAPSENSE_PROCESS_BASELINE))
         {
@@ -1633,18 +1608,44 @@ cy_capsense_status_t Cy_CapSense_DpProcessLiquidLevel(
     cy_stc_capsense_position_t newPosition[CY_CAPSENSE_MAX_CENTROIDS];
     cy_stc_capsense_touch_t newTouch = {&newPosition[0u], CY_CAPSENSE_POSITION_ONE};
     uint32_t scalingFactor = (1uL << CY_CAPSENSE_LLW_RESULT_SHIFT);
+    cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdConfig->ptrWdContext;
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
         uint16_t foamCorrection;
     #endif
 
     const void * ptrLlwContext = ptrWdConfig->ptrSnsContext;
+    uint8_t * ptrDebounceCnt = ptrWdConfig->ptrDebounceArr;
+    uint32_t touchTh;
 
     liquidLevel = Cy_CapSense_GetLiquidLevel_Lib(ptrWdConfig->ptrDiplexTable, (const uint16_t *)ptrLlwContext);
 
     /* Check liquid level validity */
     if (CY_CAPSENSE_LLW_NOT_VALID_DATA != liquidLevel)
     {
+        #if (CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN)
+            /* Check that the liquid level is above (threshold + hysteresis) */
+            if (0u != (liquidLevel & CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_MASK))
+            {  
+                ptrWdCxt->status |= (uint8_t)CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK;
+            }
+            /* Check that the liquid level is below (threshold + hysteresis) */
+            else if (0u != (liquidLevel & CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_MASK))
+            {
+                ptrWdCxt->status &= (uint8_t)(~CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK);
+            }
+            else
+            {
+                /* 
+                * Do nothing, liquid level is within the hysteresis range 
+                * from (threshold - hysteresis) to (threshold + hysteresis)
+                */
+            }
+        #endif
+
+        /* Clear liquid level tank detection bits */
+        liquidLevel &= (uint32_t)~(CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_MASK | CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_MASK);
+
         /* Apply resolution scaling */
         liquidLevel = (((liquidLevel * ptrWdConfig->xResolution) + (scalingFactor >> 1u)) >> CY_CAPSENSE_LLW_RESULT_SHIFT);
 
@@ -1681,6 +1682,32 @@ cy_capsense_status_t Cy_CapSense_DpProcessLiquidLevel(
         #endif
 
         ptrWdConfig->ptrWdContext->wdTouch.ptrPosition->x = newTouch.ptrPosition->x;
+
+        /* Calculate touch threshold */
+        touchTh = (0u == (ptrWdCxt->status & CY_CAPSENSE_WD_ACTIVE_MASK)) ?
+                ((uint32_t)ptrWdCxt->fingerTh + ptrWdCxt->hysteresis) :
+                ((uint32_t)ptrWdCxt->fingerTh - ptrWdCxt->hysteresis);
+
+        if (0u < (*ptrDebounceCnt))
+        {
+            /* Decrement debounce counter */
+            (*ptrDebounceCnt)--;
+        }
+
+        /* No liquid */
+        if (newTouch.ptrPosition->x <= touchTh)
+        {
+            /* Reset debounce counter */
+            *ptrDebounceCnt = ptrWdCxt->onDebounce;
+            ptrWdCxt->status &= (uint8_t)~CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
+
+        /* Liquid detected or liquid still exists */
+        if (0u == (*ptrDebounceCnt))
+        {
+            /* Update widget status */
+            ptrWdCxt->status |= (uint8_t)CY_CAPSENSE_WD_ACTIVE_MASK;
+        }
     }
     else
     {
@@ -2240,14 +2267,14 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetMpDeconvolution(
                         min_diff = (int32_t)rawDataShift - min_diff - averBsln;
                         if (min_diff > (int32_t)CY_CAPSENSE_RAW_COUNT_MAX_VALUE)
                         {
-                            min_diff_second = CY_CAPSENSE_RAW_COUNT_MAX_VALUE;
+                            min_diff_second = (uint16_t)CY_CAPSENSE_RAW_COUNT_MAX_VALUE;
                         } else if (min_diff < 0)
                         {
                             min_diff_second = 0u;
                         }
                         else
                         {
-                            min_diff_second = (uint16_t)min_diff;                  
+                            min_diff_second = (uint16_t)min_diff;
                         }
 
                         /* Apply aligning algorithm */

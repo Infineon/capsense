@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
@@ -268,7 +268,7 @@
 *   </tr>
 *   <tr>
 *     <td>ModusToolbox&trade; Software Environment</td>
-*     <td>3.6.0</td>
+*     <td>3.7.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; Device Configurator tool</td>
@@ -296,11 +296,11 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>9.0.0</td>
+*     <td>10.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>9.0.0</td>
+*     <td>10.0.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
@@ -308,7 +308,7 @@
 *   </tr>
 *   <tr>
 *     <td>CAT2 Peripheral Driver Library (PDL)</td>
-*     <td>2.16.2</td>
+*     <td>2.20.0</td>
 *   </tr>
 *   <tr>
 *     <td>GCC Compiler</td>
@@ -637,7 +637,7 @@
 *   <tr>
 *     <td>27253</td>
 *     <td>
-*         In this pack, for the Liquid Level sensing, CAPSENSE™ middleware 
+*         In this pack, for the Liquid Level sensing, CAPSENSE&trade; middleware 
 *         has the Beta Version of “Foam Rejection". 
 *         Foam rejection feature might have an impact on the performance.
 *     </td>
@@ -696,6 +696,17 @@
 *         4. Introduce a dummy scan before ISX.
 *     </td>
 *   </tr>
+*   <tr>
+*     <td>19716</td>
+*     <td>
+*         Device Configurator and CAPSENSE&trade; Configurator allow assigning Cmod 
+*         capacitors to wrong port-pins for fifth-generation CAPSENSE&trade; and 
+*         fifth-generation low power CAPSENSE&trade; All Cmod capacitors have fixed pre-defined HW location.
+*     </td>
+*     <td>
+*         Refer to a device datasheet to get the proper Cmod capacitors assignment for a desired device.
+*     </td>
+*   </tr>
 * </table>
 *
 * \note Refer to the "Errata" section of the device datasheet to get information
@@ -707,6 +718,80 @@
 *
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="8">9.0.0</td>
+*     <td colspan="2"><i><b>
+*       This version is compatible with v8.10.0,
+*       but due to switching to MTB 3.7, new Device-DB, PDL, etc.
+*       a migration of projects created with a past version might be
+*       not possible. In this case a project should be newly created.
+*       Also, if you use the CAPSENSE&trade; middleware v9.0.0, if you use CAPSENSE&trade;
+*       Configurator v10.0.0 or later. This MW version
+*       is not compatible with the previous CAPSENSE&trade; Configurator versions.
+*     </b></i>
+*   </tr>
+*   <tr>
+*     <td> 
+*      New widget Liquid Presence
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   <tr>
+*     <td> 
+*      New feature Liquid tank removal detection
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*      Five new gestures:
+*         * Two-finger long press
+*         * Two-finger double click
+*         * Two-finger flick
+*         * Two-finger edge swipe
+*         * One-finger triple click
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Improved the algorithm for the 3-segment Liquid Level widget.
+*     </td>
+*     <td>
+*         Improved functionality.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Fixed broken links in documentation
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Fixed clock source selection in SMARTSENSE for multiple widgets
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*      Fixed Cmod pin assignment for the fifth-generation CAPSENSE&trade; in SMARTSENSE:
+*         * PSOC&trade; 4100S Max devices
+*         * PSOC&trade; high-voltage (HV) mixed signal (MS) devices
+*     </td>
+*     <td>
+*        Defect fixing.
+*     </td>
+*   </tr>
 *   <tr>
 *     <td>8.10.0</td>
 *     <td> 
@@ -720,7 +805,7 @@
 *     <td rowspan="6">8.0.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible to the v7.0.0,
-*       however due to switching to MTB 3.6, new Device-DB, PDL, etc.
+*       but due to switching to MTB 3.6, new Device-DB, PDL, etc.
 *       a migration of projects created with past version might be
 *       not possible. In this case a project should be newly created.
 *       Also, if you use the CAPSENSE&trade; middleware v8.0.0, you must use
@@ -772,7 +857,7 @@
 *     <td rowspan="9">7.0.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible to the v6.10.0,
-*       however due to switching to MTB 3.5, new Device-DB, PDL, etc.
+*       but due to switching to MTB 3.5, new Device-DB, PDL, etc.
 *       a migration of projects created with past version might be
 *       not possible. In this case a project should be newly created.
 *       Also, if you use the CAPSENSE&trade; middleware v7.0.0, you must use
@@ -844,7 +929,7 @@
 *     <td rowspan="9">6.10.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible to the v5.0, 
-*       however due to switching to MTB 3.4, new Device-DB, PDL,
+*       but due to switching to MTB 3.4, new Device-DB, PDL,
 *       compiler versions, etc. a migration of projects created with 
 *       past version might be not possible. In this case a project should be newly created.
 *       Also, if you use the CAPSENSE&trade; middleware v6.10.0, you must use
@@ -1440,7 +1525,7 @@
 *   * <a href="https:/\/www.infineon.com/ModusToolboxCapSenseTuner"><b>ModusToolbox&trade;
 *   CAPSENSE&trade; Tuner Tool Guide</b></a>
 *
-*   * <a href="https:/\/www.infineon.com/dgdl/Infineon-AN85951_PSOC_4_and_PSOC_6_MCU_CapSense_Design_Guide-ApplicationNotes-v30_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0723535d4661">
+*   * <a href="https:/\/www.infineon.com/row/public/documents/30/42/infineon-an85951-psoc-4-psoc-6-capsense-design-guide-applicationnotes-en.pdf">
 *   <b>CAPSENSE&trade; Design Guide</b></a>
 *
 * * ModusToolbox&trade; Overview:
@@ -1460,10 +1545,10 @@
 *   * <a href="https:/\/github.com/Infineon/mtb-example-psoc6-capsense-buttons-slider-freertos">
 *   <b>CAPSENSE&trade; Middleware Code Example for FreeRTOS</b></a>
 *
-*   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-145-40xx">
+*   * <a href="https:/\/www.infineon.com/evaluation-board/CY8CKIT-145-40XX">
 *   <b>CY8CKIT-145-40XX PSOC&trade; 4000S CAPSENSE&trade; Prototyping Kit</b></a>
 *
-*   * <a href="https:/\/www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-149">
+*   * <a href="https:/\/www.infineon.com/evaluation-board/CY8CKIT-149">
 *   <b>CY8CKIT-149 PSOC&trade; 4100S Plus Prototyping Kit</b></a>
 *
 * * General Information:
@@ -1477,7 +1562,7 @@
 *   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN210781&view=downloads"><b>AN210781 Getting Started with
 *   PSOC&trade; 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
 *
-*   * <a href="http:/\/www.infineon.com/cms/en/search.html#!term=AN215671&view=downloads"><b>AN215671 PSOC&trade; 6 MCU
+*   * <a href="http:/\/www.infineon.com/row/public/documents/30/42/infineon-an215671-psoc-6-mcu-firmware-design-for-ble-applications-applicationnotes-en.pdf"><b>AN215671 PSOC&trade; 6 MCU
 *   firmware design for BLE applications</b></a>
 *
 *   * <a href="https:/\/www.infineon.com/cms/en/search.html#!term=psoc%206%20TRM&view=downloads">

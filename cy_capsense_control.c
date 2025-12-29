@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_control.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the source code to the Control module functions.
@@ -987,7 +987,8 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
             #if ((CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) && \
                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
                 /* Disable filtering for liquid level widgets */
-                if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)
+                if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                    ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType))
                 {
                     ptrSnsCxtSns = ptrWdCfg->ptrSnsContext;
                     for (snsIndex = ptrWdCfg->numSns; snsIndex-- > 0u;)
@@ -1003,6 +1004,7 @@ cy_capsense_status_t Cy_CapSense_ProcessWidgetExt(
                 if ((0u != (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_EN_MASK)) &&
                     (0u == (ptrWdCfg->mfsConfig & CY_CAPSENSE_MFS_WIDGET_FREQ_ALL_CH_MASK)) &&
                     ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                    ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType) &&
                     ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType))
                 {
                     if (0u != (mode & CY_CAPSENSE_PROCESS_MFS_FILTER))
@@ -1183,6 +1185,7 @@ cy_capsense_status_t Cy_CapSense_ProcessSensorExt(
                     (CY_CAPSENSE_ENABLE == CY_CAPSENSE_MULTI_FREQUENCY_SCAN_EN))
                     /* Disable filtering for liquid level and wheatstone bridge widgets */
                     if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                        ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType) &&
                         ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType))
                     {
                         ptrSnsCxt = ptrWdCfg->ptrSnsContext;

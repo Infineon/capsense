@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_gesture_lib.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * Provides the gesture interface.
@@ -20,8 +20,6 @@
 
 #include <stdint.h>
 
-#if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -39,7 +37,7 @@ typedef struct
     uint16_t resolutionY;                                       /**< Widget maximum position Y-axis */
 
     /* Enabled gesture */
-    uint16_t gestureEnableMask;                                 /**< Enabled gesture mask */
+    uint32_t gestureEnableMask;                                 /**< Enabled gesture mask */
 
     /* Timeout */
     uint16_t flickTimeoutMax;                                   /**< Flick maximum timeout */
@@ -93,6 +91,14 @@ typedef struct
     uint8_t state;                                              /**< Gesture state */
 } cy_stc_capsense_ofdc_context_t;
 
+/** Gesture One Finger Triple Click context structure */
+typedef struct
+{
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_oftc_context_t;
+
 /** Gesture One Finger Click and Drag context structure */
 typedef struct
 {
@@ -110,6 +116,34 @@ typedef struct
     cy_stc_capsense_gesture_position_t touchStartPosition2;     /**< Touchdown position of the second touch */
     uint8_t state;                                              /**< Gesture state */
 } cy_stc_capsense_tfsc_context_t;
+
+/** Gesture Two Finger Double Click context structure */
+typedef struct
+{
+    uint32_t touchStartTime1;                                   /**< Touchdown time of the first touch */
+    uint32_t touchStartTime2;                                   /**< Touchdown time of the second touch */
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position of the first touch */
+    cy_stc_capsense_gesture_position_t touchStartPosition2;     /**< Touchdown position of the second touch */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_tfdc_context_t;
+
+/** Gesture One Finger Long Press context structure */
+typedef struct
+{
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_oflp_context_t;
+
+/** Gesture Two Finger Long Press context structure */
+typedef struct
+{
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position of the first touch */
+    cy_stc_capsense_gesture_position_t touchStartPosition2;     /**< Touchdown position of the second touch */
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    uint32_t touchStartTime2;                                   /**< Touchdown time */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_tflp_context_t;
 
 /** Gesture One Finger Scroll context structure */
 typedef struct
@@ -138,6 +172,16 @@ typedef struct
     uint8_t state;                                              /**< Gesture state */
 } cy_stc_capsense_offl_context_t;
 
+/** Gesture Two Finger Flick context structure */
+typedef struct
+{
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position of the first touch */
+    cy_stc_capsense_gesture_position_t touchStartPosition2;     /**< Touchdown position of the second touch */
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    uint32_t touchStartTime2;                                   /**< Touchdown time */
+    uint8_t state;                                              /**< Gesture state */
+} cy_stc_capsense_tffl_context_t;
+
 /** Gesture One Finger Edge Swipe context structure */
 typedef struct
 {
@@ -146,6 +190,17 @@ typedef struct
     uint8_t state;                                              /**< Gesture state */
     uint8_t edge;                                               /**< Detected edge */
 } cy_stc_capsense_ofes_context_t;
+
+/** Gesture Two Finger Edge Swipe context structure */
+typedef struct
+{
+    uint32_t touchStartTime1;                                   /**< Touchdown time */
+    uint32_t touchStartTime2;                                   /**< Touchdown time */
+    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position of the first touch */
+    cy_stc_capsense_gesture_position_t touchStartPosition2;     /**< Touchdown position of the second touch */
+    uint8_t state;                                              /**< Gesture state */
+    uint8_t edge;                                               /**< Detected edge */
+} cy_stc_capsense_tfes_context_t;
 
 /** Gesture Two Finger Zoom context structure */
 typedef struct
@@ -167,14 +222,6 @@ typedef struct
     uint8_t debounce;                                           /**< Gesture debounce counter */
 } cy_stc_capsense_ofrt_context_t;
 
-/** Gesture One Finger Long Press context structure */
-typedef struct
-{
-    uint32_t touchStartTime1;                                   /**< Touchdown time */
-    cy_stc_capsense_gesture_position_t touchStartPosition1;     /**< Touchdown position */
-    uint8_t state;                                              /**< Gesture state */
-} cy_stc_capsense_oflp_context_t;
-
 /** Gesture global context structure */
 typedef struct
 {
@@ -184,20 +231,26 @@ typedef struct
     cy_stc_capsense_gesture_position_t positionLast2;           /**< Previous position of the second touch */
 
     uint32_t timestamp;                                         /**< Current timestamp */
-    uint16_t detected;                                          /**< Detected gesture mask */
-    uint16_t direction;                                         /**< Mask of direction of detected gesture */
+    uint32_t detected;                                          /**< Detected gesture mask */
+    uint32_t direction;                                         /**< Mask of direction of detected gesture */
+    uint32_t idTrack;                                           /**< Finger tracking ID (1=direct, 3=cross) */
 
-    cy_stc_capsense_ofrt_context_t ofrtContext;                 /**< One-finger rotate gesture context */
-    cy_stc_capsense_ofsl_context_t ofslContext;                 /**< One-finger scroll gesture context */
-    cy_stc_capsense_tfzm_context_t tfzmContext;                 /**< Two-finger zoom gesture context */
-    cy_stc_capsense_tfsc_context_t tfscContext;                 /**< Two-finger single click gesture context */
-    cy_stc_capsense_ofes_context_t ofesContext;                 /**< One-finger edge swipe gesture context */
-    cy_stc_capsense_offl_context_t offlContext;                 /**< One-finger flick gesture context */
     cy_stc_capsense_ofsc_context_t ofscContext;                 /**< One-finger single click gesture context */
     cy_stc_capsense_ofdc_context_t ofdcContext;                 /**< One-finger double click gesture context */
-    cy_stc_capsense_ofcd_context_t ofcdContext;                 /**< One-finger click and drag gesture context */
-    cy_stc_capsense_tfsl_context_t tfslContext;                 /**< Two-finger scroll gesture context */
+    cy_stc_capsense_oftc_context_t oftcContext;                 /**< One-finger triple click gesture context */
+    cy_stc_capsense_tfsc_context_t tfscContext;                 /**< Two-finger single click gesture context */
+    cy_stc_capsense_tfdc_context_t tfdcContext;                 /**< Two-finger double click gesture context */
     cy_stc_capsense_oflp_context_t oflpContext;                 /**< One-finger long press gesture context */
+    cy_stc_capsense_tflp_context_t tflpContext;                 /**< Two-finger long press gesture context */
+    cy_stc_capsense_ofcd_context_t ofcdContext;                 /**< One-finger click and drag gesture context */
+    cy_stc_capsense_ofsl_context_t ofslContext;                 /**< One-finger scroll gesture context */
+    cy_stc_capsense_tfsl_context_t tfslContext;                 /**< Two-finger scroll gesture context */
+    cy_stc_capsense_offl_context_t offlContext;                 /**< One-finger flick gesture context */
+    cy_stc_capsense_tffl_context_t tfflContext;                 /**< Two-finger flick gesture context */
+    cy_stc_capsense_ofes_context_t ofesContext;                 /**< One-finger edge swipe gesture context */
+    cy_stc_capsense_tfes_context_t tfesContext;                 /**< Two-finger edge swipe gesture context */
+    cy_stc_capsense_ofrt_context_t ofrtContext;                 /**< One-finger rotate gesture context */
+    cy_stc_capsense_tfzm_context_t tfzmContext;                 /**< Two-finger zoom gesture context */
 
     uint8_t numPosition;                                        /**< Current number of touches */
     uint8_t numPositionLast;                                    /**< Previous number of touches */
@@ -270,39 +323,52 @@ void Cy_CapSense_Gesture_Decode(
 /** \addtogroup group_capsense_macros_gesture *//** \{ */
 /******************************************************************************/
 /* Enable and Detection */
+
 /** No gesture detected */
 #define CY_CAPSENSE_GESTURE_NO_GESTURE                      (0x00u)
-/** All gestures enable / detection mask */
-#define CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK               (0x07FFu)
-/** Gesture enable filtering mask */
-#define CY_CAPSENSE_GESTURE_FILTERING_MASK                  (0x8000u)
-/** Detection mask of Touchdown */
-#define CY_CAPSENSE_GESTURE_TOUCHDOWN_MASK                  (0x2000u)
-/** Detection mask of Lift Off */
-#define CY_CAPSENSE_GESTURE_LIFTOFF_MASK                    (0x4000u)
 
 /** Enable / detection mask of one-finger single click gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_SINGLE_CLICK_MASK      (0x0001u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_SINGLE_CLICK_MASK      (0x000001u)
 /** Enable / detection mask of one-finger double click gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_DOUBLE_CLICK_MASK      (0x0002u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_DOUBLE_CLICK_MASK      (0x000002u)
 /** Enable / detection mask of one-finger click and drag gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_CLICK_DRAG_MASK        (0x0004u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_CLICK_DRAG_MASK        (0x000004u)
 /** Enable / detection mask of two-finger single click gesture */
-#define CY_CAPSENSE_GESTURE_TWO_FNGR_SINGLE_CLICK_MASK      (0x0008u)
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_SINGLE_CLICK_MASK      (0x000008u)
 /** Enable / detection mask of one-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_SCROLL_MASK            (0x0010u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_SCROLL_MASK            (0x000010u)
 /** Enable / detection mask of two-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_TWO_FNGR_SCROLL_MASK            (0x0020u)
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_SCROLL_MASK            (0x000020u)
 /** Enable / detection mask of one-finger edge swipe gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_EDGE_SWIPE_MASK        (0x0040u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_EDGE_SWIPE_MASK        (0x000040u)
 /** Enable / detection mask of one-finger flick gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_FLICK_MASK             (0x0080u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_FLICK_MASK             (0x000080u)
 /** Enable / detection mask of one-finger rotate gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_ROTATE_MASK            (0x0100u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_ROTATE_MASK            (0x000100u)
 /** Enable / detection mask of two-finger zoom gesture */
-#define CY_CAPSENSE_GESTURE_TWO_FNGR_ZOOM_MASK              (0x0200u)
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_ZOOM_MASK              (0x000200u)
 /** Enable / detection mask of one-finger long press gesture */
-#define CY_CAPSENSE_GESTURE_ONE_FNGR_LONG_PRESS_MASK        (0x0400u)
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_LONG_PRESS_MASK        (0x000400u)
+/** Enable / detection mask of one-finger triple click gesture */
+#define CY_CAPSENSE_GESTURE_ONE_FNGR_TRIPLE_CLICK_MASK      (0x000800u)
+/** Detection mask of Touchdown */
+#define CY_CAPSENSE_GESTURE_TOUCHDOWN_MASK                  (0x002000u)
+/** Detection mask of Lift Off */
+#define CY_CAPSENSE_GESTURE_LIFTOFF_MASK                    (0x004000u)
+/** Gesture enable filtering mask */
+#define CY_CAPSENSE_GESTURE_FILTERING_MASK                  (0x008000u)
+/** Enable / detection mask of two-finger double click gesture */
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_DOUBLE_CLICK_MASK      (0x010000u)
+/** Enable / detection mask of two-finger long press gesture */
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_LONG_PRESS_MASK        (0x020000u)
+/** Enable / detection mask of two-finger flick gesture */
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_FLICK_MASK             (0x040000u)
+/** Enable / detection mask of two-finger edge swipe gesture */
+#define CY_CAPSENSE_GESTURE_TWO_FNGR_EDGE_SWIPE_MASK        (0x080000u)
+
+/** All gestures enable / detection mask */
+#define CY_CAPSENSE_GESTURE_ALL_GESTURES_MASK               (0x0F0FFFu)
+
 
 /* Direction Offsets */
 /** Offset of direction of one-finger scroll gesture */
@@ -317,6 +383,10 @@ void Cy_CapSense_Gesture_Decode(
 #define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_ZOOM       (0x07u)
 /** Offset of direction of one-finger flick gesture */
 #define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_FLICK      (0x08u)
+/** Offset of direction of two-finger edge swipe gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_EDGE       (0x0Bu)
+/** Offset of direction of two-finger flick swipe gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_FLICK      (0x0Du)
 
 /* Direction Masks */
 /** Mask of direction of one-finger scroll gesture */
@@ -331,9 +401,10 @@ void Cy_CapSense_Gesture_Decode(
 #define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_ZOOM         (0x0080u)
 /** Mask of direction of one-finger flick gesture */
 #define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_FLICK        (0x0700u)
-
-/** An extra direction offset returned by Cy_CapSense_DecodeWidgetGestures() */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET                (16u)
+/** Mask of direction of two-finger edge swipe gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_EDGE         (0x1800u)
+/** Mask of direction of two-finger flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_FLICK        (0xE000u)
 
 /* Direction */
 /** CLOCKWISE direction of Rotate gesture */
@@ -368,8 +439,6 @@ void Cy_CapSense_Gesture_Decode(
 #if defined(__cplusplus)
 }
 #endif
-
-#endif /* (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP)) */
 
 #endif /* CY_CAPSENSE_GESTURE_LIB_H */
 

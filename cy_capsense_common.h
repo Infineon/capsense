@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_common.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the common CAPSENSE&trade; middleware definitions.
@@ -109,13 +109,13 @@ extern "C" {
 /** \addtogroup group_capsense_macros_general *//** \{ */
 /******************************************************************************/
 /** Middleware major version */
-#define CY_CAPSENSE_MW_VERSION_MAJOR                    (8)
+#define CY_CAPSENSE_MW_VERSION_MAJOR                    (9)
 /** Middleware minor version */
-#define CY_CAPSENSE_MW_VERSION_MINOR                    (10)
+#define CY_CAPSENSE_MW_VERSION_MINOR                    (0)
 /** Middleware patch version */
 #define CY_CAPSENSE_MW_VERSION_PATCH                    (0)
 /** Middleware version */
-#define CY_CAPSENSE_MW_VERSION                          (810)
+#define CY_CAPSENSE_MW_VERSION                          (900)
 
 #if (CY_CAPSENSE_PSOC6_FOURTH_GEN)
     /** Defined supported CSD driver version */
@@ -220,6 +220,8 @@ extern "C" {
 /** Widget calibration mask: performs CDAC auto-calibration even 
   * CY_CAPSENSE_TUNING_COMPLETED_MASK is set */
 #define CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK         (0x40u)
+/** Widget tank removal detection mask */
+#define CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK      (0x80u)
 /** \} */
 
 /******************************************************************************/

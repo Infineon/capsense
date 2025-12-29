@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the function prototypes specific to the scanning module.

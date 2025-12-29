@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_filter.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file contains the source code of all filters implementation.
@@ -471,7 +471,8 @@ cy_capsense_status_t Cy_CapSense_InitializeWidgetBaseline(
 
 #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
     if (((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != context->ptrWdConfig[widgetId].wdType) &&
-        ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType))
+        ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType) &&
+        ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != context->ptrWdConfig[widgetId].wdType))
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP */
     {
         for (snsIndex = context->ptrWdConfig[widgetId].numSns; snsIndex-- > 0u;)
@@ -688,9 +689,11 @@ void Cy_CapSense_InitializeWidgetFilter(
         }
 
         #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ACTIVE_FULL_EN)
-            if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdCfg->wdType) && ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType)) &&
-               (((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
-                ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
+            if ((((uint8_t)CY_CAPSENSE_WD_LOW_POWER_E != ptrWdCfg->wdType) && 
+                 ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != ptrWdCfg->wdType) &&
+                 ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != ptrWdCfg->wdType)) &&
+                (((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_CSD_ACTIVE_FULL_EN)) ||
+                 ((CY_CAPSENSE_ISX_GROUP == ptrWdCfg->senseMethod) && (CY_CAPSENSE_ENABLE == CY_CAPSENSE_SMARTSENSE_ISX_ACTIVE_FULL_EN))))
             {
                 ptrSnsCtx = ptrWdCfg->ptrSnsContext;
                 ptrNEHistory = ptrWdCfg->ptrNoiseEnvelope;

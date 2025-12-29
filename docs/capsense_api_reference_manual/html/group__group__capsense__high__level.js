@@ -13,7 +13,7 @@ var group__group__capsense__high__level =
     [ "Cy_CapSense_DeepSleepCallback", "group__group__capsense__high__level.html#ga9c47887109b22521eba45109b7a27f31", null ],
     [ "Cy_CapSense_RegisterCallback", "group__group__capsense__high__level.html#ga289c4fd495135399a9ad9897920836a7", null ],
     [ "Cy_CapSense_UnRegisterCallback", "group__group__capsense__high__level.html#gaf43b3cdfce7a3e8c0e5622f42e0a6319", null ],
-    [ "Cy_CapSense_DecodeWidgetGestures", "group__group__capsense__high__level.html#ga55fa694191705971b3aa2c29021fb9aa", null ],
+    [ "Cy_CapSense_DecodeWidgetGestures", "group__group__capsense__high__level.html#gaa51945c9546b31d798dae574ae949a35", null ],
     [ "Cy_CapSense_RunSelfTest", "group__group__capsense__high__level.html#gab1f1514db0566e14ba20fd8647ecb3ad", null ],
     [ "Cy_CapSense_ScanAllSlots", "group__group__capsense__high__level.html#ga045f3f46ff4e43c4f4dbe087c0156f56", null ],
     [ "Cy_CapSense_ScanSlots", "group__group__capsense__high__level.html#gaf10ce0cc817442374d2df04c9d241f9b", null ],

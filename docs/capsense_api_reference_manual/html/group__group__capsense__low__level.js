@@ -54,5 +54,6 @@ var group__group__capsense__low__level =
     [ "Cy_CapSense_GetCRC", "group__group__capsense__low__level.html#ga2de812825cd421ee05fec733206e157a", null ],
     [ "Cy_CapSense_SetWidgetStatus", "group__group__capsense__low__level.html#ga2ad536f018dd41e585fdd27107355a47", null ],
     [ "Cy_CapSense_IsWidgetEnabled", "group__group__capsense__low__level.html#gad1ce2644b0e056f861befcf8180de138", null ],
-    [ "Cy_CapSense_IsSlotEnabled", "group__group__capsense__low__level.html#ga4fbab9345b72bd9fe35d7f6084feed52", null ]
+    [ "Cy_CapSense_IsSlotEnabled", "group__group__capsense__low__level.html#ga4fbab9345b72bd9fe35d7f6084feed52", null ],
+    [ "Cy_CapSense_IsTankRemoved", "group__group__capsense__low__level.html#ga1f4fcd57d7cb6dd8b6844e578e9891e8", null ]
 ];

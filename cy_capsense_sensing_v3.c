@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_v3.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -5526,7 +5526,7 @@ cy_capsense_status_t Cy_CapSense_SsAutoTune(cy_stc_capsense_context_t * context)
     #endif /* (CY_CAPSENSE_TOTAL_CH_NUMBER > 1u) */
 
     /* Step #5: Restore project parameters */
-    ptrWdCxt = context->ptrWdContext;
+    ptrWdCfg = context->ptrWdConfig;
     for (i = 0u; i < CY_CAPSENSE_WIDGET_COUNT; i++)
     {
         if ((CY_CAPSENSE_CSD_GROUP == ptrWdCfg->senseMethod) && (0u != Cy_CapSense_IsWidgetEnabled(i, context)))

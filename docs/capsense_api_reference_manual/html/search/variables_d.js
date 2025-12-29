@@ -8,6 +8,7 @@ var searchData=
   ['ofrtcontext',['ofrtContext',['../structcy__stc__capsense__gesture__context__t.html#a48dfae93de6b33ba60cdd10f8292e590',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofsccontext',['ofscContext',['../structcy__stc__capsense__gesture__context__t.html#a72755d5985247fd60078900d1482ddfc',1,'cy_stc_capsense_gesture_context_t']]],
   ['ofslcontext',['ofslContext',['../structcy__stc__capsense__gesture__context__t.html#a7f7257503a55d3790ab222a6ac280a85',1,'cy_stc_capsense_gesture_context_t']]],
+  ['oftccontext',['oftcContext',['../structcy__stc__capsense__gesture__context__t.html#a590d31a9a87d475132298fc8ada00160',1,'cy_stc_capsense_gesture_context_t']]],
   ['oldactiveidsmask',['oldActiveIdsMask',['../structcy__stc__capsense__csx__touch__history__t.html#a673eaa945ec772627c954df63b42a89e',1,'cy_stc_capsense_csx_touch_history_t']]],
   ['oldpeak',['oldPeak',['../structcy__stc__capsense__csx__touch__history__t.html#a9cd73499eb9138949da6bd8812a654d1',1,'cy_stc_capsense_csx_touch_history_t']]],
   ['oldpeaknumber',['oldPeakNumber',['../structcy__stc__capsense__csx__touch__history__t.html#aad62c7d9b921294d3caff02bcca10734',1,'cy_stc_capsense_csx_touch_history_t']]],

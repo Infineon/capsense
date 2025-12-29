@@ -21,5 +21,10 @@ var group__group__capsense__macros__miscellaneous =
     [ "CY_CAPSENSE_HW_CONFIG_SMARTSENSE", "group__group__capsense__macros__miscellaneous.html#ga87bfc7c259f4cadcc86c73004bb367db", null ],
     [ "CY_CAPSENSE_HW_CONFIG_AUTO_DITHERING", "group__group__capsense__macros__miscellaneous.html#ga674a1bf68d2af3d882a229f14ae13b92", null ],
     [ "CY_CAPSENSE_HW_CONFIG_WBX_SCANNING", "group__group__capsense__macros__miscellaneous.html#ga397053d1e25b61f33552c74aa24fce98", null ],
-    [ "CY_CAPSENSE_LLW_RESULT_SHIFT", "group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b", null ]
+    [ "CY_CAPSENSE_LLW_NOT_VALID_DATA", "group__group__capsense__macros__miscellaneous.html#ga7fcf524dd749524271225297a86bdd6c", null ],
+    [ "CY_CAPSENSE_LLW_RESULT_SHIFT", "group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b", null ],
+    [ "CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_SHIFT", "group__group__capsense__macros__miscellaneous.html#ga9b808d8be4e7caa75e1388779de58a0b", null ],
+    [ "CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_MASK", "group__group__capsense__macros__miscellaneous.html#ga398917d1bfa345bc9e48c2d7871e9f7d", null ],
+    [ "CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_SHIFT", "group__group__capsense__macros__miscellaneous.html#gac284592ea15d3e779f4b6084041713e3", null ],
+    [ "CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_MASK", "group__group__capsense__macros__miscellaneous.html#gadc7546c0024e65c229a2361deae10c1b", null ]
 ];

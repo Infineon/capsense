@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * The file contains application programming interface to the CAPSENSE&trade; library.
@@ -42,8 +42,18 @@ extern "C" {
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_miscellaneous *//** \{ */
 /******************************************************************************/
+/** Returned liquid level is not valid */
+#define CY_CAPSENSE_LLW_NOT_VALID_DATA                                  (0xFFFFFFFFuL)
 /** Left shift of returned liquid level */
 #define CY_CAPSENSE_LLW_RESULT_SHIFT                                    (14u)
+/** Left shift of returned liquid level above threshold (tank removal detection) */
+#define CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_SHIFT             (CY_CAPSENSE_LLW_RESULT_SHIFT + 1u)
+/** Mask of returned liquid level above threshold (tank removal detection) */
+#define CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_MASK              (1uL << CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_SHIFT)
+/** Left shift of returned liquid level below threshold (tank removal detection) */
+#define CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_SHIFT             (CY_CAPSENSE_LLW_RESULT_SHIFT + 2u)
+/** Mask of returned liquid level above threshold (tank removal detection) */
+#define CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_MASK              (1uL << CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_SHIFT)
 /** \} */
 
 
@@ -697,10 +707,12 @@ void Cy_CapSense_RunNoiseEnvelope_Lib(
 *
 * \return
 * Returns a calculated liquid level in range
-* from 0 to 2 ^ CY_CAPSENSE_LLW_RESULT_SHIFT
+* from 0 to 2 ^ CY_CAPSENSE_LLW_RESULT_SHIFT and liquid level tank detection
+* status (CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK) or CY_CAPSENSE_LLW_NOT_VALID_DATA
+* when liquid level calculation has not finished successfully.
 *
 *******************************************************************************/
-uint16_t Cy_CapSense_GetLiquidLevel_Lib(
+uint32_t Cy_CapSense_GetLiquidLevel_Lib(
                 const uint8_t * ptrLlwConfig,
                 const uint16_t * ptrLlwContext);
 

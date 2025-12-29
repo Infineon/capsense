@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the common function prototypes for different supported

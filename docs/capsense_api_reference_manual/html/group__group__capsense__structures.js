@@ -149,8 +149,8 @@ var group__group__capsense__structures =
       [ "lowBslnRst", "structcy__stc__capsense__widget__context__t.html#abcf89959f49d28d2d396d8beaae05710", null ],
       [ "snsClk", "structcy__stc__capsense__widget__context__t.html#ac2c184d4476a32763d29fd3c1813d533", null ],
       [ "rowSnsClk", "structcy__stc__capsense__widget__context__t.html#a2dd4e90d01407e1c2a0ed33f637e3b4f", null ],
-      [ "gestureDetected", "structcy__stc__capsense__widget__context__t.html#a1abcf6d1b22d6cc09006eb81576f81f6", null ],
-      [ "gestureDirection", "structcy__stc__capsense__widget__context__t.html#a1bd21ada41343af3e4102b85ab62edab", null ],
+      [ "gestureDetected", "structcy__stc__capsense__widget__context__t.html#ab878610e7cece170d2c3f5e7433bf185", null ],
+      [ "gestureDirection", "structcy__stc__capsense__widget__context__t.html#a8ae5624633c568847cf38b329ffcb745", null ],
       [ "xDelta", "structcy__stc__capsense__widget__context__t.html#a723b1a11630c801ad30546fd35cec715", null ],
       [ "yDelta", "structcy__stc__capsense__widget__context__t.html#a869b23837236045aba13b4fbde082e95", null ],
       [ "noiseTh", "structcy__stc__capsense__widget__context__t.html#abc7ea702d95e07827cb3f8b6d97aed8d", null ],
@@ -174,7 +174,8 @@ var group__group__capsense__structures =
       [ "cdacCompDivider", "structcy__stc__capsense__widget__context__t.html#a9af84926eb2b426096323ccb6bea68f8", null ],
       [ "lfsrBits", "structcy__stc__capsense__widget__context__t.html#a722806ceec62995188beb928c08fa6f2", null ],
       [ "cicShift", "structcy__stc__capsense__widget__context__t.html#abec14468cac066568edf52d857f2f7ed", null ],
-      [ "rowCicShift", "structcy__stc__capsense__widget__context__t.html#a14509b3dff9d39405dcde5ec86babaf6", null ]
+      [ "rowCicShift", "structcy__stc__capsense__widget__context__t.html#a14509b3dff9d39405dcde5ec86babaf6", null ],
+      [ "reserved0", "structcy__stc__capsense__widget__context__t.html#a468083abf3fbe16d3cc19b6888942461", null ]
     ] ],
     [ "cy_stc_capsense_pin_config_t", "structcy__stc__capsense__pin__config__t.html", [
       [ "pcPtr", "structcy__stc__capsense__pin__config__t.html#a6e73d425b113f359b2d0911e44b36e62", null ],

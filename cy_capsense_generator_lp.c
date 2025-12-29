@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -1359,7 +1359,8 @@ cy_capsense_status_t Cy_CapSense_GenerateCdacConfig(
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_EN)
         /* Uses configuration from Configurator for LLW if tuning is complete */
-        if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) &&
+        if ((((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+            ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType)) &&
             (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_TUNING_COMPLETED_MASK)))
         {
             snsCdacCtlReg |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCfg->ptrWdContext->cdacRef);

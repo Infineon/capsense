@@ -3,7 +3,7 @@ var group__group__capsense__gesture__structures =
     [ "cy_stc_capsense_gesture_config_t", "structcy__stc__capsense__gesture__config__t.html", [
       [ "resolutionX", "structcy__stc__capsense__gesture__config__t.html#abcdafc8f4ecbb01e2202dee3ed252364", null ],
       [ "resolutionY", "structcy__stc__capsense__gesture__config__t.html#ac418cd1cf76d0dcfe90232450954eb82", null ],
-      [ "gestureEnableMask", "structcy__stc__capsense__gesture__config__t.html#a47ee76801d9ab0c1c11e057d12fb37cc", null ],
+      [ "gestureEnableMask", "structcy__stc__capsense__gesture__config__t.html#a8432758b9c019f65eef7cc9dabe03111", null ],
       [ "flickTimeoutMax", "structcy__stc__capsense__gesture__config__t.html#ac6379bfa4aa94d4031692bc31eeee6e1", null ],
       [ "edgeTimeoutMax", "structcy__stc__capsense__gesture__config__t.html#a2b78f409219d6f4de0e86b0554c2ec57", null ],
       [ "clickTimeoutMax", "structcy__stc__capsense__gesture__config__t.html#a3b1107f255188a2b7ad34f2445d45ca7", null ],
@@ -39,6 +39,11 @@ var group__group__capsense__gesture__structures =
       [ "touchStartPosition1", "structcy__stc__capsense__ofdc__context__t.html#a22e58ee9031099dd6d48aee61a1aadc2", null ],
       [ "state", "structcy__stc__capsense__ofdc__context__t.html#a68bdeb81301daf15477f4e5130a60b6d", null ]
     ] ],
+    [ "cy_stc_capsense_oftc_context_t", "structcy__stc__capsense__oftc__context__t.html", [
+      [ "touchStartTime1", "structcy__stc__capsense__oftc__context__t.html#a981f619f9a74676116e8df7265597bf5", null ],
+      [ "touchStartPosition1", "structcy__stc__capsense__oftc__context__t.html#a8fc0c5cd290dc0b2fdf9bd212049f48f", null ],
+      [ "state", "structcy__stc__capsense__oftc__context__t.html#aef5af923048b6146a4c62dd39dc70219", null ]
+    ] ],
     [ "cy_stc_capsense_ofcd_context_t", "structcy__stc__capsense__ofcd__context__t.html", [
       [ "touchStartTime1", "structcy__stc__capsense__ofcd__context__t.html#adac662a3fdcbff352d05b47127722437", null ],
       [ "touchStartPosition1", "structcy__stc__capsense__ofcd__context__t.html#aa31dd67b76a421f313721950384c14ab", null ],
@@ -50,6 +55,25 @@ var group__group__capsense__gesture__structures =
       [ "touchStartPosition1", "structcy__stc__capsense__tfsc__context__t.html#ac2bb0da57282c795cbf0f3d4c1c50e94", null ],
       [ "touchStartPosition2", "structcy__stc__capsense__tfsc__context__t.html#a8b6bd5906acd0001b1ceae797db7a8a3", null ],
       [ "state", "structcy__stc__capsense__tfsc__context__t.html#a8e22783a5b0ccb54c439fceb105978e4", null ]
+    ] ],
+    [ "cy_stc_capsense_tfdc_context_t", "structcy__stc__capsense__tfdc__context__t.html", [
+      [ "touchStartTime1", "structcy__stc__capsense__tfdc__context__t.html#a228271526f086554c91a5f45875484d8", null ],
+      [ "touchStartTime2", "structcy__stc__capsense__tfdc__context__t.html#a6bfb572a71ae4fa51a45611d185fdac0", null ],
+      [ "touchStartPosition1", "structcy__stc__capsense__tfdc__context__t.html#ae62598853283f9717c9e5b8da44049da", null ],
+      [ "touchStartPosition2", "structcy__stc__capsense__tfdc__context__t.html#a84f14141c83a621bd2b6b8bb8b3c0405", null ],
+      [ "state", "structcy__stc__capsense__tfdc__context__t.html#a511f723e84f46f6dd3f7b5c2e1de6a5a", null ]
+    ] ],
+    [ "cy_stc_capsense_oflp_context_t", "structcy__stc__capsense__oflp__context__t.html", [
+      [ "touchStartTime1", "structcy__stc__capsense__oflp__context__t.html#a8a7dfdf24ffe9611e3f0748834ec57d8", null ],
+      [ "touchStartPosition1", "structcy__stc__capsense__oflp__context__t.html#a5a48dd37bff60dd24f156488d695511c", null ],
+      [ "state", "structcy__stc__capsense__oflp__context__t.html#a5728d5f07310fc000e4d5e895e3450f4", null ]
+    ] ],
+    [ "cy_stc_capsense_tflp_context_t", "structcy__stc__capsense__tflp__context__t.html", [
+      [ "touchStartPosition1", "structcy__stc__capsense__tflp__context__t.html#a7267248234c45e515cde93590187627d", null ],
+      [ "touchStartPosition2", "structcy__stc__capsense__tflp__context__t.html#a0f39fff6e410fe2a1d1c9c20c2a47895", null ],
+      [ "touchStartTime1", "structcy__stc__capsense__tflp__context__t.html#aad7bbf792b0fdff19bb47a908a5b2cf6", null ],
+      [ "touchStartTime2", "structcy__stc__capsense__tflp__context__t.html#a413a3619b92958791bb7956d9f27c2b8", null ],
+      [ "state", "structcy__stc__capsense__tflp__context__t.html#ae8cfcf93073b07081930e18efea1579e", null ]
     ] ],
     [ "cy_stc_capsense_ofsl_context_t", "structcy__stc__capsense__ofsl__context__t.html", [
       [ "touchStartPosition1", "structcy__stc__capsense__ofsl__context__t.html#ab6b900847f84996ed25c000469c6cba4", null ],
@@ -69,11 +93,26 @@ var group__group__capsense__gesture__structures =
       [ "touchStartPosition1", "structcy__stc__capsense__offl__context__t.html#aa4bcab6ceb424cae93b48af4ba2ef1c0", null ],
       [ "state", "structcy__stc__capsense__offl__context__t.html#ab75c1891770f28ddf2e351352ad44ec9", null ]
     ] ],
+    [ "cy_stc_capsense_tffl_context_t", "structcy__stc__capsense__tffl__context__t.html", [
+      [ "touchStartPosition1", "structcy__stc__capsense__tffl__context__t.html#acb3deca1c539b6e26447955fc381eff8", null ],
+      [ "touchStartPosition2", "structcy__stc__capsense__tffl__context__t.html#afffa95a4d4d978781462996ea1b165c0", null ],
+      [ "touchStartTime1", "structcy__stc__capsense__tffl__context__t.html#a40cbf6d4f3538ccb907d6ebe8ce8b47a", null ],
+      [ "touchStartTime2", "structcy__stc__capsense__tffl__context__t.html#affd52c58a08326a01764a0f8cc5c6545", null ],
+      [ "state", "structcy__stc__capsense__tffl__context__t.html#a48a0516b6c272a73066b2e1225ccbed6", null ]
+    ] ],
     [ "cy_stc_capsense_ofes_context_t", "structcy__stc__capsense__ofes__context__t.html", [
       [ "touchStartTime1", "structcy__stc__capsense__ofes__context__t.html#aaf7cec8bf10a12f82431b1cfdc76fa3c", null ],
       [ "touchStartPosition1", "structcy__stc__capsense__ofes__context__t.html#ac6dceb387c709e7425014e0b6cbba69d", null ],
       [ "state", "structcy__stc__capsense__ofes__context__t.html#aceb2451dce6a58a27a57aad7567d96de", null ],
       [ "edge", "structcy__stc__capsense__ofes__context__t.html#ac157aeb4721e704a38dff878b34f4bbf", null ]
+    ] ],
+    [ "cy_stc_capsense_tfes_context_t", "structcy__stc__capsense__tfes__context__t.html", [
+      [ "touchStartTime1", "structcy__stc__capsense__tfes__context__t.html#adba44921ad66d4db0009a024d2bcbe20", null ],
+      [ "touchStartTime2", "structcy__stc__capsense__tfes__context__t.html#a7372000e54c4dbb6b5418751b31d266f", null ],
+      [ "touchStartPosition1", "structcy__stc__capsense__tfes__context__t.html#a3e62ccc2f90b302a9c057e9b2dfbc089", null ],
+      [ "touchStartPosition2", "structcy__stc__capsense__tfes__context__t.html#a357e2526b771f1408a2658567e7e316b", null ],
+      [ "state", "structcy__stc__capsense__tfes__context__t.html#a967db383fb13d8bad24ec7a1fe690b59", null ],
+      [ "edge", "structcy__stc__capsense__tfes__context__t.html#a1c24a39660b8f261dae04d6dbcb3c0ce", null ]
     ] ],
     [ "cy_stc_capsense_tfzm_context_t", "structcy__stc__capsense__tfzm__context__t.html", [
       [ "touchStartPosition1", "structcy__stc__capsense__tfzm__context__t.html#a60cf7f1c4af96f6113fbe04db092a80e", null ],
@@ -89,30 +128,31 @@ var group__group__capsense__gesture__structures =
       [ "history", "structcy__stc__capsense__ofrt__context__t.html#a4df4b5e9a02cba4b6bba8e6c10c2c68e", null ],
       [ "debounce", "structcy__stc__capsense__ofrt__context__t.html#a3d14b869436d9a7a23c57db47a665140", null ]
     ] ],
-    [ "cy_stc_capsense_oflp_context_t", "structcy__stc__capsense__oflp__context__t.html", [
-      [ "touchStartTime1", "structcy__stc__capsense__oflp__context__t.html#a8a7dfdf24ffe9611e3f0748834ec57d8", null ],
-      [ "touchStartPosition1", "structcy__stc__capsense__oflp__context__t.html#a5a48dd37bff60dd24f156488d695511c", null ],
-      [ "state", "structcy__stc__capsense__oflp__context__t.html#a5728d5f07310fc000e4d5e895e3450f4", null ]
-    ] ],
     [ "cy_stc_capsense_gesture_context_t", "structcy__stc__capsense__gesture__context__t.html", [
       [ "position1", "structcy__stc__capsense__gesture__context__t.html#a35b0182d531b19cf23e454b49ce332bd", null ],
       [ "positionLast1", "structcy__stc__capsense__gesture__context__t.html#aa9ca0fa15854876acb6836093813d18f", null ],
       [ "position2", "structcy__stc__capsense__gesture__context__t.html#a57ddd934f52502d73624fd05c643fe01", null ],
       [ "positionLast2", "structcy__stc__capsense__gesture__context__t.html#a41e2cc14c3e6e152afe249821d218619", null ],
       [ "timestamp", "structcy__stc__capsense__gesture__context__t.html#a2a24ea7e25b9910d7f02e7e19e43195a", null ],
-      [ "detected", "structcy__stc__capsense__gesture__context__t.html#a607d08f453a989754dd877c3118ec4c4", null ],
-      [ "direction", "structcy__stc__capsense__gesture__context__t.html#a2951e786f1279c80f1210b5d69339681", null ],
-      [ "ofrtContext", "structcy__stc__capsense__gesture__context__t.html#a48dfae93de6b33ba60cdd10f8292e590", null ],
-      [ "ofslContext", "structcy__stc__capsense__gesture__context__t.html#a7f7257503a55d3790ab222a6ac280a85", null ],
-      [ "tfzmContext", "structcy__stc__capsense__gesture__context__t.html#abdb25e19025b77d4115b551bf54454b5", null ],
-      [ "tfscContext", "structcy__stc__capsense__gesture__context__t.html#a56adc5033fdd287a8fefb4a6c8b1a251", null ],
-      [ "ofesContext", "structcy__stc__capsense__gesture__context__t.html#a34feed1bf649ef82f09da51745d0514e", null ],
-      [ "offlContext", "structcy__stc__capsense__gesture__context__t.html#a7a6f0b99bddc8e18cfea0fedb39e00b8", null ],
+      [ "detected", "structcy__stc__capsense__gesture__context__t.html#a0e47d6c2ccbf8828bc2e4cfb391ff282", null ],
+      [ "direction", "structcy__stc__capsense__gesture__context__t.html#affbac4ebe67da5e869539593bd29c176", null ],
+      [ "idTrack", "structcy__stc__capsense__gesture__context__t.html#ae61d858f59e542c78a7ab66ac8510ea4", null ],
       [ "ofscContext", "structcy__stc__capsense__gesture__context__t.html#a72755d5985247fd60078900d1482ddfc", null ],
       [ "ofdcContext", "structcy__stc__capsense__gesture__context__t.html#a41504e9edd68b6aab487492c95b6a059", null ],
-      [ "ofcdContext", "structcy__stc__capsense__gesture__context__t.html#ab916aaccb1b24a8dc5eee9385d0d2041", null ],
-      [ "tfslContext", "structcy__stc__capsense__gesture__context__t.html#a3e8c82cbc4289674f444114478fc1a7b", null ],
+      [ "oftcContext", "structcy__stc__capsense__gesture__context__t.html#a590d31a9a87d475132298fc8ada00160", null ],
+      [ "tfscContext", "structcy__stc__capsense__gesture__context__t.html#a56adc5033fdd287a8fefb4a6c8b1a251", null ],
+      [ "tfdcContext", "structcy__stc__capsense__gesture__context__t.html#ab82490f825063125e568676ec4a6fb54", null ],
       [ "oflpContext", "structcy__stc__capsense__gesture__context__t.html#ac5433980bc8aff63ef8de3e2c69136f5", null ],
+      [ "tflpContext", "structcy__stc__capsense__gesture__context__t.html#a860acd86b33f62f042b9a16c38aa0829", null ],
+      [ "ofcdContext", "structcy__stc__capsense__gesture__context__t.html#ab916aaccb1b24a8dc5eee9385d0d2041", null ],
+      [ "ofslContext", "structcy__stc__capsense__gesture__context__t.html#a7f7257503a55d3790ab222a6ac280a85", null ],
+      [ "tfslContext", "structcy__stc__capsense__gesture__context__t.html#a3e8c82cbc4289674f444114478fc1a7b", null ],
+      [ "offlContext", "structcy__stc__capsense__gesture__context__t.html#a7a6f0b99bddc8e18cfea0fedb39e00b8", null ],
+      [ "tfflContext", "structcy__stc__capsense__gesture__context__t.html#a3392c3c39f9298aa06822d950944ee9a", null ],
+      [ "ofesContext", "structcy__stc__capsense__gesture__context__t.html#a34feed1bf649ef82f09da51745d0514e", null ],
+      [ "tfesContext", "structcy__stc__capsense__gesture__context__t.html#a2e7d4c067f746a538a10bf7c6dc5cd18", null ],
+      [ "ofrtContext", "structcy__stc__capsense__gesture__context__t.html#a48dfae93de6b33ba60cdd10f8292e590", null ],
+      [ "tfzmContext", "structcy__stc__capsense__gesture__context__t.html#abdb25e19025b77d4115b551bf54454b5", null ],
       [ "numPosition", "structcy__stc__capsense__gesture__context__t.html#a5f96cbd3fde2fc2007499bdfc5e8ad59", null ],
       [ "numPositionLast", "structcy__stc__capsense__gesture__context__t.html#adfc86db072daa3b309979efb5768456d", null ]
     ] ]

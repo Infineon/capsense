@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 8.10.0: Miscellaneous Macros</title>
+<title>CAPSENSE™ Middleware Library 9.0.0: Miscellaneous Macros</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 8.10.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 9.0.0</div>
   </td>
  </tr>
  </tbody>
@@ -175,10 +175,30 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#ga397053d1e25b61f33552c74aa24fce98">CY_CAPSENSE_HW_CONFIG_WBX_SCANNING</a>&#160;&#160;&#160;(8u)</td></tr>
 <tr class="memdesc:ga397053d1e25b61f33552c74aa24fce98"><td class="mdescLeft">&#160;</td><td class="mdescRight">CAPSENSE&trade; related HW is configured to the WBX scanning. <br /></td></tr>
 <tr class="separator:ga397053d1e25b61f33552c74aa24fce98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7fcf524dd749524271225297a86bdd6c"><td class="memItemLeft" align="right" valign="top"><a id="ga7fcf524dd749524271225297a86bdd6c"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#ga7fcf524dd749524271225297a86bdd6c">CY_CAPSENSE_LLW_NOT_VALID_DATA</a>&#160;&#160;&#160;(0xFFFFFFFFuL)</td></tr>
+<tr class="memdesc:ga7fcf524dd749524271225297a86bdd6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returned liquid level is not valid. <br /></td></tr>
+<tr class="separator:ga7fcf524dd749524271225297a86bdd6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga498788fd391710f6243b7c530a2cd29b"><td class="memItemLeft" align="right" valign="top"><a id="ga498788fd391710f6243b7c530a2cd29b"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b">CY_CAPSENSE_LLW_RESULT_SHIFT</a>&#160;&#160;&#160;(14u)</td></tr>
 <tr class="memdesc:ga498788fd391710f6243b7c530a2cd29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left shift of returned liquid level. <br /></td></tr>
 <tr class="separator:ga498788fd391710f6243b7c530a2cd29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b808d8be4e7caa75e1388779de58a0b"><td class="memItemLeft" align="right" valign="top"><a id="ga9b808d8be4e7caa75e1388779de58a0b"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#ga9b808d8be4e7caa75e1388779de58a0b">CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_SHIFT</a>&#160;&#160;&#160;(<a class="el" href="group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b">CY_CAPSENSE_LLW_RESULT_SHIFT</a> + 1u)</td></tr>
+<tr class="memdesc:ga9b808d8be4e7caa75e1388779de58a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left shift of returned liquid level above threshold (tank removal detection) <br /></td></tr>
+<tr class="separator:ga9b808d8be4e7caa75e1388779de58a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga398917d1bfa345bc9e48c2d7871e9f7d"><td class="memItemLeft" align="right" valign="top"><a id="ga398917d1bfa345bc9e48c2d7871e9f7d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#ga398917d1bfa345bc9e48c2d7871e9f7d">CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_MASK</a>&#160;&#160;&#160;(1uL &lt;&lt; CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_ABOVE_TH_SHIFT)</td></tr>
+<tr class="memdesc:ga398917d1bfa345bc9e48c2d7871e9f7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of returned liquid level above threshold (tank removal detection) <br /></td></tr>
+<tr class="separator:ga398917d1bfa345bc9e48c2d7871e9f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac284592ea15d3e779f4b6084041713e3"><td class="memItemLeft" align="right" valign="top"><a id="gac284592ea15d3e779f4b6084041713e3"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#gac284592ea15d3e779f4b6084041713e3">CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_SHIFT</a>&#160;&#160;&#160;(<a class="el" href="group__group__capsense__macros__miscellaneous.html#ga498788fd391710f6243b7c530a2cd29b">CY_CAPSENSE_LLW_RESULT_SHIFT</a> + 2u)</td></tr>
+<tr class="memdesc:gac284592ea15d3e779f4b6084041713e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left shift of returned liquid level below threshold (tank removal detection) <br /></td></tr>
+<tr class="separator:gac284592ea15d3e779f4b6084041713e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc7546c0024e65c229a2361deae10c1b"><td class="memItemLeft" align="right" valign="top"><a id="gadc7546c0024e65c229a2361deae10c1b"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__capsense__macros__miscellaneous.html#gadc7546c0024e65c229a2361deae10c1b">CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_MASK</a>&#160;&#160;&#160;(1uL &lt;&lt; CY_CAPSENSE_LLW_TANK_DETECTION_LEVEL_BELOW_TH_SHIFT)</td></tr>
+<tr class="memdesc:gadc7546c0024e65c229a2361deae10c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask of returned liquid level above threshold (tank removal detection) <br /></td></tr>
+<tr class="separator:gadc7546c0024e65c229a2361deae10c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -186,7 +206,7 @@ Macros</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 8.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 9.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

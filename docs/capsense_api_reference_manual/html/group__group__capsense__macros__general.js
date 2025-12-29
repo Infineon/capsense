@@ -22,5 +22,6 @@ var group__group__capsense__macros__general =
     [ "CY_CAPSENSE_WD_MAXCOUNT_CALC_MASK", "group__group__capsense__macros__general.html#ga354fa288854b26370ddf907d481a93e2", null ],
     [ "CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK", "group__group__capsense__macros__general.html#ga9789be8ab6ab96597c236b923cbbabbb", null ],
     [ "CY_CAPSENSE_WD_WBX_COMPENSATION_DIRECTION_MASK", "group__group__capsense__macros__general.html#ga95614c6c619d9a89fc1df4aae277770b", null ],
-    [ "CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK", "group__group__capsense__macros__general.html#ga859f2ccd1022d8050f1adc6ddd5c4662", null ]
+    [ "CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK", "group__group__capsense__macros__general.html#ga859f2ccd1022d8050f1adc6ddd5c4662", null ],
+    [ "CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK", "group__group__capsense__macros__general.html#ga2866ddb2600a5d1824d4e5eafe400981", null ]
 ];

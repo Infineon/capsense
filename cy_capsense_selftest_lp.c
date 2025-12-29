@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_selftest_lp.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the source code to the Built-in Self-test (BIST)
@@ -742,7 +742,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorBaseline_V3Lp(
         if ((context->ptrCommonConfig->numWd > widgetId) &&
             (context->ptrWdConfig[widgetId].numSns > sensorId))
         {
-            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType)
+            if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType) &&
+                ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != context->ptrWdConfig[widgetId].wdType))
             {
                 /* Get a pointer to the specified widget configuration structure */
                 ptrWdgtCfg = &context->ptrWdConfig[widgetId];
@@ -856,7 +857,8 @@ cy_en_capsense_bist_status_t Cy_CapSense_CheckIntegritySensorRawcount_V3Lp(
         if ((context->ptrCommonConfig->numWd > widgetId) &&
             (context->ptrWdConfig[widgetId].numSns > sensorId))
         {
-            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType)
+            if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E != context->ptrWdConfig[widgetId].wdType) &&
+                ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E != context->ptrWdConfig[widgetId].wdType))
             {
                 /* Find a pointer to the specified widget configuration structure */
                 ptrWdgtCfg = &context->ptrWdConfig[widgetId];

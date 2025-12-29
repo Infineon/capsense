@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the function prototypes specific to the register
@@ -80,8 +80,7 @@ void Cy_CapSense_CalculateMaskRegisters(
 /*******************************************************************************
 * Macros for Cmod selection
 *******************************************************************************/
-#define CY_CAPSENSE_MSC0_CMOD1PADD_PIN                                          (2u)
-#define CY_CAPSENSE_MSC1_CMOD1PADD_PIN                                          (1u)
+#define CY_CAPSENSE_CMOD1PADD_PIN                                               (0u)
 
 #define CY_CAPSENSE_CMOD12_PAIR_SELECTION                                       (0u)
 #define CY_CAPSENSE_CMOD34_PAIR_SELECTION                                       (1u)

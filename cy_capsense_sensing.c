@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file consists of common parts for different supported platforms
@@ -950,8 +950,8 @@ cy_capsense_status_t Cy_CapSense_CalibrateWidget(
 * \note
 * The function is available for the fourth-generation and fifth-generation (only
 * for CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD) CAPSENSE&trade;. For fifth-generation
-* CAPSENSE&trade with CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD and for fifth-
-* generation low power CAPSENSE&trade use Cy_CapSense_SlotPinState().
+* CAPSENSE&trade; with CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD and for fifth-
+* generation low power CAPSENSE&trade; use Cy_CapSense_SlotPinState().
 *
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found
@@ -1080,8 +1080,8 @@ cy_capsense_status_t Cy_CapSense_SetPinState(
 * \note
 * This function is available for the fifth-generation (only
 * for CY_CAPSENSE_CTRLMUX_SENSOR_CONNECTION_METHOD) and fifth-generation low power
-* CAPSENSE&trade;. For fourth-generation CAPSENSE&trade and fifth-generation
-* CAPSENSE&trade with for CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD use
+* CAPSENSE&trade;. For fourth-generation CAPSENSE&trade; and fifth-generation
+* CAPSENSE&trade; with for CY_CAPSENSE_AMUX_SENSOR_CONNECTION_METHOD use
 * Cy_CapSense_SetPinState().
 *
 * \param slotId

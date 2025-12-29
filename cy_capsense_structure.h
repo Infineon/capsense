@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -34,7 +34,9 @@
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK selection */
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-
+#ifndef CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN
+    #define CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN (1u)
+#endif /* CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN */
 #if defined(__cplusplus)
 extern "C" {
 #endif /* defined(__cplusplus) */
@@ -90,7 +92,7 @@ typedef enum
     CY_CAPSENSE_WD_PROXIMITY_E          = 0x06u,                /**< Proximity widget */
     CY_CAPSENSE_WD_LOW_POWER_E          = 0x07u,                /**< Low Power widget, used in the fifth-generation low power CAPSENSE&trade; only */
     CY_CAPSENSE_WD_LIQUID_LEVEL_E       = 0x08u,                /**< Liquid level widget, used in the fifth-generation low power CAPSENSE&trade; only */
-    CY_CAPSENSE_WD_LIQUID_DETECTION_E   = 0x09u,                /**< Liquid detection widget, used in the fifth-generation low power CAPSENSE&trade; only */
+    CY_CAPSENSE_WD_LIQUID_PRESENCE_E    = 0x09u,                /**< Liquid presence widget, used in the fifth-generation low power CAPSENSE&trade; only */
     CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E  = 0x0Au,                /**< Wheatstone bridge widget, used in the fifth-generation low power CAPSENSE&trade; only */
 } cy_en_capsense_widget_type_t;
 
@@ -335,7 +337,7 @@ typedef struct
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN) */
     uint16_t maxRawCount;                                       /**< Calculated maximum raw count of widget */
     uint16_t maxRawCountRow;                                    /**< Calculated row maximum raw count of widget */
-    uint16_t fingerTh;                                          /**< Widget Finger Threshold */
+    uint16_t fingerTh;                                          /**< Widget Finger Threshold or Precense Threshold for Liquid Presence widget */
     uint16_t proxTh;                                            /**< Widget Proximity Threshold or Foam Correction Coefficient for Liquid level widget */
     uint16_t lowBslnRst;                                        /**< The widget low baseline reset count. Specifies the number
                                                                    * of samples the sensor signal must be below the Negative
@@ -343,8 +345,8 @@ typedef struct
     uint16_t snsClk;                                            /**< Sense Clock Divider. For the Matrix Buttons and Touchpad widgets
                                                                    * specifies the column sense clock divider */
     uint16_t rowSnsClk;                                         /**< Row Sense Clock Divider for the Matrix Buttons and Touchpad widgets */
-    uint16_t gestureDetected;                                   /**< Mask of detected gestures */
-    uint16_t gestureDirection;                                  /**< Mask of directions of detected gestures */
+    uint32_t gestureDetected;                                   /**< Mask of detected gestures */
+    uint32_t gestureDirection;                                  /**< Mask of directions of detected gestures */
     int16_t xDelta;                                             /**< The filtered by Ballistic Multiplier X-displacement */
     int16_t yDelta;                                             /**< The filtered by Ballistic Multiplier Y-displacement */
     uint16_t noiseTh;                                           /**< Widget Noise Threshold */
@@ -395,6 +397,7 @@ typedef struct
                                                                    * * bit[4] - Widget row maximum raw count calculation enable (CY_CAPSENSE_WD_MAXCOUNT_ROW_CALC_MASK)
                                                                    * * bit[5] - Widget compensation CDAC direction: direct (like CSD) or inverse (CY_CAPSENSE_WD_WBX_COMPENSATION_DIRECTION_MASK)
                                                                    * * bit[6] - Widget calibration mask: performs CDAC auto-calibration enable (CY_CAPSENSE_WD_FACTORY_CALIBRATION_MASK)
+                                                                   * * bit[7] - Tank removal detection mask: detects the presence or absence of a physical tank connected to the device (CY_CAPSENSE_WD_TANK_REMOVAL_DETECTION_MASK)
                                                                    */
     cy_stc_capsense_touch_t wdTouch;                            /**< Widget touch structure used for Matrix Buttons, Sliders, and Touchpads */
 
@@ -455,6 +458,8 @@ typedef struct
                                                                  * \note This field is available for the fifth-generation low power CAPSENSE&trade;.
                                                                  */
     #endif /* (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP) */
+
+    uint32_t reserved0;                                         /**< Reserved for internal usage */
 
 } cy_stc_capsense_widget_context_t;
 
@@ -2095,6 +2100,11 @@ uint32_t Cy_CapSense_IsWidgetEnabled(
                     uint32_t slotId,
                     const cy_stc_capsense_context_t * context);
 #endif /* ((CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN) || (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)) */
+#if (CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN)
+uint8_t Cy_CapSense_IsTankRemoved(
+                cy_stc_capsense_widget_context_t * ptrWdContext);
+#endif
+
 /** \} */
 
 

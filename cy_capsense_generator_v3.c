@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_v3.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -141,17 +141,32 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     ptrBaseCfg->swSelCmod3 = ptrTemplateCfg->swSelCmod3;
     ptrBaseCfg->swSelCmod4 = ptrTemplateCfg->swSelCmod4;
 
-    if ((CY_CAPSENSE_MSC0_CMOD1PADD_PIN != ptrChConfig->pinCmod1) &&
-        (CY_CAPSENSE_MSC1_CMOD1PADD_PIN != ptrChConfig->pinCmod1))
-    {
-        ptrBaseCfg->swSelCmod1 = 0u;
-        ptrBaseCfg->swSelCmod2 = 0u;
-    }
-    else
-    {
-        ptrBaseCfg->swSelCmod3 = 0u;
-        ptrBaseCfg->swSelCmod4 = 0u;
-    }
+    #if (defined(CY_DEVICE_PSOC4AS4))
+        if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+        {
+            /* Second Cmod pair in use. Clears the first pair */
+            ptrBaseCfg->swSelCmod1 = 0u;
+            ptrBaseCfg->swSelCmod2 = 0u;
+        }
+        else
+        {
+            ptrBaseCfg->swSelCmod3 = 0u;
+            ptrBaseCfg->swSelCmod4 = 0u;
+        }
+    #else
+        /* PSOC4-HVMS-128K Devices */
+        if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+        {
+            /* First Cmod pair in use. Clears second pair */
+            ptrBaseCfg->swSelCmod3 = 0u;
+            ptrBaseCfg->swSelCmod4 = 0u;
+        }
+        else 
+        {
+            ptrBaseCfg->swSelCmod1 = 0u;
+            ptrBaseCfg->swSelCmod2 = 0u;
+        }
+    #endif
 
     ptrBaseCfg->obsCtl = ptrTemplateCfg->obsCtl;
     ptrBaseCfg->intr = ptrTemplateCfg->intr;
@@ -231,17 +246,34 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
                     #endif
                 #endif
 
-                if ((CY_CAPSENSE_MSC0_CMOD1PADD_PIN != ptrChConfig->pinCmod1) &&
-                    (CY_CAPSENSE_MSC1_CMOD1PADD_PIN != ptrChConfig->pinCmod1))
-                {
-                    ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CPCS1_Msk);
-                    ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CMCS2_Msk);
-                    ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CPCS3_Msk;
-                    ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CMCS4_Msk;
+                #if (defined(CY_DEVICE_PSOC4AS4))
+                    if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+                    {
+                        /* Second Cmod pair in use */
+                        ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CPCS1_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CMCS2_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CPCS3_Msk;
+                        ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CMCS4_Msk;
+                        ptrBaseCfg->mode[idCounter].swSelSh &= (~MSC_MODE_SW_SEL_SH_C1SHG_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelSh |= MSC_MODE_SW_SEL_SH_C3SHG_Msk;
+                    }
+                #else
+                    /* PSOC4-HVMS-128K Devices */
+                    if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+                    {
+                        /* First Cmod pair in use. Do nothing, initialized by template. */
+                    }
+                    else 
+                    {
+                        ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CPCS1_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelComp &= (~MSC_MODE_SW_SEL_COMP_CMCS2_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CPCS3_Msk;
+                        ptrBaseCfg->mode[idCounter].swSelComp |= MSC_MODE_SW_SEL_COMP_CMCS4_Msk;
+                        ptrBaseCfg->mode[idCounter].swSelSh &= (~MSC_MODE_SW_SEL_SH_C1SHG_Msk);
+                        ptrBaseCfg->mode[idCounter].swSelSh |= MSC_MODE_SW_SEL_SH_C3SHG_Msk;
+                    }
+                #endif
 
-                    ptrBaseCfg->mode[idCounter].swSelSh &= (~MSC_MODE_SW_SEL_SH_C1SHG_Msk);
-                    ptrBaseCfg->mode[idCounter].swSelSh |= MSC_MODE_SW_SEL_SH_C3SHG_Msk;
-                }
 
                 #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CSX_EN)
                     if (CY_CAPSENSE_CSX_GROUP == snsMethod)
@@ -399,19 +431,38 @@ cy_capsense_status_t Cy_CapSense_GenerateBaseConfig(
     ptrBaseCfg->initCtl2 &= ~MSC_INIT_CTL2_NUM_INIT_CMOD_34_RAIL_CYCLES_Msk;
     ptrBaseCfg->initCtl2 &= ~MSC_INIT_CTL2_NUM_INIT_CMOD_34_SHORT_CYCLES_Msk;
 
-    if ((CY_CAPSENSE_MSC0_CMOD1PADD_PIN == ptrChConfig->pinCmod1) ||
-        (CY_CAPSENSE_MSC1_CMOD1PADD_PIN == ptrChConfig->pinCmod1))
-    {
-        ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_RAIL_CYCLES_Pos;
-        ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_SHORT_CYCLES_Pos;
-        ptrBaseCfg->initCtl3 |= CY_CAPSENSE_CMOD12_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
-    }
-    else
-    {
-        ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_RAIL_CYCLES_Pos;
-        ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_SHORT_CYCLES_Pos;
-        ptrBaseCfg->initCtl3 |= (uint32_t)CY_CAPSENSE_CMOD34_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
-    }
+    #if (defined(CY_DEVICE_PSOC4AS4))
+        if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+        {
+            /* Second Cmod pair in use. Clears the first pair */
+            ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_RAIL_CYCLES_Pos;
+            ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_SHORT_CYCLES_Pos;
+            ptrBaseCfg->initCtl3 |= (uint32_t)CY_CAPSENSE_CMOD34_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
+        }
+        else 
+        {
+            ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_RAIL_CYCLES_Pos;
+            ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_SHORT_CYCLES_Pos;
+            ptrBaseCfg->initCtl3 |= CY_CAPSENSE_CMOD12_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
+        }
+    #else
+        /* PSOC4-HVMS-128K Devices */
+        if (CY_CAPSENSE_CMOD1PADD_PIN == ptrChConfig->pinCmod1)
+        {
+            /* First Cmod pair in use. Clears second pair */
+            ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_RAIL_CYCLES_Pos;
+            ptrBaseCfg->initCtl1 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL1_NUM_INIT_CMOD_12_SHORT_CYCLES_Pos;
+            ptrBaseCfg->initCtl3 |= CY_CAPSENSE_CMOD12_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
+        }
+        else 
+        {
+            ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitChargeCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_RAIL_CYCLES_Pos;
+            ptrBaseCfg->initCtl2 |= (uint32_t)ptrIntrCxt->numCoarseInitSettleCycles << MSC_INIT_CTL2_NUM_INIT_CMOD_34_SHORT_CYCLES_Pos;
+            ptrBaseCfg->initCtl3 |= (uint32_t)CY_CAPSENSE_CMOD34_PAIR_SELECTION << MSC_INIT_CTL3_CMOD_SEL_Pos;
+        }
+    #endif
+
+
     ptrBaseCfg->initCtl3 &= ~MSC_INIT_CTL3_NUM_PRO_OFFSET_CYCLES_Msk;
     ptrBaseCfg->initCtl3 |= (uint32_t)ptrIntrCxt->numProOffsetCycles << MSC_INIT_CTL3_NUM_PRO_OFFSET_CYCLES_Pos;
 

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 8.10.0
+* \version 9.0.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
@@ -356,7 +356,8 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
                         {
                             ptrWdCfg = &context->ptrWdConfig[widgetId];
 
-                            if ((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType)
+                            if (((uint8_t)CY_CAPSENSE_WD_LIQUID_LEVEL_E == ptrWdCfg->wdType) ||
+                                ((uint8_t)CY_CAPSENSE_WD_LIQUID_PRESENCE_E == ptrWdCfg->wdType))
                             {
                                 if (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
                                 {
