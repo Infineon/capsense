@@ -12,5 +12,6 @@ var group__group__capsense__macros__mw__state =
     [ "CY_CAPSENSE_MW_STATE_SMARTSENSE_MASK", "group__group__capsense__macros__mw__state.html#gafe79cdb3ceadd371c655ea6be028a700", null ],
     [ "CY_CAPSENSE_MW_STATE_INITIALIZATION_MASK", "group__group__capsense__macros__mw__state.html#gafdfbe771bb88d2d91cc0b8ecefb2ad03", null ],
     [ "CY_CAPSENSE_MW_STATE_SCAN_SLOT_MASK", "group__group__capsense__macros__mw__state.html#gab68b2414d00242e827e8f068db3a766a", null ],
-    [ "CY_CAPSENSE_MW_STATE_SCAN_SLOT_POS", "group__group__capsense__macros__mw__state.html#gade52f7114b1a748b17c4f404ea522b44", null ]
+    [ "CY_CAPSENSE_MW_STATE_SCAN_SLOT_POS", "group__group__capsense__macros__mw__state.html#gade52f7114b1a748b17c4f404ea522b44", null ],
+    [ "CY_CAPSENSE_CALIBRATION_EN", "group__group__capsense__macros__mw__state.html#gaad5606399719a7968e04d45229c21f5f", null ]
 ];

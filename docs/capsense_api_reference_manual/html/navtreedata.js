@@ -1,6 +1,6 @@
 var NAVTREE =
 [
-  [ "CAPSENSE™ Middleware Library 9.0.0", "index.html", [
+  [ "CAPSENSE™ Middleware Library 9.10.0", "index.html", [
     [ "General Description", "index.html#section_capsense_general", [
       [ "Features", "index.html#subsection_capsense_features", null ]
     ] ],
@@ -30,11 +30,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__group__capsense__callbacks.html",
-"group__group__capsense__macros__gesture.html#ga8d5527833a1082b48a13f883a015cc1e",
-"group__group__capsense__macros__settings.html#gaf8db866012c77ad000f75d3174938c2c",
-"structcy__stc__capsense__bist__custom__parameters__t.html#aa9db7044638f1e6ee7a56a850f31d67d",
-"structcy__stc__capsense__internal__context__t.html#a0c52ee091e3084c807b1a5c9e5d8c6ce",
-"structcy__stc__capsense__widget__config__t.html#a8da5973b3062723df1b1ebf6b7f5bd86"
+"group__group__capsense__macros__gesture.html#ga77e3a9bb62112a9c735527b339f60069",
+"group__group__capsense__macros__settings.html#gaebc0fb6bfe7bc94a2c49da92907130ca",
+"structcy__stc__capsense__bist__custom__parameters__t.html",
+"structcy__stc__capsense__internal__context__t.html#a00823e55b0473a93b8fd46048472bcd9",
+"structcy__stc__capsense__widget__config__t.html#a67d55b8afd94b5ff3de3587a4241c628"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

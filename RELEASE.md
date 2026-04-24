@@ -1,24 +1,14 @@
-# CAPSENSE™ Middleware Library 9.0.0
+# CAPSENSE™ Middleware Library 9.10.0
 
 ### What is Included?
 For a complete description of the CAPSENSE™ middleware, refer to [README.md](./README.md) and [API Reference Guide](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html).
 The revision history of the CAPSENSE™ middleware is also available at [API Reference Guide Changelog](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_changelog).
 The new support added in this release:
-* New widget Liquid Presence
-* New feature Liquid tank removal detection
-* Improved algorithm for 3-segment Liquid Level widget
-* Five new gestures
+* Added support of Liquid Level Foam Rejection feature.
+* Fixed MISRA violations 10.8 and 17.8.
 
 ### Known issues
 This section lists the known problems with the CAPSENSE™ middleware. 
-The next MISRA-C:2012 compliance rules are violated by the CAPSENSE™ middleware.
-| Rule ID   | Rule Description                                                                                                      |
-|:----      | :-----------                                                                                                          |
-| Rule 10.8 | The value of a composite expression shall not be cast to a different essential type category or wider essential type. |
-| Rule 17.8 | A function parameter shall not be modified.                                                                           |
-
-**Note:** The code of the CAPSENSE™ middleware is safe. Verified manually.
-
 For a complete description of the known issues and possible workarounds, refer to the [API Reference Guide - Errata section](https://infineon.github.io/capsense/capsense_api_reference_manual/html/index.html#section_capsense_errata).
 
 ### Supported software and tools
@@ -33,7 +23,7 @@ This version of the CAPSENSE™ middleware was validated for compatibility with 
 | - ModusToolbox™ MSC Personality for PSOC™ 4 devices in the Device Configurator                    | 1.1     |
 | - ModusToolbox™ CSD Personality for PSOC™ 4 devices in the Device Configurator                    | 2.0     |
 | - ModusToolbox™ CSD Personality for PSOC™ 6 devices in the Device Configurator                    | 3.0     |
-| - ModusToolbox™ CAPSENSE™ Configurator / Tuner                                                    | 10.0.0  |
+| - ModusToolbox™ CAPSENSE™ Configurator / Tuner                                                    | 10.10.0 |
 | CAT1 Peripheral Driver Library (PDL)                                                              | 3.17.0  |
 | CAT2 Peripheral Driver Library (PDL)                                                              | 2.20.0  |
 | GCC Compiler                                                                                      | 14.2    |
@@ -78,4 +68,4 @@ For more information, refer to:
   * [Infineon Technologies](https://www.infineon.com)
 
 ---
-Cypress Semiconductor Corporation, 2019-2025.
+Infineon Technologies AG, 2019-2026.

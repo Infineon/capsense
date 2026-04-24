@@ -1,25 +1,47 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 9.0.0
+* \version 9.10.0
 *
 * \brief
 * This file includes all the header files of the CAPSENSE&trade; middleware.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
-* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+ * (c) 2018-2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 /**
 ********************************************************************************
 * \mainpage
 ********************************************************************************
-* CAPSENSE&trade; is a CYPRESS&trade; capacitive sensing solution from
-* Infineon. Capacitive sensing can be used in a variety of applications
+* CAPSENSE&trade; is a capacitive sensing solution from Infineon 
+* Technologies AG. Capacitive sensing can be used in a variety of applications
 * and products where conventional mechanical buttons can be replaced with
 * sleek human interfaces to transform the way users interact with electronic
 * systems. These include home appliances, and automotive, IoT, and
@@ -296,11 +318,11 @@
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Configurator tool</td>
-*     <td>10.0.0</td>
+*     <td>10.10.0</td>
 *   </tr>
 *   <tr>
 *     <td>- ModusToolbox&trade; CAPSENSE&trade; Tuner tool</td>
-*     <td>10.0.0</td>
+*     <td>10.10.0</td>
 *   </tr>
 *   <tr>
 *     <td>CAT1 Peripheral Driver Library (PDL)</td>
@@ -635,17 +657,6 @@
 * <table class="doxtable">
 *   <tr><th>ID</th><th>Known Issue</th><th>Workaround</th></tr>
 *   <tr>
-*     <td>27253</td>
-*     <td>
-*         In this pack, for the Liquid Level sensing, CAPSENSE&trade; middleware 
-*         has the Beta Version of “Foam Rejection". 
-*         Foam rejection feature might have an impact on the performance.
-*     </td>
-*     <td>
-*         No Workaround.
-*     </td>
-*   </tr>
-*   <tr>
 *     <td>319100</td>
 *     <td>
 *         GPIO simultaneous operation with unrestricted strength and frequency
@@ -719,27 +730,52 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="3">9.10.0</td>
+*     <td colspan="2"><i><b>
+*       This version is compatible with v9.0.0.
+*       Also, if you use the CAPSENSE&trade; middleware v9.10.0, you must use
+*       the CAPSENSE&trade; Configurator v10.10.0 or later.
+*     </b></i>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Added support of Liquid Level Foam Rejection feature.
+*     </td>
+*     <td>
+*         New feature support.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td> 
+*         Fixed MISRA violations 10.8 and 17.8.
+*     </td>
+*     <td>
+*         Defect fixing.
+*     </td>
+*   </tr>
+*   <tr>
 *     <td rowspan="8">9.0.0</td>
 *     <td colspan="2"><i><b>
 *       This version is compatible with v8.10.0,
 *       but due to switching to MTB 3.7, new Device-DB, PDL, etc.
 *       a migration of projects created with a past version might be
 *       not possible. In this case a project should be newly created.
-*       Also, if you use the CAPSENSE&trade; middleware v9.0.0, if you use CAPSENSE&trade;
-*       Configurator v10.0.0 or later. This MW version
+*       Also, if you use the CAPSENSE&trade; middleware v9.0.0, you must use
+*       the CAPSENSE&trade; Configurator v10.0.0 or later. This MW version
 *       is not compatible with the previous CAPSENSE&trade; Configurator versions.
 *     </b></i>
 *   </tr>
 *   <tr>
 *     <td> 
-*      New widget Liquid Presence
+*         New widget Liquid Presence
 *     </td>
 *     <td>
 *         New feature support.
 *     </td>
+*   </tr>
 *   <tr>
 *     <td> 
-*      New feature Liquid tank removal detection
+*         New feature Liquid tank removal detection
 *     </td>
 *     <td>
 *         New feature support.
@@ -784,12 +820,12 @@
 *   </tr>
 *   <tr>
 *     <td> 
-*      Fixed Cmod pin assignment for the fifth-generation CAPSENSE&trade; in SMARTSENSE:
+*         Fixed Cmod pin assignment for the fifth-generation CAPSENSE&trade; in SMARTSENSE:
 *         * PSOC&trade; 4100S Max devices
 *         * PSOC&trade; high-voltage (HV) mixed signal (MS) devices
 *     </td>
 *     <td>
-*        Defect fixing.
+*         Defect fixing.
 *     </td>
 *   </tr>
 *   <tr>
@@ -1507,8 +1543,8 @@
 * \section section_capsense_more_information More Information
 ********************************************************************************
 *
-* Important information about the CAPSENSE&trade;-technology overview, appropriate
-* CYPRESS&trade; device from Infineon for the design, CAPSENSE&trade; system and sensor
+* Important information about the CAPSENSE&trade;-technology overview, device 
+* from Infineon Technologies AG for the design, CAPSENSE&trade; system and sensor
 * design guidelines, different interfaces and tuning guidelines necessary
 * for a successful design of a CAPSENSE&trade; system is available in the Getting
 * Started with CAPSENSE&trade; document and the product-specific CAPSENSE&trade; design guide.

@@ -1,5 +1,12 @@
 var NAVTREEINDEX5 =
 {
+"structcy__stc__capsense__widget__config__t.html#a67d55b8afd94b5ff3de3587a4241c628":[10,2,0,20,30],
+"structcy__stc__capsense__widget__config__t.html#a78fb9e1d1b8c8cdad2d4257f5881ddc2":[10,2,0,20,41],
+"structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f":[10,2,0,20,50],
+"structcy__stc__capsense__widget__config__t.html#a872610c19b274d4daa48c9d29990f7cc":[10,2,0,20,4],
+"structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63":[10,2,0,20,38],
+"structcy__stc__capsense__widget__config__t.html#a88a5166ff86cf001344434b0bb84d799":[10,2,0,20,2],
+"structcy__stc__capsense__widget__config__t.html#a8cbf228dd4ae8a901c911c162c70b30a":[10,2,0,20,6],
 "structcy__stc__capsense__widget__config__t.html#a8da5973b3062723df1b1ebf6b7f5bd86":[10,2,0,20,21],
 "structcy__stc__capsense__widget__config__t.html#a93e1fecbb0649d67dee102b1ef2cd1b8":[10,2,0,20,17],
 "structcy__stc__capsense__widget__config__t.html#a94b1400ac7cf425e79664f4e19f54d0b":[10,2,0,20,27],

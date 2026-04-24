@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_structure.h
-* \version 9.0.0
+* \version 9.10.0
 *
 * \brief
 * This file provides the top-level declarations of the CAPSENSE&trade; data
@@ -8,11 +8,33 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
-* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+ * (c) 2018-2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 
@@ -34,13 +56,14 @@
 #endif /* CY_CAPSENSE_PLATFORM_BLOCK selection */
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
-#ifndef CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN
-    #define CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN (1u)
-#endif /* CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN */
 #if defined(__cplusplus)
 extern "C" {
 #endif /* defined(__cplusplus) */
 
+#ifndef CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN
+    /** Disable Liquid level for platforms which does not support it */
+    #define CY_CAPSENSE_LIQUID_LEVEL_TANK_REMOVAL_DETECTION_EN (0u)
+#endif
 
 /*******************************************************************************
 * CAPSENSE&trade; Enumerated Types
@@ -77,8 +100,12 @@ typedef enum
                                                                  * * Low power sensors rawcounts are copied to communication structure
                                                                  * * Data is transferred to Tuner (in case of UART or protocol-agnostic method) */
     CY_CAPSENSE_TU_CMD_RESTART_ONLY_E            = 10u,         /**< Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged */
-    CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E = 11u,         /**< Sets duty cycle and executes one scan (used only when foam-rejection is enabled for LLW) */
-    CY_CAPSENSE_TU_CMD_LAST_E                    = 12u,         /**< The last command */
+    CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E = 11u,         /**< Sets duty cycle and executes one scan (used for foam rejection LLW only) */
+    CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E = 12u,       /**< Calibrates a desired widget */
+    CY_CAPSENSE_TU_CMD_SCAN_WIDGET_BLOCKING_E    = 13u,         /**< Scans a desired widget and waits till scan complete */
+    CY_CAPSENSE_TU_CMD_BIST_UPDATE_WIDGET_CRC_E  = 14u,         /**< Updates a desired widget CRC if built-in self-test is enabled */
+    CY_CAPSENSE_TU_CMD_APPLY_CDACS_WIDGET_E      = 15u,         /**< Takes CDAC values from data structure and applies them to sensor frame structure */
+    CY_CAPSENSE_TU_CMD_LAST_E                    = 16u,         /**< The last command */
 } cy_en_capsense_tuner_cmd_t;
 
 /** Defines widget types */
@@ -260,7 +287,8 @@ typedef struct
     uint8_t status;                                             /**< Sensor status, contains masks:
                                                                    * * bit[0] - Regular Sensor Touched (CY_CAPSENSE_SNS_TOUCH_STATUS_MASK) or Proximity Sensor is active (CY_CAPSENSE_SNS_PROX_STATUS_MASK)
                                                                    * * bit[1] - Proximity Sensor Touched  (CY_CAPSENSE_SNS_TOUCH_PROX_STATUS_MASK)
-                                                                   * * bit[2] - Overflow during scanning (CY_CAPSENSE_SNS_OVERFLOW_MASK) */
+                                                                   * * bit[2] - Overflow during scanning (CY_CAPSENSE_SNS_OVERFLOW_MASK) 
+                                                                */
     uint8_t negBslnRstCnt;                                      /**< Negative baseline reset counter */
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint8_t idacComp;                                       /**< Compensation IDAC of CSD or IDAC in CSX
@@ -328,7 +356,8 @@ typedef struct
     uint16_t fingerCap;                                         /**< Touch sensitivity used when full auto-tuning mode is enabled:
                                                                    * * For CSD widgets is a finger capacitance introduced at touch
                                                                    * * For ISX widgets is a coil inductance change at touch */
-    uint16_t sigPFC;                                            /**< The 75% of signal per the user-defined touch sensitivity parameter */
+    uint16_t sigPFC;                                            /**< The 75% of signal per the user-defined touch sensitivity parameter
+                                                                   * * For foam rejection widget defines internal scan parameter */
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FOURTH_GEN)
         uint16_t resolution;                                    /**< Provides scan resolution for the CSD Widgets.
                                                                  * Provides number of sub-conversions for the CSX Widgets
@@ -1891,7 +1920,9 @@ typedef struct
     uint16_t scanCounter;                                       /**< This counter increments after each scan of active widgets. */
     uint8_t tunerSt;                                            /**< State of CAPSENSE&trade; middleware tuner module. \ref cy_en_capsense_tuner_state_t */
     uint8_t initDone;                                           /**< Keep information whether initialization was done or not */
-    uint16_t misc;                                              /**< Specifies miscellaneous feature configuration (internal usage) */
+    uint16_t misc;                                              /**< Specifies miscellaneous feature configuration (internal usage):
+                                                                  * * Bit[0-5] - Widget ID
+                                                                  */
     volatile uint32_t status;                                   /**< Middleware status information:
                                                                   * * Bit[0-3] - The set [x] bit of the result means that the previously initiated scan for the [x] channel is in progress.
                                                                   *              For MSCv3 each bit shows a busyness of a corresponding sensing channel. 

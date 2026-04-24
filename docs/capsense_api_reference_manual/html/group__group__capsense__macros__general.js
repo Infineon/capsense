@@ -16,6 +16,8 @@ var group__group__capsense__macros__general =
     [ "CY_CAPSENSE_SNS_PROX_STATUS_MASK", "group__group__capsense__macros__general.html#gaf56cec4f93d99e05d6b9197533a04c4e", null ],
     [ "CY_CAPSENSE_SNS_TOUCH_PROX_STATUS_MASK", "group__group__capsense__macros__general.html#ga2a476922a66855c1d11db532568c300a", null ],
     [ "CY_CAPSENSE_SNS_OVERFLOW_MASK", "group__group__capsense__macros__general.html#gaa37105aadfbfd2c37b34b939c6fcf016", null ],
+    [ "CY_CAPSENSE_WD_MAX_NUMBER", "group__group__capsense__macros__general.html#ga1f0f4371b15a0db1c2907dcf98577b1b", null ],
+    [ "CY_CAPSENSE_WD_MAX_NUMBER_MASK", "group__group__capsense__macros__general.html#ga4db8f505d99d308b9250b1fed5a881d4", null ],
     [ "CY_CAPSENSE_WD_ACTIVE_MASK", "group__group__capsense__macros__general.html#gad47321d5011cc28ee15d2148c62af66f", null ],
     [ "CY_CAPSENSE_WD_ENABLE_MASK", "group__group__capsense__macros__general.html#ga167c285e8682b75dbc48faf1d5e51fae", null ],
     [ "CY_CAPSENSE_WD_WORKING_MASK", "group__group__capsense__macros__general.html#ga00a019887f9b20124c916b3a2f431fdd", null ],

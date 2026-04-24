@@ -1,5 +1,12 @@
 var NAVTREEINDEX2 =
 {
+"group__group__capsense__macros__settings.html#gaebc0fb6bfe7bc94a2c49da92907130ca":[10,4,3,156],
+"group__group__capsense__macros__settings.html#gaee14d46514f114db4fe4bf404b237b66":[10,4,3,128],
+"group__group__capsense__macros__settings.html#gaf1d73a40e03d31089561bbd84ab36afd":[10,4,3,93],
+"group__group__capsense__macros__settings.html#gaf231ca0a07513f2a3bf4b98d089be133":[10,4,3,91],
+"group__group__capsense__macros__settings.html#gaf3e12cf8efd216867fa1c284634a3053":[10,4,3,114],
+"group__group__capsense__macros__settings.html#gaf46055ebd3cc5feebeb135c6fff2359a":[10,4,3,132],
+"group__group__capsense__macros__settings.html#gaf5100eb9ad525c7553ad3f6a91af6bee":[10,4,3,5],
 "group__group__capsense__macros__settings.html#gaf8db866012c77ad000f75d3174938c2c":[10,4,3,125],
 "group__group__capsense__macros__settings.html#gafb022afde037da74b2d3950f4530984d":[10,4,3,81],
 "group__group__capsense__macros__settings.html#gafcf80ee9c55e11ea09864f8a32de99b6":[10,4,3,126],
@@ -242,12 +249,5 @@ var NAVTREEINDEX2 =
 "structcy__stc__capsense__bist__context__t.html#af41b354a7c567232a7572a73ed0bc5b9":[10,2,0,25,65],
 "structcy__stc__capsense__bist__context__t.html#af730e190820fe159e3fd59854c670a2e":[10,2,0,25,78],
 "structcy__stc__capsense__bist__context__t.html#af75d6d1eea62a6f89d6d812cd6488252":[10,2,0,25,5],
-"structcy__stc__capsense__bist__context__t.html#af8eeec145da8af1555e3bea62c8a2b6a":[10,2,0,25,27],
-"structcy__stc__capsense__bist__custom__parameters__t.html":[10,2,0,26],
-"structcy__stc__capsense__bist__custom__parameters__t.html#a0454367cc4a77a7e20a1864fa3d3e5f3":[10,2,0,26,3],
-"structcy__stc__capsense__bist__custom__parameters__t.html#a064aef0add09fe3405402613b9195060":[10,2,0,26,2],
-"structcy__stc__capsense__bist__custom__parameters__t.html#a1891b4360a526d25c2b6d2966fdba5be":[10,2,0,26,4],
-"structcy__stc__capsense__bist__custom__parameters__t.html#a60c9a9e518194f83bd0bba955066474f":[10,2,0,26,7],
-"structcy__stc__capsense__bist__custom__parameters__t.html#a73d52513a1573f6fe1ad64ed47956660":[10,2,0,26,8],
-"structcy__stc__capsense__bist__custom__parameters__t.html#aa24f7a01ccebf1ad20e600ca27565eac":[10,2,0,26,5]
+"structcy__stc__capsense__bist__context__t.html#af8eeec145da8af1555e3bea62c8a2b6a":[10,2,0,25,27]
 };

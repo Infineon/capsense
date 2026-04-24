@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_generator_lp.c
-* \version 9.0.0
+* \version 9.10.0
 *
 * \brief
 * This file contains the source of functions common for register map
@@ -8,11 +8,33 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
-* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+ * (c) 2020-2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 
@@ -1752,6 +1774,53 @@ uint32_t Cy_CapSense_AdjustSnsClkDivider(
     }
 
     return retVal;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_ApplyWidgetCdacParam
+****************************************************************************//**
+*
+* Applies a desired widget CDAC parameters.
+*
+* This function takes CDAC parameters from a CAPSENSE&trade; Data Structure
+* and add them to all sensors of sensor frame structure.
+*
+* The following CDAC parameters are taken care by this function:
+* * Widget reference CDAC (cdacRef)
+* * Widget fine CDAC (cdacFine), if enabled
+* * Widget compensation CDAC divider (cdacCompDivider)
+* * Sensor compensation CDAC (cdacComp)
+*
+*******************************************************************************/
+void Cy_CapSense_ApplyWidgetCdacParam(
+                uint32_t widgetId,
+                cy_stc_capsense_context_t * context)
+{
+    uint32_t i;
+    const cy_stc_capsense_widget_config_t * ptrWdCfg = &context->ptrWdConfig[widgetId];
+    cy_stc_capsense_widget_context_t * ptrWdCxt = ptrWdCfg->ptrWdContext;
+    cy_stc_capsense_sensor_context_t * ptrSnsCxt = ptrWdCfg->ptrSnsContext;
+
+    uint32_t * ptrSensorFrame = &context->ptrSensorFrameContext[ptrWdCfg->firstSlotId * CY_CAPSENSE_SENSOR_FRAME_SIZE];
+
+    for (i = 0u; i < context->ptrWdConfig[widgetId].numSns; i++)
+    {
+        ptrSensorFrame[CY_CAPSENSE_SNS_SCAN_CTL_INDEX] &= ~MSCLP_SNS_SNS_SCAN_CTL_COMP_DIV_Msk;
+        ptrSensorFrame[CY_CAPSENSE_SNS_SCAN_CTL_INDEX] |= _VAL2FLD(MSCLP_SNS_SNS_SCAN_CTL_COMP_DIV, ((uint32_t)ptrWdCxt->cdacCompDivider - 1u));
+
+        ptrSensorFrame[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] &= ~(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE_Msk |
+                                                            MSCLP_SNS_SNS_CDAC_CTL_SEL_CO_Msk |
+                                                            MSCLP_SNS_SNS_CDAC_CTL_SEL_CF_Msk);
+        ptrSensorFrame[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_RE, ptrWdCxt->cdacRef);
+        #if (CY_CAPSENSE_CDAC_FINE_EN)
+            ptrSensorFrame[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CF, ptrWdCxt->cdacFine);
+        #endif
+        ptrSensorFrame[CY_CAPSENSE_SNS_CDAC_CTL_INDEX] |= _VAL2FLD(MSCLP_SNS_SNS_CDAC_CTL_SEL_CO, ptrSnsCxt[i].cdacComp);
+
+        ptrSensorFrame += CY_CAPSENSE_SENSOR_FRAME_SIZE;
+    }
+    context->ptrCommonContext->status &= (uint32_t)~((uint32_t)CY_CAPSENSE_MW_STATE_WD_SCAN_MASK);
 }
 
 

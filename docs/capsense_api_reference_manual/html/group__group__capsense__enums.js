@@ -18,6 +18,10 @@ var group__group__capsense__enums =
       [ "CY_CAPSENSE_TU_CMD_COMM_EN_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79ad8519bacd62326f448283dacbf43ac5e", null ],
       [ "CY_CAPSENSE_TU_CMD_RESTART_ONLY_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c", null ],
       [ "CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6", null ],
+      [ "CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e720be467acae0ce8d7350f7626119", null ],
+      [ "CY_CAPSENSE_TU_CMD_SCAN_WIDGET_BLOCKING_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a452ee19a2f87d533e83d4cd04b36bcc6", null ],
+      [ "CY_CAPSENSE_TU_CMD_BIST_UPDATE_WIDGET_CRC_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a7ac8cdbd5d997a9368883113900046de", null ],
+      [ "CY_CAPSENSE_TU_CMD_APPLY_CDACS_WIDGET_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a61cd083a46b162c6e41e4a91cb6ce2e8", null ],
       [ "CY_CAPSENSE_TU_CMD_LAST_E", "group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92", null ]
     ] ],
     [ "cy_en_capsense_widget_type_t", "group__group__capsense__enums.html#ga855d894b24929f0d7d2774dfc4266d60", [

@@ -1,5 +1,11 @@
 var NAVTREEINDEX1 =
 {
+"group__group__capsense__macros__gesture.html#ga77e3a9bb62112a9c735527b339f60069":[10,4,7,47],
+"group__group__capsense__macros__gesture.html#ga7fbcbb9c6b55c782a9f57d94313151e9":[10,4,7,25],
+"group__group__capsense__macros__gesture.html#ga8324cb7cc6139bd316a9e574642cfd27":[10,4,7,28],
+"group__group__capsense__macros__gesture.html#ga832fa742b151f0e3935f2a64fd6bf248":[10,4,7,37],
+"group__group__capsense__macros__gesture.html#ga84ed896903d3820f5493af6b5f2f9dc5":[10,4,7,38],
+"group__group__capsense__macros__gesture.html#ga8b8acd72bf319f96f240c392dad2e271":[10,4,7,2],
 "group__group__capsense__macros__gesture.html#ga8d5527833a1082b48a13f883a015cc1e":[10,4,7,5],
 "group__group__capsense__macros__gesture.html#ga8f2f7a9121b4ada5241dd7a14250a0a2":[10,4,7,9],
 "group__group__capsense__macros__gesture.html#ga90ffefd07036a54158518aa02a267899":[10,4,7,34],
@@ -59,6 +65,7 @@ var NAVTREEINDEX1 =
 "group__group__capsense__macros__mw__state.html#ga812bfd422afd4cd3112299e51d6e3c5e":[10,4,1,8],
 "group__group__capsense__macros__mw__state.html#ga9b37d16f569ed138127fcd5362512ab7":[10,4,1,4],
 "group__group__capsense__macros__mw__state.html#gaa3c8ba2488a71e7ab976519e39169929":[10,4,1,0],
+"group__group__capsense__macros__mw__state.html#gaad5606399719a7968e04d45229c21f5f":[10,4,1,13],
 "group__group__capsense__macros__mw__state.html#gab68b2414d00242e827e8f068db3a766a":[10,4,1,11],
 "group__group__capsense__macros__mw__state.html#gab9415133b167fa71c5d0eef322b984e3":[10,4,1,3],
 "group__group__capsense__macros__mw__state.html#gade52f7114b1a748b17c4f404ea522b44":[10,4,1,12],
@@ -242,12 +249,5 @@ var NAVTREEINDEX1 =
 "group__group__capsense__macros__settings.html#gae86010c9d7c2b34d3825aed42c3bdb55":[10,4,3,14],
 "group__group__capsense__macros__settings.html#gae8a4b5b936a963429f169eba340a1bfc":[10,4,3,86],
 "group__group__capsense__macros__settings.html#gaea2d3a1649a3b61fd4373f08b42f28b8":[10,4,3,154],
-"group__group__capsense__macros__settings.html#gaeaa0712bb3ceba12e47d1d216f600e01":[10,4,3,127],
-"group__group__capsense__macros__settings.html#gaebc0fb6bfe7bc94a2c49da92907130ca":[10,4,3,156],
-"group__group__capsense__macros__settings.html#gaee14d46514f114db4fe4bf404b237b66":[10,4,3,128],
-"group__group__capsense__macros__settings.html#gaf1d73a40e03d31089561bbd84ab36afd":[10,4,3,93],
-"group__group__capsense__macros__settings.html#gaf231ca0a07513f2a3bf4b98d089be133":[10,4,3,91],
-"group__group__capsense__macros__settings.html#gaf3e12cf8efd216867fa1c284634a3053":[10,4,3,114],
-"group__group__capsense__macros__settings.html#gaf46055ebd3cc5feebeb135c6fff2359a":[10,4,3,132],
-"group__group__capsense__macros__settings.html#gaf5100eb9ad525c7553ad3f6a91af6bee":[10,4,3,5]
+"group__group__capsense__macros__settings.html#gaeaa0712bb3ceba12e47d1d216f600e01":[10,4,3,127]
 };

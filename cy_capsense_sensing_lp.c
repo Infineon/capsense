@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_sensing_lp.c
-* \version 9.0.0
+* \version 9.10.0
 *
 * \brief
 * This file contains the source of functions common for different scanning
@@ -8,11 +8,33 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2020-2025, Cypress Semiconductor Corporation (an Infineon company)
-* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+ * (c) 2020-2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 
@@ -652,6 +674,13 @@ cy_capsense_status_t Cy_CapSense_ScanSlots_V3Lp(
                     {
                         context->ptrInternalContext->ptrSSCallback(context->ptrActiveScanSns);
                     }
+
+                    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
+                        if (CY_CAPSENSE_STATUS_SUCCESS == capStatus)
+                        {
+                            capStatus = Cy_CapSense_ShortIntegration(startSlotId, numberSlots, context);
+                        }
+                    #endif
 
                     /* Check if the external start is enabled */
                     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_EXT_FRM_START_EN)
@@ -1919,6 +1948,11 @@ cy_capsense_status_t Cy_CapSense_CalibrateWidget_V3Lp(
             }
         }
 
+        if ((uint16_t)CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E == context->ptrCommonContext->tunerCmd)
+        {
+            skipCalibration = 0u;
+        }
+
         if (0u == skipCalibration)
         {
             ptrWdCxt = ptrWdCfg->ptrWdContext;
@@ -3131,11 +3165,11 @@ cy_capsense_status_t Cy_CapSense_ScanSlotInternalCPU(
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
         if (0u != (ptrWdCfg->centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
         {
-        /* Configures Foam rejection scan */
-        context->ptrCommonConfig->ptrChConfig->ptrHwBase->SENSE_DUTY_CTL = 
-                ((CY_CAPSENSE_SM_REG_SENSE_DUTY_CTL_FLD_PHASE_WIDTH_SEL_FOAM << MSCLP_SENSE_DUTY_CTL_PHASE_WIDTH_SEL_Pos) | 
-                 (CY_CAPSENSE_SM_REG_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_CYCLES_FOAM << MSCLP_SENSE_DUTY_CTL_PHASE_SHIFT_CYCLES_Pos) | 
-                 ((uint32_t)ptrWdCfg->ptrWdContext->sigPFC << MSCLP_SENSE_DUTY_CTL_PHASE_WIDTH_Pos));
+            /* Configures Foam rejection scan */
+            context->ptrCommonConfig->ptrChConfig->ptrHwBase->SENSE_DUTY_CTL =
+                    ((CY_CAPSENSE_SM_REG_SENSE_DUTY_CTL_FLD_PHASE_WIDTH_SEL_FOAM << MSCLP_SENSE_DUTY_CTL_PHASE_WIDTH_SEL_Pos) |
+                     (CY_CAPSENSE_SM_REG_SENSE_DUTY_CTL_FLD_PHASE_SHIFT_CYCLES_FOAM << MSCLP_SENSE_DUTY_CTL_PHASE_SHIFT_CYCLES_Pos) |
+                     ((uint32_t)ptrWdCfg->ptrWdContext->sigPFC << MSCLP_SENSE_DUTY_CTL_PHASE_WIDTH_Pos));
         }
     #endif
 
@@ -3434,7 +3468,10 @@ cy_capsense_status_t Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * contex
             capStatus |= Cy_CapSense_InitializeMaxRaw(i, context);
 
             #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
-                context->ptrWdConfig[i].ptrWdContext->sigPFC = context->ptrWdConfig[i].foamCoefficient;
+                if (0u != (context->ptrWdConfig[i].centroidConfig & CY_CAPSENSE_LLW_FOAM_EN_MASK))
+                {
+                    context->ptrWdConfig[i].ptrWdContext->sigPFC = context->ptrWdConfig[i].foamCoefficient;
+                }
             #endif
         }
     }
@@ -7459,7 +7496,12 @@ cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
     uint32_t epiCounts;
     uint32_t epiKrefDelay;
 
-    uint32_t shiftTemp= 0u;
+    #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN) && \
+            ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_AUTO_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)))
+        /* shiftTemp is only needed if CIC2 filter and auto modes are enabled */
+        uint32_t shiftTemp = 0u;
+    #endif
     cy_stc_capsense_widget_context_t * ptrWdCxt = &context->ptrWdContext[widgetId];
 
     (void)mode;
@@ -7503,7 +7545,8 @@ cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
     scanConfigTmp[CY_CAPSENSE_SNS_SCAN_CTL_INDEX] &= ~MSCLP_SNS_SNS_SCAN_CTL_NUM_CONV_Msk;
 
     #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN) && \
-        ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_AUTO_EN) || (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)))
+            ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_AUTO_EN) || \
+            (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)))
         if (CY_CAPSENSE_SATURATED_SCAN_TIME == mode)
         {
             /* Disable the CIC2 shift and set the decimation rate to 1 (DECIM_RATE = 0) to increment the
@@ -7586,32 +7629,33 @@ cy_capsense_status_t Cy_CapSense_ExecuteSaturatedScan(
 
     *ptrMaxRaw = CY_CAPSENSE_16_BIT_MASK;
 
-    if (((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType) &&
-       (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN))
-    {
-        if ((CY_CAPSENSE_SATURATED_SCAN_TIME == mode) &&
-               ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_AUTO_EN) || 
-               (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)))
-
+    #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_EN)
+        if ((uint8_t)CY_CAPSENSE_WD_WHEATSTONE_BRIDGE_E != ptrWdCfg->wdType)
         {
-            tmpVal <<= shiftTemp;
-            /* The final value in the FIFO fill is the equal number of Mod Clock cycles per scan minus 1 because
-             * the first CIC2 sample is invalid and is always skipped. The code below takes into account this skipped
-             * Mod Clock cycle.
-             */
-            tmpVal++;
-            *ptrMaxRaw = tmpVal;
-        }
-        else
-        {
-            tmpVal *= ptrWdCfg->numChopCycles;
-            if (tmpVal <= CY_CAPSENSE_16_BIT_MASK)
+            #if (((CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC2_FILTER_AUTO_EN) || \
+                 (CY_CAPSENSE_ENABLE == CY_CAPSENSE_CIC_RATE_MODE_AUTO_EN)))
+                if (CY_CAPSENSE_SATURATED_SCAN_TIME == mode)
+                {
+                    tmpVal <<= shiftTemp;
+                    /* The final value in the FIFO fill is the equal number of Mod Clock cycles per scan minus 1 because
+                     * the first CIC2 sample is invalid and is always skipped. The code below takes into account this skipped
+                     * Mod Clock cycle.
+                     */
+                    tmpVal++;
+                    *ptrMaxRaw = tmpVal;
+                }
+                else
+            #endif
             {
-                *ptrMaxRaw = (uint16_t)tmpVal;
+                tmpVal *= ptrWdCfg->numChopCycles;
+                if (tmpVal <= CY_CAPSENSE_16_BIT_MASK)
+                {
+                    *ptrMaxRaw = (uint16_t)tmpVal;
+                }
             }
         }
-    }
-    else
+        else
+    #endif
     {
         epiKrefDelay = CY_CAPSENSE_NUM_EPI_KREF_DELAY;
         kref = ((scanConfigTmp[CY_CAPSENSE_SNS_CTL_INDEX] & MSCLP_SNS_SNS_CTL_SENSE_DIV_Msk) >> MSCLP_SNS_SNS_CTL_SENSE_DIV_Pos) + 1u;

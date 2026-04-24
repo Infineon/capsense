@@ -1,5 +1,12 @@
 var NAVTREEINDEX4 =
 {
+"structcy__stc__capsense__internal__context__t.html#a00823e55b0473a93b8fd46048472bcd9":[10,2,0,28,53],
+"structcy__stc__capsense__internal__context__t.html#a0319bc9875f2c2f7cd7eea16cd17b8c2":[10,2,0,28,15],
+"structcy__stc__capsense__internal__context__t.html#a03b59fa0caa8560379884d6a664940dd":[10,2,0,28,55],
+"structcy__stc__capsense__internal__context__t.html#a03dd212f3b8b5e14fbc8f240697aed7d":[10,2,0,28,64],
+"structcy__stc__capsense__internal__context__t.html#a06abcbbede03f231b5adcc3a402fc47d":[10,2,0,28,89],
+"structcy__stc__capsense__internal__context__t.html#a0bb5e146f355a51b8bffced67bf1c4a8":[10,2,0,28,49],
+"structcy__stc__capsense__internal__context__t.html#a0c1d55db8fd5b06a7f94d7ce8fa74966":[10,2,0,28,28],
 "structcy__stc__capsense__internal__context__t.html#a0c52ee091e3084c807b1a5c9e5d8c6ce":[10,2,0,28,87],
 "structcy__stc__capsense__internal__context__t.html#a0d92e183f57ac38c05b30dc98f819d6a":[10,2,0,28,92],
 "structcy__stc__capsense__internal__context__t.html#a1042ee9d26a41ca6f44e82c64dbac146":[10,2,0,28,68],
@@ -242,12 +249,5 @@ var NAVTREEINDEX4 =
 "structcy__stc__capsense__widget__config__t.html#a6136eead3f476c9c0d1d3fa1dfd8c189":[10,2,0,20,18],
 "structcy__stc__capsense__widget__config__t.html#a6224ab7605e28404d786633b2c1c1f6b":[10,2,0,20,11],
 "structcy__stc__capsense__widget__config__t.html#a6592a3b822fe251c28fd54ddc75d11b9":[10,2,0,20,32],
-"structcy__stc__capsense__widget__config__t.html#a65cd4657db96f3711a88345be6527353":[10,2,0,20,28],
-"structcy__stc__capsense__widget__config__t.html#a67d55b8afd94b5ff3de3587a4241c628":[10,2,0,20,30],
-"structcy__stc__capsense__widget__config__t.html#a78fb9e1d1b8c8cdad2d4257f5881ddc2":[10,2,0,20,41],
-"structcy__stc__capsense__widget__config__t.html#a7d45ff7ce8f45fd9a26fac8ae98ec60f":[10,2,0,20,50],
-"structcy__stc__capsense__widget__config__t.html#a872610c19b274d4daa48c9d29990f7cc":[10,2,0,20,4],
-"structcy__stc__capsense__widget__config__t.html#a87a81dc03b7e5a64d58ed7286765bd63":[10,2,0,20,38],
-"structcy__stc__capsense__widget__config__t.html#a88a5166ff86cf001344434b0bb84d799":[10,2,0,20,2],
-"structcy__stc__capsense__widget__config__t.html#a8cbf228dd4ae8a901c911c162c70b30a":[10,2,0,20,6]
+"structcy__stc__capsense__widget__config__t.html#a65cd4657db96f3711a88345be6527353":[10,2,0,20,28]
 };

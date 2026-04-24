@@ -1,17 +1,39 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.c
-* \version 9.0.0
+* \version 9.10.0
 *
 * \brief
 * This file provides the source code for the Tuner module functions.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
-* or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+ * (c) 2018-2026, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 
@@ -20,6 +42,11 @@
 #include "cy_capsense_structure.h"
 #include "cy_capsense_tuner.h"
 #include "cy_capsense_control.h"
+#if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+    #include "cy_capsense_sensing_lp.h"
+    #include "cy_capsense_selftest_lp.h"
+    #include "cy_capsense_generator_lp.h"
+#endif
 #include "cy_capsense_common.h"
 
 #if (defined(CY_IP_MXCSDV2) || defined(CY_IP_M0S8CSDV2) || defined(CY_IP_M0S8MSCV3) || defined(CY_IP_M0S8MSCV3LP))
@@ -197,12 +224,12 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
     cy_capsense_tuner_receive_callback_t receiveCallback = context->ptrInternalContext->ptrTunerReceiveCallback;
 
     #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+        uint32_t widgetId;
         uint32_t sendDataFlag = 1u;
     #endif
 
     #if (CY_CAPSENSE_ENABLE == CY_CAPSENSE_LIQUID_LEVEL_FOAM_REJECTION_EN)
         const cy_stc_capsense_widget_config_t * ptrWdCfg;
-        uint32_t widgetId;
         uint16_t duty_cycle = 0u;
     #endif
 
@@ -346,6 +373,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
                         #endif
 
                         cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
+                        duty_cycle = 0u;
                         if (2u == cmdSize)
                         {
                             duty_cycle = (((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_DATA_0_IDX + 2u]) << 8u) |
@@ -367,6 +395,52 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
                         }
                     }
                     break;
+            #endif
+
+            #if (CY_CAPSENSE_PLATFORM_BLOCK_FIFTH_GEN_LP)
+                #if (CY_CAPSENSE_DISABLE != CY_CAPSENSE_CALIBRATION_EN)
+                    case (uint16_t)CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E:
+                        widgetId = (uint32_t)context->ptrCommonContext->misc & CY_CAPSENSE_WD_MAX_NUMBER_MASK;
+                        if (CY_CAPSENSE_TOTAL_WIDGET_COUNT > widgetId)
+                        {
+                            (void)Cy_CapSense_CalibrateWidget_V3Lp(widgetId, context);
+                            updateFlag = 1u;
+                        }
+                        break;
+                #endif
+
+                case (uint16_t)CY_CAPSENSE_TU_CMD_SCAN_WIDGET_BLOCKING_E:
+                    widgetId = (uint32_t)context->ptrCommonContext->misc & CY_CAPSENSE_WD_MAX_NUMBER_MASK;
+                    if (CY_CAPSENSE_TOTAL_WIDGET_COUNT > widgetId)
+                    {
+                        (void)Cy_CapSense_ScanWidget_V3Lp(widgetId, context);
+                        (void)Cy_CapSense_WaitEndScan(1000000uL, context);  /* 1 sec timeout per widget */
+                        updateFlag = 1u;
+                    }
+                    break;
+
+                #if ((CY_CAPSENSE_ENABLE == CY_CAPSENSE_BIST_EN) &&\
+                    (CY_CAPSENSE_ENABLE == CY_CAPSENSE_TST_WDGT_CRC_EN))
+                    case (uint16_t)CY_CAPSENSE_TU_CMD_BIST_UPDATE_WIDGET_CRC_E:
+                        widgetId = (uint32_t)context->ptrCommonContext->misc & CY_CAPSENSE_WD_MAX_NUMBER_MASK;
+                        if (CY_CAPSENSE_TOTAL_WIDGET_COUNT > widgetId)
+                        {
+                            /* Update CRC if BIST is enabled */
+                            Cy_CapSense_UpdateCrcWidget(widgetId, context);
+                            updateFlag = 1u;
+                        }
+                        break;
+                #endif
+
+                case (uint16_t)CY_CAPSENSE_TU_CMD_APPLY_CDACS_WIDGET_E:
+                    widgetId = (uint32_t)context->ptrCommonContext->misc & CY_CAPSENSE_WD_MAX_NUMBER_MASK;
+                    if (CY_CAPSENSE_TOTAL_WIDGET_COUNT > widgetId)
+                    {
+                        Cy_CapSense_ApplyWidgetCdacParam(widgetId, context);
+                        updateFlag = 1u;
+                    }
+                    break;
+
             #endif
 
             default:

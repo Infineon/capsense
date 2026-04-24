@@ -1,7 +1,7 @@
 # CAPSENSE™ Middleware Library
 
 ### Overview
-CAPSENSE™ is Cypress capacitive sensing solution from Infineon Technologies AG. Capacitive sensing can be used in a variety of applications and products where 
+CAPSENSE™ is a capacitive sensing solution from Infineon Technologies AG. Capacitive sensing can be used in a variety of applications and products where 
 conventional mechanical buttons can be replaced with sleek human interfaces to transform the way users interact with electronic systems. 
 These include home appliances, automotive, IoT, and industrial applications. CAPSENSE™ supports multiple interfaces (widgets) using the Self-Capacitance (CSD), 
 Mutual-Capacitance (CSX), and Inductive sensing (ISX) sensing methods with robust performance.
@@ -70,4 +70,4 @@ For more information, refer to:
   * [Infineon Technologies](https://www.infineon.com)
 
 ---
-Cypress Semiconductor Corporation, 2019-2025.
+Infineon Technologies AG, 2019-2026.

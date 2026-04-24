@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CAPSENSE™ Middleware Library 9.0.0: Enumerated Types</title>
+<title>CAPSENSE™ Middleware Library 9.10.0: Enumerated Types</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,9 +28,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFXCYP_one-line.png"/></a></td>
+  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="IFX.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CAPSENSE™ Middleware Library 9.0.0</div>
+   <div id="projectname">CAPSENSE™ Middleware Library 9.10.0</div>
   </td>
  </tr>
  </tbody>
@@ -126,7 +126,15 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6">CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E</a> = 11u, 
 <br />
-&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92">CY_CAPSENSE_TU_CMD_LAST_E</a> = 12u
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e720be467acae0ce8d7350f7626119">CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E</a> = 12u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a452ee19a2f87d533e83d4cd04b36bcc6">CY_CAPSENSE_TU_CMD_SCAN_WIDGET_BLOCKING_E</a> = 13u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a7ac8cdbd5d997a9368883113900046de">CY_CAPSENSE_TU_CMD_BIST_UPDATE_WIDGET_CRC_E</a> = 14u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a61cd083a46b162c6e41e4a91cb6ce2e8">CY_CAPSENSE_TU_CMD_APPLY_CDACS_WIDGET_E</a> = 15u, 
+<br />
+&#160;&#160;<a class="el" href="group__group__capsense__enums.html#gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92">CY_CAPSENSE_TU_CMD_LAST_E</a> = 16u
 <br />
  }<tr class="memdesc:ga049118d05a2bdf4f2d37d7b75c511f79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the Tuner command codes.  <a href="group__group__capsense__enums.html#ga049118d05a2bdf4f2d37d7b75c511f79">More...</a><br /></td></tr>
 </td></tr>
@@ -351,7 +359,15 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79af02b1aca22501e3df7e643bf4da8658c"></a>CY_CAPSENSE_TU_CMD_RESTART_ONLY_E&#160;</td><td class="fielddoc"><p>Restart command requests to perform CAPSENSE&trade; re-initialization and keeps state unchanged. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6"></a>CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E&#160;</td><td class="fielddoc"><p>Sets duty cycle and executes one scan (used only when foam-rejection is enabled for LLW) </p>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a8383832b22f044cd85d586780f8648b6"></a>CY_CAPSENSE_TU_CMD_SET_DUTY_CYCLE_AND_SCAN_E&#160;</td><td class="fielddoc"><p>Sets duty cycle and executes one scan (used for foam rejection LLW only) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a03e720be467acae0ce8d7350f7626119"></a>CY_CAPSENSE_TU_CMD_CALIBRATE_WIDGET_BLOCKING_E&#160;</td><td class="fielddoc"><p>Calibrates a desired widget. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a452ee19a2f87d533e83d4cd04b36bcc6"></a>CY_CAPSENSE_TU_CMD_SCAN_WIDGET_BLOCKING_E&#160;</td><td class="fielddoc"><p>Scans a desired widget and waits till scan complete. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a7ac8cdbd5d997a9368883113900046de"></a>CY_CAPSENSE_TU_CMD_BIST_UPDATE_WIDGET_CRC_E&#160;</td><td class="fielddoc"><p>Updates a desired widget CRC if built-in self-test is enabled. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a61cd083a46b162c6e41e4a91cb6ce2e8"></a>CY_CAPSENSE_TU_CMD_APPLY_CDACS_WIDGET_E&#160;</td><td class="fielddoc"><p>Takes CDAC values from data structure and applies them to sensor frame structure. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga049118d05a2bdf4f2d37d7b75c511f79a03e8d8e64fe3fa07ab8989744a636e92"></a>CY_CAPSENSE_TU_CMD_LAST_E&#160;</td><td class="fielddoc"><p>The last command. </p>
 </td></tr>
@@ -672,7 +688,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>CAPSENSE™ Middleware Library 9.0.0</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>CAPSENSE™ Middleware Library 9.10.0</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>
